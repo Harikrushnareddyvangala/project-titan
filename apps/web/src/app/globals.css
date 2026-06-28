@@ -147,3 +147,43 @@ img {
 
   border-radius: 999px;
 }
+
+/* -------------------------------- */
+/* Hero Grid                        */
+/* -------------------------------- */
+
+.hero-grid {
+  background-image:
+    linear-gradient(rgb(255 255 255 / 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(255 255 255 / 0.05) 1px, transparent 1px);
+
+  background-size: 48px 48px;
+
+  mask-image: radial-gradient(circle at center, black, transparent 85%);
+}
+
+/* -------------------------------- */
+/* Floating Animation               */
+/* -------------------------------- */
+
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-24px);
+  }
+
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+.animate-float {
+  animation: float 8s ease-in-out infinite;
+}
+
+.animate-float-delayed {
+  animation: float 10s ease-in-out infinite;
+}
