@@ -7,6 +7,7 @@ import {
 } from ".";
 
 import { HeroBackground } from "./HeroBackground";
+import { Container } from "@/components/layout/Container";
 
 export function Hero() {
   return (
@@ -17,7 +18,9 @@ export function Hero() {
       </div>
 
       {/* Content Layer */}
-      <div className="container relative z-10">
+      <Container className="relative z-10">
+  
+
         <HeroBadge />
 
         <HeroHeading />
@@ -27,7 +30,7 @@ export function Hero() {
         <HeroActions />
 
         <HeroStats />
-      </div>
+      </Container>
     </section>
   );
 }
