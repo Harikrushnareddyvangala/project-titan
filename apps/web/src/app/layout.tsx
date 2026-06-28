@@ -33,7 +33,7 @@ export default function RootLayout({
     >
       <body className={inter.variable}>
         <ThemeProvider>
-          { <Navbar /> }
+           <Navbar /> 
           {children}
         </ThemeProvider>
       </body>
