@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ArrowRight, Download } from "lucide-react";
 
-import { Button } from "@/components/ui/Button/Button";
+import { Button } from "@/components/ui/Button";
 
 export function HeroActions() {
   return (
