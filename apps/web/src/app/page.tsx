@@ -8,7 +8,7 @@ import {
   CardTitle,
   Button,
 } from "@/components/ui";
-
+import { Badge } from "@/components/ui";
 export default function HomePage() {
   return (
     <main className="min-h-screen bg-[var(--background)] text-[var(--foreground)]">
@@ -34,6 +34,26 @@ export default function HomePage() {
             <Button>Explore</Button>
           </CardFooter>
         </Card>
+
+        <div className="mt-10 flex flex-wrap gap-3">
+  <Badge>Python</Badge>
+
+  <Badge variant="success">
+    Machine Learning
+  </Badge>
+
+  <Badge variant="warning">
+    Power BI
+  </Badge>
+
+  <Badge variant="outline">
+    Docker
+  </Badge>
+
+  <Badge variant="destructive">
+    Deprecated
+  </Badge>
+</div>
       </section>
     </main>
   );
