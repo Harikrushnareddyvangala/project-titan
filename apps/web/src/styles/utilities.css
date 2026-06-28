@@ -1,0 +1,27 @@
+.hero-grid {
+
+  background-image:
+    linear-gradient(rgb(255 255 255 / 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(255 255 255 / 0.04) 1px, transparent 1px);
+
+  background-size: 48px 48px;
+
+  mask-image:
+    radial-gradient(circle, black 40%, transparent 95%);
+}
+
+.glass-card {
+
+  background:
+    var(--glass-bg);
+
+  border:
+    1px solid var(--glass-border);
+
+  backdrop-filter:
+    blur(18px);
+
+  border-radius:
+    var(--radius);
+
+}

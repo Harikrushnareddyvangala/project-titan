@@ -10,10 +10,14 @@ import { HeroBackground } from "./HeroBackground";
 
 export function Hero() {
   return (
-    <section className="relative overflow-hidden py-28">
-      <HeroBackground />
+    <section className="relative isolate overflow-hidden py-28">
+      {/* Background Layer */}
+      <div className="absolute inset-0">
+        <HeroBackground />
+      </div>
 
-      <div className="container relative">
+      {/* Content Layer */}
+      <div className="container relative z-10">
         <HeroBadge />
 
         <HeroHeading />
