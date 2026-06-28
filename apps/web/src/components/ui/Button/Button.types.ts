@@ -1,18 +1,11 @@
-import { ButtonHTMLAttributes } from "react";
+import type { VariantProps } from "class-variance-authority";
+import type { ButtonHTMLAttributes } from "react";
 
-export type ButtonVariant =
-  | "primary"
-  | "secondary"
-  | "outline";
-
-export type ButtonSize =
-  | "sm"
-  | "md"
-  | "lg";
+import { buttonVariants } from "./Button.styles";
 
 export interface ButtonProps
-  extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: ButtonVariant;
-  size?: ButtonSize;
+  extends ButtonHTMLAttributes<HTMLButtonElement>,
+    VariantProps<typeof buttonVariants> {
+  asChild?: boolean;
   loading?: boolean;
 }
