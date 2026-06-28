@@ -1,4 +1,5 @@
 import "./globals.css";
+import { Navbar } from "@/components/layout/Navbar";
 
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
@@ -88,10 +89,9 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className={inter.variable}>
-        <ThemeProvider>
-
-          {children}
-
+         <ThemeProvider>
+            <Navbar />
+              {children}
         </ThemeProvider>
       </body>
     </html>
