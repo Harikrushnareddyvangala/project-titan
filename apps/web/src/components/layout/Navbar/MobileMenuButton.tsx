@@ -1,23 +1,42 @@
 "use client";
 
+import * as React from "react";
+
 import { Menu, X } from "lucide-react";
 
-interface MobileMenuButtonProps {
+import { cn } from "@/lib/utils";
+
+export interface MobileMenuButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   open: boolean;
-  onClick: () => void;
 }
 
-export function MobileMenuButton({
-  open,
-  onClick,
-}: MobileMenuButtonProps) {
+export const MobileMenuButton = React.forwardRef<
+  HTMLButtonElement,
+  MobileMenuButtonProps
+>(function MobileMenuButton(
+  {
+    open,
+    className,
+    ...props
+  },
+  ref,
+) {
   return (
     <button
+      ref={ref}
       type="button"
-      onClick={onClick}
-      aria-label={open ? "Close navigation menu" : "Open navigation menu"}
       aria-expanded={open}
-      className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/5 transition-colors hover:bg-white/10 lg:hidden"
+      aria-label={
+        open
+          ? "Close navigation menu"
+          : "Open navigation menu"
+      }
+      className={cn(
+        "inline-flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 lg:hidden",
+        className,
+      )}
+      {...props}
     >
       {open ? (
         <X className="h-5 w-5" />
@@ -26,4 +45,7 @@ export function MobileMenuButton({
       )}
     </button>
   );
-}
+});
+
+MobileMenuButton.displayName =
+  "MobileMenuButton";

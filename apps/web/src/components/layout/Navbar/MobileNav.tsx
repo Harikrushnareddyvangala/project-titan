@@ -17,12 +17,8 @@ export function MobileNav() {
   return (
     <Dialog.Root open={open} onOpenChange={setOpen}>
       <Dialog.Trigger asChild>
-        <MobileMenuButton
-          open={open}
-          onClick={() => setOpen((value) => !value)}
-        />
-      </Dialog.Trigger>
-
+  <MobileMenuButton open={open} />
+</Dialog.Trigger>
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden" />
 

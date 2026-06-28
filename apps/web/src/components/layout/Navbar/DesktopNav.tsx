@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { motion } from "framer-motion";
 
 import { navigation } from "./navigation";
 
@@ -23,22 +24,25 @@ export function DesktopNav() {
             key={item.href}
             href={item.href}
             className={cn(
-              "relative text-sm font-medium transition-colors duration-200",
+              "relative py-2 text-sm font-medium transition-colors duration-200",
               active
                 ? "text-white"
-                : "text-zinc-400 hover:text-white",
+                : "text-zinc-400 hover:text-white"
             )}
           >
             {item.label}
 
-            <span
-              className={cn(
-                "absolute -bottom-2 left-0 h-0.5 w-full origin-left rounded-full bg-blue-500 transition-transform duration-300",
-                active
-                  ? "scale-x-100"
-                  : "scale-x-0",
-              )}
-            />
+            {active && (
+              <motion.span
+                layoutId="navbar-indicator"
+                transition={{
+                  type: "spring",
+                  stiffness: 380,
+                  damping: 30,
+                }}
+                className="absolute inset-x-0 -bottom-1 h-0.5 rounded-full bg-gradient-to-r from-blue-500 via-cyan-400 to-blue-500 shadow-[0_0_12px_rgba(59,130,246,0.7)]"
+            
+            />  )}
           </Link>
         );
       })}
