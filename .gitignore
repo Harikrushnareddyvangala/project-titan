@@ -1,0 +1,30 @@
+# Node
+node_modules
+.pnpm-store
+
+# Build
+.next
+dist
+coverage
+
+# Environment
+.env
+.env.local
+.env.*
+
+# Python
+.venv
+__pycache__
+*.pyc
+.pytest_cache
+
+# IDE
+.vscode/settings.json
+.idea
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
