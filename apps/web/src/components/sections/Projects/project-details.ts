@@ -1,3 +1,8 @@
+export interface ProjectMetric {
+  label: string;
+  value: string;
+}
+
 export interface ProjectDetail {
   title: string;
 
@@ -11,10 +16,13 @@ export interface ProjectDetail {
 
   architecture: string[];
 
-  metrics: {
-    label: string;
-    value: string;
-  }[];
+  technologies: string[];
+
+  metrics: ProjectMetric[];
 
   screenshots: string[];
+
+  github: string;
+
+  live: string;
 }
