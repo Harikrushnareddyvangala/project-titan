@@ -1,20 +1,46 @@
-export const careerTimeline = [
+import type { Experience } from "./types";
+
+export const careerTimeline: Experience[] = [
   {
     year: "2022",
-    title: "Junior Data Analyst",
+    role: "Data Analyst",
+    company: "Marketing Analytics",
     description:
-      "Started working with data pipelines, ETL processes, and business dashboards.",
-  },
-  {
-    year: "2023",
-    title: "Data Analyst",
-    description:
-      "Built predictive models, performed feature engineering, and improved ML workflows.",
+      "Analyzed large datasets, developed ETL pipelines, improved data quality, and increased user engagement through A/B testing.",
+    technologies: [
+      "SQL",
+      "Power BI",
+      "ETL",
+      "Excel",
+      "Python",
+    ],
   },
   {
     year: "2024",
-    title: "Data Scientist",
+    role: "Data Scientist",
+    company: "AI & Predictive Analytics",
     description:
-      "Focused on LLMs, automation systems, and production-grade AI pipelines.",
+      "Built predictive machine learning models, improved data collection, and researched advanced analytics solutions.",
+    technologies: [
+      "Python",
+      "Scikit-learn",
+      "Pandas",
+      "Machine Learning",
+      "Statistics",
+    ],
+  },
+  {
+    year: "2026",
+    role: "AI Engineer",
+    company: "Project TITAN",
+    description:
+      "Developing enterprise-grade AI applications using LLMs, RAG pipelines, Next.js, and cloud-native architectures.",
+    technologies: [
+      "OpenAI",
+      "RAG",
+      "Next.js",
+      "TypeScript",
+      "Vector DB",
+    ],
   },
 ];
