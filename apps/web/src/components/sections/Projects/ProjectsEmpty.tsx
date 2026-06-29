@@ -19,12 +19,13 @@ export function ProjectsEmpty({
         No projects found
       </h3>
 
-      <p className="mt-3 max-w-md text-zinc-400">
-        We couldn&apos;t find any projects matching{" "}
-        <span className="font-medium text-cyan-400">
-          &quot;{search}&quot;
-        </span>.
-        Try another keyword or select a different category.
+      <p className="mt-4 max-w-md text-zinc-400">
+        No project matches{" "}
+        <span className="font-semibold text-cyan-400">
+          &ldquo;{search}&rdquo;
+        </span>
+        . Try another keyword or choose a different
+        category.
       </p>
     </div>
   );

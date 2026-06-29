@@ -18,10 +18,10 @@ export function ProjectSearch({
 
         <input
           type="text"
-          placeholder="Search projects, technologies..."
+          placeholder="Search projects..."
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="w-full rounded-2xl border border-white/10 bg-white/5 py-4 pl-12 pr-4 text-white backdrop-blur-xl outline-none transition focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20"
+          className="w-full rounded-2xl border border-white/10 bg-white/5 py-4 pl-12 pr-4 text-white placeholder:text-zinc-500 backdrop-blur-xl outline-none transition-all duration-300 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20"
         />
       </div>
     </div>

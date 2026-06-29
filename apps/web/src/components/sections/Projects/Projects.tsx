@@ -6,9 +6,9 @@ import { ProjectFilter } from "./ProjectFilter";
 import { ProjectSearch } from "./ProjectSearch";
 import { ProjectsGrid } from "./ProjectsGrid";
 import { ProjectsHeader } from "./ProjectsHeader";
+import { ProjectsEmpty } from "./ProjectsEmpty";
 import { projects } from "./data";
 import type { ProjectCategory } from "./types";
-import { ProjectsEmpty } from "./ProjectsEmpty";
 
 export function Projects() {
   const [selectedCategory, setSelectedCategory] =
@@ -17,22 +17,23 @@ export function Projects() {
   const [search, setSearch] = useState("");
 
   const filteredProjects = useMemo(() => {
+    const query = search.trim().toLowerCase();
+
     return projects.filter((project) => {
       const matchesCategory =
         selectedCategory === "All" ||
         project.categories.includes(selectedCategory);
 
-      const query = search.toLowerCase();
-
       const matchesSearch =
-  project.title.toLowerCase().includes(query) ||
-  project.description.toLowerCase().includes(query) ||
-  project.categories.some((category) =>
-    category.toLowerCase().includes(query),
-  ) ||
-  project.technologies.some((tech) =>
-    tech.toLowerCase().includes(query),
-  );
+        query === "" ||
+        project.title.toLowerCase().includes(query) ||
+        project.description.toLowerCase().includes(query) ||
+        project.categories.some((category) =>
+          category.toLowerCase().includes(query),
+        ) ||
+        project.technologies.some((tech) =>
+          tech.toLowerCase().includes(query),
+        );
 
       return (
         project.featured &&
@@ -61,14 +62,14 @@ export function Projects() {
         />
 
         {filteredProjects.length > 0 ? (
-  <ProjectsGrid
-    projects={filteredProjects}
-  />
-) : (
-  <ProjectsEmpty
-    search={search}
-  />
-)}
+          <ProjectsGrid
+            projects={filteredProjects}
+          />
+        ) : (
+          <ProjectsEmpty
+            search={search}
+          />
+        )}
       </div>
     </section>
   );

@@ -15,38 +15,24 @@ export function ProjectFilter({
   onSelect,
 }: ProjectFilterProps) {
   return (
-    <div className="mt-12 flex flex-wrap justify-center gap-3">
+    <div className="mt-14 flex flex-wrap justify-center gap-3">
       {projectCategories.map((category) => {
         const active = selected === category;
 
         return (
-          <button
+          <motion.button
             key={category}
+            whileTap={{ scale: 0.95 }}
+            whileHover={{ scale: 1.05 }}
             onClick={() => onSelect(category)}
-            className="relative overflow-hidden rounded-full"
+            className={`rounded-full border px-5 py-2 text-sm font-medium transition-all duration-300 ${
+              active
+                ? "border-cyan-500 bg-cyan-500 text-white shadow-lg shadow-cyan-500/20"
+                : "border-white/10 bg-white/5 text-zinc-400 hover:border-cyan-500 hover:text-white"
+            }`}
           >
-            {active && (
-              <motion.div
-                layoutId="project-filter"
-                transition={{
-                  type: "spring",
-                  stiffness: 380,
-                  damping: 30,
-                }}
-                className="absolute inset-0 rounded-full bg-gradient-to-r from-cyan-500 to-blue-500"
-              />
-            )}
-
-            <span
-              className={`relative z-10 block rounded-full px-5 py-2 text-sm font-medium transition-colors ${
-                active
-                  ? "text-white"
-                  : "bg-white/5 text-zinc-400 hover:bg-white/10 hover:text-white"
-              }`}
-            >
-              {category}
-            </span>
-          </button>
+            {category}
+          </motion.button>
         );
       })}
     </div>
