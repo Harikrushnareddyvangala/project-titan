@@ -24,7 +24,7 @@ export function AboutSkills() {
           key={group}
           className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-xl"
         >
-          <h3 className="text-white font-semibold mb-3">
+          <h3 className="mb-4 text-lg font-semibold text-white">
             {group}
           </h3>
 
@@ -32,7 +32,20 @@ export function AboutSkills() {
             {items.map((skill) => (
               <span
                 key={skill}
-                className="rounded-lg bg-white/10 px-3 py-1 text-xs text-zinc-300"
+                className="
+                  rounded-full
+                  border
+                  border-cyan-500/20
+                  bg-cyan-500/10
+                  px-3
+                  py-1
+                  text-xs
+                  font-medium
+                  text-cyan-300
+                  transition
+                  hover:border-cyan-400
+                  hover:bg-cyan-500/20
+                "
               >
                 {skill}
               </span>
