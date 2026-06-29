@@ -3,9 +3,14 @@ import type { Project } from "./types";
 export const projects: Project[] = [
   {
     title: "Fraud Detection System",
-    category: "Machine Learning",
+    categories: [
+      "Machine Learning",
+      "Analytics",
+      "AI",
+      "Data Science",
+    ],
     description:
-      "Built a fraud detection pipeline using ensemble learning and feature engineering for financial transactions.",
+      "Built a fraud detection pipeline using ensemble learning, feature engineering, XGBoost, SHAP explainability, and financial transaction analytics.",
     technologies: [
       "Python",
       "Pandas",
@@ -18,11 +23,17 @@ export const projects: Project[] = [
     live: "#",
     featured: true,
   },
+
   {
     title: "Customer Churn Prediction",
-    category: "Predictive Analytics",
+    categories: [
+      "Machine Learning",
+      "Analytics",
+      "Business Intelligence",
+      "Data Science",
+    ],
     description:
-      "Developed a churn prediction model with extensive feature engineering and model evaluation.",
+      "Developed a predictive analytics model for customer churn using feature engineering, model evaluation, and interactive Power BI dashboards.",
     technologies: [
       "Python",
       "Scikit-learn",
@@ -33,11 +44,16 @@ export const projects: Project[] = [
     live: "#",
     featured: true,
   },
+
   {
     title: "Project TITAN",
-    category: "Generative AI",
+    categories: [
+      "AI",
+      "Web",
+      "Visualization",
+    ],
     description:
-      "Enterprise AI portfolio built with Next.js, TypeScript, RAG architecture and modern UI.",
+      "Enterprise AI portfolio built with Next.js, TypeScript, RAG architecture, OpenAI integration, and modern interactive UI.",
     technologies: [
       "Next.js",
       "TypeScript",

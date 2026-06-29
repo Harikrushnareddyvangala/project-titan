@@ -52,9 +52,16 @@ export function ProjectCard({
       {/* Content */}
       <div className="p-8">
         {/* Category */}
-        <span className="inline-flex rounded-full border border-cyan-500/20 bg-cyan-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-cyan-300">
-          {project.category}
-        </span>
+        <div className="flex flex-wrap gap-2">
+  {project.categories.map((category) => (
+    <span
+      key={category}
+      className="rounded-full border border-cyan-500/20 bg-cyan-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-cyan-300"
+    >
+      {category}
+    </span>
+  ))}
+</div>
 
         {/* Title */}
         <h3 className="mt-6 text-2xl font-bold text-white transition-colors group-hover:text-cyan-300">
