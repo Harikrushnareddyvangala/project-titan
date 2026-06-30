@@ -71,6 +71,7 @@ export const projectDetails: Record<
     github: "#",
 
     live: "#",
+    githubRepo: "fraud-detection-system",
   },
 
   "Customer Churn Prediction": {
@@ -126,6 +127,7 @@ export const projectDetails: Record<
     github: "#",
 
     live: "#",
+    githubRepo: "customer-churn-prediction",
   },
 
   "Project TITAN": {
@@ -181,5 +183,6 @@ export const projectDetails: Record<
     github: "#",
 
     live: "#",
+    githubRepo: "project-titan",
   },
 };

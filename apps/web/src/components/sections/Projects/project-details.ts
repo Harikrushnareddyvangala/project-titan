@@ -12,6 +12,22 @@ export interface ProjectDetail {
 
   solution: string;
 
+  role?: string;
+
+  duration?: string;
+
+  team?: string;
+
+  status?: string;
+
+  type?: string;
+
+  date?: string;
+
+  featured?: boolean;
+
+  impact?: string;
+
   features: string[];
 
   architecture: string[];
@@ -23,6 +39,8 @@ export interface ProjectDetail {
   screenshots: string[];
 
   github: string;
+
+  githubRepo: string;
 
   live: string;
 }
