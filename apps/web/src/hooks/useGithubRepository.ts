@@ -2,66 +2,112 @@
 
 import { useEffect, useState } from "react";
 
-interface Repository {
-  stargazers_count: number;
-  forks_count: number;
-  watchers_count: number;
-  open_issues_count: number;
+import type {
+  GithubLanguages,
+  GithubRepository,
+} from "@/types/github";
 
-  language: string;
+interface GithubRepositoryResult {
+  repository: GithubRepository | null;
 
-  size: number;
+  languages: GithubLanguages;
 
-  updated_at: string;
+  loading: boolean;
 
-  default_branch: string;
-
-  visibility: string;
-
-  license: {
-    name: string;
-  } | null;
-
-  topics: string[];
+  error: string | null;
 }
 
 export function useGithubRepository(
   repo: string,
-) {
-  const [data, setData] =
-    useState<Repository | null>(null);
+): GithubRepositoryResult {
+  const [
+    repository,
+    setRepository,
+  ] =
+    useState<GithubRepository | null>(
+      null,
+    );
 
-  const [loading, setLoading] =
-    useState(true);
-const [error ] = useState(false);
+  const [
+    languages,
+    setLanguages,
+  ] =
+    useState<GithubLanguages>({});
+
+  const [
+    loading,
+    setLoading,
+  ] = useState(true);
+
+  const [
+    error,
+    setError,
+  ] =
+    useState<string | null>(null);
 
   useEffect(() => {
-    async function load() {
+    if (!repo) return;
+
+    async function fetchRepository() {
       try {
-        const response = await fetch(
-          `https://api.github.com/repos/Harikrushnareddyvangala/${repo}`,
-          {
-    headers: {
-      Accept: "application/vnd.github+json",
-    },
-  },
+        setLoading(true);
+
+        setError(null);
+
+        const baseUrl =
+          `https://api.github.com/repos/${repo}`;
+
+        const [
+          repositoryResponse,
+          languagesResponse,
+        ] = await Promise.all([
+          fetch(baseUrl),
+
+          fetch(
+            `${baseUrl}/languages`,
+          ),
+        ]);
+
+        if (!repositoryResponse.ok) {
+          throw new Error(
+            "Unable to fetch repository.",
+          );
+        }
+
+        const repositoryData =
+          (await repositoryResponse.json()) as GithubRepository;
+
+        const languagesData =
+          (await languagesResponse.json()) as GithubLanguages;
+
+        setRepository(
+          repositoryData,
         );
 
-        const json =
-          await response.json();
-
-        setData(json);
+        setLanguages(
+          languagesData,
+        );
+      } catch (err) {
+        setError(
+          err instanceof Error
+            ? err.message
+            : "Unknown error",
+        );
       } finally {
         setLoading(false);
       }
     }
 
-    load();
+    fetchRepository();
   }, [repo]);
 
   return {
-    data,
+    repository,
+
+    languages,
+
     loading,
+
     error,
   };
 }

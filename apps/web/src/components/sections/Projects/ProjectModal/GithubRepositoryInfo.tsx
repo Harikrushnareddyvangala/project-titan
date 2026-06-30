@@ -1,91 +1,99 @@
 "use client";
 
 import {
-  Calendar,
-  GitBranch,
+  CalendarDays,
+  Code2,
+  FolderGit2,
   Globe,
-  Shield,
-  Tag,
-  AlertCircle,
+  ShieldCheck,
 } from "lucide-react";
 
-import { useGithubRepository } from "@/hooks/useGithubRepository";
+import type { ReactNode } from "react";
 
-interface Props {
-  repo: string;
+import type { GithubRepository } from "@/types/github";
+
+interface GithubRepositoryInfoProps {
+  repository: GithubRepository | null;
 }
 
 export function GithubRepositoryInfo({
-  repo,
-}: Props) {
-  const {
-    data,
-    loading,
-  } = useGithubRepository(repo);
-
-  if (loading || !data)
+  repository,
+}: GithubRepositoryInfoProps) {
+  if (!repository) {
     return null;
+  }
 
   return (
-    <div className="rounded-3xl border border-white/10 bg-white/5 p-8 backdrop-blur-xl">
-
+    <section className="rounded-3xl border border-white/10 bg-white/5 p-8">
       <h3 className="mb-8 text-2xl font-bold text-white">
-        Repository Details
+        Repository Information
       </h3>
 
       <div className="grid gap-6 md:grid-cols-2">
-
-        <Info
-          icon={<Globe />}
-          title="Visibility"
-          value={data.visibility}
-        />
-
-        <Info
-          icon={<GitBranch />}
-          title="Default Branch"
-          value={data.default_branch}
-        />
-
-        <Info
-          icon={<Calendar />}
-          title="Last Updated"
-          value={new Date(
-            data.updated_at,
-          ).toLocaleDateString()}
-        />
-
-        <Info
-          icon={<AlertCircle />}
-          title="Open Issues"
-          value={data.open_issues_count}
-        />
-
-        <Info
-          icon={<Shield />}
-          title="License"
+        <InfoCard
+          icon={<Code2 className="h-5 w-5" />}
+          label="Primary Language"
           value={
-            data.license?.name ??
-            "No License"
+            repository.language ??
+            "Not specified"
           }
         />
 
-        <Info
-          icon={<Tag />}
-          title="Primary Language"
-          value={data.language}
+        <InfoCard
+          icon={<FolderGit2 className="h-5 w-5" />}
+          label="Default Branch"
+          value={repository.default_branch}
         />
 
+        <InfoCard
+          icon={<Globe className="h-5 w-5" />}
+          label="Visibility"
+          value={repository.visibility}
+        />
+
+        <InfoCard
+          icon={<ShieldCheck className="h-5 w-5" />}
+          label="Open Issues"
+          value={repository.open_issues_count.toString()}
+        />
+
+        <InfoCard
+          icon={<CalendarDays className="h-5 w-5" />}
+          label="Last Updated"
+          value={new Date(
+            repository.updated_at,
+          ).toLocaleDateString()}
+        />
+
+        <InfoCard
+          icon={<CalendarDays className="h-5 w-5" />}
+          label="Last Push"
+          value={new Date(
+            repository.pushed_at,
+          ).toLocaleDateString()}
+        />
       </div>
 
-      {data.topics.length > 0 && (
-        <>
-          <h4 className="mt-10 mb-4 font-semibold text-white">
+      {repository.description && (
+        <div className="mt-10">
+          <h4 className="mb-3 text-lg font-semibold text-cyan-400">
+            Description
+          </h4>
+
+          <p className="leading-8 text-zinc-300">
+            {repository.description}
+          </p>
+        </div>
+      )}
+
+      {repository.topics?.length ? (
+        <div className="mt-10">
+          <h4 className="mb-3 text-lg font-semibold text-cyan-400">
             Topics
           </h4>
 
           <div className="flex flex-wrap gap-3">
-            {data.topics.map((topic) => (
+            {repository.topics.map((topic) => (
               <span
                 key={topic}
                 className="
@@ -103,38 +111,49 @@ export function GithubRepositoryInfo({
               </span>
             ))}
           </div>
-        </>
-      )}
-    </div>
+        </div>
+      ) : null}
+    </section>
   );
 }
 
-function Info({
-  icon,
-  title,
-  value,
-}: {
-  icon: React.ReactNode;
-  title: string;
-  value: React.ReactNode;
-}) {
-  return (
-    <div className="flex items-start gap-4">
+interface InfoCardProps {
+  icon: ReactNode;
+  label: string;
+  value: string;
+}
 
+function InfoCard({
+  icon,
+  label,
+  value,
+}: InfoCardProps) {
+  return (
+    <div
+      className="
+        flex
+        items-start
+        gap-4
+        rounded-2xl
+        border
+        border-white/10
+        bg-black/20
+        p-5
+      "
+    >
       <div className="text-cyan-400">
         {icon}
       </div>
 
       <div>
-        <div className="text-sm text-zinc-400">
-          {title}
-        </div>
+        <p className="text-sm text-zinc-400">
+          {label}
+        </p>
 
-        <div className="font-semibold text-white">
+        <p className="mt-1 font-medium text-white">
           {value}
-        </div>
+        </p>
       </div>
-
     </div>
   );
 }

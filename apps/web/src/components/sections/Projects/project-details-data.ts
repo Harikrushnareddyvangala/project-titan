@@ -68,10 +68,10 @@ export const projectDetails: Record<
   "/projects/fraud-model.jpg",
     ],
 
-    github: "#",
+    github: "https://github.com/Harikrushnareddyvangala/fraud-detection-system",
 
     live: "#",
-    githubRepo: "fraud-detection-system",
+    githubRepo: "Harikrushnareddyvangala/fraud-detection-system",
   },
 
   "Customer Churn Prediction": {
@@ -124,10 +124,10 @@ export const projectDetails: Record<
   "/projects/churn-report.jpg",
     ],
 
-    github: "#",
+    github: "https://github.com/Harikrushnareddyvangala/customer-churn-prediction",
 
     live: "#",
-    githubRepo: "customer-churn-prediction",
+    githubRepo: "Harikrushnareddyvangala/customer-churn-prediction",
   },
 
   "Project TITAN": {
@@ -180,9 +180,9 @@ export const projectDetails: Record<
   "/projects/project-mobile.jpg",
     ],
 
-    github: "#",
+    github: "https://github.com/Harikrushnareddyvangala/project-titan",
 
     live: "#",
-    githubRepo: "project-titan",
+    githubRepo: "Harikrushnareddyvangala/project-titan",
   },
 };

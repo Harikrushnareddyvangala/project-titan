@@ -1,8 +1,5 @@
 "use client";
 
-import { useEffect } from "react";
-
-
 import {
   AnimatePresence,
   motion,
@@ -14,8 +11,9 @@ import { ProjectContent } from "./ProjectContent";
 import { projectDetails } from "../project-details-data";
 import { ProjectActions } from "./ProjectActions";
 import { ProjectHero } from "./ProjectHero";
-import { GithubStats } from "../GithubStats";
-import { GithubRepositoryInfo } from "./GithubRepositoryInfo";
+import { useGithubRepository } from "@/hooks/useGithubRepository";
+
+import { GithubAnalyticsSection } from "./GithubAnalyticsSection";
 
 interface ProjectModalProps {
   open: boolean;
@@ -29,45 +27,19 @@ export function ProjectModal({
   onClose,
 }: ProjectModalProps) {
   const project =
-    title ? projectDetails[title] : null;
+  title ? projectDetails[title] : null;
 
-  useEffect(() => {
-    if (!open) return;
+const {
+  repository,
+  languages,
+  loading,
+} = useGithubRepository(
+  project?.githubRepo ?? "",
+);
 
-    document.body.style.overflow = "hidden";
-
-    return () => {
-      document.body.style.overflow = "auto";
-    };
-  }, [open]);
-
-  useEffect(() => {
-    if (!open) return;
-
-    const handleKeyDown = (
-      event: KeyboardEvent,
-    ) => {
-      if (event.key === "Escape") {
-        onClose();
-      }
-    };
-
-    window.addEventListener(
-      "keydown",
-      handleKeyDown,
-    );
-
-    return () => {
-      window.removeEventListener(
-        "keydown",
-        handleKeyDown,
-      );
-    };
-  }, [open, onClose]);
-
-  if (!project) {
-    return null;
-  }
+if (!project) {
+  return null;
+}
 
   return (
     <AnimatePresence>
@@ -143,12 +115,8 @@ export function ProjectModal({
   summary={project.summary}
   image={project.screenshots[0]}
 />
-<GithubStats
-    repo={project.githubRepo}
-/>
-<GithubRepositoryInfo
-    repo={project.githubRepo}
-/>
+
+
 <div className="mx-10 border-t border-white/10" />
 <ProjectContent
   challenge={project.challenge}
@@ -160,7 +128,15 @@ export function ProjectModal({
   screenshots={project.screenshots}
 />
 
-<div className="px-10 pb-10 pt-2">
+<div className="px-10 pt-2">
+  <GithubAnalyticsSection
+    repository={repository}
+    languages={languages}
+    loading={loading}
+  />
+</div>
+
+<div className="px-10 pb-10 pt-8">
   <ProjectActions
     title={project.title}
     github={project.github}
