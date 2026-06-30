@@ -1,47 +1,30 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { ProjectSort } from "./ProjectSort";
+import { useProjectFilters } from "./useProjectFilters";
 
-import { ProjectFilter } from "./ProjectFilter";
+import { ProjectFilters } from "./ProjectFilters";
 import { ProjectSearch } from "./ProjectSearch";
 import { ProjectsGrid } from "./ProjectsGrid";
 import { ProjectsHeader } from "./ProjectsHeader";
 import { ProjectsEmpty } from "./ProjectsEmpty";
-import { projects } from "./data";
-import type { ProjectCategory } from "./types";
+import { motion } from "framer-motion";
+
 
 export function Projects() {
-  const [selectedCategory, setSelectedCategory] =
-    useState<ProjectCategory>("All");
+  
+const {
+  search,
+  setSearch,
 
-  const [search, setSearch] = useState("");
+  selectedCategory,
+  setSelectedCategory,
 
-  const filteredProjects = useMemo(() => {
-    const query = search.trim().toLowerCase();
+  sortBy,
+  setSortBy,
 
-    return projects.filter((project) => {
-      const matchesCategory =
-        selectedCategory === "All" ||
-        project.categories.includes(selectedCategory);
-
-      const matchesSearch =
-        query === "" ||
-        project.title.toLowerCase().includes(query) ||
-        project.description.toLowerCase().includes(query) ||
-        project.categories.some((category) =>
-          category.toLowerCase().includes(query),
-        ) ||
-        project.technologies.some((tech) =>
-          tech.toLowerCase().includes(query),
-        );
-
-      return (
-        project.featured &&
-        matchesCategory &&
-        matchesSearch
-      );
-    });
-  }, [selectedCategory, search]);
+  filteredProjects,
+} = useProjectFilters();
 
   return (
     <section
@@ -51,24 +34,63 @@ export function Projects() {
       <div className="mx-auto max-w-7xl px-6">
         <ProjectsHeader />
 
-        <ProjectFilter
-          selected={selectedCategory}
-          onSelect={setSelectedCategory}
-        />
+        <ProjectFilters
+  categories={[
+    "All",
+    "AI",
+    "Machine Learning",
+    "Analytics",
+    "Generative AI",
+    "Predictive Analytics",
+  ]}
+  selected={selectedCategory}
+  onSelect={setSelectedCategory}
+/>
 
         <ProjectSearch
           value={search}
           onChange={setSearch}
         />
 
+        <ProjectSort
+  value={sortBy}
+  onChange={setSortBy}
+/>
+
         {filteredProjects.length > 0 ? (
+          <>
+          <motion.div
+  initial={{
+    opacity: 0,
+    y: 15,
+  }}
+  animate={{
+    opacity: 1,
+    y: 0,
+  }}
+  transition={{
+    duration: 0.35,
+  }}
+  className="mb-6 flex items-center justify-between"
+>
+  <p className="text-sm text-zinc-400">
+    Showing{" "}
+    <span className="font-semibold text-white">
+      {filteredProjects.length}
+    </span>{" "}
+    project
+    {filteredProjects.length !== 1 && "s"}
+  </p>
+</motion.div> 
           <ProjectsGrid
             projects={filteredProjects}
           />
+          </>
         ) : (
           <ProjectsEmpty
             search={search}
           />
+          
         )}
       </div>
     </section>
