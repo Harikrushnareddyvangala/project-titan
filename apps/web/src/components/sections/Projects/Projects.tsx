@@ -9,6 +9,7 @@ import { ProjectsGrid } from "./ProjectsGrid";
 import { ProjectsHeader } from "./ProjectsHeader";
 import { ProjectsEmpty } from "./ProjectsEmpty";
 import { motion } from "framer-motion";
+import { AnalyticsSection } from "./ProjectsAnalytics";
 
 
 export function Projects() {
@@ -33,6 +34,7 @@ const {
     >
       <div className="mx-auto max-w-7xl px-6">
         <ProjectsHeader />
+        <AnalyticsSection />
 
         <ProjectFilters
   categories={[
@@ -42,6 +44,10 @@ const {
     "Analytics",
     "Generative AI",
     "Predictive Analytics",
+    "Data Science",
+    "Business Intelligence",
+    "Web",
+    "Visualization",
   ]}
   selected={selectedCategory}
   onSelect={setSelectedCategory}
