@@ -33,7 +33,7 @@ export function useGithubRepository(
 
   const [loading, setLoading] =
     useState(true);
-const [error, setError] = useState(false);
+const [error ] = useState(false);
 
   useEffect(() => {
     async function load() {
