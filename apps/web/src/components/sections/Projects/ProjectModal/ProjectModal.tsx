@@ -14,12 +14,12 @@ import {
   ArrowUpRight,
 } from "lucide-react";
 
-import { ProjectArchitecture } from "./ProjectArchitecture";
-import { ProjectFeatures } from "./ProjectFeatures";
-import { ProjectGallery } from "./ProjectGallery";
-import { ProjectMetrics } from "./ProjectMetrics";
-import { ProjectTechStack } from "./ProjectTechStack";
-import { projectDetails } from "./project-details-data";
+import { ProjectArchitecture } from "../ProjectArchitecture";
+import { ProjectFeatures } from "../ProjectFeatures";
+import { ProjectGallery } from "../ProjectGallery";
+import { ProjectMetrics } from "../ProjectMetrics";
+import { ProjectTechStack } from "../ProjectTechStack";
+import { projectDetails } from "../project-details-data";
 
 interface ProjectModalProps {
   open: boolean;

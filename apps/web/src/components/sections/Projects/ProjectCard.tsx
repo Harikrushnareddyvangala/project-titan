@@ -11,7 +11,7 @@ import {
   GitBranch,
 } from "lucide-react";
 
-import { ProjectModal } from "./ProjectModal";
+import { ProjectModal } from "./ProjectModal/ProjectModal";
 import type { Project } from "./types";
 
 interface ProjectCardProps {
