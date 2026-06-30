@@ -7,9 +7,22 @@ interface Repository {
   forks_count: number;
   watchers_count: number;
   open_issues_count: number;
+
   language: string;
+
   size: number;
+
   updated_at: string;
+
+  default_branch: string;
+
+  visibility: string;
+
+  license: {
+    name: string;
+  } | null;
+
+  topics: string[];
 }
 
 export function useGithubRepository(
@@ -27,6 +40,11 @@ const [error, setError] = useState(false);
       try {
         const response = await fetch(
           `https://api.github.com/repos/Harikrushnareddyvangala/${repo}`,
+          {
+    headers: {
+      Accept: "application/vnd.github+json",
+    },
+  },
         );
 
         const json =

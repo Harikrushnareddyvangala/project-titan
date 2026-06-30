@@ -15,6 +15,7 @@ import { projectDetails } from "../project-details-data";
 import { ProjectActions } from "./ProjectActions";
 import { ProjectHero } from "./ProjectHero";
 import { GithubStats } from "../GithubStats";
+import { GithubRepositoryInfo } from "./GithubRepositoryInfo";
 
 interface ProjectModalProps {
   open: boolean;
@@ -143,6 +144,9 @@ export function ProjectModal({
   image={project.screenshots[0]}
 />
 <GithubStats
+    repo={project.githubRepo}
+/>
+<GithubRepositoryInfo
     repo={project.githubRepo}
 />
 <div className="mx-10 border-t border-white/10" />
