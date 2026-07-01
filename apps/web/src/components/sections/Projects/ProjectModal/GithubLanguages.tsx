@@ -1,9 +1,9 @@
 "use client";
 
-import type { GithubLanguages as GithubLanguagesType } from "@/types/github";
+import type { GithubLanguages } from "@/types/github";
 
 interface GithubLanguagesProps {
-  languages: GithubLanguagesType;
+  languages: GithubLanguages;
 }
 
 export function GithubLanguages({
@@ -15,48 +15,80 @@ export function GithubLanguages({
     return null;
   }
 
-  const total = entries.reduce(
+  const totalBytes = entries.reduce(
     (sum, [, value]) => sum + value,
     0,
   );
 
   return (
     <section className="rounded-3xl border border-white/10 bg-white/5 p-8">
-      <h3 className="mb-8 text-2xl font-bold text-white">
-        Languages
-      </h3>
+      <div className="mb-8 flex items-center justify-between">
+        <div>
+          <h3 className="text-2xl font-bold text-white">
+            Language Analytics
+          </h3>
+
+          <p className="mt-2 text-zinc-400">
+            Distribution of the repository codebase.
+          </p>
+        </div>
+
+        <div className="rounded-xl border border-cyan-500/20 bg-cyan-500/10 px-4 py-2">
+          <p className="text-sm text-cyan-300">
+            {entries.length} Languages
+          </p>
+        </div>
+      </div>
 
       <div className="space-y-6">
         {entries
           .sort((a, b) => b[1] - a[1])
           .map(([language, bytes]) => {
             const percentage =
-              (bytes / total) * 100;
+              (bytes / totalBytes) * 100;
 
             return (
-              <div key={language}>
-                <div className="mb-2 flex items-center justify-between">
-                  <span className="font-medium text-white">
-                    {language}
-                  </span>
-
-                  <span className="text-sm text-zinc-400">
-                    {percentage.toFixed(1)}%
-                  </span>
-                </div>
-
-                <div className="h-3 overflow-hidden rounded-full bg-zinc-800">
-                  <div
-                    className="h-full rounded-full bg-cyan-400 transition-all duration-700"
-                    style={{
-                      width: `${percentage}%`,
-                    }}
-                  />
-                </div>
-              </div>
+              <LanguageBar
+                key={language}
+                language={language}
+                percentage={percentage}
+              />
             );
           })}
       </div>
     </section>
+  );
+}
+
+interface LanguageBarProps {
+  language: string;
+  percentage: number;
+}
+
+function LanguageBar({
+  language,
+  percentage,
+}: LanguageBarProps) {
+  return (
+    <div>
+      <div className="mb-2 flex justify-between">
+        <span className="font-medium text-white">
+          {language}
+        </span>
+
+        <span className="text-zinc-400">
+          {percentage.toFixed(1)}%
+        </span>
+      </div>
+
+      <div className="h-3 overflow-hidden rounded-full bg-zinc-800">
+        <div
+          className="h-full rounded-full bg-gradient-to-r from-cyan-400 to-blue-500 transition-all duration-700"
+          style={{
+            width: `${percentage}%`,
+          }}
+        />
+      </div>
+    </div>
   );
 }

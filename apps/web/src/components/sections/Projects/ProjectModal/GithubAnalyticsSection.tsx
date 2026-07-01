@@ -37,25 +37,29 @@ export function GithubAnalyticsSection({
         Project Intelligence
       </h2>
 
-      <GithubStats
-  repository={repository}
-/>
+      <div className="space-y-10">
+  <GithubStats
+    repository={repository}
+  />
 
-<GithubHealth
-  repository={repository}
-/>
+  <div className="grid gap-8 xl:grid-cols-2">
+    <GithubHealth
+      repository={repository}
+    />
 
-<GithubTimeline
-  repository={repository}
-/>
+    <GithubTimeline
+      repository={repository}
+    />
+  </div>
 
-<GithubRepositoryInfo
-  repository={repository}
-/>
+  <GithubRepositoryInfo
+    repository={repository}
+  />
 
-<GithubLanguages
-  languages={languages}
-/>
+  <GithubLanguages
+    languages={languages}
+  />
+</div>
     </section>
   );
 }
