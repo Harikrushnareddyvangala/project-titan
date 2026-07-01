@@ -2,6 +2,7 @@
 
 import { GitFork, HardDrive, Eye, Star } from "lucide-react";
 import type { ReactNode } from "react";
+import CountUp from "react-countup";
 
 import type { GithubRepository } from "@/types/github";
 
@@ -27,26 +28,30 @@ export function GithubStats({
           icon={<Star className="h-5 w-5" />}
           label="Stars"
           value={repository.stargazers_count}
+          delay={0}
         />
 
         <StatCard
           icon={<GitFork className="h-5 w-5" />}
           label="Forks"
           value={repository.forks_count}
+          delay={0.2}
         />
 
         <StatCard
           icon={<Eye className="h-5 w-5" />}
           label="Watchers"
           value={repository.watchers_count}
+          delay={0.4}
         />
 
         <StatCard
           icon={<HardDrive className="h-5 w-5" />}
           label="Repository Size"
-          value={`${(
-            repository.size / 1024
-          ).toFixed(1)} MB`}
+          value={repository.size / 1024}
+          decimals={1}
+          suffix=" MB"
+          delay={0.6}
         />
       </div>
     </section>
@@ -56,13 +61,19 @@ export function GithubStats({
 interface StatCardProps {
   icon: ReactNode;
   label: string;
-  value: string | number;
+  value: number;
+  delay?: number;
+  decimals?: number;
+  suffix?: string;
 }
 
 function StatCard({
   icon,
   label,
   value,
+  delay = 0,
+  decimals = 0,
+  suffix = "",
 }: StatCardProps) {
   return (
     <div
@@ -83,7 +94,15 @@ function StatCard({
       </div>
 
       <p className="text-3xl font-bold text-white">
-        {value}
+        <CountUp
+          end={value}
+          duration={2}
+          delay={delay}
+          decimals={decimals}
+          suffix={suffix}
+          enableScrollSpy
+          scrollSpyOnce
+        />
       </p>
 
       <p className="mt-2 text-sm text-zinc-400">

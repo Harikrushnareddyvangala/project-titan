@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 
 import type { GithubRepository } from "@/types/github";
+import { GithubCard } from "./GithubCard";
 
 interface GithubTimelineProps {
   repository: GithubRepository | null;
@@ -36,21 +37,7 @@ export function GithubTimeline({
       : `${months} month${months !== 1 ? "s" : ""}`;
 
   return (
-    <section
-  className="
-    h-full
-    rounded-3xl
-    border
-    border-white/10
-    bg-white/5
-    p-8
-    transition-all
-duration-300
-hover:-translate-y-1
-hover:border-cyan-400/30
-hover:shadow-[0_15px_40px_rgba(34,211,238,0.08)]
-  "
->
+    <GithubCard>
       <h3 className="mb-8 text-2xl font-bold text-white">
         Repository Timeline
       </h3>
@@ -80,7 +67,7 @@ hover:shadow-[0_15px_40px_rgba(34,211,238,0.08)]
           value={repositoryAge}
         />
       </div>
-    </section>
+    </GithubCard>
   );
 }
 

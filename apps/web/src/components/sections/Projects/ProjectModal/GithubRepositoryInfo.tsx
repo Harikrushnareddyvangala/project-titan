@@ -11,6 +11,7 @@ import {
 import type { ReactNode } from "react";
 
 import type { GithubRepository } from "@/types/github";
+import { GithubCard } from "./GithubCard";
 
 interface GithubRepositoryInfoProps {
   repository: GithubRepository | null;
@@ -24,21 +25,7 @@ export function GithubRepositoryInfo({
   }
 
   return (
-    <section
-  className="
-    h-full
-    rounded-3xl
-    border
-    border-white/10
-    bg-white/5
-    p-8
-    transition-all
-duration-300
-hover:-translate-y-1
-hover:border-cyan-400/30
-hover:shadow-[0_15px_40px_rgba(34,211,238,0.08)]
-  "
->
+    <GithubCard>
       <h3 className="mb-8 text-2xl font-bold text-white">
         Repository Information
       </h3>
@@ -127,7 +114,7 @@ hover:shadow-[0_15px_40px_rgba(34,211,238,0.08)]
           </div>
         </div>
       ) : null}
-    </section>
+    </GithubCard>
   );
 }
 
