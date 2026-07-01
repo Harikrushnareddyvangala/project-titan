@@ -6,6 +6,7 @@ import { GithubRepositoryInfo } from "./GithubRepositoryInfo";
 import {GithubSkeleton} from "./GithubSkeleton";
 import { GithubHealth } from "./GithubHealth";
 import { GithubTimeline } from "./GithubTimeline";
+import { GithubBadges } from "./GithubBadges";
 
 import type {
   GithubLanguages as GithubLanguagesType,
@@ -41,6 +42,9 @@ export function GithubAnalyticsSection({
   <GithubStats
     repository={repository}
   />
+  <GithubBadges
+    repository={repository}
+/>
 
   <div className="grid gap-8 xl:grid-cols-2">
     <GithubHealth
