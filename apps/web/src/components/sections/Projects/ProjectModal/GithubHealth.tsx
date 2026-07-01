@@ -29,7 +29,21 @@ export function GithubHealth({
     daysSinceUpdate <= 90;
 
   return (
-    <section className="rounded-3xl border border-white/10 bg-white/5 p-8">
+    <section
+  className="
+    h-full
+    rounded-3xl
+    border
+    border-white/10
+    bg-white/5
+    p-8
+    transition-all
+duration-300
+hover:-translate-y-1
+hover:border-cyan-400/30
+hover:shadow-[0_15px_40px_rgba(34,211,238,0.08)]
+  "
+>
       <h3 className="mb-8 text-2xl font-bold text-white">
         Repository Health
       </h3>

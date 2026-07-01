@@ -33,37 +33,40 @@ export function GithubAnalyticsSection({
   }
 
   return (
-    <section className="space-y-10">
-      <h2 className="text-3xl font-bold text-white">
-        Project Intelligence
-      </h2>
+  <section className="space-y-10">
 
-      <div className="space-y-10">
-  <GithubStats
-    repository={repository}
-  />
-  <GithubBadges
-    repository={repository}
-/>
-
-  <div className="grid gap-8 xl:grid-cols-2">
-    <GithubHealth
+    <GithubStats
       repository={repository}
     />
 
-    <GithubTimeline
+    <GithubBadges
       repository={repository}
     />
-  </div>
 
-  <GithubRepositoryInfo
-    repository={repository}
-  />
+    <div className="grid gap-8 xl:grid-cols-2">
 
-  <GithubLanguages
-    languages={languages}
-  />
-</div>
-    </section>
-  );
+      <GithubHealth
+        repository={repository}
+      />
+
+      <GithubTimeline
+        repository={repository}
+      />
+
+    </div>
+
+    <div className="grid gap-8 xl:grid-cols-2">
+
+      <GithubRepositoryInfo
+        repository={repository}
+      />
+
+      <GithubLanguages
+        languages={languages}
+      />
+
+    </div>
+
+  </section>
+);
 }
