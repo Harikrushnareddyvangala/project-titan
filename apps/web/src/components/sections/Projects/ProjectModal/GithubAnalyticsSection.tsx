@@ -5,6 +5,7 @@ import { GithubLanguages } from "./GithubLanguages";
 import { GithubRepositoryInfo } from "./GithubRepositoryInfo";
 import {GithubSkeleton} from "./GithubSkeleton";
 import { GithubHealth } from "./GithubHealth";
+import { GithubTimeline } from "./GithubTimeline";
 
 import type {
   GithubLanguages as GithubLanguagesType,
@@ -44,12 +45,17 @@ export function GithubAnalyticsSection({
   repository={repository}
 />
 
+<GithubTimeline
+  repository={repository}
+/>
+
 <GithubRepositoryInfo
   repository={repository}
 />
-      <GithubLanguages
-        languages={languages}
-      />
+
+<GithubLanguages
+  languages={languages}
+/>
     </section>
   );
 }
