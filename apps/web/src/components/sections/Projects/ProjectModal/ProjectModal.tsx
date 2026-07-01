@@ -6,7 +6,7 @@ import {
 } from "framer-motion";
 
 import { X } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { ProjectNavigation } from "./ProjectNavigation";
 
@@ -35,6 +35,37 @@ export function ProjectModal({
   activeSection,
   setActiveSection,
 ] = useState("Overview");
+const overviewRef =
+  useRef<HTMLDivElement>(null);
+
+const githubRef =
+  useRef<HTMLDivElement>(null);
+
+const galleryRef =
+  useRef<HTMLDivElement>(null);
+
+const metricsRef =
+  useRef<HTMLDivElement>(null);
+
+const scrollToSection = (
+  section: string,
+) => {
+  const map = {
+    Overview: overviewRef,
+    GitHub: githubRef,
+    Gallery: galleryRef,
+    Metrics: metricsRef,
+  };
+
+  map[
+    section as keyof typeof map
+  ]?.current?.scrollIntoView({
+    behavior: "smooth",
+    block: "start",
+  });
+
+  setActiveSection(section);
+};
 
 const {
   repository,
@@ -124,10 +155,11 @@ if (!project) {
 />
 <ProjectNavigation
   active={activeSection}
-  onSelect={setActiveSection}
+  onSelect={scrollToSection}
 />
 
 <div className="mx-10 border-t border-white/10" />
+<div ref={overviewRef}>
 <ProjectContent
   challenge={project.challenge}
   solution={project.solution}
@@ -137,13 +169,15 @@ if (!project) {
   architecture={project.architecture}
   screenshots={project.screenshots}
 />
-
+</div>
 <div className="px-10 pt-2">
+  <div ref={githubRef}>
   <GithubAnalyticsSection
     repository={repository}
     languages={languages}
     loading={loading}
   />
+  </div>
 </div>
 
 <div className="px-10 pb-10 pt-8">
