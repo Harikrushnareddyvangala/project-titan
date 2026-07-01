@@ -6,6 +6,9 @@ import {
 } from "framer-motion";
 
 import { X } from "lucide-react";
+import { useState } from "react";
+
+import { ProjectNavigation } from "./ProjectNavigation";
 
 import { ProjectContent } from "./ProjectContent";
 import { projectDetails } from "../project-details-data";
@@ -28,6 +31,10 @@ export function ProjectModal({
 }: ProjectModalProps) {
   const project =
   title ? projectDetails[title] : null;
+  const [
+  activeSection,
+  setActiveSection,
+] = useState("Overview");
 
 const {
   repository,
@@ -115,7 +122,10 @@ if (!project) {
   summary={project.summary}
   image={project.screenshots[0]}
 />
-
+<ProjectNavigation
+  active={activeSection}
+  onSelect={setActiveSection}
+/>
 
 <div className="mx-10 border-t border-white/10" />
 <ProjectContent
