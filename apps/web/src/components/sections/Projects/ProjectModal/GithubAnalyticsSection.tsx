@@ -4,6 +4,7 @@ import { GithubStats } from "../GithubStats";
 import { GithubLanguages } from "./GithubLanguages";
 import { GithubRepositoryInfo } from "./GithubRepositoryInfo";
 import {GithubSkeleton} from "./GithubSkeleton";
+import { GithubHealth } from "./GithubHealth";
 
 import type {
   GithubLanguages as GithubLanguagesType,
@@ -36,13 +37,16 @@ export function GithubAnalyticsSection({
       </h2>
 
       <GithubStats
-        repository={repository}
-      />
+  repository={repository}
+/>
 
-      <GithubRepositoryInfo
-        repository={repository}
-      />
+<GithubHealth
+  repository={repository}
+/>
 
+<GithubRepositoryInfo
+  repository={repository}
+/>
       <GithubLanguages
         languages={languages}
       />
