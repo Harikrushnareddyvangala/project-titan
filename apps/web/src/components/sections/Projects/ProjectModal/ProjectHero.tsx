@@ -2,17 +2,51 @@
 
 import Image from "next/image";
 import { motion } from "framer-motion";
+import type { GithubRepository } from "@/types/github";
 
 interface ProjectHeroProps {
   title: string;
   summary: string;
   image: string;
-}
 
+  repository?: GithubRepository | null;
+}
+function HeroBadge({
+  label,
+  value,
+}: {
+  label: string;
+  value: React.ReactNode;
+}) {
+  return (
+    <div
+      className="
+      rounded-full
+      border
+      border-cyan-500/30
+      bg-cyan-500/10
+      px-4
+      py-2
+      text-sm
+      text-cyan-300
+      backdrop-blur-xl
+    "
+    >
+      <span className="font-semibold">
+        {label}
+      </span>
+
+      {" "}
+
+      {value}
+    </div>
+  );
+}
 export function ProjectHero({
   title,
   summary,
   image,
+  repository,
 }: ProjectHeroProps) {
   return (
     <div className="relative h-[420px] w-full overflow-hidden rounded-t-3xl">
@@ -88,6 +122,24 @@ export function ProjectHero({
         >
           {summary}
         </motion.p>
+        {repository && (
+  <div className="mt-6 flex flex-wrap gap-3">
+    <HeroBadge
+      label="⭐ Stars"
+      value={repository.stargazers_count}
+    />
+
+    <HeroBadge
+      label="⑂ Forks"
+      value={repository.forks_count}
+    />
+
+    <HeroBadge
+      label="👀 Watchers"
+      value={repository.watchers_count}
+    />
+  </div>
+)}
 
       </div>
     </div>
