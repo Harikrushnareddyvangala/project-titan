@@ -218,6 +218,7 @@ if (!project) {
   summary={project.summary}
   image={project.screenshots[0]}
   repository={repository}
+  technologies={project.technologies}
 />
 <div className="sticky top-0 z-30">
   <ProjectNavigation

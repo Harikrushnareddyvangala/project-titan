@@ -4,12 +4,55 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import type { GithubRepository } from "@/types/github";
 
+const technologyIcons: Record<
+  string,
+  string
+> = {
+  Python: "🐍",
+
+  TypeScript: "📘",
+
+  JavaScript: "🟨",
+
+  React: "⚛️",
+
+  "Next.js": "▲",
+
+  Tailwind: "💨",
+
+  Docker: "🐳",
+
+  PostgreSQL: "🐘",
+
+  MongoDB: "🍃",
+
+  Redis: "🟥",
+
+  Streamlit: "📊",
+
+  Pandas: "🐼",
+
+  NumPy: "📐",
+
+  XGBoost: "🌲",
+
+  SHAP: "🔍",
+
+  "Power BI": "📈",
+
+  OpenAI: "🤖",
+
+  "Scikit-learn": "🧠",
+};
+
 interface ProjectHeroProps {
   title: string;
   summary: string;
   image: string;
 
   repository?: GithubRepository | null;
+
+  technologies: string[];
 }
 function HeroBadge({
   label,
@@ -42,11 +85,66 @@ function HeroBadge({
     </div>
   );
 }
+
+function TechnologyBadge({
+  technology,
+}: {
+  technology: string;
+}) {
+  return (
+    <motion.div
+      variants={{
+        hidden: {
+          opacity: 0,
+          y: 15,
+        },
+        visible: {
+          opacity: 1,
+          y: 0,
+        },
+      }}
+      whileHover={{
+        scale: 1.08,
+        y: -4,
+      }}
+      transition={{
+        type: "spring",
+        stiffness: 350,
+      }}
+      className="
+        rounded-full
+        border
+        border-white/10
+        bg-white/5
+        px-4
+        py-2
+        text-sm
+        font-medium
+        text-white
+        backdrop-blur-xl
+        transition-all
+        duration-300
+        hover:border-cyan-400
+        hover:bg-cyan-500/10
+        hover:text-cyan-300
+      "
+    >
+      <span>
+  {technologyIcons[technology] ?? "⚡"}
+</span>
+
+<span className="ml-2">
+  {technology}
+</span>
+    </motion.div>
+  );
+}
 export function ProjectHero({
   title,
   summary,
   image,
   repository,
+  technologies
 }: ProjectHeroProps) {
   return (
     <div className="relative h-[420px] w-full overflow-hidden rounded-t-3xl">
@@ -140,6 +238,27 @@ export function ProjectHero({
     />
   </div>
 )}
+
+<motion.div
+  className="mt-8 flex flex-wrap gap-3"
+  initial="hidden"
+  animate="visible"
+  variants={{
+    hidden: {},
+    visible: {
+      transition: {
+        staggerChildren: 0.08,
+      },
+    },
+  }}
+>
+  {technologies.map((technology) => (
+    <TechnologyBadge
+      key={technology}
+      technology={technology}
+    />
+  ))}
+</motion.div>
 
       </div>
     </div>
