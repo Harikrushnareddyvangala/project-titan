@@ -2,7 +2,19 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import type { GithubRepository } from "@/types/github";
+import type {
+  GithubRepository,
+} from "@/types/github";
+
+import {
+  Star,
+  GitFork,
+  Eye,
+  CalendarDays,
+  HardDrive,
+  GitBranch,
+  ShieldCheck,
+} from "lucide-react";
 
 const technologyIcons: Record<
   string,
@@ -54,6 +66,48 @@ interface ProjectHeroProps {
   repository?: GithubRepository | null;
 
   technologies: string[];
+}
+function RepositoryRow({
+  icon,
+  label,
+  value,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: React.ReactNode;
+}) {
+  return (
+    <motion.div
+      whileHover={{
+        x: 4,
+      }}
+      className="
+        flex
+        items-center
+        justify-between
+        rounded-xl
+        border
+        border-white/5
+        bg-white/[0.03]
+        px-4
+        py-3
+      "
+    >
+      <div className="flex items-center gap-3">
+        <div className="text-cyan-400">
+          {icon}
+        </div>
+
+        <span className="text-zinc-300">
+          {label}
+        </span>
+      </div>
+
+      <span className="font-semibold text-white">
+        {value}
+      </span>
+    </motion.div>
+  );
 }
 function HeroBadge({
   label,
@@ -246,6 +300,26 @@ useEffect(() => {
     backdrop-blur-[2px]
   "
 />
+<motion.div
+  className="
+    absolute
+    inset-0
+    opacity-[0.06]
+    bg-[linear-gradient(to_right,white_1px,transparent_1px),linear-gradient(to_bottom,white_1px,transparent_1px)]
+    bg-[size:48px_48px]
+  "
+  animate={{
+    backgroundPosition: [
+      "0px 0px",
+      "48px 48px",
+    ],
+  }}
+  transition={{
+    duration: 35,
+    repeat: Infinity,
+    ease: "linear",
+  }}
+/>
       {/* Decorative Blur */}
       <motion.div
   className="
@@ -293,8 +367,19 @@ useEffect(() => {
   ))}
 </div>
       {/* Content */}
-      <div className="absolute bottom-12 left-10 right-10">
-
+      <div
+  className="
+    absolute
+    bottom-12
+    left-10
+    right-10
+    grid
+    gap-10
+    lg:grid-cols-[1.6fr_0.8fr]
+    items-end
+  "
+>
+<div className="space-y-6">
         <motion.div
           initial={{
             opacity: 0,
@@ -388,7 +473,94 @@ useEffect(() => {
     />
   ))}
 </motion.div>
+</div>
+<div className="hidden lg:block">
+  <motion.div
+  initial={{
+    opacity: 0,
+    x: 40,
+  }}
+  animate={{
+    opacity: 1,
+    x: 0,
+  }}
+  transition={{
+    delay: 0.5,
+  }}
+  className="
+    rounded-3xl
+    border
+    border-white/10
+    bg-white/5
+    backdrop-blur-2xl
+    p-8
+    shadow-2xl
+  "
+>
 
+  <h3 className="text-lg font-semibold text-white">
+    Repository
+  </h3>
+  <div className="mt-8 space-y-4">
+
+{repository && (
+
+<>
+<RepositoryRow
+  icon={<Star size={18} />}
+  label="Stars"
+  value={repository.stargazers_count}
+/>
+
+<RepositoryRow
+  icon={<GitFork size={18} />}
+  label="Forks"
+  value={repository.forks_count}
+/>
+
+<RepositoryRow
+  icon={<Eye size={18} />}
+  label="Watchers"
+  value={repository.watchers_count}
+/>
+<RepositoryRow
+  icon={<HardDrive size={18} />}
+  label="Size"
+  value={`${(
+    repository.size / 1024
+  ).toFixed(1)} MB`}
+/>
+
+<RepositoryRow
+  icon={<GitBranch size={18} />}
+  label="Branch"
+  value={repository.default_branch}
+/>
+<RepositoryRow
+  icon={<ShieldCheck size={18} />}
+  label="Visibility"
+  value={
+    repository.private
+      ? "Private"
+      : "Public"
+  }
+/>
+<RepositoryRow
+  icon={<CalendarDays size={18} />}
+  label="Updated"
+  value={new Date(
+    repository.updated_at,
+  ).toLocaleDateString()}
+ />
+</>
+
+)}
+
+</div>
+
+</motion.div>
+
+</div>
       </div>
     </div>
   );

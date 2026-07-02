@@ -7,6 +7,7 @@ import {GithubSkeleton} from "./GithubSkeleton";
 import { GithubHealth } from "./GithubHealth";
 import { GithubTimeline } from "./GithubTimeline";
 import { GithubBadges } from "./GithubBadges";
+import { RepositoryInsights } from "./RepositoryInsights";
 
 import type {
   GithubLanguages as GithubLanguagesType,
@@ -64,6 +65,11 @@ export function GithubAnalyticsSection({
       <GithubLanguages
         languages={languages}
       />
+      {repository && (
+  <RepositoryInsights
+    repository={repository}
+  />
+)}
 
     </div>
 
