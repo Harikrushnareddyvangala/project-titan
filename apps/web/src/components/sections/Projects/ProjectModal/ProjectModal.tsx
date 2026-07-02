@@ -39,6 +39,10 @@ export function ProjectModal({
   activeSection,
   setActiveSection,
 ] = useState("Overview");
+const [
+  scrollProgress,
+  setScrollProgress,
+] = useState(0);
 const overviewRef =
   useRef<HTMLDivElement>(null);
 
@@ -51,15 +55,21 @@ const galleryRef =
 const metricsRef =
   useRef<HTMLDivElement>(null);
 
+const architectureRef =
+  useRef<HTMLDivElement>(null);
+
+  const modalRef =
+  useRef<HTMLDivElement>(null);
 const scrollToSection =     (
   section: string,
 ) => {
   const map = {
-    Overview: overviewRef,
-    GitHub: githubRef,
-    Gallery: galleryRef,
-    Metrics: metricsRef,
-  };
+  Overview: overviewRef,
+  Architecture: architectureRef,
+  Metrics: metricsRef,
+  Gallery: galleryRef,
+  GitHub: githubRef,
+};
 
   map[
     section as keyof typeof map
@@ -74,23 +84,27 @@ useEffect(() => {
   if (!open) return;
 
   const sections = [
-    {
-      name: "Overview",
-      ref: overviewRef,
-    },
-    {
-      name: "GitHub",
-      ref: githubRef,
-    },
-    {
-      name: "Metrics",
-      ref: metricsRef,
-    },
-    {
-      name: "Gallery",
-      ref: galleryRef,
-    },
-  ];
+  {
+    name: "Overview",
+    ref: overviewRef,
+  },
+  {
+    name: "Architecture",
+    ref: architectureRef,
+  },
+  {
+    name: "Metrics",
+    ref: metricsRef,
+  },
+  {
+    name: "Gallery",
+    ref: galleryRef,
+  },
+  {
+    name: "GitHub",
+    ref: githubRef,
+  },
+];
 
   const observer =
     new IntersectionObserver(
@@ -132,6 +146,41 @@ useEffect(() => {
     observer.disconnect();
   };
 }, [open]);
+useEffect(() => {
+  const modal = modalRef.current;
+
+  if (!modal) return;
+
+  const updateProgress = () => {
+    const max =
+      modal.scrollHeight -
+      modal.clientHeight;
+
+    const current =
+      modal.scrollTop;
+
+    const progress =
+      max > 0
+        ? (current / max) * 100
+        : 0;
+
+    setScrollProgress(progress);
+  };
+
+  modal.addEventListener(
+    "scroll",
+    updateProgress,
+  );
+
+  updateProgress();
+
+  return () => {
+    modal.removeEventListener(
+      "scroll",
+      updateProgress,
+    );
+  };
+}, [open]);
 const {
   repository,
   languages,
@@ -157,6 +206,7 @@ if (!project) {
   />
 
           <motion.div
+            ref={modalRef}
             role="dialog"
             aria-modal="true"
             aria-labelledby="project-title"
@@ -223,6 +273,7 @@ if (!project) {
 <div className="sticky top-0 z-30">
   <ProjectNavigation
     active={activeSection}
+    progress={scrollProgress}
     onSelect={scrollToSection}
   />
 </div>
@@ -310,11 +361,31 @@ if (!project) {
 />
 
 </motion.div>
-<div className="px-10 pt-10">
+<motion.div
+  ref={architectureRef}
+  id="architecture"
+  className="scroll-mt-32 px-10 pt-10"
+  initial={{
+    opacity: 0,
+    y: 30,
+  }}
+  whileInView={{
+    opacity: 1,
+    y: 0,
+  }}
+  viewport={{
+    once: true,
+    amount: 0.25,
+  }}
+  transition={{
+    duration: 0.5,
+    delay: 0.15,
+  }}
+>
   <ProjectArchitecture
     architecture={project.architecture}
   />
-</div>
+</motion.div>
 
 <motion.div
   ref={galleryRef}
