@@ -40,6 +40,12 @@ export interface GithubRepository {
   pushed_at: string;
 
   topics?: string[];
+
+  private: boolean;
+
+  license: {
+  name: string;
+} | null;
 }
 
 export type GithubLanguages = Record<

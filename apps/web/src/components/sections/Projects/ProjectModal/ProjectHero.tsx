@@ -1,5 +1,5 @@
 "use client";
-
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import type { GithubRepository } from "@/types/github";
@@ -44,6 +44,7 @@ const technologyIcons: Record<
 
   "Scikit-learn": "🧠",
 };
+
 
 interface ProjectHeroProps {
   title: string;
@@ -146,23 +147,151 @@ export function ProjectHero({
   repository,
   technologies
 }: ProjectHeroProps) {
+  type Particle = {
+  id: number;
+  left: number;
+  top: number;
+  duration: number;
+};
+
+const [particles, setParticles] = useState<Particle[]>([]);
+
+useEffect(() => {
+  setParticles(
+    Array.from({ length: 12 }, (_, i) => ({
+      id: i,
+      left: Math.random() * 100,
+      top: Math.random() * 100,
+      duration: 4 + i,
+    })),
+  );
+}, []); 
   return (
     <div className="relative h-[420px] w-full overflow-hidden rounded-t-3xl">
+      <motion.div
+  className="
+    absolute
+    -left-32
+    -top-32
+    h-80
+    w-80
+    rounded-full
+    bg-cyan-500/20
+    blur-[120px]
+  "
+  animate={{
+    x: [0, 40, -20, 0],
+    y: [0, -30, 20, 0],
+    scale: [1, 1.15, 0.95, 1],
+  }}
+  transition={{
+    duration: 14,
+    repeat: Infinity,
+    ease: "easeInOut",
+  }}
+/>
+
+<motion.div
+  className="
+    absolute
+    bottom-0
+    right-0
+    h-72
+    w-72
+    rounded-full
+    bg-violet-500/20
+    blur-[120px]
+  "
+  animate={{
+    x: [0, -50, 30, 0],
+    y: [0, 30, -20, 0],
+    scale: [1, 0.9, 1.2, 1],
+  }}
+  transition={{
+    duration: 18,
+    repeat: Infinity,
+    ease: "easeInOut",
+  }}
+/>
       {/* Background Image */}
-      <Image
-        src={image}
-        alt={title}
-        fill
-        priority
-        className="object-cover"
-      />
+      <motion.div
+  initial={{
+    scale: 1.08,
+  }}
+  animate={{
+    scale: 1,
+  }}
+  transition={{
+    duration: 2,
+    ease: "easeOut",
+  }}
+  className="absolute inset-0"
+>
+  <Image
+    src={image}
+    alt={title}
+    fill
+    priority
+    className="object-cover"
+  />
+</motion.div>
 
       {/* Dark Overlay */}
       <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/50 to-black/20" />
-
+      <div
+  className="
+    absolute
+    inset-0
+    bg-white/[0.02]
+    backdrop-blur-[2px]
+  "
+/>
       {/* Decorative Blur */}
-      <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 via-transparent to-purple-500/10" />
-
+      <motion.div
+  className="
+    absolute
+    inset-0
+    bg-gradient-to-r
+    from-cyan-500/15
+    via-transparent
+    to-violet-500/15
+    mix-blend-screen
+  "
+  animate={{
+    opacity: [0.3, 0.7, 0.4],
+  }}
+  transition={{
+    duration: 8,
+    repeat: Infinity,
+    ease: "easeInOut",
+  }}
+/>
+<div className="absolute inset-0 overflow-hidden">
+  {particles.map((particle) => (
+    <motion.div
+      key={particle.id}
+      className="
+        absolute
+        h-1
+        w-1
+        rounded-full
+        bg-cyan-300/40
+      "
+      style={{
+        left: `${particle.left}%`,
+        top: `${particle.top}%`,
+      }}
+      animate={{
+        y: [0, -40, 0],
+        opacity: [0.2, 1, 0.2],
+      }}
+      transition={{
+        duration: particle.duration,
+        repeat: Infinity,
+      }}
+    />
+  ))}
+</div>
       {/* Content */}
       <div className="absolute bottom-12 left-10 right-10">
 
