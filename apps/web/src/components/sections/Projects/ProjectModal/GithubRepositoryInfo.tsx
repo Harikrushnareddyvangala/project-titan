@@ -26,9 +26,15 @@ export function GithubRepositoryInfo({
 
   return (
     <GithubCard>
-      <h3 className="mb-8 text-2xl font-bold text-white">
-        Repository Information
-      </h3>
+      <div className="mb-8">
+  <h3 className="text-2xl font-bold text-white">
+    Repository Overview
+  </h3>
+
+  <p className="mt-2 text-sm text-zinc-400">
+    Core repository metadata and activity.
+  </p>
+</div>
 
       <div className="grid gap-6 md:grid-cols-2">
         <InfoCard
@@ -77,11 +83,11 @@ export function GithubRepositoryInfo({
 
       {repository.description && (
         <div className="mt-10">
-          <h4 className="mb-3 text-lg font-semibold text-cyan-400">
+          <h4 className="mb-3 text-lg font-semibold text-white">
             Description
           </h4>
 
-          <p className="leading-8 text-zinc-300">
+          <p className="leading-8 text-zinc-400">
             {repository.description}
           </p>
         </div>
@@ -89,7 +95,7 @@ export function GithubRepositoryInfo({
 
       {repository.topics?.length ? (
         <div className="mt-10">
-          <h4 className="mb-3 text-lg font-semibold text-cyan-400">
+          <h4 className="mb-3 text-lg font-semibold text-white">
             Topics
           </h4>
 
@@ -98,15 +104,20 @@ export function GithubRepositoryInfo({
               <span
                 key={topic}
                 className="
-                  rounded-full
-                  border
-                  border-cyan-500/30
-                  bg-cyan-500/10
-                  px-4
-                  py-2
-                  text-sm
-                  text-cyan-300
-                "
+rounded-full
+border
+border-white/10
+bg-white/5
+px-4
+py-2
+text-sm
+font-medium
+text-cyan-300
+transition-all
+duration-300
+hover:border-cyan-400/40
+hover:bg-cyan-500/10
+"
               >
                 {topic}
               </span>
@@ -132,28 +143,50 @@ function InfoCard({
   return (
     <div
       className="
-        flex
-        items-start
-        gap-4
-        rounded-2xl
-        border
-        border-white/10
-        bg-black/20
-        p-5
-      "
+group
+rounded-2xl
+border
+border-white/10
+bg-white/[0.03]
+p-5
+transition-all
+duration-300
+hover:border-cyan-400/40
+hover:bg-cyan-500/5
+"
     >
-      <div className="text-cyan-400">
-        {icon}
-      </div>
+      <div className="flex items-start gap-4">
 
-      <div>
-        <p className="text-sm text-zinc-400">
-          {label}
-        </p>
+        <div
+          className="
+flex
+h-11
+w-11
+items-center
+justify-center
+rounded-xl
+bg-cyan-500/10
+text-cyan-400
+transition-transform
+duration-300
+group-hover:scale-110
+"
+        >
+          {icon}
+        </div>
 
-        <p className="mt-1 font-medium text-white">
-          {value}
-        </p>
+        <div className="min-w-0">
+
+          <p className="text-xs uppercase tracking-widest text-zinc-500">
+            {label}
+          </p>
+
+          <p className="mt-2 break-words text-base font-semibold text-white">
+            {value}
+          </p>
+
+        </div>
+
       </div>
     </div>
   );

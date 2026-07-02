@@ -12,6 +12,7 @@ import { GithubBadges } from "./GithubBadges";
 import { RepositoryInsights } from "./RepositoryInsights";
 import { DashboardBackground } from "../GithubAnalytics/DashboardBackground";
 
+
 import type {
   GithubLanguages as GithubLanguagesType,
   GithubRepository,
@@ -37,67 +38,62 @@ export function GithubAnalyticsSection({
   }
 
   return (
-    <motion.section
-      initial={{
-        opacity: 0,
-        y: 40,
-      }}
-      whileInView={{
-        opacity: 1,
-        y: 0,
-      }}
-      viewport={{
-        once: true,
-      }}
-      transition={{
-        duration: 0.6,
-      }}
-      className="
-        relative
-        overflow-hidden
-        rounded-[36px]
-        border
-        border-white/10
-        bg-gradient-to-br
-        from-zinc-950
-        via-zinc-900
-        to-black
-        p-10
-      "
-    >
-      <DashboardBackground />
+  <section
+    className="
+      relative
+      overflow-hidden
+      rounded-[36px]
+      border
+      border-white/10
+      bg-gradient-to-br
+      from-zinc-950
+      via-zinc-900
+      to-black
+      p-10
+    "
+  >
+    <DashboardBackground />
 
-      <div className="relative z-10 space-y-12">
-        <div className="mb-8">
-          <h2 className="text-4xl font-bold text-white">
-            Repository Analytics
-          </h2>
+    <div className="relative z-10 space-y-10">
 
-          <p className="mt-3 max-w-2xl text-zinc-400">
-            Live GitHub repository health, language distribution,
-            activity timeline, quality metrics, and engineering
-            insights.
-          </p>
-        </div>
+      <GithubStats
+        repository={repository}
+      />
 
-        <GithubStats repository={repository} />
+      <GithubBadges
+        repository={repository}
+      />
 
-        <GithubBadges repository={repository} />
+      <div className="grid gap-8 xl:grid-cols-2">
 
-        <div className="grid gap-10 xl:grid-cols-2">
-          <GithubHealth repository={repository} />
+        <GithubHealth
+          repository={repository}
+        />
 
-          <GithubTimeline repository={repository} />
-        </div>
+        <GithubTimeline
+          repository={repository}
+        />
 
-        <div className="grid gap-10 xl:grid-cols-2">
-          <GithubRepositoryInfo repository={repository} />
-
-          <GithubLanguages languages={languages} />
-        </div>
-
-        <RepositoryInsights repository={repository} />
       </div>
-    </motion.section>
-  );
+
+      <div className="grid gap-8 xl:grid-cols-2">
+
+        <GithubRepositoryInfo
+          repository={repository}
+        />
+
+        <GithubLanguages
+          languages={languages}
+        />
+
+      </div>
+
+      <RepositoryInsights
+        repository={repository}
+      />
+
+    </div>
+
+  </section>
+);
 }

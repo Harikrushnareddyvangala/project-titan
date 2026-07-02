@@ -1,5 +1,6 @@
 "use client";
 
+import { motion } from "framer-motion";
 import {
   BadgeCheck,
   GitBranch,
@@ -21,11 +22,19 @@ export function GithubBadges({
 
   return (
     <GithubCard>
-      <h3 className="mb-6 text-2xl font-bold text-white">
-        Repository Badges
-      </h3>
+      <div className="mb-8">
 
-      <div className="flex flex-wrap gap-3">
+  <h3 className="text-2xl font-bold text-white">
+    Repository Badges
+  </h3>
+
+  <p className="mt-2 text-zinc-400">
+    Automatically generated repository achievements.
+  </p>
+
+</div>
+
+      <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
 
         <Badge
           icon={<Globe size={16} />}
@@ -86,23 +95,64 @@ function Badge({
   };
 
   return (
-    <div
+    <motion.div
+      whileHover={{
+        y: -6,
+        scale: 1.03,
+      }}
+      transition={{
+        duration: 0.25,
+      }}
       className={`
-        flex
-        items-center
-        gap-2
-        rounded-full
-        border
-        px-4
-        py-2
-        text-sm
-        font-medium
-        ${colors[color]}
-      `}
+group
+relative
+overflow-hidden
+rounded-3xl
+border
+p-6
+transition-all
+duration-300
+${colors[color]}
+`}
     >
-      {icon}
+      <div
+        className="
+absolute
+inset-0
+bg-gradient-to-br
+from-white/5
+via-transparent
+to-white/5
+opacity-0
+transition-opacity
+duration-500
+group-hover:opacity-100
+"
+      />
 
-      {text}
-    </div>
+      <div className="relative z-10">
+
+        <div
+          className="
+mb-5
+flex
+h-12
+w-12
+items-center
+justify-center
+rounded-2xl
+bg-white/10
+"
+        >
+          {icon}
+        </div>
+
+        <p className="font-semibold">
+          {text}
+        </p>
+
+      </div>
+
+    </motion.div>
   );
 }
