@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useMemo } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import type {
@@ -201,25 +201,17 @@ export function ProjectHero({
   repository,
   technologies
 }: ProjectHeroProps) {
-  type Particle = {
-  id: number;
-  left: number;
-  top: number;
-  duration: number;
-};
-
-const [particles, setParticles] = useState<Particle[]>([]);
-
-useEffect(() => {
-  setParticles(
+  
+const particles = useMemo(
+  () =>
     Array.from({ length: 12 }, (_, i) => ({
       id: i,
-      left: Math.random() * 100,
-      top: Math.random() * 100,
-      duration: 4 + i,
+      left: (i * 17) % 100,
+      top: (i * 29) % 100,
+      duration: 4 + (i % 5),
     })),
-  );
-}, []); 
+  [],
+);
   return (
     <div className="relative h-[420px] w-full overflow-hidden rounded-t-3xl">
       <motion.div
