@@ -96,42 +96,12 @@ export function MetricRing({
 
         </svg>
 
-        <div
-          className="
-            absolute
-            inset-0
-            flex
-            flex-col
-            items-center
-            justify-center
-          "
-        >
-          <motion.span
-            initial={{
-              opacity: 0,
-            }}
-            animate={{
-              opacity: 1,
-            }}
-            transition={{
-              delay: .5,
-            }}
-            className="
-              text-3xl
-              font-bold
-              text-white
-            "
-          >
-            {value}%
-          </motion.span>
-
-        </div>
 
       </div>
 
       <p
         className="
-          mt-5
+          mt-5  
           text-center
           font-medium
           text-zinc-400
