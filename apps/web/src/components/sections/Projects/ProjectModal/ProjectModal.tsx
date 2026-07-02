@@ -12,7 +12,7 @@ import { ProjectNavigation } from "./ProjectNavigation";
 
 import { ProjectOverview } from "./ProjectOverview";
 
-import { ProjectMetrics } from "../ProjectMetrics";
+import { MetricsDashboard } from "./MetricsDashboard";
 import { ProjectArchitecture } from "../ProjectArchitecture";
 import { ProjectGallery } from "../ProjectGallery";
 import { projectDetails } from "../project-details-data";
@@ -305,9 +305,9 @@ if (!project) {
   }}
 >
 
-  <ProjectMetrics
-    metrics={project.metrics}
-  />
+  <MetricsDashboard
+  metrics={project.metrics}
+/>
 
 </motion.div>
 <div className="px-10 pt-10">
