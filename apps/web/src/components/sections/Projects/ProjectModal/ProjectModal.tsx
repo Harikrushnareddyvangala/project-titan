@@ -10,7 +10,11 @@ import { useEffect, useRef, useState } from "react";
 
 import { ProjectNavigation } from "./ProjectNavigation";
 
-import { ProjectContent } from "./ProjectContent";
+import { ProjectOverview } from "./ProjectOverview";
+
+import { ProjectMetrics } from "../ProjectMetrics";
+import { ProjectArchitecture } from "../ProjectArchitecture";
+import { ProjectGallery } from "../ProjectGallery";
 import { projectDetails } from "../project-details-data";
 import { ProjectActions } from "./ProjectActions";
 import { ProjectHero } from "./ProjectHero";
@@ -47,7 +51,7 @@ const galleryRef =
 const metricsRef =
   useRef<HTMLDivElement>(null);
 
-const scrollToSection = (
+const scrollToSection =     (
   section: string,
 ) => {
   const map = {
@@ -66,7 +70,68 @@ const scrollToSection = (
 
   setActiveSection(section);
 };
+useEffect(() => {
+  if (!open) return;
 
+  const sections = [
+    {
+      name: "Overview",
+      ref: overviewRef,
+    },
+    {
+      name: "GitHub",
+      ref: githubRef,
+    },
+    {
+      name: "Metrics",
+      ref: metricsRef,
+    },
+    {
+      name: "Gallery",
+      ref: galleryRef,
+    },
+  ];
+
+  const observer =
+    new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const section =
+              sections.find(
+                (s) =>
+                  s.ref.current ===
+                  entry.target,
+              );
+
+            if (section) {
+              setActiveSection((current) =>
+                current === section.name
+                  ? current
+                  : section.name,
+              );
+            }
+          }
+        });
+      },
+      {
+        rootMargin:
+          "-120px 0px -45% 0px",
+      },
+    );
+
+  sections.forEach((section) => {
+    if (section.ref.current) {
+      observer.observe(
+        section.ref.current,
+      );
+    }
+  });
+
+  return () => {
+    observer.disconnect();
+  };
+}, [open]);
 const {
   repository,
   languages,
@@ -153,32 +218,127 @@ if (!project) {
   summary={project.summary}
   image={project.screenshots[0]}
 />
-<ProjectNavigation
-  active={activeSection}
-  onSelect={scrollToSection}
-/>
+<div className="sticky top-0 z-30">
+  <ProjectNavigation
+    active={activeSection}
+    onSelect={scrollToSection}
+  />
+</div>
 
 <div className="mx-10 border-t border-white/10" />
-<div ref={overviewRef}>
-<ProjectContent
-  challenge={project.challenge}
-  solution={project.solution}
-  features={project.features}
-  technologies={project.technologies}
-  metrics={project.metrics}
-  architecture={project.architecture}
-  screenshots={project.screenshots}
-/>
-</div>
-<div className="px-10 pt-2">
-  <div ref={githubRef}>
+<motion.div
+  ref={overviewRef}
+  id="overview"
+  className="scroll-mt-32 px-10 pt-2"
+  initial={{
+    opacity: 0,
+    y: 30,
+  }}
+  whileInView={{
+    opacity: 1,
+    y: 0,
+  }}
+  viewport={{
+    once: true,
+    amount: 0.25,
+  }}
+  transition={{
+    duration: 0.5,
+    delay: 0.15,
+  }}
+>
+  <ProjectOverview
+    challenge={project.challenge}
+    solution={project.solution}
+    features={project.features}
+    technologies={project.technologies}
+  />
+</motion.div>
+<motion.div
+  ref={githubRef}
+  id="github"
+  className="scroll-mt-32 px-10 pt-2"
+  initial={{
+    opacity: 0,
+    y: 30,
+  }}
+  whileInView={{
+    opacity: 1,
+    y: 0,
+  }}
+  viewport={{
+    once: true,
+    amount: 0.25,
+  }}
+  transition={{
+    duration: 0.5,
+    delay: 0.15,
+  }}
+>
   <GithubAnalyticsSection
     repository={repository}
     languages={languages}
     loading={loading}
   />
-  </div>
+</motion.div>
+<motion.div
+  ref={metricsRef}
+  id="metrics"
+  className="scroll-mt-32 px-10 pt-2"
+  initial={{
+    opacity: 0,
+    y: 30,
+  }}
+  whileInView={{
+    opacity: 1,
+    y: 0,
+  }}
+  viewport={{
+    once: true,
+    amount: 0.25,
+  }}
+  transition={{
+    duration: 0.5,
+    delay: 0.15,
+  }}
+>
+
+  <ProjectMetrics
+    metrics={project.metrics}
+  />
+
+</motion.div>
+<div className="px-10 pt-10">
+  <ProjectArchitecture
+    architecture={project.architecture}
+  />
 </div>
+
+<motion.div
+  ref={galleryRef}
+  id="gallery"
+  className="scroll-mt-32 px-10 pt-2"
+  initial={{
+    opacity: 0,
+    y: 30,
+  }}
+  whileInView={{
+    opacity: 1,
+    y: 0,
+  }}
+  viewport={{
+    once: true,
+    amount: 0.25,
+  }}
+  transition={{
+    duration: 0.5,
+    delay: 0.15,
+  }}
+>
+  <ProjectGallery
+    screenshots={project.screenshots}
+  />
+</motion.div> 
 
 <div className="px-10 pb-10 pt-8">
   <ProjectActions
