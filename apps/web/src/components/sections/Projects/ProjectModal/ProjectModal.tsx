@@ -22,6 +22,7 @@ import { useGithubRepository } from "@/hooks/useGithubRepository";
 
 import { GithubAnalyticsSection } from "./GithubAnalyticsSection";
 import { ModalBackground } from "./ModalBackground";
+import { SectionContainer } from "./SectionContainer";
 
 interface ProjectModalProps {
   open: boolean;
@@ -315,12 +316,18 @@ backdrop-blur-2xl
     delay: 0.15,
   }}
 >
+  <SectionContainer
+  id="overview"
+  title="Project Overview"
+  subtitle="Challenge, solution and technologies."
+>
   <ProjectOverview
     challenge={project.challenge}
     solution={project.solution}
     features={project.features}
     technologies={project.technologies}
   />
+</SectionContainer>
 </motion.div>
 <motion.div
   ref={githubRef}
@@ -343,11 +350,17 @@ backdrop-blur-2xl
     delay: 0.15,
   }}
 >
+  <SectionContainer
+  id="github"
+  title="GitHub Analytics"
+  subtitle="Repository statistics, health and language insights."
+>
   <GithubAnalyticsSection
     repository={repository}
     languages={languages}
     loading={loading}
   />
+</SectionContainer>
 </motion.div>
 <motion.div
   ref={metricsRef}
@@ -371,9 +384,15 @@ backdrop-blur-2xl
   }}
 >
 
+  <SectionContainer
+  id="metrics"
+  title="Performance Metrics"
+  subtitle="Project KPIs and measurable outcomes."
+>
   <MetricsDashboard
-  metrics={project.metrics}
-/>
+    metrics={project.metrics}
+  />
+</SectionContainer>
 
 </motion.div>
 <motion.div
@@ -397,9 +416,15 @@ backdrop-blur-2xl
     delay: 0.15,
   }}
 >
+  <SectionContainer
+  id="architecture"
+  title="System Architecture"
+  subtitle="High-level data flow through the application."
+>
   <ProjectArchitecture
     architecture={project.architecture}
   />
+</SectionContainer>
 </motion.div>
 
 <motion.div
@@ -423,9 +448,15 @@ backdrop-blur-2xl
     delay: 0.15,
   }}
 >
+  <SectionContainer
+  id="gallery"
+  title="Project Gallery"
+  subtitle="Screenshots and UI walkthrough."
+>
   <ProjectGallery
     screenshots={project.screenshots}
   />
+</SectionContainer>
 </motion.div> 
 
 <div className="px-10 pb-10 pt-8">
