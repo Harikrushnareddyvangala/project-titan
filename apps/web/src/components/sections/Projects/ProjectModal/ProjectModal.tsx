@@ -21,6 +21,7 @@ import { ProjectHero } from "./ProjectHero";
 import { useGithubRepository } from "@/hooks/useGithubRepository";
 
 import { GithubAnalyticsSection } from "./GithubAnalyticsSection";
+import { ModalBackground } from "./ModalBackground";
 
 interface ProjectModalProps {
   open: boolean;
@@ -233,6 +234,10 @@ if (!project) {
             }}
             onClick={(e) => e.stopPropagation()}
           >
+<ModalBackground />
+
+    <div className="relative z-10">
+
             <button
   onClick={onClose}
   aria-label="Close project details"
@@ -270,7 +275,17 @@ if (!project) {
   repository={repository}
   technologies={project.technologies}
 />
-<div className="sticky top-0 z-30">
+<div
+  className="
+sticky
+top-0
+z-30
+border-b
+border-white/10
+bg-zinc-950/80
+backdrop-blur-2xl
+"
+>
   <ProjectNavigation
     active={activeSection}
     progress={scrollProgress}
@@ -419,6 +434,7 @@ if (!project) {
     github={project.github}
     live={project.live}
   />
+</div>
 </div>
           </motion.div>
         </>

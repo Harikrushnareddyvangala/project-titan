@@ -24,19 +24,16 @@ export function ProjectNavigation({
   return (
     <div
       className="
-sticky
-top-0
-z-40
-border-y
+relative
+border-b
 border-white/10
-bg-zinc-950/80
+bg-zinc-950/70
 backdrop-blur-2xl
-supports-[backdrop-filter]:bg-zinc-950/60
 "
     >
       {/* Progress Bar */}
 
-      <div className="mx-auto mb-5 max-w-xl">
+      <div className="mx-auto max-w-xl px-8 pt-5">
 
         <div
           className="
@@ -58,7 +55,9 @@ to-blue-500
               width: `${progress}%`,
             }}
             transition={{
-              duration: 0.2,
+              type: "spring",
+  stiffness: 120,
+  damping: 20,
             }}
           />
         </div>
@@ -114,17 +113,20 @@ text-sm
 font-medium
 transition-all
 duration-300
+focus:outline-none
+focus:ring-2
+focus:ring-cyan-400/40
 
 ${
   selected
     ? "text-cyan-300"
-    : "text-zinc-400 hover:text-white"
+    : "text-zinc-400 hover:text-white hover:bg-white/5"
 }
 `}
             >
               {selected && (
                 <motion.div
-                  layoutId="navigation-highlight"
+                  layoutId="project-navigation-pill"
                   className="
 absolute
 inset-0
@@ -151,4 +153,4 @@ border-cyan-400/40
       </div>
     </div>
   );
-}
+} 
