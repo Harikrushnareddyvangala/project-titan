@@ -1,0 +1,208 @@
+"use client";
+
+import { motion } from "framer-motion";
+
+interface RepositoryHealthRingProps {
+  score: number;
+}
+
+export function RepositoryHealthRing({
+  score,
+}: RepositoryHealthRingProps) {
+  const radius = 72;
+
+  const circumference = 2 * Math.PI * radius;
+
+  const progress =
+    circumference -
+    (score / 100) * circumference;
+
+  return (
+    <motion.div
+      whileHover={{
+        scale: 1.04,
+      }}
+      transition={{
+        type: "spring",
+        stiffness: 250,
+      }}
+      className="
+        relative
+        overflow-hidden
+        rounded-[34px]
+        border
+        border-white/10
+        bg-white/[0.05]
+        backdrop-blur-3xl
+        p-8
+      "
+    >
+      {/* Glow */}
+
+      <motion.div
+        className="
+          absolute
+          -right-20
+          -top-20
+          h-52
+          w-52
+          rounded-full
+          bg-cyan-500/15
+          blur-[100px]
+        "
+        animate={{
+          scale: [1, 1.25, 1],
+          opacity: [0.25, 0.6, 0.25],
+        }}
+        transition={{
+          duration: 6,
+          repeat: Infinity,
+        }}
+      />
+
+      <div className="relative z-10 flex flex-col items-center">
+
+        <h3
+          className="
+            text-lg
+            font-semibold
+            text-white
+          "
+        >
+          Repository Health
+        </h3>
+
+        <div className="relative mt-8">
+
+          <svg
+            width="180"
+            height="180"
+            viewBox="0 0 180 180"
+            className="-rotate-90"
+          >
+            {/* Track */}
+
+            <circle
+              cx="90"
+              cy="90"
+              r={radius}
+              stroke="rgba(255,255,255,.08)"
+              strokeWidth="12"
+              fill="none"
+            />
+
+            {/* Progress */}
+
+            <motion.circle
+              cx="90"
+              cy="90"
+              r={radius}
+              fill="none"
+              stroke="url(#gradient)"
+              strokeWidth="12"
+              strokeLinecap="round"
+              strokeDasharray={circumference}
+              initial={{
+                strokeDashoffset: circumference,
+              }}
+              animate={{
+                strokeDashoffset: progress,
+              }}
+              transition={{
+                duration: 1.6,
+                ease: "easeOut",
+              }}
+            />
+
+            <defs>
+              <linearGradient
+                id="gradient"
+                x1="0%"
+                y1="0%"
+                x2="100%"
+                y2="100%"
+              >
+                <stop
+                  offset="0%"
+                  stopColor="#22d3ee"
+                />
+
+                <stop
+                  offset="100%"
+                  stopColor="#3b82f6"
+                />
+              </linearGradient>
+            </defs>
+
+          </svg>
+
+          {/* Center */}
+
+          <div
+            className="
+              absolute
+              inset-0
+              flex
+              flex-col
+              items-center
+              justify-center
+            "
+          >
+            <motion.div
+              initial={{
+                opacity: 0,
+                scale: 0.8,
+              }}
+              animate={{
+                opacity: 1,
+                scale: 1,
+              }}
+              transition={{
+                delay: 0.4,
+              }}
+            >
+              <p
+                className="
+                  text-5xl
+                  font-bold
+                  text-white
+                "
+              >
+                {score}
+              </p>
+
+              <p
+                className="
+                  mt-1
+                  text-sm
+                  text-zinc-400
+                "
+              >
+                /100
+              </p>
+            </motion.div>
+
+          </div>
+
+        </div>
+
+        <p
+          className="
+            mt-8
+            max-w-xs
+            text-center
+            text-sm
+            leading-7
+            text-zinc-400
+          "
+        >
+          Repository quality based on community
+          engagement, maintenance activity and
+          project popularity.
+        </p>
+
+      </div>
+
+    </motion.div>
+  );
+}
