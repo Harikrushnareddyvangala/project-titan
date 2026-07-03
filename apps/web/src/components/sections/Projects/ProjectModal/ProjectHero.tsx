@@ -15,6 +15,7 @@ import {
   GitBranch,
   ShieldCheck,
 } from "lucide-react";
+import { AuroraBackground } from "./AuroraBackground";
 
 const technologyIcons: Record<
   string,
@@ -281,7 +282,9 @@ const particles = useMemo(
     className="object-cover"
   />
 </motion.div>
+{/* Aurora Background */}
 
+<AuroraBackground />
       {/* Dark Overlay */}
       <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/50 to-black/20" />
       <div
