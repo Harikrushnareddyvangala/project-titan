@@ -1,7 +1,8 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { GitBranch, Activity } from "lucide-react";
+import {  Activity } from "lucide-react";
+import { FaGithub } from "react-icons/fa";
 
 import type { GithubRepository } from "@/types/github";
 
@@ -71,7 +72,7 @@ export function AnalyticsHeader({
                   bg-cyan-500/10
                 "
               >
-                <GitBranch
+                <FaGithub
                   className="text-cyan-300"
                   size={26}
                 />

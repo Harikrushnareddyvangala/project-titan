@@ -1,13 +1,74 @@
 "use client";
 
-import { GitFork, HardDrive, Eye, Star } from "lucide-react";
+import { motion } from "framer-motion";
 import type { ReactNode } from "react";
-import CountUp from "react-countup";
+
+import {
+  Star,
+  GitFork,
+  Eye,
+  HardDrive,
+  AlertCircle,
+} from "lucide-react";
 
 import type { GithubRepository } from "@/types/github";
 
+import { AnalyticsHeader } from "./ProjectModal/GithubAnalytics/AnalyticsHeader";
+import { KpiCard } from "./ProjectModal/GithubAnalytics/KpiCard";
+import { RepositoryHealthRing } from "./ProjectModal/GithubAnalytics/RepositoryHealthRing";
+import { RepositoryScore } from "./ProjectModal/GithubAnalytics/RepositoryScore";
+import {AnimatedCounter} from "./ProjectModal/GithubAnalytics/AnimatedCounter";
+
 interface GithubStatsProps {
   repository: GithubRepository | null;
+}
+
+function calculateHealth(
+  repository: GithubRepository,
+) {
+  let score = 50;
+
+  score += Math.min(
+    repository.stargazers_count / 10,
+    15,
+  );
+
+  score += Math.min(
+    repository.forks_count / 5,
+    10,
+  );
+
+  score += Math.min(
+    repository.watchers_count / 8,
+    8,
+  );
+
+  const updated =
+    new Date(repository.updated_at);
+
+  const days =
+    (Date.now() -
+      updated.getTime()) /
+    (1000 * 60 * 60 * 24);
+
+  if (days < 30)
+    score += 10;
+
+  else if (days < 90)
+    score += 5;
+
+  score -= Math.min(
+    repository.open_issues_count,
+    10,
+  );
+
+  return Math.max(
+    0,
+    Math.min(
+      Math.round(score),
+      100,
+    ),
+  );
 }
 
 export function GithubStats({
@@ -17,44 +78,168 @@ export function GithubStats({
     return null;
   }
 
+  const health =
+    calculateHealth(repository);
   return (
-    <section className="rounded-3xl border border-white/10 bg-white/5 p-8">
-      <h3 className="mb-8 text-2xl font-bold text-white">
-        GitHub Statistics
-      </h3>
+    <motion.section
+      initial={{
+        opacity: 0,
+        y: 30,
+      }}
+      whileInView={{
+        opacity: 1,
+        y: 0,
+      }}
+      viewport={{
+        once: true,
+        amount: 0.25,
+      }}
+      transition={{
+        duration: 0.6,
+      }}
+      className="
+        space-y-8
+      "
+    >
+      <AnalyticsHeader
+        repository={repository}
+      />
 
-      <div className="grid grid-cols-2 gap-5 lg:grid-cols-4">
-        <StatCard
-          icon={<Star className="h-5 w-5" />}
-          label="Stars"
+      <div
+        className="
+          grid
+          gap-6
+          xl:grid-cols-4
+          md:grid-cols-2
+        "
+      >
+        <KpiCard
+          title="Stars"
           value={repository.stargazers_count}
-          delay={0}
+          icon={<Star size={22} />}
         />
 
-        <StatCard
-          icon={<GitFork className="h-5 w-5" />}
-          label="Forks"
+        <KpiCard
+          title="Forks"
           value={repository.forks_count}
-          delay={0.2}
+          icon={<GitFork size={22} />}
+          
         />
 
-        <StatCard
-          icon={<Eye className="h-5 w-5" />}
-          label="Watchers"
+        <KpiCard
+          title="Watchers"
           value={repository.watchers_count}
-          delay={0.4}
+          icon={<Eye size={22} />}
+          
         />
 
-        <StatCard
-          icon={<HardDrive className="h-5 w-5" />}
-          label="Repository Size"
-          value={repository.size / 1024}
-          decimals={1}
+        <KpiCard
+          title="Repository Size"
+          value={Number(
+            (
+              repository.size / 1024
+            ).toFixed(1),
+          )}
           suffix=" MB"
-          delay={0.6}
+          decimals={1}
+          icon={<HardDrive size={22} />}
+          
         />
       </div>
-    </section>
+
+      <div
+        className="
+          grid
+          gap-8
+          xl:grid-cols-2
+        "
+      >
+        <RepositoryHealthRing
+          score={health}
+        />
+
+        <RepositoryScore
+          repository={repository}
+        />
+      </div>
+
+      <motion.div
+        initial={{
+          opacity: 0,
+          y: 20,
+        }}
+        whileInView={{
+          opacity: 1,
+          y: 0,
+        }}
+        viewport={{
+          once: true,
+        }}
+        transition={{
+          delay: 0.25,
+        }}
+        className="
+          rounded-[34px]
+          border
+          border-white/10
+          bg-white/[0.05]
+          backdrop-blur-3xl
+          p-8
+        "
+      >
+        <div className="flex items-center gap-3">
+
+          <AlertCircle
+            className="text-cyan-400"
+            size={22}
+          />
+
+          <h3 className="text-lg font-semibold text-white">
+            Repository Summary
+          </h3>
+
+        </div>
+
+        <p
+          className="
+            mt-6
+            text-[15px]
+            leading-8
+            text-zinc-400
+          "
+        >
+          This repository currently has{" "}
+          <span className="font-semibold text-white">
+            {repository.stargazers_count}
+          </span>{" "}
+          stars,
+          {" "}
+          <span className="font-semibold text-white">
+            {repository.forks_count}
+          </span>{" "}
+          forks and{" "}
+          <span className="font-semibold text-white">
+            {repository.watchers_count}
+          </span>{" "}
+          watchers.
+
+          {" "}It was last updated on{" "}
+
+          <span className="font-semibold text-white">
+            {new Date(
+              repository.updated_at,
+            ).toLocaleDateString()}
+          </span>
+
+          {" "}and currently contains{" "}
+
+          <span className="font-semibold text-white">
+            {repository.open_issues_count}
+          </span>{" "}
+          open issues.
+        </p>
+      </motion.div>
+    </motion.section>
   );
 }
 
@@ -94,15 +279,7 @@ function StatCard({
       </div>
 
       <p className="text-3xl font-bold text-white">
-        <CountUp
-          end={value}
-          duration={2}
-          delay={delay}
-          decimals={decimals}
-          suffix={suffix}
-          enableScrollSpy
-          scrollSpyOnce
-        />
+        <AnimatedCounter value={value} />
       </p>
 
       <p className="mt-2 text-sm text-zinc-400">
