@@ -46,6 +46,11 @@ export interface GithubRepository {
   license: {
   name: string;
 } | null;
+  owner: {
+  login: string;
+  avatar_url: string;
+  html_url: string;
+};
 }
 
 export type GithubLanguages = Record<

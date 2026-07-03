@@ -24,6 +24,7 @@
     "react-countup": "^6.5.3",
     "react-dom": "^19.2.7",
     "react-hook-form": "^7.80.0",
+    "react-icons": "^5.7.0",
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.6.0",
     "tailwindcss-animate": "^1.0.7",
