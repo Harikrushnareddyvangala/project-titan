@@ -1,10 +1,16 @@
 "use client";
-import { useMemo } from "react";
+import { useMemo, useRef } from "react";
 import Image from "next/image";
-import { motion } from "framer-motion";
+import {
+  motion,
+  useMotionValue,
+  useSpring,
+  useTransform,
+} from "framer-motion";
 import type {
   GithubRepository,
 } from "@/types/github";
+
 
 import {
   Star,
@@ -213,8 +219,157 @@ const particles = useMemo(
     })),
   [],
 );
+const mouseX = useMotionValue(0);
+const mouseY = useMotionValue(0);
+
+const springX = useSpring(mouseX, {
+  stiffness: 120,
+  damping: 18,
+});
+
+const springY = useSpring(mouseY, {
+  stiffness: 120,
+  damping: 18,
+});
+
+const rotateY = useTransform(
+  springX,
+  [-0.5, 0.5],
+  [-8, 8],
+);
+
+const rotateX = useTransform(
+  springY,
+  [-0.5, 0.5],
+  [8, -8],
+);
+
+const handleMouseMove = (
+  event: React.MouseEvent<HTMLDivElement>,
+) => {
+  const rect =
+    event.currentTarget.getBoundingClientRect();
+
+  const x =
+    (event.clientX - rect.left) / rect.width - 0.5;
+
+  const y =
+    (event.clientY - rect.top) / rect.height - 0.5;
+
+  mouseX.set(x);
+
+  mouseY.set(y);
+};
+
+const resetMouse = () => {
+  mouseX.set(0);
+  mouseY.set(0);
+const heroRef =
+  useRef<HTMLDivElement>(null);
+
+const mouseX =
+  useMotionValue(0);
+
+const mouseY =
+  useMotionValue(0);
+
+const springX =
+  useSpring(mouseX, {
+    stiffness: 120,
+    damping: 18,
+  });
+
+const springY =
+  useSpring(mouseY, {
+    stiffness: 120,
+    damping: 18,
+  });
+
+const imageX =
+  useTransform(
+    springX,
+    [-300, 300],
+    [-18, 18],
+  );
+
+const imageY =
+  useTransform(
+    springY,
+    [-300, 300],
+    [-18, 18],
+  );
+
+const contentX =
+  useTransform(
+    springX,
+    [-300, 300],
+    [-8, 8],
+  );
+
+const contentY =
+  useTransform(
+    springY,
+    [-300, 300],
+    [-8, 8],
+  );
+
+const cardX =
+  useTransform(
+    springX,
+    [-300, 300],
+    [12, -12],
+  );
+
+const cardY =
+  useTransform(
+    springY,
+    [-300, 300],
+    [12, -12],
+  );
+
+const handleMouseMove = (
+  e: React.MouseEvent<HTMLDivElement>,
+) => {
+  if (!heroRef.current) return;
+
+  const rect =
+    heroRef.current.getBoundingClientRect();
+
+  mouseX.set(
+    e.clientX -
+      rect.left -
+      rect.width / 2,
+  );
+
+  mouseY.set(
+    e.clientY -
+      rect.top -
+      rect.height / 2,
+  );
+};
+
+const resetMouse = () => {
+  mouseX.set(0);
+  mouseY.set(0);
+};
+};  
   return (
-    <div className="relative h-[560px] w-full overflow-hidden rounded-t-3xl">
+    <motion.div
+  className="
+    relative
+    h-[560px]
+    w-full
+    overflow-hidden
+    rounded-t-3xl
+    perspective-[1800px]
+  "
+  onMouseMove={handleMouseMove}
+  onMouseLeave={resetMouse}
+  style={{
+    rotateX,
+    rotateY,
+  }}
+>
       <motion.div
   className="
     absolute
@@ -260,26 +415,121 @@ const particles = useMemo(
     ease: "easeInOut",
   }}
 />
-      {/* Background Image */}
-      <motion.div
+      {/* Cinematic Background Image */}
+
+<motion.div
   initial={{
-    scale: 1.08,
+    scale: 1.15,
   }}
   animate={{
     scale: 1,
   }}
   transition={{
-    duration: 2,
+    duration: 4,
     ease: "easeOut",
   }}
-  className="absolute inset-0"
+  className="absolute inset-0 overflow-hidden"
 >
-  <Image
-    src={image}
-    alt={title}
-    fill
-    priority
-    className="object-cover"
+  <motion.div
+    animate={{
+      y: [-8, 8, -8],
+      scale: [1, 1.03, 1],
+    }}
+    transition={{
+      duration: 16,
+      repeat: Infinity,
+      ease: "easeInOut",
+    }}
+    className="absolute inset-0"
+  >
+    <Image
+      src={image}
+      alt={title}
+      fill
+      priority
+      className="
+        object-cover
+        brightness-[0.48]
+        contrast-125
+        saturate-125
+      "
+    />
+  </motion.div>
+
+  {/* Top spotlight */}
+
+  <motion.div
+    className="
+      absolute
+      -top-52
+      left-1/2
+      h-[700px]
+      w-[700px]
+      -translate-x-1/2
+      rounded-full
+      bg-cyan-400/15
+      blur-[140px]
+      mix-blend-screen
+    "
+    animate={{
+      opacity: [0.25, 0.55, 0.25],
+      scale: [1, 1.15, 1],
+    }}
+    transition={{
+      duration: 9,
+      repeat: Infinity,
+      ease: "easeInOut",
+    }}
+  />
+
+  {/* Bottom glow */}
+
+  <motion.div
+    className="
+      absolute
+      bottom-[-250px]
+      right-[-120px]
+      h-[500px]
+      w-[500px]
+      rounded-full
+      bg-violet-500/20
+      blur-[150px]
+      mix-blend-screen
+    "
+    animate={{
+      opacity: [0.15, 0.4, 0.15],
+      scale: [1, 1.2, 1],
+    }}
+    transition={{
+      duration: 12,
+      repeat: Infinity,
+      ease: "easeInOut",
+    }}
+  />
+
+  {/* Moving light beam */}
+
+  <motion.div
+    className="
+      absolute
+      inset-y-0
+      -left-1/2
+      w-1/3
+      bg-gradient-to-r
+      from-transparent
+      via-white/8
+      to-transparent
+      rotate-12
+      blur-3xl
+    "
+    animate={{
+      x: ["-20%", "220%"],
+    }}
+    transition={{
+      duration: 10,
+      repeat: Infinity,
+      ease: "linear",
+    }}
   />
 </motion.div>
 {/* Aurora Background */}
