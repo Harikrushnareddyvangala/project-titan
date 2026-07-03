@@ -213,7 +213,7 @@ const particles = useMemo(
   [],
 );
   return (
-    <div className="relative h-[420px] w-full overflow-hidden rounded-t-3xl">
+    <div className="relative h-[560px] w-full overflow-hidden rounded-t-3xl">
       <motion.div
   className="
     absolute
@@ -362,11 +362,11 @@ const particles = useMemo(
       <div
   className="
     absolute
-    bottom-12
-    left-10
-    right-10
+    bottom-16
+    left-14
+    right-14
     grid
-    gap-10
+    gap-14
     lg:grid-cols-[1.6fr_0.8fr]
     items-end
   "
@@ -404,7 +404,7 @@ const particles = useMemo(
             delay: 0.15,
             duration: 0.55,
           }}
-          className="mt-5 text-5xl font-bold tracking-tight text-white"
+          className="mt-5 text-6xl xl:text-7xl font-bold tracking-tight text-white"
         >
           {title}
         </motion.h1>
@@ -422,7 +422,7 @@ const particles = useMemo(
             delay: 0.3,
             duration: 0.55,
           }}
-          className="mt-5 max-w-3xl text-lg leading-8 text-zinc-300"
+          className="mt-5 max-w-4xl text-xl leading-8 text-zinc-300"
         >
           {summary}
         </motion.p>
