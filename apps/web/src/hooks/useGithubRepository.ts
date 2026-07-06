@@ -6,12 +6,14 @@ import type {
   GithubLanguages,
   GithubRepository,
   GithubCommitWeek,
+  GithubContributor,
 } from "@/types/github";
 
 interface GithubRepositoryResult {
   repository: GithubRepository | null;
   languages: GithubLanguages;
   commitActivity: GithubCommitWeek[];
+  contributors: GithubContributor[];
   loading: boolean;
   error: string | null;
 }
@@ -29,6 +31,8 @@ export function useGithubRepository(
   commitActivity,
   setCommitActivity,
 ] = useState<GithubCommitWeek[]>([]);
+
+  const [contributors, setContributors] = useState<GithubContributor[]>([]);
 
   const [loading, setLoading] =
     useState(false);
@@ -71,8 +75,10 @@ console.log("==================================");
 
         setLanguages(data.languages ?? {});
         setCommitActivity(
-  data.commitActivity ?? [],
+  data.commitActivity ?? [],);
+   setContributors(data.contributors ?? [],
 );
+
         console.log("Calling setRepository...");
 console.log(data.repository);
       } catch (err) {
@@ -84,6 +90,7 @@ console.log(data.repository);
 
         setCommitActivity([]);
 
+        setContributors([]);
         setError(
           err instanceof Error
             ? err.message
@@ -107,7 +114,9 @@ console.log(data.repository);
     repository,
     languages,
     commitActivity,
+    contributors,
     loading,
     error,
+    
   };
 }

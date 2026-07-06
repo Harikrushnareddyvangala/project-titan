@@ -199,6 +199,7 @@ const {
   repository,
   languages,
   commitActivity,
+  contributors,
   loading,
   error,
 } = github;
@@ -367,6 +368,7 @@ backdrop-blur-2xl
     repository={repository}
     languages={languages}
     commitActivity= {commitActivity}
+    contributors={contributors}
     loading={loading}
   />
 </motion.div>

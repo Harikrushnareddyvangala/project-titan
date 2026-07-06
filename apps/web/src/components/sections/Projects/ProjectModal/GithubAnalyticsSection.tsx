@@ -4,6 +4,7 @@ import type {
   GithubLanguages,
   GithubRepository,
   GithubCommitWeek,
+  GithubContributors,
 } from "@/types/github";
 
 import { GithubStats } from "../GithubStats";
@@ -18,6 +19,7 @@ interface GithubAnalyticsSectionProps {
   repository: GithubRepository | null;
   languages: GithubLanguages;
   commitActivity: GithubCommitWeek[];
+  contributors: GithubContributors[];
   loading: boolean;
 }
 
@@ -25,6 +27,7 @@ export function GithubAnalyticsSection({
   repository,
   languages,
   commitActivity,
+  contributors,
   loading,
 }: GithubAnalyticsSectionProps) {
   if (loading) {
@@ -46,6 +49,9 @@ export function GithubAnalyticsSection({
  />
     <GithubCommitActivity
     commits={commitActivity?? []}
+/>
+<GithubContributors
+    contributors={contributors}
 />
 
      <GithubBadges repository={repository} />

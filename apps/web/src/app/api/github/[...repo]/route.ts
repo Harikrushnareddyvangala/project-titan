@@ -34,7 +34,7 @@ export async function GET(
   };
 
   try {
-    const [repoResponse, languageResponse, commitResponse] =
+    const [repoResponse, languageResponse, commitResponse, contributorResponse,] =
       await Promise.all([
         fetch(baseUrl, {
           headers,
@@ -50,6 +50,12 @@ export async function GET(
           },
         }),
         fetch(`${baseUrl}/stats/commit_activity`, {
+          headers,
+          next: {
+            revalidate: 600,
+          },
+        }),
+        fetch(`${baseUrl}/contributors`, {
           headers,
           next: {
             revalidate: 600,
@@ -73,17 +79,21 @@ export async function GET(
         ? await languageResponse.json()
         : {};
     let commitActivityData = [];
+    let contributorsData = [];
 
     if (commitResponse.status === 200) {
   commitActivityData = await commitResponse.json();
 } else if (commitResponse.status === 202) {
   commitActivityData = [];
+} 
+ if(contributorResponse.ok) {
+  contributorsData = await contributorResponse.json();
 }
-
     return NextResponse.json({
       repository: repositoryData,
       languages: languageData,
       commitActivity: commitActivityData,
+      contributors: contributorsData,
     });
   } catch {
     return NextResponse.json(
