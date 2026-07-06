@@ -12,6 +12,7 @@ import { GithubHealth } from "./GithubHealth";
 import { GithubTimeline } from "./GithubTimeline";
 import { GithubLanguagesCard } from "./GithubAnalytics/GithubLanguagesCard";
 import { GithubCommitActivity } from "./GithubAnalytics/GithubCommitActivity";
+import { GithubRepositoryMetadata } from "./GithubAnalytics/GithubRepositoryMetadata";
 
 interface GithubAnalyticsSectionProps {
   repository: GithubRepository | null;
@@ -37,6 +38,9 @@ export function GithubAnalyticsSection({
   return (
    <section className="p-10 bg-zinc-900 text-white space-y-8">
      <GithubStats repository={repository} />
+     <GithubRepositoryMetadata
+    repository={repository}
+/>
      <GithubLanguagesCard
    languages={languages}
  />
