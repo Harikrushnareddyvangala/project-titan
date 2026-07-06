@@ -2,15 +2,21 @@
 
 import { motion } from "framer-motion";
 
+
+
+import type { GithubRepository } from "@/types/github";
+import { GithubCard } from "./GithubCard";
 import {
   Activity,
   CalendarClock,
   Globe,
   Wrench,
+  CheckCircle2,
+  AlertTriangle,
+  Clock3,
 } from "lucide-react";
 
-import type { GithubRepository } from "@/types/github";
-import { GithubCard } from "./GithubCard";
+import { RepositoryHealthRing } from "./GithubAnalytics/RepositoryHealthRing";
 
 interface GithubHealthProps {
   repository: GithubRepository | null;
@@ -31,6 +37,23 @@ export function GithubHealth({
   const active =
     daysSinceUpdate <= 90;
 
+  const healthScore =
+  Math.max(
+    25,
+    100 -
+      daysSinceUpdate / 2 -
+      repository.open_issues_count,
+  );
+
+const maintenanceStatus =
+  healthScore > 80
+    ? "Excellent"
+
+    : healthScore > 60
+      ? "Healthy"
+
+      : "Needs Attention";
+
   return (
     <GithubCard>
       <div className="mb-8">
@@ -45,9 +68,35 @@ export function GithubHealth({
 
 </div>
 
-      <div className="grid gap-6 md:grid-cols-2">
+      <div
+  className="
+    grid
+    gap-8
+    xl:grid-cols-[330px_1fr]
+  "
+>
+
+  <RepositoryHealthRing
+    score={Math.round(
+      healthScore,
+    )}
+  />
+
+  <div className="grid gap-6 md:grid-cols-2">
         <HealthItem
-          icon={<Activity size={20} />}
+  icon={
+    active
+      ? (
+          <CheckCircle2
+            size={20}
+          />
+        )
+      : (
+          <AlertTriangle
+            size={20}
+          />
+        )
+  }
           label="Development"
           value={
             active
@@ -69,7 +118,7 @@ export function GithubHealth({
         />
 
         <HealthItem
-          icon={<CalendarClock size={20} />}
+          icon={<Clock3 size={20} />}
           label="Last Updated"
           value={`${daysSinceUpdate} days ago`}
           color="text-purple-400"
@@ -78,11 +127,7 @@ export function GithubHealth({
         <HealthItem
           icon={<Wrench size={20} />}
           label="Maintenance"
-          value={
-            active
-              ? "Maintained"
-              : "Needs attention"
-          }
+          value={maintenanceStatus}
           color={
             active
               ? "text-green-400"
@@ -90,6 +135,47 @@ export function GithubHealth({
           }
         />
       </div>
+      </div>
+      <motion.div
+  initial={{
+    opacity: 0,
+  }}
+  whileInView={{
+    opacity: 1,
+  }}
+  viewport={{
+    once: true,
+  }}
+  className="
+    mt-10
+    rounded-2xl
+    border
+    border-white/10
+    bg-white/[0.03]
+    p-5
+  "
+>
+  <div className="flex items-center justify-between">
+
+    <span className="text-zinc-400">
+      Repository Health Score
+    </span>
+
+    <span
+      className="
+        text-xl
+        font-bold
+        text-cyan-300
+      "
+    >
+      {Math.round(
+        healthScore,
+      )}
+      %
+    </span>
+
+  </div>
+</motion.div>
     </GithubCard>
   );
 }

@@ -5,19 +5,24 @@ import { useEffect, useState } from "react";
 interface AnimatedCounterProps {
   value: number;
   duration?: number;
+  prefix?: string;
+  suffix?: string;
+  decimals?: number;
 }
 
 export function AnimatedCounter({
   value,
   duration = 1200,
+  prefix = "",
+  suffix = "",
+  decimals = 0,
 }: AnimatedCounterProps) {
   const [count, setCount] = useState(0);
 
   useEffect(() => {
     let start = 0;
 
-    const increment =
-      value / (duration / 16);
+    const increment = value / (duration / 16);
 
     const timer = setInterval(() => {
       start += increment;
@@ -26,12 +31,18 @@ export function AnimatedCounter({
         setCount(value);
         clearInterval(timer);
       } else {
-        setCount(Math.floor(start));
+        setCount(start);
       }
     }, 16);
 
     return () => clearInterval(timer);
   }, [value, duration]);
 
-  return <>{count}</>;
+  return (
+    <>
+      {prefix}
+      {count.toFixed(decimals)}
+      {suffix}
+    </>
+  );
 }

@@ -67,3 +67,9 @@ export interface GithubRepositoryResult {
 
   error: string | null;
 }
+
+export interface GithubCommitWeek {
+  week: number;
+  total: number;
+  days: number[];
+}

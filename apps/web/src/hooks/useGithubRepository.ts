@@ -5,109 +5,109 @@ import { useEffect, useState } from "react";
 import type {
   GithubLanguages,
   GithubRepository,
+  GithubCommitWeek,
 } from "@/types/github";
 
 interface GithubRepositoryResult {
   repository: GithubRepository | null;
-
   languages: GithubLanguages;
-
+  commitActivity: GithubCommitWeek[];
   loading: boolean;
-
   error: string | null;
 }
 
 export function useGithubRepository(
   repo: string,
 ): GithubRepositoryResult {
-  const [
-    repository,
-    setRepository,
-  ] =
-    useState<GithubRepository | null>(
-      null,
-    );
+  const [repository, setRepository] =
+    useState<GithubRepository | null>(null);
 
-  const [
-    languages,
-    setLanguages,
-  ] =
+  const [languages, setLanguages] =
     useState<GithubLanguages>({});
-
+  
   const [
-    loading,
-    setLoading,
-  ] = useState(true);
+  commitActivity,
+  setCommitActivity,
+] = useState<GithubCommitWeek[]>([]);
 
-  const [
-    error,
-    setError,
-  ] =
+  const [loading, setLoading] =
+    useState(false);
+
+  const [error, setError] =
     useState<string | null>(null);
 
   useEffect(() => {
     if (!repo) return;
 
-    async function fetchRepository() {
+    let cancelled = false;
+
+    async function load() {
       try {
         setLoading(true);
-
         setError(null);
 
-        const baseUrl =
-          `https://api.github.com/repos/${repo}`;
+        const response = await fetch(
+          `/api/github/${repo}`,
+        );
 
-        const [
-          repositoryResponse,
-          languagesResponse,
-        ] = await Promise.all([
-          fetch(baseUrl),
+        const data = await response.json();
+        console.log("========== API RESPONSE ==========");
+console.log(data);
+console.log("repository =", data.repository);
+console.log("languages =", data.languages);
+console.log("==================================");
 
-          fetch(
-            `${baseUrl}/languages`,
-          ),
-        ]);
-
-        if (!repositoryResponse.ok) {
+        if (!response.ok) {
           throw new Error(
-            "Unable to fetch repository.",
+            data.message ??
+              data.error ??
+              "Unable to load repository",
           );
         }
 
-        const repositoryData =
-          (await repositoryResponse.json()) as GithubRepository;
+        if (cancelled) return;
 
-        const languagesData =
-          (await languagesResponse.json()) as GithubLanguages;
+        setRepository(data.repository);
 
-        setRepository(
-          repositoryData,
-        );
-
-        setLanguages(
-          languagesData,
-        );
+        setLanguages(data.languages ?? {});
+        setCommitActivity(
+  data.commitActivity ?? [],
+);
+        console.log("Calling setRepository...");
+console.log(data.repository);
       } catch (err) {
+        if (cancelled) return;
+
+        setRepository(null);
+
+        setLanguages({});
+
+        setCommitActivity([]);
+
         setError(
           err instanceof Error
             ? err.message
             : "Unknown error",
         );
       } finally {
-        setLoading(false);
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
     }
 
-    fetchRepository();
+    load();
+
+    return () => {
+      cancelled = true;
+    };
   }, [repo]);
 
   return {
     repository,
-
     languages,
-
+    commitActivity,
     loading,
-
     error,
   };
 }

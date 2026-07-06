@@ -1,99 +1,55 @@
 "use client";
 
-import { motion } from "framer-motion";
+import type {
+  GithubLanguages,
+  GithubRepository,
+  GithubCommitWeek,
+} from "@/types/github";
 
 import { GithubStats } from "../GithubStats";
-import { GithubLanguages } from "./GithubLanguages";
-import { GithubRepositoryInfo } from "./GithubRepositoryInfo";
-import { GithubSkeleton } from "./GithubSkeleton";
+import { GithubBadges } from "./GithubBadges";
 import { GithubHealth } from "./GithubHealth";
 import { GithubTimeline } from "./GithubTimeline";
-import { GithubBadges } from "./GithubBadges";
-import { RepositoryInsights } from "./RepositoryInsights";
-import { DashboardBackground } from "../GithubAnalytics/DashboardBackground";
-
-
-import type {
-  GithubLanguages as GithubLanguagesType,
-  GithubRepository,
-} from "@/types/github";
+import { GithubLanguagesCard } from "./GithubAnalytics/GithubLanguagesCard";
+import { GithubCommitActivity } from "./GithubAnalytics/GithubCommitActivity";
 
 interface GithubAnalyticsSectionProps {
   repository: GithubRepository | null;
-  languages: GithubLanguagesType;
+  languages: GithubLanguages;
+  commitActivity: GithubCommitWeek[];
   loading: boolean;
 }
 
 export function GithubAnalyticsSection({
   repository,
   languages,
+  commitActivity,
   loading,
 }: GithubAnalyticsSectionProps) {
   if (loading) {
-    return <GithubSkeleton />;
+    return <div>Loading...</div>;
   }
 
   if (!repository) {
-    return null;
+    return <div>No Repository</div>;
   }
 
   return (
-  <section
-    className="
-      relative
-      overflow-hidden
-      rounded-[36px]
-      border
-      border-white/10
-      bg-gradient-to-br
-      from-zinc-950
-      via-zinc-900
-      to-black
-      p-10
-    "
-  >
-    <DashboardBackground />
+   <section className="p-10 bg-zinc-900 text-white space-y-8">
+     <GithubStats repository={repository} />
+     <GithubLanguagesCard
+   languages={languages}
+ />
+    <GithubCommitActivity
+    commits={commitActivity?? []}
+/>
 
-    <div className="relative z-10 space-y-10">
+     <GithubBadges repository={repository} />
 
-      <GithubStats
-        repository={repository}
-      />
+     <GithubHealth repository={repository} />
 
-      <GithubBadges
-        repository={repository}
-      />
+    <GithubTimeline repository={repository} />
 
-      <div className="grid gap-8 xl:grid-cols-2">
-
-        <GithubHealth
-          repository={repository}
-        />
-
-        <GithubTimeline
-          repository={repository}
-        />
-
-      </div>
-
-      <div className="grid gap-8 xl:grid-cols-2">
-
-        <GithubRepositoryInfo
-          repository={repository}
-        />
-
-        <GithubLanguages
-          languages={languages}
-        />
-
-      </div>
-
-      <RepositoryInsights
-        repository={repository}
-      />
-
-    </div>
-
-  </section>
-);
+   </section>
+ );
 }

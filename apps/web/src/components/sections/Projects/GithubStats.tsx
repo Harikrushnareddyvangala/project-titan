@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import type { ReactNode } from "react";
+import { useMemo, type ReactNode } from "react";
 
 import {
   Star,
@@ -46,10 +46,10 @@ function calculateHealth(
   const updated =
     new Date(repository.updated_at);
 
+  const now = new Date();
   const days =
-    (Date.now() -
-      updated.getTime()) /
-    (1000 * 60 * 60 * 24);
+  (now.getTime() - updated.getTime()) /
+  (1000 * 60 * 60 * 24);
 
   if (days < 30)
     score += 10;
@@ -81,165 +81,200 @@ export function GithubStats({
   const health =
     calculateHealth(repository);
   return (
-    <motion.section
-      initial={{
-        opacity: 0,
-        y: 30,
-      }}
-      whileInView={{
-        opacity: 1,
-        y: 0,
-      }}
-      viewport={{
-        once: true,
-        amount: 0.25,
-      }}
-      transition={{
-        duration: 0.6,
-      }}
-      className="
-        space-y-8
-      "
-    >
-      <AnalyticsHeader
-        repository={repository}
+  //   <motion.section
+  //     initial={{
+  //       opacity: 0,
+  //       y: 30,
+  //     }}
+  //     whileInView={{
+  //       opacity: 1,
+  //       y: 0,
+  //     }}
+  //     viewport={{
+  //       once: true,
+  //       amount: 0.25,
+  //     }}
+  //     transition={{
+  //       duration: 0.6,
+  //     }}
+  //     className="
+  //       space-y-8
+  //     "
+  //   >
+  //     <AnalyticsHeader
+  //       repository={repository}
+  //     />
+
+  //     <div
+  //       className="
+  //         grid
+  //         gap-6
+  //         xl:grid-cols-4
+  //         md:grid-cols-2
+  //       "
+  //     >
+  //       <KpiCard
+  //         title="Stars"
+  //         value={repository.stargazers_count}
+  //         icon={<Star size={22} />}
+  //       />
+
+  //       <KpiCard
+  //         title="Forks"
+  //         value={repository.forks_count}
+  //         icon={<GitFork size={22} />}
+          
+  //       />
+
+  //       <KpiCard
+  //         title="Watchers"
+  //         value={repository.watchers_count}
+  //         icon={<Eye size={22} />}
+          
+  //       />
+
+  //       <KpiCard
+  //         title="Repository Size"
+  //         value={Number(
+  //           (
+  //             repository.size / 1024
+  //           ).toFixed(1),
+  //         )}
+  //         suffix=" MB"
+  //         decimals={1}
+  //         icon={<HardDrive size={22} />}
+          
+  //       />
+  //     </div>
+
+  //     <div
+  //       className="
+  //         grid
+  //         gap-8
+  //         xl:grid-cols-2
+  //       "
+  //     >
+  //       <RepositoryHealthRing
+  //         score={health}
+  //       />
+
+  //       <RepositoryScore
+  //         repository={repository}
+  //       />
+  //     </div>
+
+  //     <motion.div
+  //       initial={{
+  //         opacity: 0,
+  //         y: 20,
+  //       }}
+  //       whileInView={{
+  //         opacity: 1,
+  //         y: 0,
+  //       }}
+  //       viewport={{
+  //         once: true,
+  //       }}
+  //       transition={{
+  //         delay: 0.25,
+  //       }}
+  //       className="
+  //         rounded-[34px]
+  //         border
+  //         border-white/10
+  //         bg-white/[0.05]
+  //         backdrop-blur-3xl
+  //         p-8
+  //       "
+  //     >
+  //       <div className="flex items-center gap-3">
+
+  //         <AlertCircle
+  //           className="text-cyan-400"
+  //           size={22}
+  //         />
+
+  //         <h3 className="text-lg font-semibold text-white">
+  //           Repository Summary
+  //         </h3>
+
+  //       </div>
+
+  //       <p
+  //         className="
+  //           mt-6
+  //           text-[15px]
+  //           leading-8
+  //           text-zinc-400
+  //         "
+  //       >
+  //         This repository currently has{" "}
+  //         <span className="font-semibold text-white">
+  //           {repository.stargazers_count}
+  //         </span>{" "}
+  //         stars,
+  //         {" "}
+  //         <span className="font-semibold text-white">
+  //           {repository.forks_count}
+  //         </span>{" "}
+  //         forks and{" "}
+  //         <span className="font-semibold text-white">
+  //           {repository.watchers_count}
+  //         </span>{" "}
+  //         watchers.
+
+  //         {" "}It was last updated on{" "}
+
+  //         <span className="font-semibold text-white">
+  //           {new Date(
+  //             repository.updated_at,
+  //           ).toLocaleDateString()}
+  //         </span>
+
+  //         {" "}and currently contains{" "}
+
+  //         <span className="font-semibold text-white">
+  //           {repository.open_issues_count}
+  //         </span>{" "}
+  //         open issues.
+  //       </p>
+  //     </motion.div>
+  //   </motion.section>
+  // );
+  <motion.section className="space-y-8">
+    <AnalyticsHeader repository={repository} />
+
+    <div className="grid gap-6 xl:grid-cols-4 md:grid-cols-2">
+      <KpiCard
+        title="Stars"
+        value={repository.stargazers_count}
+        icon={<Star size={22} />}
       />
-
-      <div
-        className="
-          grid
-          gap-6
-          xl:grid-cols-4
-          md:grid-cols-2
-        "
-      >
-        <KpiCard
-          title="Stars"
-          value={repository.stargazers_count}
-          icon={<Star size={22} />}
-        />
-
-        <KpiCard
+      <KpiCard
           title="Forks"
           value={repository.forks_count}
-          icon={<GitFork size={22} />}
-          
-        />
-
-        <KpiCard
+          icon={<GitFork size={22} />}        
+       />
+       <KpiCard
           title="Watchers"
           value={repository.watchers_count}
           icon={<Eye size={22} />}
-          
-        />
-
-        <KpiCard
-          title="Repository Size"
-          value={Number(
-            (
-              repository.size / 1024
+       />
+       <KpiCard
+           title="Repository Size"
+           value={Number(
+             (
+               repository.size / 1024
             ).toFixed(1),
           )}
           suffix=" MB"
           decimals={1}
-          icon={<HardDrive size={22} />}
-          
-        />
-      </div>
-
-      <div
-        className="
-          grid
-          gap-8
-          xl:grid-cols-2
-        "
-      >
-        <RepositoryHealthRing
-          score={health}
-        />
-
-        <RepositoryScore
-          repository={repository}
-        />
-      </div>
-
-      <motion.div
-        initial={{
-          opacity: 0,
-          y: 20,
-        }}
-        whileInView={{
-          opacity: 1,
-          y: 0,
-        }}
-        viewport={{
-          once: true,
-        }}
-        transition={{
-          delay: 0.25,
-        }}
-        className="
-          rounded-[34px]
-          border
-          border-white/10
-          bg-white/[0.05]
-          backdrop-blur-3xl
-          p-8
-        "
-      >
-        <div className="flex items-center gap-3">
-
-          <AlertCircle
-            className="text-cyan-400"
-            size={22}
-          />
-
-          <h3 className="text-lg font-semibold text-white">
-            Repository Summary
-          </h3>
-
-        </div>
-
-        <p
-          className="
-            mt-6
-            text-[15px]
-            leading-8
-            text-zinc-400
-          "
-        >
-          This repository currently has{" "}
-          <span className="font-semibold text-white">
-            {repository.stargazers_count}
-          </span>{" "}
-          stars,
-          {" "}
-          <span className="font-semibold text-white">
-            {repository.forks_count}
-          </span>{" "}
-          forks and{" "}
-          <span className="font-semibold text-white">
-            {repository.watchers_count}
-          </span>{" "}
-          watchers.
-
-          {" "}It was last updated on{" "}
-
-          <span className="font-semibold text-white">
-            {new Date(
-              repository.updated_at,
-            ).toLocaleDateString()}
-          </span>
-
-          {" "}and currently contains{" "}
-
-          <span className="font-semibold text-white">
-            {repository.open_issues_count}
-          </span>{" "}
-          open issues.
-        </p>
-      </motion.div>
-    </motion.section>
+           icon={<HardDrive size={22} />}
+      />
+    </div>
+    <RepositoryHealthRing score={health} />
+    <RepositoryScore repository={repository} />
+  </motion.section>
   );
 }
 

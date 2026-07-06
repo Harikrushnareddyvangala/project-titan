@@ -183,13 +183,42 @@ useEffect(() => {
     );
   };
 }, [open]);
+const repoName = project?.githubRepo ?? "";
+
+console.log("repoName =", repoName);
+
+const github = useGithubRepository(repoName);
+
+useEffect(() => {
+  console.log("====== PROJECT MODAL ======");
+  console.log(github);
+  console.log("===========================");
+}, [github]);
+
 const {
   repository,
   languages,
+  commitActivity,
   loading,
-} = useGithubRepository(
-  project?.githubRepo ?? "",
-);
+  error,
+} = github;
+useEffect(() => {
+  console.log("PROJECT MODAL STATE");
+  console.log({
+    loading,
+    repository,
+    languages,
+    error,
+  });
+}, [loading, repository, languages, error]);
+console.log("PROJECT MODAL");
+
+console.log({
+  project: project?.title,
+  loading,
+  repository,
+  languages,
+});
 
 if (!project) {
   return null;
@@ -333,34 +362,13 @@ backdrop-blur-2xl
   ref={githubRef}
   id="github"
   className="scroll-mt-32 px-10 pt-2"
-  initial={{
-    opacity: 0,
-    y: 30,
-  }}
-  whileInView={{
-    opacity: 1,
-    y: 0,
-  }}
-  viewport={{
-    once: true,
-    amount: 0.25,
-  }}
-  transition={{
-    duration: 0.5,
-    delay: 0.15,
-  }}
->
-  <SectionContainer
-  id="github"
-  title="GitHub Analytics"
-  subtitle="Repository statistics, health and language insights."
 >
   <GithubAnalyticsSection
     repository={repository}
     languages={languages}
+    commitActivity= {commitActivity}
     loading={loading}
   />
-</SectionContainer>
 </motion.div>
 <motion.div
   ref={metricsRef}
