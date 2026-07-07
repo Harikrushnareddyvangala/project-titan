@@ -11,6 +11,7 @@ interface Props {
   height?: number;
   className?: string;
   sizes?: string;
+  loading?: "lazy" | "eager" | "auto";
 }
 
 export function ProjectImage({
