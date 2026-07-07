@@ -13,6 +13,7 @@ import {
 
 import { ProjectModal } from "./ProjectModal/ProjectModal";
 import type { Project } from "./types";
+import { ProjectImage } from "@/components/common/ProjectImage";
 
 interface ProjectCardProps {
   project: Project;
@@ -36,11 +37,13 @@ export function ProjectCard({
         className="group cursor-pointer overflow-hidden rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl"
       >
         <div className="relative aspect-[16/10] overflow-hidden">
-          <Image
+          <ProjectImage
             src={project.image}
             alt={project.title}
             fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             className="object-cover transition duration-500 group-hover:scale-105"
+            loading= "lazy"
           />
         </div>
 
