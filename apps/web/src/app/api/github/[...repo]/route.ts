@@ -36,6 +36,7 @@ export async function GET(
   try {
     const [repoResponse, languageResponse, commitResponse, contributorResponse,] =
       await Promise.all([
+        
         fetch(baseUrl, {
           headers,
           next: {
@@ -62,6 +63,13 @@ export async function GET(
           },
         }),
       ]);
+      console.log({
+  repository,
+  repoStatus: repoResponse.status,
+  languageStatus: languageResponse.status,
+  commitStatus: commitResponse.status,
+  contributorStatus: contributorResponse.status,
+});
 
     if (!repoResponse.ok) {
       const error = await repoResponse.json();
@@ -82,12 +90,16 @@ export async function GET(
     let contributorsData = [];
 
     if (commitResponse.status === 200) {
-  commitActivityData = await commitResponse.json();
-} else if (commitResponse.status === 202) {
+  commitActivityData =
+    await commitResponse.json();
+} else {
   commitActivityData = [];
-} 
- if(contributorResponse.ok) {
-  contributorsData = await contributorResponse.json();
+}
+ if (contributorResponse.status === 200) {
+  contributorsData =
+    await contributorResponse.json();
+} else {
+  contributorsData = [];
 }
     return NextResponse.json({
       repository: repositoryData,
@@ -95,7 +107,8 @@ export async function GET(
       commitActivity: commitActivityData,
       contributors: contributorsData,
     });
-  } catch {
+  } catch(error) {
+    console.error("GitHub API Route Error:", error);
     return NextResponse.json(
       {
         error: "GitHub unavailable",

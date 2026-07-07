@@ -4,7 +4,7 @@ import type {
   GithubLanguages,
   GithubRepository,
   GithubCommitWeek,
-  GithubContributors,
+  GithubContributor,
 } from "@/types/github";
 
 import { GithubStats } from "../GithubStats";
@@ -14,12 +14,13 @@ import { GithubTimeline } from "./GithubTimeline";
 import { GithubLanguagesCard } from "./GithubAnalytics/GithubLanguagesCard";
 import { GithubCommitActivity } from "./GithubAnalytics/GithubCommitActivity";
 import { GithubRepositoryMetadata } from "./GithubAnalytics/GithubRepositoryMetadata";
+import { GithubContributors } from "./GithubAnalytics/GithubContributors";
 
 interface GithubAnalyticsSectionProps {
   repository: GithubRepository | null;
   languages: GithubLanguages;
   commitActivity: GithubCommitWeek[];
-  contributors: GithubContributors[];
+   contributors: GithubContributor[];
   loading: boolean;
 }
 
