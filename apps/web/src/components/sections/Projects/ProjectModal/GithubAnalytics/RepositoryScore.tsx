@@ -120,6 +120,7 @@ export function RepositoryScore({
         bg-white/[0.05]
         backdrop-blur-3xl
         p-8
+        min-h-[280px]
       "
     >
       <motion.div

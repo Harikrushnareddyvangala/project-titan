@@ -68,12 +68,15 @@ export function RepositoryOverviewCard({
         duration: 0.45,
       }}
       className="
-      rounded-3xl
-      border
-      border-white/10
-      bg-white/[0.04]
-      backdrop-blur-xl
-      p-8
+      relative
+overflow-hidden
+rounded-[34px]
+border
+border-white/10
+bg-white/[0.05]
+backdrop-blur-3xl
+p-8
+min-h-[300px]
       "
     >
       <div className="flex items-center justify-between">

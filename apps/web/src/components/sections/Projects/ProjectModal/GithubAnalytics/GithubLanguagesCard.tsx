@@ -62,6 +62,7 @@ export function GithubLanguagesCard({
         bg-white/[0.05]
         backdrop-blur-3xl
         p-8
+        min-h-[360px]
       "
     >
       <div className="mb-8 flex items-center justify-between">

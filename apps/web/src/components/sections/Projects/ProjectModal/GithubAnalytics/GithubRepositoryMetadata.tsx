@@ -54,6 +54,7 @@ border-white/10
 bg-white/[0.05]
 backdrop-blur-2xl
 p-8
+min-h-[260px]
 "
     >
       <h3 className="text-2xl font-bold text-white">

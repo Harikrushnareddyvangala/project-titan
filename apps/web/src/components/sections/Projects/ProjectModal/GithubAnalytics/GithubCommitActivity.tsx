@@ -15,11 +15,13 @@ export function GithubCommitActivity({
     return (
       <section
         className="
-rounded-[30px]
+        relative
+        overflow-hidden
+rounded-[34px]
 border
 border-white/10
 bg-white/[0.05]
-backdrop-blur-2xl
+backdrop-blur-3xl
 p-8
 "
       >
@@ -48,13 +50,15 @@ p-8
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       className="
-rounded-[30px]
-border
-border-white/10
-bg-white/[0.05]
-backdrop-blur-2xl
-p-8
-"
+      relative
+      overflow-hidden
+      rounded-[34px]
+      border
+      border-white/10
+      bg-white/[0.05]
+      backdrop-blur-3xl
+      p-8
+    "
     >
       <h3 className="text-2xl font-bold text-white">
         Commit Activity

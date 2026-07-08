@@ -46,6 +46,7 @@ export function RepositoryHealthRing({
         bg-white/[0.05]
         backdrop-blur-3xl
         p-8
+        min-h-[420px]
       "
     >
       {/* Glow */}
