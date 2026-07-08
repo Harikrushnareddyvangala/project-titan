@@ -242,7 +242,7 @@ if (!project) {
             role="dialog"
             aria-modal="true"
             aria-labelledby="project-title"
-            className="fixed left-1/2 top-1/2 z-50 h-[90vh] w-[95vw] max-w-5xl -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-3xl border border-white/10 bg-gradient-to-b from-zinc-950 to-zinc-900 shadow-[0_30px_80px_rgba(0,0,0,.65)]"
+            className="fixed left-1/2 top-1/2 z-50 h-[90vh] w-[96vw] max-w-[1600px] -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-3xl border border-white/10 bg-gradient-to-b from-zinc-950 to-zinc-900 shadow-[0_30px_80px_rgba(0,0,0,.65)]"
             initial={{
               opacity: 0,
               scale: 0.9,

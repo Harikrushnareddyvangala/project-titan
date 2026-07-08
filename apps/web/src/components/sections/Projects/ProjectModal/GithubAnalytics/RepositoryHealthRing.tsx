@@ -1,17 +1,27 @@
 "use client";
 
 import { motion } from "framer-motion";
+import type { GithubRepository } from "@/types/github";
 
 interface RepositoryHealthRingProps {
-  score: number;
+  repository: GithubRepository;
 }
 
 export function RepositoryHealthRing({
-  score,
+  repository,
 }: RepositoryHealthRingProps) {
   const radius = 72;
 
   const circumference = 2 * Math.PI * radius;
+  const score =
+  Math.min(
+    100,
+    Math.round(
+      repository.stargazers_count * 2 +
+      repository.forks_count * 3 +
+      repository.watchers_count
+    )
+  );
 
   const progress =
     circumference -

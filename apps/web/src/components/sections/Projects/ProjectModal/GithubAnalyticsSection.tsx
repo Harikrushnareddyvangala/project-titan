@@ -7,14 +7,9 @@ import type {
   GithubContributor,
 } from "@/types/github";
 
-import { GithubStats } from "../GithubStats";
-import { GithubBadges } from "./GithubBadges";
-import { GithubHealth } from "./GithubHealth";
-import { GithubTimeline } from "./GithubTimeline";
-import { GithubLanguagesCard } from "./GithubAnalytics/GithubLanguagesCard";
-import { GithubCommitActivity } from "./GithubAnalytics/GithubCommitActivity";
-import { GithubRepositoryMetadata } from "./GithubAnalytics/GithubRepositoryMetadata";
-import { GithubContributors } from "./GithubAnalytics/GithubContributors";
+import { AnalyticsHeader } from "./GithubAnalytics/AnalyticsHeader";
+import {
+  DashboardGrid,} from "./GithubAnalytics/DashboardGrid";
 
 interface GithubAnalyticsSectionProps {
   repository: GithubRepository | null;
@@ -32,35 +27,23 @@ export function GithubAnalyticsSection({
   loading,
 }: GithubAnalyticsSectionProps) {
   if (loading) {
-    return <div>Loading...</div>;
+    return <div className="p-10 text-center text-zinc-400">Loading...</div>;
   }
 
   if (!repository) {
-    return <div>No Repository</div>;
+    return <div className="p-10 text-center text-zinc-400">No Repository</div>;
   }
 
   return (
    <section className="p-10 bg-zinc-900 text-white space-y-8">
-     <GithubStats repository={repository} />
-     <GithubRepositoryMetadata
-    repository={repository}
+      <AnalyticsHeader />
+      <DashboardGrid
+  repository={repository}
+  languages={languages}
+  commits={commitActivity}
+  contributors={contributors}
 />
-     <GithubLanguagesCard
-   languages={languages}
- />
-    <GithubCommitActivity
-    commits={commitActivity?? []}
-/>
-<GithubContributors
-    contributors={contributors}
-/>
-
-     <GithubBadges repository={repository} />
-
-     <GithubHealth repository={repository} />
-
-    <GithubTimeline repository={repository} />
-
+     
    </section>
  );
 }
