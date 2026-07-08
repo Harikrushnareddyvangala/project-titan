@@ -29,7 +29,7 @@ export function GithubContributors({
     <motion.section
       initial={{
         opacity: 0,
-        y: 20,
+        y: 25,
       }}
       whileInView={{
         opacity: 1,
@@ -37,6 +37,7 @@ export function GithubContributors({
       }}
       viewport={{
         once: true,
+        amount:.2,
       }}
       transition={{
         duration: 0.5,
@@ -44,10 +45,11 @@ export function GithubContributors({
       className="
 rounded-[30px]
 border
-border-white/10
+border-white/[0.08]
 bg-white/[0.05]
 backdrop-blur-2xl
-p-8
+p-6
+lg:p-8
 space-y-8
 "
     >
@@ -94,7 +96,7 @@ space-y-8
                 className="
 rounded-2xl
 border
-border-white/10
+border-white/[0.08]
 bg-black/20
 p-5
 "
@@ -110,7 +112,7 @@ p-5
                     }
                     width={52}
                     height={52}
-                    className="rounded-full border border-white/10"
+                    className="rounded-full border border-white/[0.08]"
                   />
 
                   <div className="flex-1">

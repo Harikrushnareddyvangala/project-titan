@@ -19,10 +19,11 @@ export function GithubCommitActivity({
         overflow-hidden
 rounded-[34px]
 border
-border-white/10
+border-white/[0.08]
 bg-white/[0.05]
 backdrop-blur-3xl
-p-8
+p-6
+lg:p-8
 "
       >
         <h3 className="text-2xl font-bold text-white">
@@ -54,10 +55,11 @@ p-8
       overflow-hidden
       rounded-[34px]
       border
-      border-white/10
+      border-white/[0.08]
       bg-white/[0.05]
       backdrop-blur-3xl
-      p-8
+      p-6
+      lg:p-8
     "
     >
       <h3 className="text-2xl font-bold text-white">

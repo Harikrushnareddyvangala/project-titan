@@ -39,7 +39,7 @@ overflow-hidden
 h-full
 rounded-[30px]
 border
-border-white/10
+border-white/[0.08]
 bg-gradient-to-br
 from-white/[0.06]
 to-white/[0.02]

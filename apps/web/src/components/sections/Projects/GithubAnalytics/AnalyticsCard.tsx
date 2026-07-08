@@ -37,7 +37,7 @@ export function AnalyticsCard({
         overflow-hidden
         rounded-3xl
         border
-        border-white/10
+        border-white/[0.08]
         bg-white/[0.04]
         p-7
         backdrop-blur-xl

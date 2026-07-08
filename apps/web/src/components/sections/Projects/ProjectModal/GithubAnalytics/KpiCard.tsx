@@ -35,7 +35,7 @@ export function KpiCard({
         overflow-hidden
         rounded-[30px]
         border
-        border-white/10
+        border-white/[0.08]
         bg-white/[0.05]
         backdrop-blur-3xl
         p-6
@@ -77,7 +77,7 @@ export function KpiCard({
               justify-center
               rounded-2xl
               border
-              border-white/10
+              border-white/[0.08]
               bg-white/5
             "
           >

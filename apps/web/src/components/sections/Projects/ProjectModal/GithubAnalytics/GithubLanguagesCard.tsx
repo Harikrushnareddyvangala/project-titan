@@ -46,7 +46,7 @@ export function GithubLanguagesCard({
     <motion.section
       initial={{
         opacity: 0,
-        y: 20,
+        y: 25,
       }}
       whileInView={{
         opacity: 1,
@@ -54,14 +54,19 @@ export function GithubLanguagesCard({
       }}
       viewport={{
         once: true,
+        amount:.2,
       }}
+      transition={{
+duration:.5,
+}}
       className="
         rounded-[34px]
         border
-        border-white/10
+        border-white/[0.08]
         bg-white/[0.05]
         backdrop-blur-3xl
-        p-8
+        p-6
+        lg:p-8
         min-h-[360px]
       "
     >
@@ -117,7 +122,7 @@ export function GithubLanguagesCard({
           gap-4
           rounded-2xl
           border
-          border-white/10
+          border-white/[0.08]
           bg-black/20
           p-6
           md:grid-cols-2

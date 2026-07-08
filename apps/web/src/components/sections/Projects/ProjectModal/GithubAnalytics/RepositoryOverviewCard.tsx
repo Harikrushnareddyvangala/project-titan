@@ -31,7 +31,7 @@ function InfoItem({
       className="
       rounded-2xl
       border
-      border-white/10
+      border-white/[0.08]
       bg-white/[0.03]
       p-4
       "
@@ -55,7 +55,7 @@ export function RepositoryOverviewCard({
     <motion.section
       initial={{
         opacity: 0,
-        y: 20,
+        y: 25,
       }}
       whileInView={{
         opacity: 1,
@@ -63,19 +63,21 @@ export function RepositoryOverviewCard({
       }}
       viewport={{
         once: true,
+        amount:.2,
       }}
       transition={{
-        duration: 0.45,
+        duration: 0.5,
       }}
       className="
       relative
 overflow-hidden
 rounded-[34px]
 border
-border-white/10
+border-white/[0.08]
 bg-white/[0.05]
 backdrop-blur-3xl
-p-8
+p-6
+lg:p-8
 min-h-[300px]
       "
     >

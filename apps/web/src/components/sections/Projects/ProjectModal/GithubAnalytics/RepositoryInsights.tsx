@@ -54,10 +54,11 @@ export function RepositoryInsights({
       className="
         rounded-[34px]
         border
-        border-white/10
+        border-white/[0.08]
         bg-white/[0.05]
         backdrop-blur-3xl
-        p-8
+        p-6
+        lg:p-8
       "
     >
       <div className="flex items-center gap-4">
@@ -171,7 +172,7 @@ function InsightCard({
       className="
         rounded-3xl
         border
-        border-white/10
+        border-white/[0.08]
         bg-white/[0.03]
         p-6
       "

@@ -40,14 +40,14 @@ export function DashboardGrid({
   contributors,
 }: DashboardGridProps) {
   return (
-  <div className="space-y-10">
+  <div className="space-y-12">
 
     {/* Dashboard */}
 
     <div
       className="
       grid
-      gap-8
+      gap-10
       xl:grid-cols-[1.7fr_0.9fr]
       items-start
       "

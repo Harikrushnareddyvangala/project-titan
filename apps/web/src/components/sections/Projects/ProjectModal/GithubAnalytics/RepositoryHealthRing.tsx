@@ -69,10 +69,11 @@ const daysSinceUpdate = Math.floor(
         overflow-hidden
         rounded-[34px]
         border
-        border-white/10
+        border-white/[0.08]
         bg-white/[0.05]
         backdrop-blur-3xl
-        p-8
+        p-6
+        lg:p-8
         min-h-[560px]
       "
     >
@@ -287,7 +288,7 @@ function Metric({
       justify-between
       rounded-xl
       border
-      border-white/10
+      border-white/[0.08]
       bg-white/[0.03]
       px-4
       py-3

@@ -130,7 +130,8 @@ Math.min(
   return (
     <motion.div
       whileHover={{
-        y: -6,
+        y:-8,
+scale:1.015,
       }}
       transition={{
         type: "spring",
@@ -144,7 +145,8 @@ Math.min(
         border-white/10
         bg-white/[0.05]
         backdrop-blur-3xl
-        p-8
+        p-6
+        lg:p-8
         min-h-[280px]
       "
     >
@@ -211,7 +213,7 @@ Math.min(
           <motion.div
             initial={{
               opacity: 0,
-              y: 20,
+              y: 25,
             }}
             animate={{
               opacity: 1,

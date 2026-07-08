@@ -28,7 +28,8 @@ export function AnalyticsHeader() {
       from-cyan-500/10
       via-zinc-900
       to-violet-500/10
-      p-8
+      p-6
+      lg:p-8
       "
     >
       <div className="flex items-start justify-between">
