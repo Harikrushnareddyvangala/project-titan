@@ -7,7 +7,7 @@ import { RepositoryHealthRing } from "./RepositoryHealthRing";
 
 import { GithubLanguageDonut } from "./GithubLanguageDonut";
 import { GithubCommitHeatmap } from "./GithubCommitHeatmap";
-import { GithubContributors } from "./GithubContributors";
+import { GithubContributorLeaderboard } from "./GithubContributorLeaderboard";
 import { GithubRepositoryMetadata } from "./GithubRepositoryMetadata";
 
 import type {
@@ -141,9 +141,9 @@ export function DashboardGrid({
     commits={commits}
 />
 
-    <GithubContributors
-      contributors={contributors}
-    />
+    <GithubContributorLeaderboard
+    contributors={contributors}
+/>
 
   </div>
 );
