@@ -1,7 +1,8 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Award } from "lucide-react";
+import { Award, BrainCircuit } from "lucide-react";
+import { ProgressBar } from "./ProgressBar";
 
 import type { GithubRepository } from "@/types/github";
 import { AnimatedCounter } from "./AnimatedCounter";
@@ -101,6 +102,30 @@ export function RepositoryScore({
 
   const description =
     getDescription(score);
+  
+  const communityScore = Math.min(
+  100,
+  Math.round(
+    repository.stargazers_count * 2 +
+    repository.forks_count * 3
+  )
+);
+
+const maintenanceScore =
+Math.max(
+  40,
+  100 -
+  repository.open_issues_count * 4
+);
+
+const popularityScore =
+Math.min(
+  100,
+  Math.round(
+    repository.watchers_count * 4 +
+    repository.stargazers_count
+  )
+);
 
   return (
     <motion.div
@@ -174,7 +199,7 @@ export function RepositoryScore({
             </h3>
 
             <p className="text-sm text-zinc-400">
-              AI Quality Assessment
+              Machine Learning Repository Evaluation
             </p>
 
           </div>
@@ -222,19 +247,67 @@ export function RepositoryScore({
                 text-emerald-300
               "
             >
-              Grade {grade}
+              ★★★★★ {grade}
             </div>
 
-            <p
-              className="
-                mt-6
-                text-sm
-                leading-7
-                text-zinc-400
-              "
-            >
-              {description}
-            </p>
+            <div className="mt-8 space-y-6">
+
+  <div
+    className="
+    rounded-2xl
+    border
+    border-cyan-400/20
+    bg-cyan-500/5
+    p-5
+    "
+  >
+
+    <div className="flex items-center gap-3">
+
+      <BrainCircuit
+        className="text-cyan-400"
+        size={20}
+      />
+
+      <span
+        className="
+        font-semibold
+        text-cyan-300
+        "
+      >
+        AI Assessment
+      </span>
+
+    </div>
+
+    <p
+      className="
+      mt-4
+      leading-7
+      text-zinc-300
+      "
+    >
+      {description}
+    </p>
+
+  </div>
+
+  <ProgressBar
+    title="Community"
+    value={communityScore}
+  />
+
+  <ProgressBar
+    title="Maintenance"
+    value={maintenanceScore}
+  />
+
+  <ProgressBar
+    title="Popularity"
+    value={popularityScore}
+  />
+
+</div>
 
           </motion.div>
 
