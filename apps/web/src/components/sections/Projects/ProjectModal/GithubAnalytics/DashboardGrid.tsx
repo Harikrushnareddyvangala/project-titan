@@ -17,6 +17,15 @@ import type {
   GithubContributor,
 } from "@/types/github";
 
+import {
+    Star,
+    GitFork,
+    Eye,
+    HardDrive,
+} from "lucide-react";
+
+import { KpiCard } from "./KpiCard";
+
 interface DashboardGridProps {
   repository: GithubRepository;
   languages: GithubLanguages;
@@ -58,6 +67,46 @@ export function DashboardGrid({
           {/* Step 3 */}
 
           {/* KPI Cards */}
+          <div
+    className="
+        grid
+        gap-6
+        sm:grid-cols-2
+        xl:grid-cols-4
+    "
+>
+
+    <KpiCard
+        title="Stars"
+        value={repository.stargazers_count}
+        icon={<Star className="text-yellow-400" />}
+        color="rgba(250,204,21,.25)"
+    />
+
+    <KpiCard
+        title="Forks"
+        value={repository.forks_count}
+        icon={<GitFork className="text-cyan-400" />}
+        color="rgba(34,211,238,.25)"
+    />
+
+    <KpiCard
+        title="Watchers"
+        value={repository.watchers_count}
+        icon={<Eye className="text-purple-400" />}
+        color="rgba(168,85,247,.25)"
+    />
+
+    <KpiCard
+        title="Repository Size"
+        value={`${(
+            repository.size / 1024
+        ).toFixed(1)} MB`}
+        icon={<HardDrive className="text-green-400" />}
+        color="rgba(34,197,94,.25)"
+    />
+
+</div>
 
           {/* Step 4 */}
 

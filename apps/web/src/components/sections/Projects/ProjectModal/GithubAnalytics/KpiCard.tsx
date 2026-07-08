@@ -3,36 +3,20 @@
 import { motion } from "framer-motion";
 import type { ReactNode } from "react";
 
-import { TrendingUp } from "lucide-react";
-
-import { AnimatedCounter } from "./AnimatedCounter";
-
 interface KpiCardProps {
   title: string;
-  value: number;
-
+  value: ReactNode;
   icon: ReactNode;
-
+  color: string;
   subtitle?: string;
-
-  trend?: number;
-
-  prefix?: string;
-
-  suffix?: string;
-
-  decimals?: number;
 }
 
 export function KpiCard({
   title,
   value,
   icon,
+  color,
   subtitle,
-  trend,
-  prefix,
-  suffix,
-  decimals,
 }: KpiCardProps) {
   return (
     <motion.div
@@ -43,57 +27,38 @@ export function KpiCard({
       transition={{
         type: "spring",
         stiffness: 280,
-        damping: 20,
       }}
       className="
         group
         relative
         overflow-hidden
-        rounded-3xl
+        rounded-[30px]
         border
         border-white/10
         bg-white/[0.05]
         backdrop-blur-3xl
         p-6
-        shadow-[0_15px_45px_rgba(0,0,0,.35)]
       "
     >
-      {/* Animated Glow */}
       <motion.div
         className="
           absolute
-          -right-12
-          -top-12
-          h-40
-          w-40
+          -right-16
+          -top-16
+          h-44
+          w-44
           rounded-full
-          bg-cyan-500/15
-          blur-[80px]
+          blur-[90px]
         "
+        style={{
+          background: color,
+        }}
         animate={{
           scale: [1, 1.25, 1],
-          opacity: [0.25, 0.55, 0.25],
+          opacity: [0.2, 0.45, 0.2],
         }}
         transition={{
           duration: 6,
-          repeat: Infinity,
-        }}
-      />
-
-      {/* Animated Border */}
-      <motion.div
-        className="
-          absolute
-          inset-0
-          rounded-3xl
-          border
-          border-cyan-400/10
-        "
-        animate={{
-          opacity: [0.15, 0.4, 0.15],
-        }}
-        transition={{
-          duration: 5,
           repeat: Infinity,
         }}
       />
@@ -105,86 +70,37 @@ export function KpiCard({
           <div
             className="
               flex
-              h-12
-              w-12
+              h-14
+              w-14
               items-center
               justify-center
               rounded-2xl
               border
-              border-cyan-400/20
-              bg-cyan-500/10
-              text-cyan-300
+              border-white/10
+              bg-white/5
             "
           >
             {icon}
           </div>
 
-          {trend !== undefined && (
-            <div
-              className="
-                flex
-                items-center
-                gap-1
-                rounded-full
-                border
-                border-emerald-400/20
-                bg-emerald-500/10
-                px-3
-                py-1
-                text-xs
-                font-medium
-                text-emerald-300
-              "
-            >
-              <TrendingUp size={12} />
-
-              {trend}%
-            </div>
-          )}
-
         </div>
 
-        <div className="mt-8">
+        <h4 className="mt-6 text-sm text-zinc-400">
+          {title}
+        </h4>
 
-          <p
-            className="
-              text-sm
-              font-medium
-              uppercase
-              tracking-wider
-              text-zinc-400
-            "
-          >
-            {title}
+        <p className="mt-3 text-4xl font-bold text-white">
+          {value}
+        </p>
+
+        {subtitle && (
+          <p className="mt-2 text-sm text-zinc-500">
+            {subtitle}
           </p>
-
-          <div className="mt-3 text-4xl font-bold">
-
-            <AnimatedCounter
-              value={value}
-              prefix={prefix}
-              suffix={suffix}
-              decimals={decimals}
-            />
-
-          </div>
-
-          {subtitle && (
-            <p
-              className="
-                mt-3
-                text-sm
-                leading-relaxed
-                text-zinc-500
-              "
-            >
-              {subtitle}
-            </p>
-          )}
-
-        </div>
+        )}
 
       </div>
+
     </motion.div>
   );
 }
