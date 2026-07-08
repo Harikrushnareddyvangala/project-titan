@@ -6,7 +6,7 @@ import { RepositoryScore } from "./RepositoryScore";
 import { RepositoryHealthRing } from "./RepositoryHealthRing";
 
 import { GithubLanguageDonut } from "./GithubLanguageDonut";
-import { GithubCommitActivity } from "./GithubCommitActivity";
+import { GithubCommitHeatmap } from "./GithubCommitHeatmap";
 import { GithubContributors } from "./GithubContributors";
 import { GithubRepositoryMetadata } from "./GithubRepositoryMetadata";
 
@@ -137,9 +137,9 @@ export function DashboardGrid({
 
     {/* FULL WIDTH */}
 
-    <GithubCommitActivity
-      commits={commits}
-    />
+    <GithubCommitHeatmap
+    commits={commits}
+/>
 
     <GithubContributors
       contributors={contributors}
