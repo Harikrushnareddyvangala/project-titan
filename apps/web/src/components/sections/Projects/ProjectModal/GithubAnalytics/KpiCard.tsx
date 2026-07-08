@@ -2,10 +2,11 @@
 
 import { motion } from "framer-motion";
 import type { ReactNode } from "react";
+import { AnimatedCounter } from "./AnimatedCounter";
 
 interface KpiCardProps {
   title: string;
-  value: ReactNode;
+  value: number;
   icon: ReactNode;
   color: string;
   subtitle?: string;
@@ -90,7 +91,7 @@ export function KpiCard({
         </h4>
 
         <p className="mt-3 text-4xl font-bold text-white">
-          {value}
+          <AnimatedCounter value={value} />
         </p>
 
         {subtitle && (

@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import type { GithubRepository } from "@/types/github";
+import { AnimatedCounter } from "./AnimatedCounter";
 
 interface RepositoryHealthRingProps {
   repository: GithubRepository;
@@ -178,7 +179,9 @@ export function RepositoryHealthRing({
                   text-white
                 "
               >
-                {score}
+                <AnimatedCounter
+    value={score}
+/>
               </p>
 
               <p

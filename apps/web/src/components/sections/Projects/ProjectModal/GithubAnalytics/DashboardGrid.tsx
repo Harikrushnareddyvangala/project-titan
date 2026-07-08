@@ -99,9 +99,8 @@ export function DashboardGrid({
 
     <KpiCard
         title="Repository Size"
-        value={`${(
-            repository.size / 1024
-        ).toFixed(1)} MB`}
+        value={Math.round(repository.size / 1024)}
+        subtitle="MB"
         icon={<HardDrive className="text-green-400" />}
         color="rgba(34,197,94,.25)"
     />

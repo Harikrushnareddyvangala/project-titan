@@ -1,51 +1,59 @@
 "use client";
 
-import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
-import { useEffect } from "react";
+import { motion, useMotionValue, useSpring } from "framer-motion";
+import { useEffect, useState } from "react";
 
 interface AnimatedCounterProps {
   value: number;
   duration?: number;
   prefix?: string;
   suffix?: string;
-  decimals?: number;
 }
 
 export function AnimatedCounter({
   value,
-  duration = 1.6,
+  duration = 1.8,
   prefix = "",
   suffix = "",
-  decimals = 0,
 }: AnimatedCounterProps) {
   const motionValue = useMotionValue(0);
 
   const spring = useSpring(motionValue, {
-    damping: 24,
+    damping: 28,
     stiffness: 90,
   });
 
-  const display = useTransform(
-    spring,
-    (latest) =>
-      `${prefix}${latest.toFixed(decimals)}${suffix}`,
-  );
+  const [display, setDisplay] = useState(0);
 
   useEffect(() => {
     motionValue.set(value);
-  }, [motionValue, value]);
+  }, [value, motionValue]);
+
+  useEffect(() => {
+    const unsubscribe = spring.on("change", (latest) => {
+      setDisplay(Math.round(latest));
+    });
+
+    return unsubscribe;
+  }, [spring]);
 
   return (
     <motion.span
-      className="
-        font-bold
-        tracking-tight
-        text-white
-      "
+      initial={{
+        opacity: 0,
+        y: 10,
+      }}
+      animate={{
+        opacity: 1,
+        y: 0,
+      }}
+      transition={{
+        duration,
+      }}
     >
-      <motion.span>
-        {display}
-      </motion.span>
+      {prefix}
+      {display.toLocaleString()}
+      {suffix}
     </motion.span>
   );
 }

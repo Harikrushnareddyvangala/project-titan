@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Award } from "lucide-react";
 
 import type { GithubRepository } from "@/types/github";
+import { AnimatedCounter } from "./AnimatedCounter";
 
 interface RepositoryScoreProps {
   repository: GithubRepository;
@@ -194,7 +195,9 @@ export function RepositoryScore({
             <div className="flex items-end gap-3">
 
               <span className="text-6xl font-bold text-white">
-                {score}
+                <AnimatedCounter
+    value={score}
+/>
               </span>
 
               <span className="mb-2 text-zinc-400">
