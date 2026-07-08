@@ -27,6 +27,33 @@ export function RepositoryHealthRing({
   const progress =
     circumference -
     (score / 100) * circumference;
+  const status =
+  score >= 90
+    ? "Excellent"
+    : score >= 75
+      ? "Healthy"
+      : score >= 60
+        ? "Fair"
+        : "Needs Work";
+
+const statusColor =
+  score >= 90
+    ? "text-green-400"
+
+    : score >= 75
+      ? "text-cyan-400"
+
+      : score >= 60
+        ? "text-yellow-400"
+
+        : "text-red-400";
+
+const updated = new Date(repository.updated_at);
+
+const daysSinceUpdate = Math.floor(
+  (Date.now() - updated.getTime()) /
+    (1000 * 60 * 60 * 24),
+);
 
   return (
     <motion.div
@@ -46,7 +73,7 @@ export function RepositoryHealthRing({
         bg-white/[0.05]
         backdrop-blur-3xl
         p-8
-        min-h-[420px]
+        min-h-[560px]
       "
     >
       {/* Glow */}
@@ -56,15 +83,15 @@ export function RepositoryHealthRing({
           absolute
           -right-20
           -top-20
-          h-52
-          w-52
+          h-72
+          w-72
           rounded-full
           bg-cyan-500/15
-          blur-[100px]
+          blur-[140px]
         "
         animate={{
           scale: [1, 1.25, 1],
-          opacity: [0.25, 0.6, 0.25],
+          opacity: [0.15,0.5,0.15],
         }}
         transition={{
           duration: 6,
@@ -111,7 +138,7 @@ export function RepositoryHealthRing({
               r={radius}
               fill="none"
               stroke="url(#gradient)"
-              strokeWidth="12"
+              strokeWidth="14"
               strokeLinecap="round"
               strokeDasharray={circumference}
               initial={{
@@ -161,62 +188,129 @@ export function RepositoryHealthRing({
             "
           >
             <motion.div
-              initial={{
-                opacity: 0,
-                scale: 0.8,
-              }}
-              animate={{
-                opacity: 1,
-                scale: 1,
-              }}
-              transition={{
-                delay: 0.4,
-              }}
-            >
-              <p
-                className="
-                  text-5xl
-                  font-bold
-                  text-white
-                "
-              >
-                <AnimatedCounter
-    value={score}
-/>
-              </p>
+  animate={{
+    scale: [1, 1.08, 1],
+  }}
+  transition={{
+    duration: 3,
+    repeat: Infinity,
+  }}
+  className="
+  flex
+  flex-col
+  items-center
+  "
+>
 
-              <p
-                className="
-                  mt-1
-                  text-sm
-                  text-zinc-400
-                "
-              >
-                /100
-              </p>
-            </motion.div>
+  <p
+    className="
+    text-5xl
+    font-bold
+    text-white
+    "
+  >
+    <AnimatedCounter
+      value={score}
+    />
+  </p>
+
+  <p
+    className={`
+    mt-2
+    text-sm
+    font-semibold
+    ${statusColor}
+    `}
+  >
+    {status}
+  </p>
+
+</motion.div>
 
           </div>
 
         </div>
 
-        <p
-          className="
-            mt-8
-            max-w-xs
-            text-center
-            text-sm
-            leading-7
-            text-zinc-400
-          "
-        >
-          Repository quality based on community
-          engagement, maintenance activity and
-          project popularity.
-        </p>
+        <div
+className="
+mt-8
+space-y-5
+w-full
+"
+>
+
+<Metric
+title="Repository Status"
+value={status}
+/>
+
+<Metric
+title="Last Sync"
+value={`${daysSinceUpdate} days ago`}
+/>
+
+<Metric
+title="Open Issues"
+value={repository.open_issues_count.toString()}
+/>
+
+<Metric
+title="Community"
+value={
+repository.watchers_count > 5
+? "Strong"
+: "Growing"
+}
+/>
+
+</div>
 
       </div>
 
     </motion.div>
+  );
+}
+interface MetricProps {
+  title: string;
+  value: string;
+}
+
+function Metric({
+  title,
+  value,
+}: MetricProps) {
+  return (
+    <div
+      className="
+      flex
+      items-center
+      justify-between
+      rounded-xl
+      border
+      border-white/10
+      bg-white/[0.03]
+      px-4
+      py-3
+      "
+    >
+      <span
+        className="
+        text-sm
+        text-zinc-400
+        "
+      >
+        {title}
+      </span>
+
+      <span
+        className="
+        font-semibold
+        text-white
+        "
+      >
+        {value}
+      </span>
+
+    </div>
   );
 }
