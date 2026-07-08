@@ -5,7 +5,7 @@ import { RepositoryOverviewCard } from "./RepositoryOverviewCard";
 import { RepositoryScore } from "./RepositoryScore";
 import { RepositoryHealthRing } from "./RepositoryHealthRing";
 
-import { GithubLanguagesCard } from "./GithubLanguagesCard";
+import { GithubLanguageDonut } from "./GithubLanguageDonut";
 import { GithubCommitActivity } from "./GithubCommitActivity";
 import { GithubContributors } from "./GithubContributors";
 import { GithubRepositoryMetadata } from "./GithubRepositoryMetadata";
@@ -103,9 +103,9 @@ export function DashboardGrid({
 
         </div>
 
-        <GithubLanguagesCard
-          languages={languages}
-        />
+        <GithubLanguageDonut
+  languages={languages}
+/>
 
       </div>
 
