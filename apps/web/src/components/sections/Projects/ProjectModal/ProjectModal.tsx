@@ -305,6 +305,8 @@ if (!project) {
   image={project.screenshots[0]}
   repository={repository}
   technologies={project.technologies}
+  githubUrl={project.github}
+  liveUrl={project.live}
 />
 <div
   className="
@@ -469,7 +471,14 @@ backdrop-blur-2xl
 </SectionContainer>
 </motion.div> 
 
-<div className="px-10 pb-10 pt-8">
+<div className="px-10
+pb-12
+pt-10
+border-t
+border-white/10
+bg-gradient-to-t
+from-zinc-950
+to-transparent">
   <ProjectActions
     title={project.title}
     github={project.github}

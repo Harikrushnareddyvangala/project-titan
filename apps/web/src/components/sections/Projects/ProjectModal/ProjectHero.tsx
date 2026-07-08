@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 
 import { AuroraBackground } from "./AuroraBackground";
+import { ProjectHeroActions } from "./ProjectHeroActions";
 
 import type {
   GithubRepository,
@@ -56,6 +57,8 @@ interface ProjectHeroProps {
   image: string;
   repository?: GithubRepository | null;
   technologies: string[];
+  githubUrl?: string;
+  liveUrl?: string;
 }
 
 function RepositoryRow({
@@ -195,6 +198,8 @@ export function ProjectHero({
   image,
   repository,
   technologies,
+  githubUrl,
+  liveUrl,
 }: ProjectHeroProps) {
   const heroRef =
     useRef<HTMLDivElement>(null);
@@ -305,6 +310,21 @@ export function ProjectHero({
       {/* Aurora */}
       <AuroraBackground />
 
+<motion.div
+  className="
+absolute
+inset-0
+bg-[radial-gradient(circle_at_center,rgba(6,182,212,.12),transparent_65%)]
+"
+  animate={{
+    opacity: [0.5, 0.9, 0.5],
+    scale: [1, 1.08, 1],
+  }}
+  transition={{
+    duration: 8,
+    repeat: Infinity,
+  }}
+/>
       {/* Cinematic Background Image */}
 
       <motion.div
@@ -313,7 +333,7 @@ export function ProjectHero({
           rotateY,
           transformPerspective: 1200,
         }}
-        className="absolute inset-0"
+        className="absolute inset-0 z-0"
       >
         <motion.div
           initial={{
@@ -345,51 +365,9 @@ export function ProjectHero({
 
       {/* Cinematic Lighting */}
 
-      <motion.div
-        className="
-        absolute
-        -left-40
-        -top-40
-        h-[500px]
-        w-[500px]
-        rounded-full
-        bg-cyan-400/20
-        blur-[160px]
-        "
-        animate={{
-          x: [0, 80, -30, 0],
-          y: [0, -50, 30, 0],
-          scale: [1, 1.15, 0.95, 1],
-        }}
-        transition={{
-          duration: 18,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-      />
+      
 
-      <motion.div
-        className="
-        absolute
-        -right-44
-        bottom-0
-        h-[420px]
-        w-[420px]
-        rounded-full
-        bg-violet-500/20
-        blur-[150px]
-        "
-        animate={{
-          x: [0, -60, 40, 0],
-          y: [0, 30, -25, 0],
-          scale: [1, .9, 1.2, 1],
-        }}
-        transition={{
-          duration: 20,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-      />
+      
 
       {/* Animated Grid */}
 
@@ -420,8 +398,7 @@ export function ProjectHero({
         className="
         absolute
         inset-0
-        bg-black/30
-        backdrop-blur-[2px]
+        bg-black/40
         "
       />
 
@@ -429,6 +406,7 @@ export function ProjectHero({
         className="
         absolute
         inset-0
+        z-20
         bg-gradient-to-t
         from-zinc-950
         via-zinc-950/45
@@ -438,7 +416,7 @@ export function ProjectHero({
 
       {/* Floating Particles */}
 
-      <div className="absolute inset-0 overflow-hidden">
+      <div className="absolute inset-0 overflow-hidden z-10">
         {particles.map((particle) => (
           <motion.div
             key={particle.id}
@@ -468,6 +446,7 @@ export function ProjectHero({
         className="
         absolute
         inset-0
+        z-10
         bg-gradient-to-r
         from-cyan-500/15
         via-transparent
@@ -487,17 +466,17 @@ export function ProjectHero({
       {/* Main Layout */}
 
       <div
-        className="
-        absolute
-        inset-x-14
-        bottom-14
-        z-20
-        grid
-        gap-14
-        lg:grid-cols-[1.6fr_.8fr]
-        items-end
-        "
-      >
+className="
+absolute
+inset-x-14
+bottom-14
+z-30
+grid
+gap-14
+lg:grid-cols-[1.6fr_.8fr]
+items-end
+"
+>
                 {/* Left Content */}
 
         <motion.div
@@ -529,24 +508,66 @@ export function ProjectHero({
               delay: 0.15,
             }}
           >
-            <span
-              className="
-              inline-flex
-              items-center
-              rounded-full
-              border
-              border-cyan-400/30
-              bg-cyan-500/10
-              px-5
-              py-2
-              text-sm
-              font-medium
-              text-cyan-300
-              backdrop-blur-xl
-              "
-            >
-              ✨ Featured Project
-            </span>
+            <div className="flex flex-wrap items-center gap-3">
+
+<span
+className ="inline-flex items-center
+rounded-full
+border
+border-cyan-400/30
+bg-cyan-500/10
+px-5
+py-2
+text-sm
+font-medium
+text-cyan-300
+backdrop-blur-xl
+"
+>
+✨ Featured Project
+</span>
+
+{repository && (
+<>
+<span
+className="
+inline-flex
+items-center
+rounded-full
+bg-emerald-500/10
+border
+border-emerald-500/20
+px-4
+py-2
+text-xs
+font-semibold
+text-emerald-300
+"
+>
+🟢 Public Repository
+</span>
+
+<span
+className="
+inline-flex
+items-center
+rounded-full
+bg-orange-500/10
+border
+border-orange-500/20
+px-4
+py-2
+text-xs
+font-semibold
+text-orange-300
+"
+>
+Updated {new Date(repository.updated_at).toLocaleDateString()}
+</span>
+</>
+)}
+
+</div>
           </motion.div>
 
           {/* Project Title */}
@@ -567,10 +588,13 @@ export function ProjectHero({
             className="
             max-w-5xl
             text-6xl
+md:text-7xl
+xl:text-8xl
             font-black
             leading-none
             tracking-tight
             text-white
+            drop-shadow-[0_0_30px_rgba(34,211,238,.25)]
             xl:text-7xl
             "
           >
@@ -593,9 +617,11 @@ export function ProjectHero({
             }}
             className="
             max-w-4xl
-            text-xl
-            leading-9
-            text-zinc-300
+text-xl
+md:text-2xl
+leading-9
+text-zinc-300
+font-light
             "
           >
             {summary}
@@ -605,7 +631,7 @@ export function ProjectHero({
 
           {repository && (
             <motion.div
-              className="mt-8 flex flex-wrap gap-4"
+              className="mt-8 flex flex-wrap gap-4 rounded-2xl px-6 py-4 bg-gradient-to-br from-cyan-500/20 to-blue-500/10"
               initial={{
                 opacity: 0,
                 y: 20,
@@ -643,6 +669,10 @@ export function ProjectHero({
             flex
             flex-wrap
             gap-3
+            rounded-2xl
+            hover:border-cyan-400/60
+hover:bg-cyan-500/15
+hover:shadow-[0_0_30px_rgba(6,182,212,.35)]
             "
             initial="hidden"
             animate="visible"
@@ -659,13 +689,20 @@ export function ProjectHero({
               <TechnologyBadge
                 key={technology}
                 technology={technology}
+                
               />
             ))}
           </motion.div>
+          {/* Project Buttons */}
+          <ProjectHeroActions
+  githubUrl={githubUrl}
+  liveUrl={liveUrl}
+/>
         </motion.div>
+        
                 {/* Repository Card */}
 
-        <div className="hidden lg:block">
+        
           <motion.div
             initial={{
               opacity: 0,
@@ -680,23 +717,27 @@ export function ProjectHero({
               duration: 0.8,
             }}
             whileHover={{
-              y: -8,
-              scale: 1.015,
-            }}
+y:-12,
+scale:1.025,
+rotateX:2,
+rotateY:-2
+}}
             className="
             relative
             overflow-hidden
             rounded-[34px]
             border
             border-white/10
-            bg-white/[0.05]
+            bg-gradient-to-br
+from-white/[0.08]
+to-white/[0.03]
             backdrop-blur-3xl
-            shadow-[0_25px_80px_rgba(0,0,0,.45)]
+            shadow-[0_30px_120px_rgba(0,0,0,.55)]
             "
           >
             {/* Animated Top Border */}
 
-            <motion.div
+            < motion.div
               className="
               h-1.5
               w-full
@@ -772,7 +813,7 @@ export function ProjectHero({
                   text-emerald-300
                   "
                 >
-                  LIVE
+                 LIVE API
                 </div>
 
               </div>
@@ -840,6 +881,6 @@ export function ProjectHero({
         </div>
 
       </div>
-    </div>
+    
   );
 } 
