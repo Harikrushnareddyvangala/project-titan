@@ -8,7 +8,7 @@ import { RepositoryHealthRing } from "./RepositoryHealthRing";
 import { GithubLanguageDonut } from "./GithubLanguageDonut";
 import { GithubCommitHeatmap } from "./GithubCommitHeatmap";
 import { GithubContributorLeaderboard } from "./GithubContributorLeaderboard";
-import { GithubRepositoryMetadata } from "./GithubRepositoryMetadata";
+import { GithubActivityTimeline } from "./GithubActivityTimeline";
 
 import type {
   GithubLanguages,
@@ -127,9 +127,9 @@ export function DashboardGrid({
           repository={repository}
         />
 
-        <GithubRepositoryMetadata
-          repository={repository}
-        />
+        <GithubActivityTimeline
+    repository={repository}
+/>
 
       </div>
 
