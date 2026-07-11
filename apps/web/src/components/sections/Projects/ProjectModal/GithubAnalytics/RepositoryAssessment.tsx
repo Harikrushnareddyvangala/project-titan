@@ -72,6 +72,17 @@ export function RepositoryAssessment({
     ? "Solid implementation with room for optimization."
     : "Growing repository with improvement opportunities.";
 
+    const grade =
+  production >= 95
+    ? "A+"
+    : production >= 90
+    ? "A"
+    : production >= 80
+    ? "B+"
+    : production >= 70
+    ? "B"
+    : "C";
+
   const metrics: Metric[] = [
     {
       label: "Engineering Quality",
@@ -170,17 +181,32 @@ export function RepositoryAssessment({
           repeat: Infinity,
         }}
       >
-        <p className="text-lg font-semibold text-white">
+        <div className="flex items-center justify-between">
 
-          Overall Verdict
+  <p className="text-lg font-semibold text-white">
+    Overall Verdict
+  </p>
 
-        </p>
+  <span
+    className="
+      rounded-full
+      border
+      border-cyan-400/20
+      bg-cyan-500/10
+      px-4
+      py-1
+      text-sm
+      font-semibold
+      text-cyan-300
+    "
+  >
+    Grade {grade}
+  </span>
 
-        <p className="mt-3 text-zinc-300 leading-8">
-
-          {verdict}
-
-        </p>
+</div>
+<p className="mt-4 text-zinc-300 leading-8">
+  {verdict}
+</p>
 
       </motion.div>
 
