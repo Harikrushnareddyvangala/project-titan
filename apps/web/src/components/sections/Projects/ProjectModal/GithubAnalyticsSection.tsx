@@ -10,6 +10,7 @@ import type {
 import { AnalyticsHeader } from "./GithubAnalytics/AnalyticsHeader";
 import {
   DashboardGrid,} from "./GithubAnalytics/DashboardGrid";
+  import { ExecutiveSummaryHero } from "./GithubAnalytics/ExecutiveSummaryHero";
 
 interface GithubAnalyticsSectionProps {
   repository: GithubRepository | null;
@@ -102,6 +103,10 @@ from-transparent
 via-cyan-400/40
 to-transparent
 "
+/>
+<ExecutiveSummaryHero
+  repository={repository}
+  languages={languages}
 />
       <DashboardGrid
   repository={repository}
