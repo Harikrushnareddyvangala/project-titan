@@ -12,6 +12,8 @@ import {
   DashboardGrid,} from "./GithubAnalytics/DashboardGrid";
   import { ExecutiveSummaryHero } from "./GithubAnalytics/ExecutiveSummaryHero";
   import { RepositoryAssessment } from "./GithubAnalytics/RepositoryAssessment";
+  import { RepositoryTimeline } from "./GithubAnalytics/RepositoryTimeline";
+  import { RepositoryInsights } from "./GithubAnalytics/RepositoryInsights";
 
 interface GithubAnalyticsSectionProps {
   repository: GithubRepository | null;
@@ -118,6 +120,12 @@ to-transparent
   commits={commitActivity}
   contributors={contributors}
 />
+<RepositoryInsights
+    repository={repository}
+  />
+  <RepositoryTimeline
+    repository={repository}
+  />
      
    </section>
  );
