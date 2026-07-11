@@ -14,6 +14,7 @@ import {
   import { RepositoryAssessment } from "./GithubAnalytics/RepositoryAssessment";
   import { RepositoryTimeline } from "./GithubAnalytics/RepositoryTimeline";
   import { RepositoryInsights } from "./GithubAnalytics/RepositoryInsights";
+  import { RepositoryRecommendations } from "./GithubAnalytics/RepositoryRecommendations";
 
 interface GithubAnalyticsSectionProps {
   repository: GithubRepository | null;
@@ -123,6 +124,9 @@ to-transparent
 <RepositoryInsights
     repository={repository}
   />
+  <RepositoryRecommendations
+    repository={repository}
+/>
   <RepositoryTimeline
     repository={repository}
   />
