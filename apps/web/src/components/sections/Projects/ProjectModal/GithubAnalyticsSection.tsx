@@ -16,7 +16,7 @@ import {
   import { RepositoryInsights } from "./GithubAnalytics/RepositoryInsights";
   import { RepositoryRecommendations } from "./GithubAnalytics/RepositoryRecommendations";
   import { EngineeringScoreDashboard } from "./GithubAnalytics/EngineeringScoreDashboard";
-
+import { RepositoryRiskAssessment } from "./GithubAnalytics/RepositoryRiskAssessment";
 interface GithubAnalyticsSectionProps {
   repository: GithubRepository | null;
   languages: GithubLanguages;
@@ -116,6 +116,7 @@ to-transparent
 <EngineeringScoreDashboard
   repository={repository}
 />
+<RepositoryRiskAssessment repository={repository} />
 <RepositoryAssessment
     repository={repository}
 />
