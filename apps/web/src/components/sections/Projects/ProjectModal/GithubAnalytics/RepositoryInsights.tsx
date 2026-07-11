@@ -26,17 +26,23 @@ export function RepositoryInsights({
     repository.forks_count * 3 +
     repository.watchers_count;
 
-  const quality =
-    score > 500
-      ? "Outstanding"
+  const qualityScore =
+    Math.min(
+        100,
+        repository.stargazers_count * 2 +
+        repository.forks_count * 3 +
+        repository.watchers_count -
+        repository.open_issues_count,
+    );
 
-      : score > 200
-      ? "Excellent"
-
-      : score > 80
-      ? "Good"
-
-      : "Growing";
+const quality =
+    qualityScore >= 90
+        ? "Outstanding"
+        : qualityScore >= 75
+        ? "Excellent"
+        : qualityScore >= 60
+        ? "Good"
+        : "Growing";
 
   return (
     <motion.section
@@ -82,7 +88,8 @@ export function RepositoryInsights({
 
       </div>
 
-      <div className="mt-10 grid gap-6 lg:grid-cols-3">
+      <div className="mt-10 grid gap-6 md:grid-cols-2
+xl:grid-cols-5">
 
         <InsightCard
           icon={<TrendingUp size={22} />}
@@ -104,6 +111,20 @@ export function RepositoryInsights({
           value={`${repository.watchers_count} Watchers`}
           description="Current repository engagement."
         />
+
+        <InsightCard
+    icon={<ShieldCheck size={22} />}
+    title="Open Issues"
+    value={`${repository.open_issues_count}`}
+    description="Outstanding issues requiring attention."
+/>
+
+<InsightCard
+    icon={<TrendingUp size={22} />}
+    title="Fork Growth"
+    value={`${repository.forks_count}`}
+    description="Developer adoption through forks."
+/>
 
       </div>
 
@@ -133,6 +154,13 @@ export function RepositoryInsights({
           <p className="leading-8 text-zinc-300">
 
             This repository demonstrates
+strong engineering practices,
+healthy community engagement,
+continuous maintenance, and
+a scalable project architecture.
+Current repository health
+suggests long-term maintainability
+and production readiness.
 
             <span className="mx-2 font-semibold text-white">
               {quality}
@@ -167,8 +195,14 @@ function InsightCard({
   return (
     <motion.div
       whileHover={{
-        y: -8,
-      }}
+    y:-8,
+    scale:1.03,
+}}
+
+transition={{
+    type:"spring",
+    stiffness:250,
+}}
       className="
         rounded-3xl
         border
