@@ -11,6 +11,7 @@ import { AnalyticsHeader } from "./GithubAnalytics/AnalyticsHeader";
 import {
   DashboardGrid,} from "./GithubAnalytics/DashboardGrid";
   import { ExecutiveSummaryHero } from "./GithubAnalytics/ExecutiveSummaryHero";
+  import { RepositoryAssessment } from "./GithubAnalytics/RepositoryAssessment";
 
 interface GithubAnalyticsSectionProps {
   repository: GithubRepository | null;
@@ -107,6 +108,9 @@ to-transparent
 <ExecutiveSummaryHero
   repository={repository}
   languages={languages}
+/>
+<RepositoryAssessment
+    repository={repository}
 />
       <DashboardGrid
   repository={repository}
