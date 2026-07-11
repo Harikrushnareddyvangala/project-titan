@@ -15,6 +15,7 @@ import {
   import { RepositoryTimeline } from "./GithubAnalytics/RepositoryTimeline";
   import { RepositoryInsights } from "./GithubAnalytics/RepositoryInsights";
   import { RepositoryRecommendations } from "./GithubAnalytics/RepositoryRecommendations";
+  import { EngineeringScoreDashboard } from "./GithubAnalytics/EngineeringScoreDashboard";
 
 interface GithubAnalyticsSectionProps {
   repository: GithubRepository | null;
@@ -111,6 +112,9 @@ to-transparent
 <ExecutiveSummaryHero
   repository={repository}
   languages={languages}
+/>
+<EngineeringScoreDashboard
+  repository={repository}
 />
 <RepositoryAssessment
     repository={repository}
