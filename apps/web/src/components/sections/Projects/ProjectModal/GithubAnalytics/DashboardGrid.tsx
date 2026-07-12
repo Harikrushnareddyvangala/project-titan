@@ -29,7 +29,7 @@ import { KpiCard } from "./KpiCard";
 
 interface DashboardGridProps {
   repository: GithubRepository;
-  analytics: RepositoryAnalytics;
+  analytics: RepositoryAnalytics | null;
   languages: GithubLanguages;
   commits: GithubCommitWeek[];
   contributors: GithubContributor[];

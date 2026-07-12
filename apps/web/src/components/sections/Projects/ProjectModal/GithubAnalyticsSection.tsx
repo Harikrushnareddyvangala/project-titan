@@ -5,6 +5,7 @@ import type {
   GithubRepository,
   GithubCommitWeek,
   GithubContributor,
+  RepositoryAnalytics,
 } from "@/types/github";
 
 import { AnalyticsHeader } from "./GithubAnalytics/AnalyticsHeader";
@@ -18,8 +19,10 @@ import {
   import { EngineeringScoreDashboard } from "./GithubAnalytics/EngineeringScoreDashboard";
 import { RepositoryRiskAssessment } from "./GithubAnalytics/RepositoryRiskAssessment";
 import { AIEngineeringRecommendations } from "./GithubAnalytics/AIEngineeringRecommendations";
+import { GithubAnalyticsSkeleton } from "./GithubAnalytics/GithubAnalyticsSkeleton";
 interface GithubAnalyticsSectionProps {
   repository: GithubRepository | null;
+  analytics: RepositoryAnalytics | null;
   languages: GithubLanguages;
   commitActivity: GithubCommitWeek[];
    contributors: GithubContributor[];
@@ -28,14 +31,15 @@ interface GithubAnalyticsSectionProps {
 
 export function GithubAnalyticsSection({
   repository,
+  analytics,
   languages,
   commitActivity,
   contributors,
   loading,
 }: GithubAnalyticsSectionProps) {
   if (loading) {
-    return <div className="p-10 text-center text-zinc-400">Loading...</div>;
-  }
+    return <GithubAnalyticsSkeleton />;
+}
 
   if (!repository) {
     return <div className="p-10 text-center text-zinc-400">No Repository</div>;
@@ -116,21 +120,29 @@ to-transparent
 />
 <EngineeringScoreDashboard
   repository={repository}
+  analytics={analytics}
 />
-<RepositoryRiskAssessment repository={repository} />
-<AIEngineeringRecommendations repository={repository} />
+<RepositoryRiskAssessment 
+  repository={repository} 
+  analytics={analytics}/>
+<AIEngineeringRecommendations 
+  repository={repository} 
+  analytics={analytics}/>
 
 <RepositoryAssessment
     repository={repository}
+    analytics={analytics}
 />
       <DashboardGrid
   repository={repository}
+  analytics={analytics}
   languages={languages}
   commits={commitActivity}
   contributors={contributors}
 />
 <RepositoryInsights
     repository={repository}
+    analytics={analytics}
   />
   <RepositoryRecommendations
     repository={repository}

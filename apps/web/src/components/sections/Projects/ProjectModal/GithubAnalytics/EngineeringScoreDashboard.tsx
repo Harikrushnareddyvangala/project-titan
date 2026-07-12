@@ -275,7 +275,7 @@ const repositoryAge = formatDistanceToNowStrict(
         "
       >
         <p className="leading-8 text-zinc-300">
-          <p className="leading-8 text-zinc-300">
+          
   <strong>Repository Quality:</strong> {quality}
   <br />
   <strong>Production Ready:</strong>{" "}
@@ -287,7 +287,7 @@ const repositoryAge = formatDistanceToNowStrict(
   <br />
   <strong>Risk Level:</strong> {riskLevel}
 </p>
-        </p>
+        
       </motion.div>
     </motion.section>
   );
