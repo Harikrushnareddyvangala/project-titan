@@ -15,6 +15,7 @@ import type {
   GithubRepository,
   GithubCommitWeek,
   GithubContributor,
+  RepositoryAnalytics,
 } from "@/types/github";
 
 import {
@@ -28,6 +29,7 @@ import { KpiCard } from "./KpiCard";
 
 interface DashboardGridProps {
   repository: GithubRepository;
+  analytics: RepositoryAnalytics;
   languages: GithubLanguages;
   commits: GithubCommitWeek[];
   contributors: GithubContributor[];
@@ -35,6 +37,7 @@ interface DashboardGridProps {
 
 export function DashboardGrid({
   repository,
+  analytics,
   languages,
   commits,
   contributors,
@@ -121,6 +124,7 @@ export function DashboardGrid({
 
         <RepositoryScore
           repository={repository}
+          analytics={analytics}
         />
 
         <RepositoryHealthRing

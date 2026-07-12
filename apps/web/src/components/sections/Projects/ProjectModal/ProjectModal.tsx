@@ -197,6 +197,7 @@ useEffect(() => {
 
 const {
   repository,
+  analytics,
   languages,
   commitActivity,
   contributors,
@@ -368,6 +369,7 @@ backdrop-blur-2xl
 >
   <GithubAnalyticsSection
     repository={repository}
+    analytics={analytics}
     languages={languages}
     commitActivity= {commitActivity}
     contributors={contributors}

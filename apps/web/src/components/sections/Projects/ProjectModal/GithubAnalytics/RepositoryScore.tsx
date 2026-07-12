@@ -4,104 +4,118 @@ import { motion } from "framer-motion";
 import { Award, BrainCircuit } from "lucide-react";
 import { ProgressBar } from "./ProgressBar";
 
-import type { GithubRepository } from "@/types/github";
+import type { GithubRepository, RepositoryAnalytics, } from "@/types/github";
 import { AnimatedCounter } from "./AnimatedCounter";
+import { useRepositoryAnalytics } from "@/hooks/useRepositoryAnalytics";
 
 interface RepositoryScoreProps {
   repository: GithubRepository;
+  analytics: RepositoryAnalytics | null;
 }
 
-function calculateScore(
-  repository: GithubRepository,
-) {
-  let score = 50;
+// function calculateScore(
+//   repository: GithubRepository,
+// ) {
+//   let score = 50;
 
-  // Community
+//   // Community
 
-  score += Math.min(
-    repository.stargazers_count / 10,
-    15,
-  );
+//   score += Math.min(
+//     repository.stargazers_count / 10,
+//     15,
+//   );
 
-  score += Math.min(
-    repository.forks_count / 5,
-    10,
-  );
+//   score += Math.min(
+//     repository.forks_count / 5,
+//     10,
+//   );
 
-  score += Math.min(
-    repository.watchers_count / 8,
-    8,
-  );
+//   score += Math.min(
+//     repository.watchers_count / 8,
+//     8,
+//   );
 
-  // Maintenance
+//   // Maintenance
 
-  const updated =
-    new Date(repository.updated_at);
+//   const updated =
+//     new Date(repository.updated_at);
 
-  const days =
-    (Date.now() -
-      updated.getTime()) /
-    (1000 * 60 * 60 * 24);
+//   const days =
+//     (Date.now() -
+//       updated.getTime()) /
+//     (1000 * 60 * 60 * 24);
 
-  if (days < 30) score += 10;
-  else if (days < 90) score += 5;
+//   if (days < 30) score += 10;
+//   else if (days < 90) score += 5;
 
-  // Open Issues
+//   // Open Issues
 
-  score -= Math.min(
-    repository.open_issues_count,
-    10,
-  );
+//   score -= Math.min(
+//     repository.open_issues_count,
+//     10,
+//   );
 
-  return Math.max(
-    0,
-    Math.min(
-      Math.round(score),
-      100,
-    ),
-  );
-}
+//   return Math.max(
+//     0,
+//     Math.min(
+//       Math.round(score),
+//       100,
+//     ),
+//   );
+// }
 
-function getGrade(score: number) {
-  if (score >= 95)
-    return "A+";
+// function getGrade(score: number) {
+//   if (score >= 95)
+//     return "A+";
 
-  if (score >= 90)
-    return "A";
+//   if (score >= 90)
+//     return "A";
 
-  if (score >= 80)
-    return "B";
+//   if (score >= 80)
+//     return "B";
 
-  if (score >= 70)
-    return "C";
+//   if (score >= 70)
+//     return "C";
 
-  return "D";
-}
+//   return "D";
+// }
 
-function getDescription(score: number) {
-  if (score >= 90)
-    return "Outstanding repository health";
+// function getDescription(score: number) {
+//   if (score >= 90)
+//     return "Outstanding repository health";
 
-  if (score >= 80)
-    return "Well maintained project";
+//   if (score >= 80)
+//     return "Well maintained project";
 
-  if (score >= 70)
-    return "Healthy repository";
+//   if (score >= 70)
+//     return "Healthy repository";
 
-  return "Needs improvements";
-}
+//   return "Needs improvements";
+// }
 
 export function RepositoryScore({
   repository,
+  analytics,
 }: RepositoryScoreProps) {
   const score =
-    calculateScore(repository);
+    analytics?.engineeringScore ?? 0;
+
+
 
   const grade =
-    getGrade(score);
+    score >= 95
+    ? "A+"
+    : score >= 90
+    ? "A"
+    : score >= 80
+    ? "B"
+    : score >= 70
+    ? "C"
+    : "D";
 
   const description =
-    getDescription(score);
+    analytics?.quality ??
+  "Unknown";
   
   const communityScore = Math.min(
   100,
