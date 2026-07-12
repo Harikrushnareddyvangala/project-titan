@@ -17,6 +17,7 @@ import {
   import { RepositoryRecommendations } from "./GithubAnalytics/RepositoryRecommendations";
   import { EngineeringScoreDashboard } from "./GithubAnalytics/EngineeringScoreDashboard";
 import { RepositoryRiskAssessment } from "./GithubAnalytics/RepositoryRiskAssessment";
+import { AIEngineeringRecommendations } from "./GithubAnalytics/AIEngineeringRecommendations";
 interface GithubAnalyticsSectionProps {
   repository: GithubRepository | null;
   languages: GithubLanguages;
@@ -117,6 +118,8 @@ to-transparent
   repository={repository}
 />
 <RepositoryRiskAssessment repository={repository} />
+<AIEngineeringRecommendations repository={repository} />
+
 <RepositoryAssessment
     repository={repository}
 />

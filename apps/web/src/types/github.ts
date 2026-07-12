@@ -52,11 +52,38 @@ export interface GithubRepository {
   html_url: string;
 };
 }
+export interface RepositoryAnalytics {
+  repositoryAge: number;
+
+  inactiveDays: number;
+
+  engineeringScore: number;
+
+  healthScore: number;
+
+  productionScore: number;
+
+  deploymentReady: boolean;
+
+  riskLevel:
+    | "Low"
+    | "Medium"
+    | "High";
+
+  quality:
+    | "Outstanding"
+    | "Excellent"
+    | "Good"
+    | "Growing";
+
+  recommendations: string[];
+}
 
 export type GithubLanguages = Record<
   string,
   number
 >;
+
 
 export interface GithubRepositoryResult {
   repository: GithubRepository | null;
@@ -83,3 +110,24 @@ export interface GithubContributor {
 
   contributions: number;
 }
+export interface GithubRepositoryResponse {
+
+  repository: GithubRepository;
+
+  analytics: RepositoryAnalytics;
+
+  languages: GithubLanguages;
+
+  commitActivity: GithubCommitWeek[];
+
+  contributors: GithubContributor[];
+
+}
+export interface GithubApiError {
+  message: string;
+  documentation_url?: string;
+}
+
+export type GithubApiResponse =
+  | GithubRepositoryResponse
+  | GithubApiError;

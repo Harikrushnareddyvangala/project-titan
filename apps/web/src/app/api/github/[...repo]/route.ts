@@ -82,6 +82,193 @@ export async function GET(
     const repositoryData =
       await repoResponse.json();
 
+    //----------------------------------------------------
+// Repository Analytics Engine
+//----------------------------------------------------
+
+const DAY = 1000 * 60 * 60 * 24;
+
+const now = new Date();
+
+const created = new Date(
+  repositoryData.created_at,
+);
+
+const updated = new Date(
+  repositoryData.updated_at,
+);
+
+const repositoryAge = Math.floor(
+  (now.getTime() - created.getTime()) /
+    DAY,
+);
+
+const inactiveDays = Math.floor(
+  (now.getTime() - updated.getTime()) /
+    DAY,
+);
+
+//--------------------------------------
+// Engineering Score
+//--------------------------------------
+
+let engineeringScore = 70;
+
+engineeringScore += Math.min(
+  repositoryData.stargazers_count,
+  10,
+);
+
+engineeringScore += Math.min(
+  repositoryData.forks_count,
+  10,
+);
+
+engineeringScore += Math.min(
+  repositoryData.watchers_count,
+  10,
+);
+
+engineeringScore -= Math.min(
+  repositoryData.open_issues_count,
+  15,
+);
+
+engineeringScore = Math.max(
+  0,
+  Math.min(engineeringScore, 100),
+);
+
+//--------------------------------------
+// Health Score
+//--------------------------------------
+
+let healthScore = 100;
+
+healthScore -=
+  repositoryData.open_issues_count * 2;
+
+healthScore -= Math.floor(
+  inactiveDays / 15,
+);
+
+healthScore = Math.max(
+  0,
+  Math.min(healthScore, 100),
+);
+
+//--------------------------------------
+// Production Score
+//--------------------------------------
+
+const productionScore = Math.round(
+
+  engineeringScore * 0.45 +
+
+  healthScore * 0.35 +
+
+  Math.min(
+    repositoryData.watchers_count * 2,
+    20,
+  ),
+
+);
+
+//--------------------------------------
+// Risk Level
+//--------------------------------------
+
+const riskLevel =
+  productionScore >= 85
+    ? "Low"
+    : productionScore >= 65
+      ? "Medium"
+      : "High";
+
+//--------------------------------------
+// Quality
+//--------------------------------------
+
+const quality =
+  productionScore >= 90
+    ? "Outstanding"
+    : productionScore >= 80
+      ? "Excellent"
+      : productionScore >= 65
+        ? "Good"
+        : "Growing";
+
+//--------------------------------------
+// Deployment Ready
+//--------------------------------------
+
+const deploymentReady =
+  productionScore >= 80 &&
+  repositoryData.open_issues_count < 10 &&
+  inactiveDays < 90;
+
+//--------------------------------------
+// Recommendations
+//--------------------------------------
+
+const recommendations: string[] = [];
+
+if (
+  repositoryData.open_issues_count > 10
+) {
+  recommendations.push(
+    "Reduce open issues to improve maintainability.",
+  );
+}
+
+if (
+  repositoryData.stargazers_count < 20
+) {
+  recommendations.push(
+    "Increase repository visibility using an improved README and demonstrations.",
+  );
+}
+
+if (
+  repositoryData.watchers_count < 5
+) {
+  recommendations.push(
+    "Increase community engagement.",
+  );
+}
+
+if (
+  repositoryData.forks_count < 3
+) {
+  recommendations.push(
+    "Encourage community contributions.",
+  );
+}
+
+if (inactiveDays > 90) {
+  recommendations.push(
+    "Repository appears inactive. Consider regular maintenance updates.",
+  );
+}
+
+if (recommendations.length === 0) {
+  recommendations.push(
+    "Excellent repository health.",
+  );
+}
+
+const analytics = {
+  repositoryAge,
+  inactiveDays,
+  engineeringScore,
+  healthScore,
+  productionScore,
+  deploymentReady,
+  riskLevel,
+  quality,
+  recommendations,
+};
+
     const languageData =
       languageResponse.ok
         ? await languageResponse.json()
@@ -102,11 +289,16 @@ export async function GET(
   contributorsData = [];
 }
     return NextResponse.json({
-      repository: repositoryData,
-      languages: languageData,
-      commitActivity: commitActivityData,
-      contributors: contributorsData,
-    });
+  repository: repositoryData,
+
+  analytics,
+
+  languages: languageData,
+
+  commitActivity: commitActivityData,
+
+  contributors: contributorsData,
+});
   } catch(error) {
     console.error("GitHub API Route Error:", error);
     return NextResponse.json(

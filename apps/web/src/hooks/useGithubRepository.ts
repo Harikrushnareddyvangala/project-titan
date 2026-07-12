@@ -8,9 +8,15 @@ import type {
   GithubCommitWeek,
   GithubContributor,
 } from "@/types/github";
+import type {
+  GithubRepositoryResponse,
+  GithubApiResponse,
+  RepositoryAnalytics,
+} from "@/types/github";
 
 interface GithubRepositoryResult {
   repository: GithubRepository | null;
+  analytics: RepositoryAnalytics | null;
   languages: GithubLanguages;
   commitActivity: GithubCommitWeek[];
   contributors: GithubContributor[];
@@ -33,6 +39,8 @@ export function useGithubRepository(
 ] = useState<GithubCommitWeek[]>([]);
 
   const [contributors, setContributors] = useState<GithubContributor[]>([]);
+  const [analytics, setAnalytics] =
+  useState<RepositoryAnalytics | null>(null);
 
   const [loading, setLoading] =
     useState(false);
@@ -54,20 +62,19 @@ export function useGithubRepository(
           `/api/github/${repo}`,
         );
 
-        const data = await response.json();
-        console.log("========== API RESPONSE ==========");
+        const data: GithubApiResponse =
+  await response.json();
+
+if ("message" in data) {
+  throw new Error(data.message);
+}
+
+console.log("========== API RESPONSE ==========");
 console.log(data);
 console.log("repository =", data.repository);
+console.log("analytics =", data.analytics);
 console.log("languages =", data.languages);
 console.log("==================================");
-
-        if (!response.ok) {
-          throw new Error(
-            data.message ??
-              data.error ??
-              "Unable to load repository",
-          );
-        }
 
         if (cancelled) return;
 
@@ -76,9 +83,11 @@ console.log("==================================");
         setLanguages(data.languages ?? {});
         setCommitActivity(
   data.commitActivity ?? [],);
-   setContributors(data.contributors ?? [],
+ setContributors(data.contributors ?? [],
 );
-
+setAnalytics(
+  data.analytics,
+);
         console.log("Calling setRepository...");
 console.log(data.repository);
       } catch (err) {
@@ -91,6 +100,7 @@ console.log(data.repository);
         setCommitActivity([]);
 
         setContributors([]);
+        setAnalytics(null);
         setError(
           err instanceof Error
             ? err.message
@@ -111,12 +121,12 @@ console.log(data.repository);
   }, [repo]);
 
   return {
-    repository,
-    languages,
-    commitActivity,
-    contributors,
-    loading,
-    error,
-    
-  };
+  repository,
+  analytics,
+  languages,
+  commitActivity,
+  contributors,
+  loading,
+  error,
+};
 }
