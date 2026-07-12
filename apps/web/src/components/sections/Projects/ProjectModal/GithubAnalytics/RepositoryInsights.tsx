@@ -10,40 +10,59 @@ import {
   Activity,
 } from "lucide-react";
 
-import type { GithubRepository } from "@/types/github";
+import type { GithubRepository, RepositoryAnalytics } from "@/types/github";
 
 interface RepositoryInsightsProps {
   repository: GithubRepository | null;
+  analytics: RepositoryAnalytics | null;
 }
 
 export function RepositoryInsights({
   repository,
+  analytics,
 }: RepositoryInsightsProps) {
   if (!repository) return null;
 
-  const score =
-    repository.stargazers_count * 2 +
-    repository.forks_count * 3 +
-    repository.watchers_count;
+//   const score =
+//     repository.stargazers_count * 2 +
+//     repository.forks_count * 3 +
+//     repository.watchers_count;
 
-  const qualityScore =
-    Math.min(
-        100,
-        repository.stargazers_count * 2 +
-        repository.forks_count * 3 +
-        repository.watchers_count -
-        repository.open_issues_count,
-    );
+//   const qualityScore =
+//     Math.min(
+//         100,
+//         repository.stargazers_count * 2 +
+//         repository.forks_count * 3 +
+//         repository.watchers_count -
+//         repository.open_issues_count,
+//     );
+
+// const quality =
+//     qualityScore >= 90
+//         ? "Outstanding"
+//         : qualityScore >= 75
+//         ? "Excellent"
+//         : qualityScore >= 60
+//         ? "Good"
+//         : "Growing";
 
 const quality =
-    qualityScore >= 90
-        ? "Outstanding"
-        : qualityScore >= 75
-        ? "Excellent"
-        : qualityScore >= 60
-        ? "Good"
-        : "Growing";
+  analytics?.quality ?? "Growing";
 
+const engineeringScore =
+  analytics?.engineeringScore ?? 0;
+
+const productionScore =
+  analytics?.productionScore ?? 0;
+
+const healthScore =
+  analytics?.healthScore ?? 0;
+
+const deploymentReady =
+  analytics?.deploymentReady ?? false;
+
+const riskLevel =
+  analytics?.riskLevel ?? "Medium";
   return (
     <motion.section
       initial={{
@@ -114,16 +133,16 @@ xl:grid-cols-5">
 
         <InsightCard
     icon={<ShieldCheck size={22} />}
-    title="Open Issues"
-    value={`${repository.open_issues_count}`}
-    description="Outstanding issues requiring attention."
+    title="Engineering Score"
+    value={`${engineeringScore}%`}
+    description="Overall engineering quality."
 />
 
 <InsightCard
     icon={<TrendingUp size={22} />}
-    title="Fork Growth"
-    value={`${repository.forks_count}`}
-    description="Developer adoption through forks."
+    title="Production Score"
+    value={`${productionScore}%`}
+    description="Estimated production readiness."
 />
 
       </div>
@@ -153,23 +172,46 @@ xl:grid-cols-5">
 
           <p className="leading-8 text-zinc-300">
 
-            This repository demonstrates
-strong engineering practices,
-healthy community engagement,
-continuous maintenance, and
-a scalable project architecture.
-Current repository health
-suggests long-term maintainability
-and production readiness.
+            <span className="font-semibold text-white">
+    Repository Quality:
+  </span>{" "}
+  {quality}
 
-            <span className="mx-2 font-semibold text-white">
-              {quality}
-            </span>
+  <br /><br />
 
-            engineering quality with active
-            maintenance, measurable community
-            engagement and a well-organized
-            project structure.
+  Engineering Score:
+  <span className="ml-2 font-semibold text-cyan-300">
+    {engineeringScore}%
+  </span>
+
+  <br />
+
+  Production Score:
+  <span className="ml-2 font-semibold text-cyan-300">
+    {productionScore}%
+  </span>
+
+  <br />
+
+  Repository Health:
+  <span className="ml-2 font-semibold text-cyan-300">
+    {healthScore}%
+  </span>
+
+  <br />
+
+  Deployment Ready:
+  <span className="ml-2 font-semibold text-cyan-300">
+    {deploymentReady ? "Yes" : "No"}
+  </span>
+
+  <br />
+
+  Risk Level:
+  <span className="ml-2 font-semibold text-cyan-300">
+    {riskLevel}
+  </span>
+
 
           </p>
 
