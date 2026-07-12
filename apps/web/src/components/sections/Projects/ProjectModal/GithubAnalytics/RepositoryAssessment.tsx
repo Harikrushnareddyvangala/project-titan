@@ -10,10 +10,11 @@ import {
   Rocket,
 } from "lucide-react";
 
-import type { GithubRepository } from "@/types/github";
+import type { GithubRepository, RepositoryAnalytics } from "@/types/github";
 
 interface RepositoryAssessmentProps {
   repository: GithubRepository;
+  analytics: RepositoryAnalytics | null;
 }
 
 interface Metric {
@@ -24,55 +25,99 @@ interface Metric {
 
 export function RepositoryAssessment({
   repository,
+  analytics,
 }: RepositoryAssessmentProps) {
 
-  const engineering =
-    Math.min(
-      100,
-      70 +
-        repository.stargazers_count +
-        repository.forks_count,
-    );
+  // const engineering =
+  //   Math.min(
+  //     100,
+  //     70 +
+  //       repository.stargazers_count +
+  //       repository.forks_count,
+  //   );
 
     
 
-  const maintainability =
-    Math.max(
-      60,
-      100 -
-        repository.open_issues_count * 2,
-    );
+  // const maintainability =
+  //   Math.max(
+  //     60,
+  //     100 -
+  //       repository.open_issues_count * 2,
+  //   );
 
-  const documentation =
-    repository.description
-      ? 92
-      : 60;
+  // const documentation =
+  //   repository.description
+  //     ? 92
+  //     : 60;
 
-  const community =
-    Math.min(
-      100,
-      repository.watchers_count * 8 +
-        repository.forks_count * 5,
-    );
+  // const community =
+  //   Math.min(
+  //     100,
+  //     repository.watchers_count * 8 +
+  //       repository.forks_count * 5,
+  //   );
 
-  const production =
-    Math.min(
-      100,
-      engineering * 0.4 +
-        maintainability * 0.3 +
-        documentation * 0.3,
-    );
+  // const production =
+  //   Math.min(
+  //     100,
+  //     engineering * 0.4 +
+  //       maintainability * 0.3 +
+  //       documentation * 0.3,
+  //   );
 
-    const verdict =
-  production > 90
-    ? "Outstanding production-ready repository."
-    : production > 80
-    ? "Well engineered with excellent maintainability."
-    : production > 70
-    ? "Solid implementation with room for optimization."
-    : "Growing repository with improvement opportunities.";
+  //   const verdict =
+  // production > 90
+  //   ? "Outstanding production-ready repository."
+  //   : production > 80
+  //   ? "Well engineered with excellent maintainability."
+  //   : production > 70
+  //   ? "Solid implementation with room for optimization."
+  //   : "Growing repository with improvement opportunities.";
 
-    const grade =
+  //   const grade =
+  // production >= 95
+  //   ? "A+"
+  //   : production >= 90
+  //   ? "A"
+  //   : production >= 80
+  //   ? "B+"
+  //   : production >= 70
+  //   ? "B"
+  //   : "C";
+  const engineering =
+  analytics?.engineeringScore ?? 0;
+
+const maintainability =
+  analytics?.healthScore ?? 0;
+
+const documentation =
+  repository.description ? 92 : 60;
+
+const community =
+  Math.min(
+    100,
+    repository.watchers_count * 8 +
+      repository.forks_count * 5,
+  );
+
+const production =
+  analytics?.productionScore ?? 0;
+
+const quality =
+  analytics?.quality ?? "Growing";
+
+const deploymentReady =
+  analytics?.deploymentReady ?? false;
+
+const riskLevel =
+  analytics?.riskLevel ?? "Medium";
+
+  const verdict =
+  deploymentReady
+    ? `${quality} repository ready for production deployment.`
+    : `${quality} repository with ${riskLevel.toLowerCase()} deployment confidence.`;
+
+  const grade =
   production >= 95
     ? "A+"
     : production >= 90
@@ -83,34 +128,60 @@ export function RepositoryAssessment({
     ? "B"
     : "C";
 
-  const metrics: Metric[] = [
-    {
-      label: "Engineering Quality",
-      value: engineering,
-      icon: <ShieldCheck size={18} />,
-    },
-    {
-      label: "Maintainability",
-      value: maintainability,
-      icon: <Rocket size={18} />,
-    },
-    {
-      label: "Documentation",
-      value: documentation,
-      icon: <BookOpen size={18} />,
-    },
-    {
-      label: "Community",
-      value: community,
-      icon: <Users size={18} />,
-    },
-    {
-      label: "Production Ready",
-      value: production,
-      icon: <Brain size={18} />,
-    },
-  ];
-
+  // const metrics: Metric[] = [
+  //   {
+  //     label: "Engineering Quality",
+  //     value: engineering,
+  //     icon: <ShieldCheck size={18} />,
+  //   },
+  //   {
+  //     label: "Maintainability",
+  //     value: maintainability,
+  //     icon: <Rocket size={18} />,
+  //   },
+  //   {
+  //     label: "Documentation",
+  //     value: documentation,
+  //     icon: <BookOpen size={18} />,
+  //   },
+  //   {
+  //     label: "Community",
+  //     value: community,
+  //     icon: <Users size={18} />,
+  //   },
+  //   {
+  //     label: "Production Ready",
+  //     value: production,
+  //     icon: <Brain size={18} />,
+  //   },
+  // ];
+const metrics: Metric[] = [
+  {
+    label: "Engineering Quality",
+    value: engineering,
+    icon: <ShieldCheck size={18} />,
+  },
+  {
+    label: "Repository Health",
+    value: maintainability,
+    icon: <Rocket size={18} />,
+  },
+  {
+    label: "Documentation",
+    value: documentation,
+    icon: <BookOpen size={18} />,
+  },
+  {
+    label: "Community",
+    value: community,
+    icon: <Users size={18} />,
+  },
+  {
+    label: "Production Readiness",
+    value: production,
+    icon: <Brain size={18} />,
+  },
+];
   return (
     <motion.section
       initial={{
