@@ -10,62 +10,95 @@ import {
   Clock3,
 } from "lucide-react";
 
-import type { GithubRepository } from "@/types/github";
+import type { GithubRepository,RepositoryAnalytics, } from "@/types/github";
 import { formatDistanceToNowStrict } from "date-fns";
 
 interface EngineeringScoreDashboardProps {
   repository: GithubRepository | null;
+  analytics: RepositoryAnalytics | null;
 }
 
-function calculateEngineeringScore(
-  repository: GithubRepository,
-) {
-  if (!repository) return 0;
+// function calculateEngineeringScore(
+//   repository: GithubRepository,
+// ) {
+//   if (!repository) return 0;
 
-  let score = 55;
+//   let score = 55;
 
-  // Community
-  score += Math.min(repository.stargazers_count * 2, 15);
-  score += Math.min(repository.forks_count * 2, 10);
-  score += Math.min(repository.watchers_count, 8);
+//   // Community
+//   score += Math.min(repository.stargazers_count * 2, 15);
+//   score += Math.min(repository.forks_count * 2, 10);
+//   score += Math.min(repository.watchers_count, 8);
 
-  // Maintenance
-  const updatedDays =
-    (Date.now() -
-      new Date(repository.updated_at).getTime()) /
-    (1000 * 60 * 60 * 24);
+//   // Maintenance
+//   const updatedDays =
+//     (Date.now() -
+//       new Date(repository.updated_at).getTime()) /
+//     (1000 * 60 * 60 * 24);
 
-  if (updatedDays < 30) score += 10;
-  else if (updatedDays < 90) score += 5;
+//   if (updatedDays < 30) score += 10;
+//   else if (updatedDays < 90) score += 5;
 
-  // Penalize excessive issues
-  score -= Math.min(repository.open_issues_count, 10);
+//   // Penalize excessive issues
+//   score -= Math.min(repository.open_issues_count, 10);
 
-  return Math.max(0, Math.min(100, Math.round(score)));
-}
+//   return Math.max(0, Math.min(100, Math.round(score)));
+// }
 
-function grade(score: number) {
-  if (score >= 95) return "A+";
-  if (score >= 90) return "A";
-  if (score >= 80) return "B";
-  if (score >= 70) return "C";
-  return "D";
-}
+// function grade(score: number) {
+//   if (score >= 95) return "A+";
+//   if (score >= 90) return "A";
+//   if (score >= 80) return "B";
+//   if (score >= 70) return "C";
+//   return "D";
+// }
 
-function statusColor(score: number) {
-  if (score >= 90) return "text-emerald-400";
-  if (score >= 80) return "text-cyan-400";
-  if (score >= 70) return "text-yellow-400";
-  return "text-red-400";
-}
+// function statusColor(score: number) {
+//   if (score >= 90) return "text-emerald-400";
+//   if (score >= 80) return "text-cyan-400";
+//   if (score >= 70) return "text-yellow-400";
+//   return "text-red-400";
+// }
 
 export function EngineeringScoreDashboard({
   repository,
+  analytics,
 }: EngineeringScoreDashboardProps) {
   if (!repository) return null;
 
   const score =
-    calculateEngineeringScore(repository);
+  analytics?.engineeringScore ?? 0;
+
+const productionScore =
+  analytics?.productionScore ?? 0;
+
+const quality =
+  analytics?.quality ?? "Growing";
+
+const deploymentReady =
+  analytics?.deploymentReady ?? false;
+
+const riskLevel =
+  analytics?.riskLevel ?? "Medium";
+  const grade =
+  score >= 95
+    ? "A+"
+    : score >= 90
+    ? "A"
+    : score >= 80
+    ? "B"
+    : score >= 70
+    ? "C"
+    : "D";
+
+const scoreColor =
+  score >= 90
+    ? "text-emerald-400"
+    : score >= 80
+    ? "text-cyan-400"
+    : score >= 70
+    ? "text-yellow-400"
+    : "text-red-400";
 
 const repositoryAge = formatDistanceToNowStrict(
     new Date(repository.created_at),
@@ -137,7 +170,7 @@ const repositoryAge = formatDistanceToNowStrict(
             className={`
               text-7xl
               font-black
-              ${statusColor(score)}
+              ${scoreColor}
             `}
           >
             {score}
@@ -160,7 +193,7 @@ const repositoryAge = formatDistanceToNowStrict(
               text-white
             "
           >
-            Grade {grade(score)}
+            Grade {grade}
           </div>
         </motion.div>
 
@@ -203,6 +236,17 @@ const repositoryAge = formatDistanceToNowStrict(
             title="Visibility"
             value={repository.visibility}
           />
+          <MetricCard
+    icon={<ShieldCheck size={20} />}
+    title="Production Score"
+    value={`${productionScore}%`}
+/>
+
+<MetricCard
+    icon={<ShieldCheck size={20} />}
+    title="Risk Level"
+    value={riskLevel}
+/>
 
         </div>
 
@@ -231,11 +275,18 @@ const repositoryAge = formatDistanceToNowStrict(
         "
       >
         <p className="leading-8 text-zinc-300">
-          This engineering score combines repository popularity,
-          maintenance cadence, community engagement, issue health,
-          and development activity to estimate overall production
-          readiness. It serves as a high-level quality indicator
-          rather than a strict benchmark.
+          <p className="leading-8 text-zinc-300">
+  <strong>Repository Quality:</strong> {quality}
+  <br />
+  <strong>Production Ready:</strong>{" "}
+  {deploymentReady ? "Yes" : "No"}
+  <br />
+  <strong>Engineering Score:</strong> {score}%
+  <br />
+  <strong>Production Score:</strong> {productionScore}%
+  <br />
+  <strong>Risk Level:</strong> {riskLevel}
+</p>
         </p>
       </motion.div>
     </motion.section>
