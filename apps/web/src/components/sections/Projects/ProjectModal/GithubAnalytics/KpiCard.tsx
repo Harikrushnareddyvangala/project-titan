@@ -90,9 +90,12 @@ export function KpiCard({
           {title}
         </h4>
 
-        <p className="mt-3 text-4xl font-bold text-white">
-          <AnimatedCounter value={value} />
-        </p>
+        
+          <AnimatedCounter 
+          value={value}
+          formatter={(v) => Math.round(v).toLocaleString()}
+          className="mt-3 text-4xl font-bold text-white" />
+        
 
         {subtitle && (
           <p className="mt-2 text-sm text-zinc-500">

@@ -9,14 +9,13 @@ import type {
 } from "@/types/github";
 
 import { AnalyticsHeader } from "./GithubAnalytics/AnalyticsHeader";
-import {
-  DashboardGrid,} from "./GithubAnalytics/DashboardGrid";
-  import { ExecutiveSummaryHero } from "./GithubAnalytics/ExecutiveSummaryHero";
-  import { RepositoryAssessment } from "./GithubAnalytics/RepositoryAssessment";
-  import { RepositoryTimeline } from "./GithubAnalytics/RepositoryTimeline";
-  import { RepositoryInsights } from "./GithubAnalytics/RepositoryInsights";
-  import { RepositoryRecommendations } from "./GithubAnalytics/RepositoryRecommendations";
-  import { EngineeringScoreDashboard } from "./GithubAnalytics/EngineeringScoreDashboard";
+import { DashboardGrid,} from "./GithubAnalytics/DashboardGrid";
+import { ExecutiveSummaryHero } from "./GithubAnalytics/ExecutiveSummaryHero";
+import { RepositoryAssessment } from "./GithubAnalytics/RepositoryAssessment";
+import { RepositoryTimeline } from "./GithubAnalytics/RepositoryTimeline";
+import { RepositoryInsights } from "./GithubAnalytics/RepositoryInsights";
+import { RepositoryRecommendations } from "./GithubAnalytics/RepositoryRecommendations";
+import { EngineeringScoreDashboard } from "./GithubAnalytics/EngineeringScoreDashboard";
 import { RepositoryRiskAssessment } from "./GithubAnalytics/RepositoryRiskAssessment";
 import { AIEngineeringRecommendations } from "./GithubAnalytics/AIEngineeringRecommendations";
 import { GithubAnalyticsSkeleton } from "./GithubAnalytics/GithubAnalyticsSkeleton";
@@ -25,7 +24,7 @@ interface GithubAnalyticsSectionProps {
   analytics: RepositoryAnalytics | null;
   languages: GithubLanguages;
   commitActivity: GithubCommitWeek[];
-   contributors: GithubContributor[];
+  contributors: GithubContributor[];
   loading: boolean;
 }
 
@@ -44,9 +43,9 @@ export function GithubAnalyticsSection({
   if (!repository) {
     return <div className="p-10 text-center text-zinc-400">No Repository</div>;
   }
-
+  
   return (
-   <section
+  <section
 className="
 relative
 overflow-hidden
@@ -133,7 +132,7 @@ to-transparent
     repository={repository}
     analytics={analytics}
 />
-      <DashboardGrid
+<DashboardGrid
   repository={repository}
   analytics={analytics}
   languages={languages}
@@ -150,7 +149,6 @@ to-transparent
   <RepositoryTimeline
     repository={repository}
   />
-     
-   </section>
- );
+  </section>
+);
 }

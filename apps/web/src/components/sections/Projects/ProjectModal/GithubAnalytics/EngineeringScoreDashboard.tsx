@@ -12,6 +12,7 @@ import {
 
 import type { GithubRepository,RepositoryAnalytics, } from "@/types/github";
 import { formatDistanceToNowStrict } from "date-fns";
+import { AnimatedCounter } from "./AnimatedCounter";
 
 interface EngineeringScoreDashboardProps {
   repository: GithubRepository | null;
@@ -166,15 +167,10 @@ const repositoryAge = formatDistanceToNowStrict(
             text-center
           "
         >
-          <div
-            className={`
-              text-7xl
-              font-black
-              ${scoreColor}
-            `}
-          >
-            {score}
-          </div>
+          <AnimatedCounter
+  value={score}
+  className={`text-7xl font-black ${scoreColor}`}
+/>
 
           <div className="mt-3 text-zinc-400">
             Overall Engineering Score
@@ -204,25 +200,25 @@ const repositoryAge = formatDistanceToNowStrict(
           <MetricCard
             icon={<Star size={20} />}
             title="Stars"
-            value={repository.stargazers_count.toLocaleString()}
+            value={repository.stargazers_count}
           />
 
           <MetricCard
             icon={<GitBranch size={20} />}
             title="Forks"
-            value={repository.forks_count.toLocaleString()}
+            value={repository.forks_count}
           />
 
           <MetricCard
             icon={<Eye size={20} />}
             title="Watchers"
-            value={repository.watchers_count.toLocaleString()}
+            value={repository.watchers_count}
           />
 
           <MetricCard
             icon={<Bug size={20} />}
             title="Open Issues"
-            value={repository.open_issues_count.toString()}
+            value={repository.open_issues_count}
           />
 
           <MetricCard
@@ -296,7 +292,7 @@ const repositoryAge = formatDistanceToNowStrict(
 interface MetricCardProps {
   icon: React.ReactNode;
   title: string;
-  value: string;
+  value: number | string;
 }
 
 function MetricCard({
@@ -329,9 +325,16 @@ function MetricCard({
             {title}
           </p>
 
-          <p className="mt-1 text-xl font-semibold text-white">
-            {value}
-          </p>
+          {typeof value === "number" ? (
+  <AnimatedCounter
+    value={value}
+    className="mt-1 text-xl font-semibold text-white"
+  />
+) : (
+  <p className="mt-1 text-xl font-semibold text-white">
+    {value}
+  </p>
+)}
 
         </div>
 
