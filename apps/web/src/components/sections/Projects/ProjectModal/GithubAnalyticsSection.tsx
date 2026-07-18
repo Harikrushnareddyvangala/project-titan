@@ -19,6 +19,7 @@ import { EngineeringScoreDashboard } from "./GithubAnalytics/EngineeringScoreDas
 import { RepositoryRiskAssessment } from "./GithubAnalytics/RepositoryRiskAssessment";
 import { AIEngineeringRecommendations } from "./GithubAnalytics/AIEngineeringRecommendations";
 import { GithubAnalyticsSkeleton } from "./GithubAnalytics/GithubAnalyticsSkeleton";
+import { LanguageAnalytics } from "./GithubAnalytics/LanguageAnalytics";
 interface GithubAnalyticsSectionProps {
   repository: GithubRepository | null;
   analytics: RepositoryAnalytics | null;
@@ -116,6 +117,10 @@ to-transparent
 <ExecutiveSummaryHero
   repository={repository}
   languages={languages}
+  analytics={analytics}
+/>
+<LanguageAnalytics
+    languages={languages}
 />
 <EngineeringScoreDashboard
   repository={repository}
@@ -143,8 +148,10 @@ to-transparent
     repository={repository}
     analytics={analytics}
   />
+  
   <RepositoryRecommendations
     repository={repository}
+    analytics={analytics}
 />
   <RepositoryTimeline
     repository={repository}

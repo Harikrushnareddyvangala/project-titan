@@ -52,6 +52,11 @@ export interface GithubRepository {
   html_url: string;
 };
 }
+export interface Recommendation {
+  title: string;
+  description: string;
+}
+
 export interface RepositoryAnalytics {
   repositoryAge: number;
 
@@ -70,13 +75,13 @@ export interface RepositoryAnalytics {
     | "Medium"
     | "High";
 
-  quality:
-    | "Outstanding"
-    | "Excellent"
-    | "Good"
-    | "Growing";
+  quality: string;
+    // | "Outstanding"
+    // | "Excellent"
+    // | "Good"
+    // | "Growing";
 
-  recommendations: string[];
+  recommendations: Recommendation[];
 }
 
 export type GithubLanguages = Record<

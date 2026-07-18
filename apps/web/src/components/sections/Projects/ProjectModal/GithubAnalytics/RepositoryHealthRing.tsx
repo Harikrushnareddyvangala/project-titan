@@ -3,9 +3,14 @@
 import { motion } from "framer-motion";
 import type { GithubRepository } from "@/types/github";
 import { AnimatedCounter } from "./AnimatedCounter";
+import { RepositoryAnalytics } from "@/types/github";
+// import {
+//   analyzeRepository,
+// } from "@/lib/github/githubAnalytics";
 
 interface RepositoryHealthRingProps {
   repository: GithubRepository;
+  analytics: RepositoryAnalytics | null;
 }
 const containerVariants = {
   hidden: {},
@@ -28,19 +33,14 @@ const itemVariants = {
 };
 export function RepositoryHealthRing({
   repository,
+  analytics,
 }: RepositoryHealthRingProps) {
   const radius = 72;
 
   const circumference = 2 * Math.PI * radius;
   const score =
-  Math.min(
-    100,
-    Math.round(
-      repository.stargazers_count * 2 +
-      repository.forks_count * 3 +
-      repository.watchers_count
-    )
-  );
+   analytics?.engineeringScore ??
+    0;
 
   const progress =
     circumference -
