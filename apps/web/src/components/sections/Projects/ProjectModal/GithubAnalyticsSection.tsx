@@ -28,6 +28,7 @@ import { RepositoryComplexityAnalysis } from "./GithubAnalytics/RepositoryComple
 import { ArchitectureDetection } from "./GithubAnalytics/ArchitectureDetection";
 import { RepositoryMaturityAssessment } from "./GithubAnalytics/RepositoryMaturityAssessment";
 import { AIExecutiveEngineeringReport } from "./GithubAnalytics/AIExecutiveEngineeringReport";
+import { TechnologyStackAnalytics } from "./GithubAnalytics/TechnologyStackAnalytics";
 
 interface GithubAnalyticsSectionProps {
   repository: GithubRepository | null;
@@ -140,6 +141,10 @@ to-transparent
     languages={languages}
 />
 <ArchitectureDetection
+    repository={repository}
+    languages={languages}
+/>
+<TechnologyStackAnalytics
     repository={repository}
     languages={languages}
 />
