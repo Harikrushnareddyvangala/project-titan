@@ -22,6 +22,7 @@ import { GithubAnalyticsSkeleton } from "./GithubAnalytics/GithubAnalyticsSkelet
 import { LanguageAnalytics } from "./GithubAnalytics/LanguageAnalytics";
 import { ContributorAnalytics } from "./GithubAnalytics/ContributorAnalytics";
 import { CommitActivityAnalytics } from "./GithubAnalytics/CommitActivityAnalytics";
+import { RepositoryHealthDashboard } from "./GithubAnalytics/RepositoryHealthDashboard";
 
 interface GithubAnalyticsSectionProps {
   repository: GithubRepository | null;
@@ -130,6 +131,10 @@ to-transparent
 />
 <CommitActivityAnalytics
   commits={commitActivity}
+/>
+<RepositoryHealthDashboard
+  repository={repository}
+  analytics={analytics}
 />
 <EngineeringScoreDashboard
   repository={repository}
