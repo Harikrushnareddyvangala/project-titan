@@ -20,6 +20,7 @@ import { RepositoryRiskAssessment } from "./GithubAnalytics/RepositoryRiskAssess
 import { AIEngineeringRecommendations } from "./GithubAnalytics/AIEngineeringRecommendations";
 import { GithubAnalyticsSkeleton } from "./GithubAnalytics/GithubAnalyticsSkeleton";
 import { LanguageAnalytics } from "./GithubAnalytics/LanguageAnalytics";
+import { ContributorAnalytics } from "./GithubAnalytics/ContributorAnalytics";
 interface GithubAnalyticsSectionProps {
   repository: GithubRepository | null;
   analytics: RepositoryAnalytics | null;
@@ -121,6 +122,9 @@ to-transparent
 />
 <LanguageAnalytics
     languages={languages}
+/>
+<ContributorAnalytics
+  contributors={contributors}
 />
 <EngineeringScoreDashboard
   repository={repository}
