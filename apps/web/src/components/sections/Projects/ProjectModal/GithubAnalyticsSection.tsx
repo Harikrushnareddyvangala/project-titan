@@ -32,6 +32,7 @@ import { TechnologyStackAnalytics } from "./GithubAnalytics/TechnologyStackAnaly
 import { RepositorySecurityAnalysis } from "./GithubAnalytics/RepositorySecurityAnalysis"; 
 import { RepositoryDevOpsAnalysis } from "./GithubAnalytics/RepositoryDevOpsAnalysis";   
 import { RepositoryCodeQualityAnalysis } from "./GithubAnalytics/RepositoryCodeQualityAnalysis";
+import { RepositoryPerformanceAnalysis } from "./GithubAnalytics/RepositoryPerformanceAnalysis";
 
 interface GithubAnalyticsSectionProps {
   repository: GithubRepository | null;
@@ -153,6 +154,10 @@ to-transparent
     languages={languages}
 />
 <RepositoryCodeQualityAnalysis
+    repository={repository}
+    analytics={analytics}
+/>
+<RepositoryPerformanceAnalysis
     repository={repository}
     analytics={analytics}
 />
