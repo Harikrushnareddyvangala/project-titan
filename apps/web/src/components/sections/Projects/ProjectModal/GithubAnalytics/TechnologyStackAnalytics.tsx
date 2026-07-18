@@ -132,6 +132,7 @@ export function TechnologyStackAnalytics({
 
   return (
     <motion.section
+    id = "technology"
       initial={{ opacity: 0, y: 25 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}

@@ -48,6 +48,7 @@ export function LanguageAnalytics({
 
   return (
     <motion.section
+    id = "languages"
       initial={{
         opacity: 0,
         y: 30,

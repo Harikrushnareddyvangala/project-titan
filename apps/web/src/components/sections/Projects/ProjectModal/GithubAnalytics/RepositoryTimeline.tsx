@@ -59,7 +59,7 @@ export function RepositoryTimeline({
     ];
 
     return (
-        <section className="rounded-[32px] border border-white/10 bg-white/[0.04] p-8">
+        <section id = "timeline" className="rounded-[32px] border border-white/10 bg-white/[0.04] p-8">
 
             <h2 className="text-2xl font-bold text-white">
                 Development Timeline

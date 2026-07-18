@@ -30,6 +30,7 @@ export function ContributorAnalytics({
 
   return (
     <motion.section
+    id = "contributors"
       initial={{
         opacity: 0,
         y: 30,

@@ -78,6 +78,7 @@ const quality =
 
   return (
     <motion.section
+    id = "executive"
       initial={{
         opacity: 0,
         y: 20,
