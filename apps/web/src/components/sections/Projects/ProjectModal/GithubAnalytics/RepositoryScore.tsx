@@ -6,93 +6,29 @@ import { ProgressBar } from "./ProgressBar";
 
 import type { GithubRepository, RepositoryAnalytics, } from "@/types/github";
 import { AnimatedCounter } from "./AnimatedCounter";
-import { useRepositoryAnalytics } from "@/hooks/useRepositoryAnalytics";
-
 interface RepositoryScoreProps {
   repository: GithubRepository;
   analytics: RepositoryAnalytics | null;
 }
+const containerVariants = {
+  hidden: {},
+  show: {
+    transition: {
+      staggerChildren: 0.12,
+    },
+  },
+};
 
-// function calculateScore(
-//   repository: GithubRepository,
-// ) {
-//   let score = 50;
-
-//   // Community
-
-//   score += Math.min(
-//     repository.stargazers_count / 10,
-//     15,
-//   );
-
-//   score += Math.min(
-//     repository.forks_count / 5,
-//     10,
-//   );
-
-//   score += Math.min(
-//     repository.watchers_count / 8,
-//     8,
-//   );
-
-//   // Maintenance
-
-//   const updated =
-//     new Date(repository.updated_at);
-
-//   const days =
-//     (Date.now() -
-//       updated.getTime()) /
-//     (1000 * 60 * 60 * 24);
-
-//   if (days < 30) score += 10;
-//   else if (days < 90) score += 5;
-
-//   // Open Issues
-
-//   score -= Math.min(
-//     repository.open_issues_count,
-//     10,
-//   );
-
-//   return Math.max(
-//     0,
-//     Math.min(
-//       Math.round(score),
-//       100,
-//     ),
-//   );
-// }
-
-// function getGrade(score: number) {
-//   if (score >= 95)
-//     return "A+";
-
-//   if (score >= 90)
-//     return "A";
-
-//   if (score >= 80)
-//     return "B";
-
-//   if (score >= 70)
-//     return "C";
-
-//   return "D";
-// }
-
-// function getDescription(score: number) {
-//   if (score >= 90)
-//     return "Outstanding repository health";
-
-//   if (score >= 80)
-//     return "Well maintained project";
-
-//   if (score >= 70)
-//     return "Healthy repository";
-
-//   return "Needs improvements";
-// }
-
+const itemVariants = {
+  hidden: {
+    opacity: 0,
+    y: 20,
+  },
+  show: {
+    opacity: 1,
+    y: 0,
+  },
+};
 export function RepositoryScore({
   repository,
   analytics,
@@ -143,7 +79,11 @@ Math.min(
 
   return (
     <motion.div
-      whileHover={{
+    initial="hidden"
+    whileInView="show"
+    viewport={{ once: true }}
+    variants={containerVariants}
+    whileHover={{
         y:-8,
 scale:1.015,
       }}
@@ -189,26 +129,37 @@ scale:1.015,
 
         <div className="flex items-center gap-3">
 
-          <div
-            className="
-              flex
-              h-12
-              w-12
-              items-center
-              justify-center
-              rounded-2xl
-              border
-              border-cyan-400/20
-              bg-cyan-500/10
-            "
+          <motion.div
+    variants={itemVariants}
+    animate={{
+        rotate: [0, 8, -8, 0],
+        scale: [1, 1.06, 1],
+    }}
+    transition={{
+        duration: 6,
+        repeat: Infinity,
+    }}
+    className="
+relative
+flex
+h-12
+w-12
+items-center
+justify-center
+rounded-2xl
+border
+border-cyan-400/20
+bg-cyan-500/10
+shadow-[0_0_35px_rgba(34,211,238,.18)]
+"
           >
             <Award
               size={22}
               className="text-cyan-300"
             />
-          </div>
+          </motion.div>
 
-          <div>
+          <motion.div variants={itemVariants}>
 
             <h3 className="text-lg font-semibold text-white">
               Repository Score
@@ -218,13 +169,14 @@ scale:1.015,
               Machine Learning Repository Evaluation
             </p>
 
-          </div>
+          </motion.div>
 
         </div>
 
         <div className="mt-10">
 
           <motion.div
+          variants = {itemVariants}
             initial={{
               opacity: 0,
               y: 25,
@@ -234,12 +186,30 @@ scale:1.015,
               y: 0,
             }}
           >
-            <div className="flex items-end gap-3">
-
+            <div
+className="
+flex
+items-end
+gap-4
+pb-3
+border-b
+border-white/10
+"
+>
               <span className="text-6xl font-bold text-white">
-                <AnimatedCounter
-    value={score}
-/>
+                <motion.div
+    animate={{
+        scale: [1, 1.05, 1],
+    }}
+    transition={{
+        duration: 3,
+        repeat: Infinity,
+    }}
+>
+    <AnimatedCounter
+        value={score}
+    />
+</motion.div> 
               </span>
 
               <span className="mb-2 text-zinc-400">
@@ -248,7 +218,14 @@ scale:1.015,
 
             </div>
 
-            <div
+            <motion.div
+    animate={{
+        scale: [1, 1.04, 1],
+    }}
+    transition={{
+        duration: 2,
+        repeat: Infinity,
+    }}
               className="
                 mt-5
                 inline-flex
@@ -263,12 +240,36 @@ scale:1.015,
                 text-emerald-300
               "
             >
+              <p
+className="
+mb-2
+text-xs
+uppercase
+tracking-[0.3em]
+text-zinc-500
+"
+>
+Engineering Grade
+</p>
               ★★★★★ {grade}
-            </div>
+            </motion.div>
 
-            <div className="mt-8 space-y-6">
+            <motion.div
+    variants={containerVariants}
+    className="mt-8 space-y-7"
+>
 
-  <div
+  <motion.div
+    variants={itemVariants}
+    whileHover={{
+        scale: 1.02,
+        y: -4,
+        boxShadow: "0 0 45px rgba(34,211,238,.18)"
+    }}
+    transition={{
+        type: "spring",
+        stiffness: 260,
+    }}
     className="
     rounded-2xl
     border
@@ -306,31 +307,61 @@ scale:1.015,
       {description}
     </p>
 
-  </div>
+  </motion.div>
 
+<motion.div variants={itemVariants}>
   <ProgressBar
     title="Community"
     value={communityScore}
   />
-
+  </motion.div>
+<motion.div variants={itemVariants}>
   <ProgressBar
     title="Maintenance"
     value={maintenanceScore}
   />
+</motion.div>
 
-  <ProgressBar
+ <motion.div variants={itemVariants}>
+   <ProgressBar
     title="Popularity"
     value={popularityScore}
   />
+  </motion.div>
 
-</div>
+</motion.div>
 
           </motion.div>
 
         </div>
 
-      </div>
+</div>
+<motion.div
+    initial={{
+        scaleX: 0,
+    }}
+    whileInView={{
+        scaleX: 1,
+    }}
+    viewport={{
+        once: true,
+    }}
+    transition={{
+        duration: 1,
+        delay: 0.5,
+    }}
+    className="
+        mt-8
+        h-px
+        origin-left
+        bg-gradient-to-r
+        from-cyan-400
+        via-blue-500
+        to-transparent
+    "
+/>
+      </motion.div>
 
-    </motion.div>
+    
   );
 }

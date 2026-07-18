@@ -7,7 +7,25 @@ import { AnimatedCounter } from "./AnimatedCounter";
 interface RepositoryHealthRingProps {
   repository: GithubRepository;
 }
+const containerVariants = {
+  hidden: {},
+  show: {
+    transition: {
+      staggerChildren: 0.1,
+    },
+  },
+};
 
+const itemVariants = {
+  hidden: {
+    opacity: 0,
+    y: 18,
+  },
+  show: {
+    opacity: 1,
+    y: 0,
+  },
+};
 export function RepositoryHealthRing({
   repository,
 }: RepositoryHealthRingProps) {
@@ -57,6 +75,10 @@ const daysSinceUpdate = Math.floor(
 
   return (
     <motion.div
+    initial="hidden"
+    whileInView="show"
+    viewport={{ once: true }}
+    variants={containerVariants}
       whileHover={{
         scale: 1.04,
       }}
@@ -91,18 +113,28 @@ const daysSinceUpdate = Math.floor(
           blur-[140px]
         "
         animate={{
-          scale: [1, 1.25, 1],
-          opacity: [0.15,0.5,0.15],
-        }}
+    scale:[1,1.22,1],
+    opacity:[0.15,0.45,0.15],
+    rotate:[0,360],
+}}
         transition={{
           duration: 6,
           repeat: Infinity,
         }}
       />
 
-      <div className="relative z-10 flex flex-col items-center">
+      <motion.div
+    whileHover={{
+        x: 6,
+        scale: 1.02,
+    }}
+    transition={{
+        type: "spring",
+        stiffness: 260,
+    }} className="relative z-10 flex flex-col items-center">
 
-        <h3
+        <motion.h3
+    variants={itemVariants}
           className="
             text-lg
             font-semibold
@@ -110,15 +142,39 @@ const daysSinceUpdate = Math.floor(
           "
         >
           Repository Health
-        </h3>
+       </motion.h3>
+<motion.p
+variants={itemVariants}
+className="
+mt-2
+text-xs
+uppercase
+tracking-[0.35em]
+text-cyan-400
+"
+>
+AI Certified Repository
+</motion.p>
+        <motion.div
+    variants={itemVariants}
+    className="relative mt-8"
+>
 
-        <div className="relative mt-8">
-
-          <svg
+          <motion.svg
+            animate={{
+        rotate: 360,
+    }}
+    transition={{
+        duration: 60,
+        repeat: Infinity,
+        ease: "linear",
+    }}
             width="180"
             height="180"
             viewBox="0 0 180 180"
-            className="-rotate-90"
+            className="-rotate-90
+            drop-shadow-[0_0_24px_rgba(34,211,238,.25)]
+            "
           >
             {/* Track */}
 
@@ -174,7 +230,7 @@ const daysSinceUpdate = Math.floor(
               </linearGradient>
             </defs>
 
-          </svg>
+          </motion.svg>
 
           {/* Center */}
 
@@ -189,6 +245,25 @@ const daysSinceUpdate = Math.floor(
             "
           >
             <motion.div
+className="
+absolute
+h-24
+w-24
+rounded-full
+bg-cyan-400/10
+blur-2xl
+"
+animate={{
+    scale:[1,1.4,1],
+    opacity:[0.2,0.5,0.2],
+}}
+transition={{
+    duration:3,
+    repeat:Infinity,
+}}
+/>
+            <motion.div
+    variants={itemVariants}
   animate={{
     scale: [1, 1.08, 1],
   }}
@@ -204,16 +279,33 @@ const daysSinceUpdate = Math.floor(
 >
 
   <p
-    className="
-    text-5xl
-    font-bold
-    text-white
-    "
-  >
+  className="
+  text-6xl
+  font-black
+  bg-gradient-to-r
+  from-cyan-300
+  via-white
+  to-blue-400
+  bg-clip-text
+  text-transparent
+  drop-shadow-[0_0_18px_rgba(34,211,238,.25)]
+  "
+>
     <AnimatedCounter
       value={score}
     />
   </p>
+  <p
+className="
+mt-1
+text-xs
+uppercase
+tracking-[0.3em]
+text-zinc-500
+"
+>
+Health Score
+</p>
 
   <p
     className={`
@@ -230,31 +322,39 @@ const daysSinceUpdate = Math.floor(
 
           </div>
 
-        </div>
+        </motion.div>
 
-        <div
-className="
-mt-8
-space-y-5
-w-full
+        <motion.div
+    variants={containerVariants}
+    className="
+    mt-8
+    space-y-5
+    w-full
 "
 >
 
+<motion.div variants={itemVariants}>
 <Metric
 title="Repository Status"
 value={status}
 />
+</motion.div>
 
+<motion.div variants={itemVariants}>
 <Metric
 title="Last Sync"
 value={`${daysSinceUpdate} days ago`}
 />
+</motion.div>
 
+<motion.div variants={itemVariants}>
 <Metric
 title="Open Issues"
 value={repository.open_issues_count.toString()}
 />
+</motion.div>
 
+<motion.div variants={itemVariants}>
 <Metric
 title="Community"
 value={
@@ -263,11 +363,35 @@ repository.watchers_count > 5
 : "Growing"
 }
 />
+</motion.div>
 
-</div>
+</motion.div>
 
-      </div>
-
+      </motion.div>
+<motion.div
+    initial={{
+        scaleX: 0,
+    }}
+    whileInView={{
+        scaleX: 1,
+    }}
+    viewport={{
+        once: true,
+    }}
+    transition={{
+        duration: 1,
+        delay: 0.4,
+    }}
+    className="
+        mt-8
+        h-px
+        origin-left
+        bg-gradient-to-r
+        from-cyan-400
+        via-blue-500
+        to-transparent
+    "
+/>
     </motion.div>
   );
 }
@@ -281,19 +405,28 @@ function Metric({
   value,
 }: MetricProps) {
   return (
-    <div
-      className="
-      flex
-      items-center
-      justify-between
-      rounded-xl
-      border
-      border-white/[0.08]
-      bg-white/[0.03]
-      px-4
-      py-3
-      "
-    >
+    <motion.div
+whileHover={{
+    y:-3,
+    scale:1.02,
+}}
+transition={{
+    type:"spring",
+    stiffness:260,
+}}
+className="
+flex
+items-center
+justify-between
+rounded-xl
+border
+border-white/[0.08]
+bg-white/[0.03]
+px-4
+py-3
+"
+>
+
       <span
         className="
         text-sm
@@ -312,6 +445,6 @@ function Metric({
         {value}
       </span>
 
-    </div>
+    </motion.div>
   );
 }

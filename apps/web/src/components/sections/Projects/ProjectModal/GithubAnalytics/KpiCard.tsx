@@ -11,7 +11,25 @@ interface KpiCardProps {
   color: string;
   subtitle?: string;
 }
+const containerVariants = {
+  hidden: {},
+  visible: {
+    transition: {
+      staggerChildren: 0.08,
+    },
+  },
+};
 
+const itemVariants = {
+  hidden: {
+    opacity: 0,
+    y: 20,
+  },
+  visible: {
+    opacity: 1,
+    y: 0,
+  },
+};
 export function KpiCard({
   title,
   value,
@@ -21,10 +39,14 @@ export function KpiCard({
 }: KpiCardProps) {
   return (
     <motion.div
-      whileHover={{
-        y: -8,
-        scale: 1.02,
-      }}
+    initial="hidden"
+    whileInView="visible"
+    viewport={{ once: true }}
+    variants={containerVariants}
+    whileHover={{
+        y:-8,
+        scale:1.02,
+    }}
       transition={{
         type: "spring",
         stiffness: 280,
@@ -55,9 +77,10 @@ export function KpiCard({
           background: color,
         }}
         animate={{
-          scale: [1, 1.25, 1],
-          opacity: [0.2, 0.45, 0.2],
-        }}
+    scale:[1,1.3,1],
+    rotate:[0,20,0],
+    opacity:[0.18,0.5,0.18],
+}}
         transition={{
           duration: 6,
           repeat: Infinity,
@@ -68,10 +91,21 @@ export function KpiCard({
 
         <div className="flex items-center justify-between">
 
-          <div
-            className="
-              flex
-              h-14
+          <motion.div
+    variants={itemVariants}
+    animate={{
+        scale:[1,1.06,1],
+    }}
+    transition={{
+        duration:3,
+        repeat:Infinity,
+    }}
+    style={{
+    boxShadow: `0 0 30px ${color}30`,
+}}
+    className="
+        flex
+        h-14
               w-14
               items-center
               justify-center
@@ -82,26 +116,44 @@ export function KpiCard({
             "
           >
             {icon}
-          </div>
+          </motion.div>
 
         </div>
 
-        <h4 className="mt-6 text-sm text-zinc-400">
+        <motion.h4
+    variants={itemVariants} className="mt-6 text-sm text-zinc-400">
           {title}
-        </h4>
+        </motion. h4>
 
         
-          <AnimatedCounter 
-          value={value}
-          formatter={(v) => Math.round(v).toLocaleString()}
-          className="mt-3 text-4xl font-bold text-white" />
+          <motion.div variants={itemVariants}>
+
+<AnimatedCounter
+    value={value}
+    formatter={(v)=>Math.round(v).toLocaleString()}
+    className="mt-3 text-4xl font-bold text-white"
+/>
+
+</motion.div>
         
 
         {subtitle && (
-          <p className="mt-2 text-sm text-zinc-500">
+          <motion.p
+    variants={itemVariants} className="mt-2 text-sm text-zinc-500">
             {subtitle}
-          </p>
+          </motion.p>
         )}
+        <motion.div
+    variants={itemVariants}
+    className="
+        mt-6
+        h-px
+        bg-gradient-to-r
+        from-cyan-400
+        via-blue-500
+        to-transparent
+    "
+/>
 
       </div>
 

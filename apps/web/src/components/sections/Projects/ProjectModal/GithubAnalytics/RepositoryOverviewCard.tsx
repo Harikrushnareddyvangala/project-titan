@@ -59,6 +59,8 @@ function InfoItem({
         stiffness: 260,
       }}
       className="
+        relative
+        overflow-hidden
         rounded-2xl
         border
         border-white/[0.08]
@@ -66,12 +68,37 @@ function InfoItem({
         p-4
       "
     >
-      <div className="flex items-center gap-2 text-sm text-zinc-400">
+      <motion.div
+  className="
+    absolute
+    inset-0
+    rounded-2xl
+    bg-cyan-500/5
+    pointer-events-none
+  "
+  animate={{
+    opacity: [0.15, 0.35, 0.15],
+  }}
+  transition={{
+    duration: 5,
+    repeat: Infinity,
+  }}
+/>
+      <motion.div
+    animate={{
+        x:[0,2,0],
+    }}
+    transition={{
+        duration:4,
+        repeat:Infinity,
+    }}
+    className="flex items-center gap-2 text-sm text-zinc-400"
+>
         {icon}
         {label}
-      </div>
+      </motion.div>
 
-      <div className="mt-2 text-lg font-semibold text-white">
+      <div className="relative z-10 mt-2 text-lg font-semibold text-white">
         {value}
       </div>
     </motion.div>
@@ -83,18 +110,13 @@ export function RepositoryOverviewCard({
 }: Props) {
   return (
     <motion.section
-      initial={{
-        opacity: 0,
-        y: 25,
-      }}
-      whileInView={{
-        opacity: 1,
-        y: 0,
-      }}
-      viewport={{
+    initial="hidden"
+    whileInView="visible"
+    viewport={{
         once: true,
         amount: 0.2,
-      }}
+    }}
+    variants={containerVariants}
       transition={{
         duration: 0.5,
       }}
@@ -135,7 +157,10 @@ export function RepositoryOverviewCard({
 
       <div className="relative z-10">
 
-        <div className="flex items-center justify-between">
+        <motion.div
+    variants={itemVariants}
+    className="flex items-center justify-between"
+>
 
           <div>
 
@@ -151,8 +176,13 @@ export function RepositoryOverviewCard({
 
           <motion.div
             animate={{
-              scale: [1, 1.05, 1],
-            }}
+    scale:[1,1.05,1],
+    boxShadow:[
+        "0 0 0 rgba(34,211,238,0)",
+        "0 0 24px rgba(34,211,238,.35)",
+        "0 0 0 rgba(34,211,238,0)",
+    ],
+}}
             transition={{
               duration: 2,
               repeat: Infinity,
@@ -172,15 +202,12 @@ export function RepositoryOverviewCard({
             LIVE
           </motion.div>
 
-        </div>
+        </motion.div>
 
         <div className="mt-8">
 
           <motion.h2
-            initial={{
-              opacity: 0,
-              y: 15,
-            }}
+    variants={itemVariants}
             whileInView={{
               opacity: 1,
               y: 0,
@@ -197,9 +224,7 @@ export function RepositoryOverviewCard({
           </motion.h2>
 
           <motion.p
-            initial={{
-              opacity: 0,
-            }}
+    variants={itemVariants}
             whileInView={{
               opacity: 1,
             }}
@@ -289,6 +314,24 @@ export function RepositoryOverviewCard({
             ).toLocaleDateString()}
           />
         </motion.div>
+        <motion.div
+  initial={{ scaleX: 0 }}
+  whileInView={{ scaleX: 1 }}
+  viewport={{ once: true }}
+  transition={{
+    duration: 1,
+    delay: 0.3,
+  }}
+  className="
+    mt-8
+    h-px
+    origin-left
+    bg-gradient-to-r
+    from-cyan-400
+    via-blue-500
+    to-transparent
+  "
+/>
 
       </div>
 

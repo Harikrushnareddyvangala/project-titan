@@ -14,6 +14,25 @@ const COLORS = [
   "bg-cyan-500",
   "bg-cyan-300",
 ];
+const containerVariants = {
+  hidden: {},
+  show: {
+    transition: {
+      staggerChildren: 0.05,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: {
+    opacity: 0,
+    scale: 0.8,
+  },
+  show: {
+    opacity: 1,
+    scale: 1,
+  },
+};
 
 export function GithubCommitHeatmap({
   commits,
@@ -57,9 +76,14 @@ export function GithubCommitHeatmap({
 
   return (
     <motion.div
-      whileHover={{
-        y: -6,
-      }}
+  initial="hidden"
+  whileInView="show"
+  viewport={{ once: true }}
+  variants={containerVariants}
+  whileHover={{
+    y: -6,
+    scale: 1.01,
+  }}
       className="
       rounded-[34px]
       border
@@ -69,7 +93,33 @@ export function GithubCommitHeatmap({
       p-8
       "
     >
-      <div className="flex items-center justify-between">
+      <motion.div
+  className="
+    absolute
+    -right-24
+    -top-24
+    h-72
+    w-72
+    rounded-full
+    bg-cyan-500/10
+    blur-[140px]
+    pointer-events-none
+  "
+  animate={{
+    scale: [1, 1.15, 1],
+    opacity: [0.15, 0.4, 0.15],
+  }}
+  transition={{
+    duration: 10,
+    repeat: Infinity,
+  }}
+/>
+
+<div className="relative z-10">
+      <motion.div
+  variants={itemVariants}
+  className="flex items-center justify-between"
+>
 
         <div>
           <h3 className="text-xl font-semibold text-white">
@@ -91,26 +141,19 @@ export function GithubCommitHeatmap({
           </p>
         </div>
 
-      </div>
+      </motion.div>
 
-      <div className="mt-10 flex gap-2 overflow-x-auto pb-2">
+      <motion.div
+  variants={containerVariants}
+  className="mt-10 flex gap-2 overflow-x-auto pb-2"
+>
 
         {commits.map((week, weekIndex) => (
           <motion.div
-            key={week.week}
-            className="flex flex-col gap-2"
-            initial={{
-              opacity: 0,
-              y: 20,
-            }}
-            animate={{
-              opacity: 1,
-              y: 0,
-            }}
-            transition={{
-              delay: weekIndex * 0.03,
-            }}
-          >
+    key={week.week}
+    variants={itemVariants}
+    className="flex flex-col gap-2"
+>
             {week.days.map(
               (count, dayIndex) => {
                 const intensity =
@@ -130,10 +173,14 @@ export function GithubCommitHeatmap({
 
                 return (
                   <motion.div
-                    key={dayIndex}
-                    whileHover={{
-                      scale: 1.25,
-                    }}
+    key={dayIndex}
+    whileHover={{
+        scale: 1.35,
+        rotate: 8,
+    }}
+    whileTap={{
+        scale: 0.9,
+    }}
                     title={`${count} commits`}
                     className={`
                     h-4
@@ -149,9 +196,12 @@ export function GithubCommitHeatmap({
           </motion.div>
         ))}
 
-      </div>
+      </motion.div>
 
-      <div className="mt-10 border-t border-white/10 pt-6">
+      <motion.div
+  variants={itemVariants}
+  className="mt-10 border-t border-white/10 pt-6"
+>
 
         <div className="grid grid-cols-2 gap-8">
 
@@ -177,8 +227,32 @@ export function GithubCommitHeatmap({
 
         </div>
 
-      </div>
-
+      </motion.div>
+      <motion.div
+  initial={{
+    scaleX: 0,
+  }}
+  whileInView={{
+    scaleX: 1,
+  }}
+  viewport={{
+    once: true,
+  }}
+  transition={{
+    duration: 1,
+    delay: 0.4,
+  }}
+  className="
+    mt-8
+    h-px
+    origin-left
+    bg-gradient-to-r
+    from-cyan-400
+    via-blue-500
+    to-transparent
+  "
+/>
+</div>
     </motion.div>
   );
 }

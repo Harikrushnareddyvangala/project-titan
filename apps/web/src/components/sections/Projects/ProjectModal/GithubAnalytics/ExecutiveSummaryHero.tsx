@@ -71,22 +71,43 @@ export function ExecutiveSummaryHero({
         p-8
       "
     >
-      <div
-        className="
-          absolute
-          right-0
-          top-0
-          h-80
-          w-80
-          rounded-full
-          bg-cyan-500/10
-          blur-[120px]
-        "
-      />
+      <motion.div
+    className="
+        absolute
+        -right-24
+        -top-24
+        h-80
+        w-80
+        rounded-full
+        bg-cyan-500/10
+        blur-[140px]
+    "
+    animate={{
+        scale:[1,1.2,1],
+        opacity:[0.15,0.45,0.15],
+    }}
+    transition={{
+        duration:10,
+        repeat:Infinity,
+    }}
+/>
 
       <div className="relative z-10">
 
-        <div className="flex items-center gap-3">
+        <motion.div
+initial={{
+opacity:0,
+x:-20,
+}}
+animate={{
+opacity:1,
+x:0,
+}}
+transition={{
+delay:.15,
+}}
+className="flex items-center gap-3"
+>
 
           <Sparkles
             className="
@@ -105,10 +126,21 @@ export function ExecutiveSummaryHero({
             Executive Summary
           </span>
 
-        </div>
+        </motion.div>
 
-        <h2
-          className="
+        <motion.h2
+initial={{
+opacity:0,
+y:20,
+}}
+animate={{
+opacity:1,
+y:0,
+}}
+transition={{
+delay:.2,
+}}
+className="
             mt-4
             text-4xl
             font-bold
@@ -116,9 +148,18 @@ export function ExecutiveSummaryHero({
           "
         >
           {repository.name}
-        </h2>
+        </motion.h2>
 
-        <p
+        <motion.p
+        initial={{
+opacity:0,
+}}
+animate={{
+opacity:1,
+}}
+transition={{
+delay:.35,
+}}
           className="
             mt-4
             max-w-3xl
@@ -131,16 +172,22 @@ export function ExecutiveSummaryHero({
           active maintenance and measurable
           community engagement with a
           repository score of {score}/100.
-        </p>
+        </motion.p>
 
-        <div
-          className="
-            mt-10
-            grid
-            gap-4
-            md:grid-cols-5
-          "
-        >
+        <motion.div
+className="mt-10 grid ..."
+initial="hidden"
+whileInView="show"
+viewport={{once:true}}
+variants={{
+hidden:{},
+show:{
+transition:{
+staggerChildren:.08,
+},
+},
+}}
+>
           <MetricCard
             icon={<Activity size={18} />}
             label="Score"
@@ -170,7 +217,7 @@ export function ExecutiveSummaryHero({
             label="Updated"
             value={`${days}d ago`}
           />
-        </div>
+        </motion.div>
 
       </div>
 

@@ -19,47 +19,25 @@ interface EngineeringScoreDashboardProps {
   analytics: RepositoryAnalytics | null;
 }
 
-// function calculateEngineeringScore(
-//   repository: GithubRepository,
-// ) {
-//   if (!repository) return 0;
+const containerVariants = {
+  hidden: {},
+  show: {
+    transition: {
+      staggerChildren: 0.08,
+    },
+  },
+};
 
-//   let score = 55;
-
-//   // Community
-//   score += Math.min(repository.stargazers_count * 2, 15);
-//   score += Math.min(repository.forks_count * 2, 10);
-//   score += Math.min(repository.watchers_count, 8);
-
-//   // Maintenance
-//   const updatedDays =
-//     (Date.now() -
-//       new Date(repository.updated_at).getTime()) /
-//     (1000 * 60 * 60 * 24);
-
-//   if (updatedDays < 30) score += 10;
-//   else if (updatedDays < 90) score += 5;
-
-//   // Penalize excessive issues
-//   score -= Math.min(repository.open_issues_count, 10);
-
-//   return Math.max(0, Math.min(100, Math.round(score)));
-// }
-
-// function grade(score: number) {
-//   if (score >= 95) return "A+";
-//   if (score >= 90) return "A";
-//   if (score >= 80) return "B";
-//   if (score >= 70) return "C";
-//   return "D";
-// }
-
-// function statusColor(score: number) {
-//   if (score >= 90) return "text-emerald-400";
-//   if (score >= 80) return "text-cyan-400";
-//   if (score >= 70) return "text-yellow-400";
-//   return "text-red-400";
-// }
+const itemVariants = {
+  hidden: {
+    opacity: 0,
+    y: 20,
+  },
+  show: {
+    opacity: 1,
+    y: 0,
+  },
+};
 
 export function EngineeringScoreDashboard({
   repository,
@@ -129,6 +107,29 @@ const repositoryAge = formatDistanceToNowStrict(
         p-8
       "
     >
+      <motion.div
+  className="
+    absolute
+    -right-28
+    -top-28
+    h-80
+    w-80
+    rounded-full
+    bg-cyan-500/10
+    blur-[150px]
+    pointer-events-none
+  "
+  animate={{
+    scale: [1, 1.2, 1],
+    opacity: [0.15, 0.4, 0.15],
+  }}
+  transition={{
+    duration: 10,
+    repeat: Infinity,
+  }}
+/>
+
+<div className="relative z-10">
       <div className="flex items-center justify-between">
 
         <div>
@@ -143,10 +144,21 @@ const repositoryAge = formatDistanceToNowStrict(
 
         </div>
 
-        <ShieldCheck
-          size={38}
-          className="text-cyan-400"
-        />
+        <motion.div
+  animate={{
+    rotate: [0, 8, -8, 0],
+    scale: [1, 1.08, 1],
+  }}
+  transition={{
+    duration: 5,
+    repeat: Infinity,
+  }}
+>
+  <ShieldCheck
+    size={38}
+    className="text-cyan-400"
+  />
+</motion.div>
 
       </div>
 
@@ -155,9 +167,12 @@ const repositoryAge = formatDistanceToNowStrict(
         {/* LEFT */}
 
         <motion.div
-          whileHover={{
-            scale: 1.02,
-          }}
+  whileHover={{
+    scale: 1.03,
+    y: -8,
+    boxShadow:
+      "0 0 55px rgba(34,211,238,.18)",
+  }}
           className="
             rounded-3xl
             border
@@ -167,35 +182,54 @@ const repositoryAge = formatDistanceToNowStrict(
             text-center
           "
         >
-          <AnimatedCounter
-  value={score}
-  className={`text-7xl font-black ${scoreColor}`}
-/>
-
+          <motion.div
+  animate={{
+    scale: [1, 1.05, 1],
+  }}
+  transition={{
+    duration: 3,
+    repeat: Infinity,
+  }}
+>
+  <AnimatedCounter
+    value={score}
+    className={`text-7xl font-black ${scoreColor}`}
+  />
+</motion.div>
           <div className="mt-3 text-zinc-400">
             Overall Engineering Score
           </div>
 
           <div
-            className="
-              mt-6
-              inline-flex
-              rounded-full
-              bg-white/10
-              px-5
-              py-2
-              text-lg
-              font-bold
-              text-white
-            "
-          >
-            Grade {grade}
-          </div>
+  className="
+    mt-6
+    inline-flex
+    items-center
+    gap-2
+    rounded-full
+    border
+    border-emerald-400/20
+    bg-emerald-500/10
+    px-5
+    py-2
+    text-sm
+    font-semibold
+    text-emerald-300
+  "
+>
+  ★ {grade} Engineering Grade
+</div>
         </motion.div>
 
         {/* RIGHT */}
 
-        <div className="grid gap-5 sm:grid-cols-2">
+        <motion.div
+  variants={containerVariants}
+  initial="hidden"
+  whileInView="show"
+  viewport={{ once: true }}
+  className="grid gap-5 sm:grid-cols-2"
+>
 
           <MetricCard
             icon={<Star size={20} />}
@@ -244,7 +278,7 @@ const repositoryAge = formatDistanceToNowStrict(
     value={riskLevel}
 />
 
-        </div>
+        </motion.div>
 
       </div>
 
@@ -285,6 +319,31 @@ const repositoryAge = formatDistanceToNowStrict(
 </p>
         
       </motion.div>
+      <motion.div
+  initial={{
+    scaleX: 0,
+  }}
+  whileInView={{
+    scaleX: 1,
+  }}
+  viewport={{
+    once: true,
+  }}
+  transition={{
+    duration: 1,
+    delay: 0.4,
+  }}
+  className="
+    mt-8
+    h-px
+    origin-left
+    bg-gradient-to-r
+    from-cyan-400
+    via-blue-500
+    to-transparent
+  "
+/>
+      </div>
     </motion.section>
   );
 }
@@ -302,9 +361,15 @@ function MetricCard({
 }: MetricCardProps) {
   return (
     <motion.div
-      whileHover={{
-        y: -4,
-      }}
+  variants={itemVariants}
+  whileHover={{
+    y: -6,
+    scale: 1.02,
+  }}
+  transition={{
+    type: "spring",
+    stiffness: 260,
+  }}
       className="
         rounded-2xl
         border

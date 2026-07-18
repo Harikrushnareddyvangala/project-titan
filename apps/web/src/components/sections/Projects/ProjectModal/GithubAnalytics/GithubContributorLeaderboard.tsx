@@ -10,7 +10,25 @@ interface Props {
 }
 
 const medals = ["🥇", "🥈", "🥉"];
+const containerVariants = {
+  hidden: {},
+  show: {
+    transition: {
+      staggerChildren: 0.08,
+    },
+  },
+};
 
+const itemVariants = {
+  hidden: {
+    opacity: 0,
+    y: 20,
+  },
+  show: {
+    opacity: 1,
+    y: 0,
+  },
+};  
 export function GithubContributorLeaderboard({
   contributors,
 }: Props) {
@@ -43,7 +61,14 @@ export function GithubContributorLeaderboard({
 
   return (
     <motion.div
-      whileHover={{ y: -6 }}
+  initial="hidden"
+  whileInView="show"
+  viewport={{ once: true }}
+  variants={containerVariants}
+  whileHover={{
+    y: -6,
+    scale: 1.01,
+  }}
       className="
       rounded-[34px]
       border
@@ -53,15 +78,46 @@ export function GithubContributorLeaderboard({
       p-8
       "
     >
-      <h3 className="text-xl font-semibold text-white">
+        <motion.div
+  className="
+    absolute
+    -right-24
+    -top-24
+    h-72
+    w-72
+    rounded-full
+    bg-violet-500/10
+    blur-[140px]
+    pointer-events-none
+  "
+  animate={{
+    scale: [1, 1.15, 1],
+    opacity: [0.15, 0.4, 0.15],
+  }}
+  transition={{
+    duration: 10,
+    repeat: Infinity,
+  }}
+/>
+
+<div className="relative z-10">
+      <motion.h3
+  variants={itemVariants}
+  className="text-xl font-semibold text-white">
         Contributor Leaderboard
-      </h3>
+      </motion.h3>
 
-      <p className="mt-2 text-zinc-400">
+      <motion.p
+  variants={itemVariants}
+  className="mt-2 text-zinc-400"
+>
         Top project contributors
-      </p>
+      </motion.p>
 
-      <div className="mt-10 space-y-5">
+      <motion.div
+  variants={containerVariants}
+  className="mt-10 space-y-5"
+>
 
         {contributors.map((contributor, index) => {
 
@@ -73,21 +129,16 @@ export function GithubContributorLeaderboard({
 
           return (
             <motion.div
-              key={contributor.login}
-              initial={{
-                opacity: 0,
-                y: 20,
-              }}
-              animate={{
-                opacity: 1,
-                y: 0,
-              }}
-              transition={{
-                delay: index * 0.08,
-              }}
-              whileHover={{
-                x: 6,
-              }}
+  key={contributor.login}
+  variants={itemVariants}
+  whileHover={{
+    x: 10,
+    scale: 1.02,
+  }}
+  transition={{
+    type: "spring",
+    stiffness: 260,
+  }}
               className="
               rounded-3xl
               border
@@ -104,17 +155,24 @@ export function GithubContributorLeaderboard({
 
                 </div>
 
-                <Image
-                  src={contributor.avatar_url}
-                  alt={contributor.login}
-                  width={56}
-                  height={56}
-                  className="
-                  rounded-full
-                  border
-                  border-cyan-400/20
-                  "
-                />
+                <motion.div
+  whileHover={{
+    rotate: 8,
+    scale: 1.08,
+  }}
+>
+  <Image
+    src={contributor.avatar_url}
+    alt={contributor.login}
+    width={56}
+    height={56}
+    className="
+      rounded-full
+      border
+      border-cyan-400/20
+    "
+  />
+</motion.div>
 
                 <div className="flex-1">
 
@@ -143,9 +201,12 @@ export function GithubContributorLeaderboard({
                       initial={{
                         width: 0,
                       }}
-                      animate={{
-                        width: `${percent}%`,
-                      }}
+                      whileInView={{
+  width: `${percent}%`,
+}}
+viewport={{
+  once: true,
+}}
                       transition={{
                         duration: 1,
                         delay: index * 0.1,
@@ -180,8 +241,32 @@ export function GithubContributorLeaderboard({
           );
         })}
 
-      </div>
-
+      </motion.div>
+      <motion.div
+  initial={{
+    scaleX: 0,
+  }}
+  whileInView={{
+    scaleX: 1,
+  }}
+  viewport={{
+    once: true,
+  }}
+  transition={{
+    duration: 1,
+    delay: 0.3,
+  }}
+  className="
+    mt-8
+    h-px
+    origin-left
+    bg-gradient-to-r
+    from-violet-400
+    via-cyan-500
+    to-transparent
+  "
+/>
+</div>
     </motion.div>
   );
 }

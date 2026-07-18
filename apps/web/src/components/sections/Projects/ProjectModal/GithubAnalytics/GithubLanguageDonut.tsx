@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 
 import type { GithubLanguages } from "@/types/github";
+import { AnimatedCounter } from "./AnimatedCounter";
 
 interface Props {
   languages: GithubLanguages;
@@ -17,6 +18,25 @@ const COLORS = [
   "#ef4444",
   "#ec4899",
 ];
+const containerVariants = {
+  hidden: {},
+  show: {
+    transition: {
+      staggerChildren: 0.08,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: {
+    opacity: 0,
+    y: 20,
+  },
+  show: {
+    opacity: 1,
+    y: 0,
+  },
+};
 
 export function GithubLanguageDonut({
   languages,
@@ -38,10 +58,17 @@ export function GithubLanguageDonut({
 
   return (
     <motion.div
-      whileHover={{
+    initial="hidden"
+    whileInView="show"
+    viewport={{ once: true }}
+    variants={containerVariants}
+    whileHover={{
         y: -6,
-      }}
+        scale: 1.01,
+    }}
       className="
+      relative
+      overflow-hidden
       rounded-[34px]
       border
       border-white/10
@@ -50,19 +77,54 @@ export function GithubLanguageDonut({
       p-8
       "
     >
-      <h3 className="text-xl font-semibold text-white">
+      <motion.div
+    className="
+        absolute
+        -right-24
+        -top-24
+        h-72
+        w-72
+        rounded-full
+        bg-cyan-500/10
+        blur-[140px]
+        pointer-events-none
+    "
+    animate={{
+        scale: [1, 1.15, 1],
+        opacity: [0.15, 0.4, 0.15],
+    }}
+    transition={{
+        duration: 10,
+        repeat: Infinity,
+    }}
+/>
+<div className="relative z-10">
+      <motion.h3
+    variants={itemVariants} className="text-xl font-semibold text-white">
         Language Distribution
-      </h3>
+      </motion.h3>
 
-      <p className="mt-2 text-sm text-zinc-400">
+      <motion.p
+    variants={itemVariants} className="mt-2 text-sm text-zinc-400">
         Repository code composition
-      </p>
+      </motion.p>
 
-      <div className="mt-10 flex flex-col items-center gap-10 lg:flex-row">
+      <motion.div
+    variants={itemVariants}
+    className="mt-10 flex flex-col items-center gap-10 lg:flex-row"
+>
 
         <div className="relative">
 
-          <svg
+          <motion.svg
+    animate={{
+        rotate: 360,
+    }}
+    transition={{
+        duration: 90,
+        repeat: Infinity,
+        ease: "linear",
+    }}
             width="180"
             height="180"
             viewBox="0 0 180 180"
@@ -102,12 +164,14 @@ export function GithubLanguageDonut({
 
               return circle;
             })}
-          </svg>
+          </motion.svg>
 
           <div className="absolute inset-0 flex flex-col items-center justify-center">
 
             <p className="text-3xl font-bold text-white">
-              {entries.length}
+              <AnimatedCounter
+        value={entries.length}
+    />
             </p>
 
             <p className="text-sm text-zinc-400">
@@ -118,7 +182,10 @@ export function GithubLanguageDonut({
 
         </div>
 
-        <div className="flex-1 space-y-5">
+        <motion.div
+    variants={containerVariants}
+    className="flex-1 space-y-5"
+>
 
           {entries.map(([language, value], index) => {
             const percent =
@@ -126,10 +193,16 @@ export function GithubLanguageDonut({
 
             return (
               <motion.div
-                key={language}
-                whileHover={{
-                  x: 6,
-                }}
+    key={language}
+    variants={itemVariants}
+    whileHover={{
+        x: 8,
+        scale: 1.02,
+    }}
+    transition={{
+        type: "spring",
+        stiffness: 260,
+    }}
                 className="space-y-2"
               >
                 <div className="flex justify-between">
@@ -182,11 +255,14 @@ export function GithubLanguageDonut({
             );
           })}
 
-        </div>
+        </motion.div>
 
-      </div>
+      </motion.div>
 
-      <div className="mt-8 border-t border-white/10 pt-6">
+      <motion.div
+    variants={itemVariants}
+    className="mt-8 border-t border-white/10 pt-6"
+>
 
         <div className="flex justify-between">
 
@@ -200,8 +276,33 @@ export function GithubLanguageDonut({
 
         </div>
 
-      </div>
+      </motion.div>
 
-    </motion.div>
+    <motion.div
+    initial={{
+        scaleX: 0,
+    }}
+    whileInView={{
+        scaleX: 1,
+    }}
+    viewport={{
+        once: true,
+    }}
+    transition={{
+        duration: 1,
+        delay: 0.3,
+    }}
+    className="
+        mt-8
+        h-px
+        origin-left
+        bg-gradient-to-r
+        from-cyan-400
+        via-blue-500
+        to-transparent
+    "
+/>
+</div>
+</motion.div>
   );
-}
+};
