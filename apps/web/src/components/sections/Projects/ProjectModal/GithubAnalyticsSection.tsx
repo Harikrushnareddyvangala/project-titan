@@ -29,7 +29,8 @@ import { ArchitectureDetection } from "./GithubAnalytics/ArchitectureDetection";
 import { RepositoryMaturityAssessment } from "./GithubAnalytics/RepositoryMaturityAssessment";
 import { AIExecutiveEngineeringReport } from "./GithubAnalytics/AIExecutiveEngineeringReport";
 import { TechnologyStackAnalytics } from "./GithubAnalytics/TechnologyStackAnalytics";
-import { RepositorySecurityAnalysis } from "./GithubAnalytics/RepositorySecurityAnalysis";  
+import { RepositorySecurityAnalysis } from "./GithubAnalytics/RepositorySecurityAnalysis"; 
+import { RepositoryDevOpsAnalysis } from "./GithubAnalytics/RepositoryDevOpsAnalysis";   
 
 interface GithubAnalyticsSectionProps {
   repository: GithubRepository | null;
@@ -145,6 +146,10 @@ to-transparent
 <RepositorySecurityAnalysis
     repository={repository}
     analytics={analytics}
+/>
+<RepositoryDevOpsAnalysis
+    repository={repository}
+    languages={languages}
 />
 <ArchitectureDetection
     repository={repository}
