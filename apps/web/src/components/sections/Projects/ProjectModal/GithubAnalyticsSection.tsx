@@ -24,6 +24,7 @@ import { ContributorAnalytics } from "./GithubAnalytics/ContributorAnalytics";
 import { CommitActivityAnalytics } from "./GithubAnalytics/CommitActivityAnalytics";
 import { RepositoryHealthDashboard } from "./GithubAnalytics/RepositoryHealthDashboard";
 import { TechnologyStackAnalysis } from "./GithubAnalytics/TechnologyStackAnalysis";
+import { RepositoryComplexityAnalysis } from "./GithubAnalytics/RepositoryComplexityAnalysis";
 
 interface GithubAnalyticsSectionProps {
   repository: GithubRepository | null;
@@ -128,6 +129,10 @@ to-transparent
     languages={languages}
 />
 <TechnologyStackAnalysis
+    repository={repository}
+    languages={languages}
+/>
+<RepositoryComplexityAnalysis
     repository={repository}
     languages={languages}
 />
