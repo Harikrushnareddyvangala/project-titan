@@ -2,74 +2,180 @@
 
 import { motion } from "framer-motion";
 
+import {
+    LayoutDashboard,
+    Cpu,
+    Shield,
+    Server,
+    Zap,
+    Boxes,
+    Network,
+    Code2,
+    Users,
+    Clock3,
+} from "lucide-react";
+
 const sections = [
-  { id: "executive", title: "Executive Summary" },
-  { id: "engineering", title: "Engineering" },
-  { id: "security", title: "Security" },
-  { id: "devops", title: "DevOps" },
-  { id: "performance", title: "Performance" },
-  { id: "technology", title: "Technology" },
-  { id: "architecture", title: "Architecture" },
-  { id: "languages", title: "Languages" },
-  { id: "contributors", title: "Contributors" },
-  { id: "timeline", title: "Timeline" },
+
+{
+id:"executive",
+title:"Executive",
+icon:LayoutDashboard,
+},
+
+{
+id:"engineering",
+title:"Engineering",
+icon:Cpu,
+},
+
+{
+id:"security",
+title:"Security",
+icon:Shield,
+},
+
+{
+id:"devops",
+title:"DevOps",
+icon:Server,
+},
+
+{
+id:"performance",
+title:"Performance",
+icon:Zap,
+},
+
+{
+id:"technology",
+title:"Technology",
+icon:Boxes,
+},
+
+{
+id:"architecture",
+title:"Architecture",
+icon:Network,
+},
+
+{
+id:"languages",
+title:"Languages",
+icon:Code2,
+},
+
+{
+id:"contributors",
+title:"Contributors",
+icon:Users,
+},
+
+{
+id:"timeline",
+title:"Timeline",
+icon:Clock3,
+},
+
 ];
 
+export function AnalyticsSidebar(){
 
-export function AnalyticsSidebar() {
+return(
 
-  return (
+<motion.aside
 
-    <motion.aside
-      initial={{opacity:0,x:-30}}
-      animate={{opacity:1,x:0}}
-      className="
-      sticky
-      top-28
-      h-fit
-      rounded-3xl
-      border
-      border-white/10
-      bg-white/[0.04]
-      backdrop-blur-3xl
-      p-6
-      "
-    >
+initial={{
+opacity:0,
+x:-25,
+}}
 
-      <h3 className="text-lg font-semibold text-white">
-        Dashboard
-      </h3>
+animate={{
+opacity:1,
+x:0,
+}}
 
-      <div className="mt-6 space-y-2">
+className="
+sticky
+top-28
+rounded-[34px]
+border
+border-white/10
+bg-white/[0.04]
+backdrop-blur-3xl
+p-6
+"
 
-        {sections.map(section=>(
+>
 
-          <a
-            key={section.id}
-            href={`#${section.id}`}
-            className="
-            block
-            rounded-xl
-            px-4
-            py-3
-            text-zinc-400
-            transition-all
-            duration-300
-            hover:bg-cyan-500/10
-            hover:text-cyan-300
-            "
-          >
+<h2 className="text-xl font-bold text-white">
 
-            {section.title}
+Analytics Dashboard
 
-          </a>
+</h2>
 
-        ))}
+<p className="mt-2 text-sm text-zinc-500">
 
-      </div>
+Enterprise Navigation
 
-    </motion.aside>
+</p>
 
-  );
+<div className="mt-8 space-y-2">
+
+{sections.map((section)=>{
+
+const Icon=section.icon;
+
+return(
+
+<motion.a
+
+key={section.id}
+
+href={`#${section.id}`}
+
+whileHover={{
+x:6,
+}}
+
+whileTap={{
+scale:.97,
+}}
+
+className="
+flex
+items-center
+gap-4
+rounded-2xl
+px-4
+py-3
+text-zinc-400
+transition-all
+duration-300
+hover:bg-cyan-500/10
+hover:text-cyan-300
+"
+
+>
+
+<Icon size={18}/>
+
+<span>
+
+{section.title}
+
+</span>
+
+</motion.a>
+
+);
+
+})}
+
+</div>
+
+</motion.aside>
+
+);
 
 }
