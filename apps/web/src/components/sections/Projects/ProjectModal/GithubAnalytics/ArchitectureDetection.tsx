@@ -185,15 +185,6 @@ else {
       </div>
 
       <div className="mt-10 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
-        
-
-
-
-
-
-
-
-
         <ArchitectureCard
           icon={<Layers3 size={22} />}
           title="Architecture"
