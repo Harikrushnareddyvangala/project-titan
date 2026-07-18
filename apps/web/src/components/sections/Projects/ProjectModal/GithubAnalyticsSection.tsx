@@ -21,6 +21,8 @@ import { AIEngineeringRecommendations } from "./GithubAnalytics/AIEngineeringRec
 import { GithubAnalyticsSkeleton } from "./GithubAnalytics/GithubAnalyticsSkeleton";
 import { LanguageAnalytics } from "./GithubAnalytics/LanguageAnalytics";
 import { ContributorAnalytics } from "./GithubAnalytics/ContributorAnalytics";
+import { CommitActivityAnalytics } from "./GithubAnalytics/CommitActivityAnalytics";
+
 interface GithubAnalyticsSectionProps {
   repository: GithubRepository | null;
   analytics: RepositoryAnalytics | null;
@@ -125,6 +127,9 @@ to-transparent
 />
 <ContributorAnalytics
   contributors={contributors}
+/>
+<CommitActivityAnalytics
+  commits={commitActivity}
 />
 <EngineeringScoreDashboard
   repository={repository}
