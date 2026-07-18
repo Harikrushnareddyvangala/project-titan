@@ -31,6 +31,7 @@ import { AIExecutiveEngineeringReport } from "./GithubAnalytics/AIExecutiveEngin
 import { TechnologyStackAnalytics } from "./GithubAnalytics/TechnologyStackAnalytics";
 import { RepositorySecurityAnalysis } from "./GithubAnalytics/RepositorySecurityAnalysis"; 
 import { RepositoryDevOpsAnalysis } from "./GithubAnalytics/RepositoryDevOpsAnalysis";   
+import { RepositoryCodeQualityAnalysis } from "./GithubAnalytics/RepositoryCodeQualityAnalysis";
 
 interface GithubAnalyticsSectionProps {
   repository: GithubRepository | null;
@@ -150,6 +151,10 @@ to-transparent
 <RepositoryDevOpsAnalysis
     repository={repository}
     languages={languages}
+/>
+<RepositoryCodeQualityAnalysis
+    repository={repository}
+    analytics={analytics}
 />
 <ArchitectureDetection
     repository={repository}
