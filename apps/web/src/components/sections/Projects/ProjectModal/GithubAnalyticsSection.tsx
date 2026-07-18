@@ -139,6 +139,7 @@ to-transparent
 <RepositoryComplexityAnalysis
     repository={repository}
     languages={languages}
+    analytics={analytics}
 />
 <ArchitectureDetection
     repository={repository}
