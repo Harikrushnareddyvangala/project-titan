@@ -26,6 +26,7 @@ import { RepositoryHealthDashboard } from "./GithubAnalytics/RepositoryHealthDas
 import { TechnologyStackAnalysis } from "./GithubAnalytics/TechnologyStackAnalysis";
 import { RepositoryComplexityAnalysis } from "./GithubAnalytics/RepositoryComplexityAnalysis";
 import { ArchitectureDetection } from "./GithubAnalytics/ArchitectureDetection";
+import { RepositoryMaturityAssessment } from "./GithubAnalytics/RepositoryMaturityAssessment";
 
 interface GithubAnalyticsSectionProps {
   repository: GithubRepository | null;
@@ -140,6 +141,10 @@ to-transparent
 <ArchitectureDetection
     repository={repository}
     languages={languages}
+/>
+<RepositoryMaturityAssessment
+    repository={repository}
+    analytics={analytics}
 />
 <ContributorAnalytics
   contributors={contributors}
