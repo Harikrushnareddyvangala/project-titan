@@ -6,6 +6,9 @@ import {
   Activity,
   Gauge,
   CheckCircle2,
+  Brain,
+  AlertTriangle,
+  Rocket,
 } from "lucide-react";
 
 import type {
@@ -33,6 +36,28 @@ export function RepositoryHealthDashboard({
 
   const deploymentReady =
     analytics?.deploymentReady ?? false;
+
+  const risk =
+  analytics?.riskLevel ?? "Medium";
+
+const quality =
+  analytics?.quality ?? "Growing";
+
+const overallScore =
+  Math.round(
+    (engineering +
+      production +
+      health) / 3,
+  );
+
+const verdict =
+  overallScore >= 90
+    ? "Enterprise Ready"
+    : overallScore >= 80
+    ? "Production Ready"
+    : overallScore >= 65
+    ? "Development Ready"
+    : "Needs Improvement";
 
   return (
     <motion.section
@@ -69,53 +94,206 @@ export function RepositoryHealthDashboard({
 
       </div>
 
-      <div className="mt-10 grid md:grid-cols-4 gap-6">
+      <div className="mt-10 grid gap-6 lg:grid-cols-2">
 
-        <HealthCard
-          icon={<Activity size={22} />}
-          title="Engineering"
-          score={engineering}
-        />
+<div>
 
-        <HealthCard
-          icon={<Gauge size={22} />}
-          title="Production"
-          score={production}
-        />
+<motion.div
 
-        <HealthCard
-          icon={<ShieldCheck size={22} />}
-          title="Health"
-          score={health}
-        />
+animate={{
+scale:[1,1.05,1],
+}}
 
-        <div
-          className="
-          rounded-3xl
-          border
-          border-cyan-400/20
-          bg-cyan-500/10
-          p-6
-          "
-        >
-          <CheckCircle2
-            className="text-cyan-400"
-            size={24}
-          />
+transition={{
+duration:5,
+repeat:Infinity,
+}}
 
-          <p className="mt-5 text-sm text-zinc-400">
-            Deployment
-          </p>
+className="
+mx-auto
+flex
+h-56
+w-56
+items-center
+justify-center
+rounded-full
+border-[10px]
+border-cyan-500/30
+bg-cyan-500/10
+"
 
-          <p className="mt-2 text-xl font-bold text-white">
-            {deploymentReady
-              ? "Ready"
-              : "Not Ready"}
-          </p>
+>
 
-        </div>
+<div>
 
-      </div>
+<p className="text-center text-6xl font-bold text-white">
+
+{overallScore}
+
+</p>
+
+<p className="mt-2 text-center text-cyan-300">
+
+Overall Score
+
+</p>
+
+</div>
+
+</motion.div>
+
+</div>
+        <div className="space-y-5">
+
+<HealthCard
+    icon={<Activity size={22}/>}
+    title="Engineering"
+    score={engineering}
+/>
+
+<HealthCard
+    icon={<Rocket size={22}/>}
+    title="Production"
+    score={production}
+/>
+
+<HealthCard
+    icon={<ShieldCheck size={22}/>}
+    title="Repository Health"
+    score={health}
+/>
+
+<div
+className="
+rounded-3xl
+border
+border-cyan-400/20
+bg-cyan-500/10
+p-6
+"
+>
+
+<Brain
+className="text-cyan-400"
+size={24}
+/>
+
+<p className="mt-5 text-sm text-zinc-400">
+
+AI Verdict
+
+</p>
+
+<p className="mt-2 text-xl font-bold text-white">
+
+{verdict}
+
+</p>
+
+<p className="mt-4 text-sm text-zinc-400">
+
+Risk
+
+<span className="ml-2 font-semibold text-cyan-300">
+
+{risk}
+
+</span>
+
+</p>
+
+<p className="mt-3 text-sm text-zinc-400">
+
+Deployment
+
+<span className="ml-2 font-semibold text-cyan-300">
+
+{deploymentReady ? "Ready" : "Not Ready"}
+
+</span>
+
+</p>
+
+</div>
+
+</div>
+</div>
+<motion.div
+
+whileHover={{
+scale:1.01,
+}}
+
+className="
+mt-10
+rounded-3xl
+border
+border-cyan-400/20
+bg-cyan-500/10
+p-6
+"
+
+>
+
+<h3 className="text-xl font-semibold text-white">
+
+AI Executive Summary
+
+</h3>
+
+<p className="mt-6 leading-8 text-zinc-300">
+
+Overall Repository Quality
+
+<span className="ml-2 font-semibold text-cyan-300">
+
+{quality}
+
+</span>
+
+<br/><br/>
+
+Repository Status
+
+<span className="ml-2 font-semibold text-cyan-300">
+
+{verdict}
+
+</span>
+
+<br/>
+
+Risk Level
+
+<span className="ml-2 font-semibold text-cyan-300">
+
+{risk}
+
+</span>
+
+<br/>
+
+Engineering Score
+
+<span className="ml-2 font-semibold text-cyan-300">
+
+{engineering}%
+
+</span>
+
+<br/>
+
+Production Score
+
+<span className="ml-2 font-semibold text-cyan-300">
+
+{production}%
+
+</span>
+
+</p>
+
+</motion.div>
 
     </motion.section>
   );
