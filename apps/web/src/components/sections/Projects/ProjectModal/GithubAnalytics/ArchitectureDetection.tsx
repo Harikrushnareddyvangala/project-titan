@@ -25,56 +25,128 @@ export function ArchitectureDetection({
 }: Props) {
 
   const description =
-    repository.description?.toLowerCase() ?? "";
+  repository.description?.toLowerCase() ?? "";
 
-  const langNames =
-    Object.keys(languages).join(" ").toLowerCase();
+const homepage =
+  repository.homepage?.toLowerCase() ?? "";
+
+const topics =
+  (repository.topics ?? [])
+    .join(" ")
+    .toLowerCase();
+
+const langNames =
+  Object.keys(languages)
+    .join(" ")
+    .toLowerCase();
+
+const searchable =
+  `${description} ${homepage} ${topics} ${langNames}`;
+
+const frontend =
+  searchable.includes("next")
+    ? "Next.js"
+    : searchable.includes("react")
+    ? "React"
+    : searchable.includes("vue")
+    ? "Vue"
+    : searchable.includes("angular")
+    ? "Angular"
+    : "Unknown";
+
+const backend =
+  searchable.includes("fastapi")
+    ? "FastAPI"
+    : searchable.includes("express")
+    ? "Express.js"
+    : searchable.includes("nestjs")
+    ? "NestJS"
+    : searchable.includes("django")
+    ? "Django"
+    : searchable.includes("flask")
+    ? "Flask"
+    : "Unknown";
+
+const ai =
+  searchable.includes("langchain")
+    ? "LangChain"
+    : searchable.includes("llamaindex")
+    ? "LlamaIndex"
+    : searchable.includes("openai")
+    ? "OpenAI"
+    : "None";
+
+const database =
+  searchable.includes("pinecone")
+    ? "Pinecone"
+    : searchable.includes("chroma")
+    ? "ChromaDB"
+    : searchable.includes("faiss")
+    ? "FAISS"
+    : searchable.includes("postgres")
+    ? "PostgreSQL"
+    : "Unknown";
+
+const deployment =
+  searchable.includes("docker")
+    ? "Docker"
+    : searchable.includes("vercel")
+    ? "Vercel"
+    : searchable.includes("aws")
+    ? "AWS"
+    : searchable.includes("azure")
+    ? "Azure"
+    : "Unknown";
 
   let architecture = "General Application";
   let confidence = 72;
   let explanation = "";
 
   if (
-    description.includes("rag") ||
-    description.includes("retrieval")
-  ) {
-    architecture = "Retrieval-Augmented Generation";
-    confidence = 97;
-    explanation =
-      "Detected retrieval pipeline, embeddings and LLM workflow.";
-  }
-  else if (
-    description.includes("microservice")
-  ) {
-    architecture = "Microservices";
-    confidence = 94;
-    explanation =
-      "Repository indicates distributed service architecture.";
-  }
-  else if (
-    description.includes("next") &&
-    description.includes("fastapi")
-  ) {
-    architecture = "Full Stack AI Platform";
-    confidence = 95;
-    explanation =
-      "Detected React frontend with Python backend.";
-  }
-  else if (
-    langNames.includes("typescript") &&
-    langNames.includes("python")
-  ) {
-    architecture = "Multi-tier Application";
-    confidence = 90;
-    explanation =
-      "Multiple languages indicate layered architecture.";
-  }
-  else {
-    architecture = "Monolithic Application";
-    confidence = 80;
-    explanation =
-      "Repository appears to use a centralized application structure.";
-  }
+  searchable.includes("rag") ||
+  searchable.includes("retrieval")
+) {
+  architecture = "Retrieval-Augmented Generation Platform";
+  confidence = 98;
+  explanation =
+    "Detected enterprise RAG pipeline with LLM retrieval workflow.";
+}
+
+else if (
+  searchable.includes("microservice")
+) {
+  architecture = "Microservices Architecture";
+  confidence = 95;
+  explanation =
+    "Repository indicates distributed service-based architecture.";
+}
+
+else if (
+  frontend === "Next.js" &&
+  backend === "FastAPI"
+) {
+  architecture = "Full Stack AI Platform";
+  confidence = 96;
+  explanation =
+    "Detected React frontend with FastAPI backend and AI services.";
+}
+
+else if (
+  langNames.includes("typescript") &&
+  langNames.includes("python")
+) {
+  architecture = "Layered Multi-tier Application";
+  confidence = 91;
+  explanation =
+    "Repository combines frontend and backend technologies.";
+}
+
+else {
+  architecture = "Monolithic Application";
+  confidence = 82;
+  explanation =
+    "Repository appears to follow centralized application architecture.";
+}
 
   return (
     <motion.section
@@ -112,7 +184,15 @@ export function ArchitectureDetection({
 
       </div>
 
-      <div className="mt-10 grid gap-6 lg:grid-cols-4">
+      <div className="mt-10 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+        
+
+
+
+
+
+
+
 
         <ArchitectureCard
           icon={<Layers3 size={22} />}
@@ -125,6 +205,32 @@ export function ArchitectureDetection({
           title="Confidence"
           value={`${confidence}%`}
         />
+
+        <ArchitectureCard
+    icon={<Cpu size={22} />}
+    title="Frontend"
+    value={frontend}
+/>
+<ArchitectureCard
+    icon={<Server size={22} />}
+    title="Backend"
+    value={backend}
+/>
+<ArchitectureCard
+    icon={<Brain size={22} />}
+    title="AI"
+    value={ai}
+/>
+<ArchitectureCard
+    icon={<Layers3 size={22} />}
+    title="Database"
+    value={database}
+/>
+<ArchitectureCard
+    icon={<Network size={22} />}
+    title="Deployment"
+    value={deployment}
+/>
 
         <ArchitectureCard
           icon={<Server size={22} />}
@@ -174,10 +280,36 @@ export function ArchitectureDetection({
 
           <br /><br />
 
-          {explanation}
+          <br /><br />
 
-        </p>
+Frontend:
+<span className="ml-2 text-cyan-300">{frontend}</span>
 
+<br />
+
+Backend:
+<span className="ml-2 text-cyan-300">{backend}</span>
+
+<br />
+
+AI Framework:
+<span className="ml-2 text-cyan-300">{ai}</span>
+
+<br />
+
+Database:
+<span className="ml-2 text-cyan-300">{database}</span>
+
+<br />
+
+Deployment:
+<span className="ml-2 text-cyan-300">{deployment}</span>
+
+<br /><br />
+
+{explanation}
+
+</p>
       </motion.div>
 
     </motion.section>
