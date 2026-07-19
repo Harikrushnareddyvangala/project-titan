@@ -399,6 +399,7 @@ Completed
 - AI architecture visualization
 - Framework dependency overview
 
+<<<<<<< HEAD
 ## Commit 0154 — Repository Activity Heatmap
 
 Completed
@@ -577,6 +578,8 @@ TITAN now evaluates repository security posture and DevOps readiness alongside e
 
 TITAN automatically detects and presents the repository's technology stack using GitHub metadata, languages, topics, and repository descriptions.
 
+=======
+>>>>>>> 736eaeb16824704d91119479e9d92d145e27c1e2
 
 # Current Sprint
 Goal
