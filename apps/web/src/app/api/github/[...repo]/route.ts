@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import type { GithubCommitWeek, GithubContributor } from "@/types/github";
 
 export async function GET(
   request: Request,
@@ -81,7 +82,53 @@ export async function GET(
 
     const repositoryData =
       await repoResponse.json();
+// ------------------------------------------------------
+// Load Supporting GitHub Data
+// ------------------------------------------------------
 
+const languageData = languageResponse.ok
+  ? await languageResponse.json()
+  : {};
+
+const commitActivityData: GithubCommitWeek[] =
+  commitResponse.ok
+    ? ((await commitResponse.json()) as GithubCommitWeek[])
+    : [];
+
+const contributorsData: GithubContributor[] =
+  contributorResponse.ok
+    ? ((await contributorResponse.json()) as GithubContributor[])
+    : [];
+
+// ------------------------------------------------------
+// Repository Intelligence Metrics
+// ------------------------------------------------------
+
+const languageCount =
+  Object.keys(languageData).length;
+
+const contributorCount =
+  contributorsData.length;
+
+const totalCommits =
+  commitActivityData.reduce(
+    (sum: number, week: GithubCommitWeek) => sum + week.total,
+    0,
+  );
+
+const recentCommits =
+  commitActivityData
+    .slice(-4)
+    .reduce(
+      (sum: number, week: GithubCommitWeek) => sum + week.total,
+      0,
+    );
+
+const commitsPerWeek =
+  Math.round(
+    totalCommits /
+      Math.max(commitActivityData.length, 1),
+  );
     //----------------------------------------------------
 // Repository Analytics Engine
 //----------------------------------------------------
@@ -112,65 +159,177 @@ const inactiveDays = Math.floor(
 // Engineering Score
 //--------------------------------------
 
-let engineeringScore = 70;
+let engineeringScore = 0;
 
-engineeringScore += Math.min(
-  repositoryData.stargazers_count,
-  10,
+// Repository popularity
+
+engineeringScore +=
+
+Math.min(
+repositoryData.stargazers_count,
+25,
 );
 
-engineeringScore += Math.min(
-  repositoryData.forks_count,
-  10,
+// Community contribution
+
+engineeringScore +=
+
+Math.min(
+repositoryData.forks_count*2,
+20,
 );
 
-engineeringScore += Math.min(
-  repositoryData.watchers_count,
-  10,
+// Repository followers
+
+engineeringScore +=
+
+Math.min(
+repositoryData.watchers_count,
+10,
 );
 
-engineeringScore -= Math.min(
-  repositoryData.open_issues_count,
-  15,
+// Language diversity
+
+engineeringScore +=
+
+Math.min(
+languageCount*4,
+12,
 );
 
-engineeringScore = Math.max(
-  0,
-  Math.min(engineeringScore, 100),
+// Contributor diversity
+
+engineeringScore +=
+
+Math.min(
+contributorCount*3,
+12,
+);
+
+// Commit activity
+
+engineeringScore +=
+
+Math.min(
+commitsPerWeek,
+12,
+);
+
+// Repository maturity
+
+engineeringScore +=
+
+Math.min(
+
+Math.floor(repositoryAge/365),
+
+6,
+
+);
+
+// Issues penalty
+
+engineeringScore -=
+
+Math.min(
+
+repositoryData.open_issues_count,
+
+15,
+
+);
+
+engineeringScore=Math.max(
+
+0,
+
+Math.min(
+
+100,
+
+Math.round(engineeringScore),
+
+),
+
 );
 
 //--------------------------------------
 // Health Score
 //--------------------------------------
 
-let healthScore = 100;
+let healthScore=100;
 
-healthScore -=
-  repositoryData.open_issues_count * 2;
+// inactivity
 
-healthScore -= Math.floor(
-  inactiveDays / 15,
+healthScore-=Math.floor(
+
+inactiveDays/20,
+
 );
 
-healthScore = Math.max(
-  0,
-  Math.min(healthScore, 100),
+// issues
+
+healthScore-=
+
+repositoryData.open_issues_count;
+
+// low contributors
+
+if(contributorCount<3){
+
+healthScore-=8;
+
+}
+
+// inactive commits
+
+if(recentCommits<10){
+
+healthScore-=12;
+
+}
+
+healthScore=Math.max(
+
+0,
+
+Math.min(
+
+100,
+
+healthScore,
+
+),
+
 );
 
 //--------------------------------------
 // Production Score
 //--------------------------------------
 
-const productionScore = Math.round(
+const productionScore=
 
-  engineeringScore * 0.45 +
+Math.round(
 
-  healthScore * 0.35 +
+engineeringScore*0.45+
 
-  Math.min(
-    repositoryData.watchers_count * 2,
-    20,
-  ),
+healthScore*0.30+
+
+Math.min(
+
+contributorCount*3,
+
+10,
+
+)+
+
+Math.min(
+
+recentCommits/2,
+
+15,
+
+),
 
 );
 
@@ -250,44 +409,70 @@ if (inactiveDays > 90) {
     "Repository appears inactive. Consider regular maintenance updates.",
   );
 }
+if(languageCount===1){
 
+recommendations.push(
+
+"Support additional tooling or languages where appropriate."
+
+);
+
+}
+
+if(contributorCount<=1){
+
+recommendations.push(
+
+"Repository depends on a single contributor."
+
+);
+
+}
+
+if(recentCommits<10){
+
+recommendations.push(
+
+"Development activity has slowed during the last month."
+
+);
+
+}
 if (recommendations.length === 0) {
   recommendations.push(
     "Excellent repository health.",
   );
 }
 
-const analytics = {
-  repositoryAge,
-  inactiveDays,
-  engineeringScore,
-  healthScore,
-  productionScore,
-  deploymentReady,
-  riskLevel,
-  quality,
-  recommendations,
+const analytics={
+
+repositoryAge,
+
+inactiveDays,
+
+languageCount,
+
+contributorCount,
+
+totalCommits,
+
+recentCommits,
+
+engineeringScore,
+
+healthScore,
+
+productionScore,
+
+deploymentReady,
+
+riskLevel,
+
+quality,
+
+recommendations,
+
 };
-
-    const languageData =
-      languageResponse.ok
-        ? await languageResponse.json()
-        : {};
-    let commitActivityData = [];
-    let contributorsData = [];
-
-    if (commitResponse.status === 200) {
-  commitActivityData =
-    await commitResponse.json();
-} else {
-  commitActivityData = [];
-}
- if (contributorResponse.status === 200) {
-  contributorsData =
-    await contributorResponse.json();
-} else {
-  contributorsData = [];
-}
     return NextResponse.json({
   repository: repositoryData,
 
@@ -299,7 +484,7 @@ const analytics = {
 
   contributors: contributorsData,
 });
-  } catch(error) {
+  } catch(error: unknown) {
     console.error("GitHub API Route Error:", error);
     return NextResponse.json(
       {
