@@ -34,6 +34,7 @@ import { RepositorySecurityAnalysis } from "./GithubAnalytics/RepositorySecurity
 import { RepositoryDevOpsAnalysis } from "./GithubAnalytics/RepositoryDevOpsAnalysis";   
 import { RepositoryCodeQualityAnalysis } from "./GithubAnalytics/RepositoryCodeQualityAnalysis";
 import { RepositoryPerformanceAnalysis } from "./GithubAnalytics/RepositoryPerformanceAnalysis";
+import { RepositoryRadarChart } from "./GithubAnalytics/RepositoryRadarChart";
 
 interface GithubAnalyticsSectionProps {
   repository: GithubRepository | null;
@@ -233,6 +234,9 @@ commits={commitActivity}
 <RepositoryHealthDashboard
 repository={repository}
 analytics={analytics}
+/>
+<RepositoryRadarChart
+    analytics={analytics}
 />
 
   </div>
