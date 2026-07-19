@@ -258,9 +258,7 @@ analytics={analytics}
 <RepositoryActivityHeatmap
 commits={commitActivity}
 />
-<RepositoryActivityHeatmap
-    commits={commitActivity}
-/>
+
 
   </div>
 
