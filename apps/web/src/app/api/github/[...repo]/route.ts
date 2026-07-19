@@ -356,7 +356,27 @@ const quality =
       : productionScore >= 65
         ? "Good"
         : "Growing";
+//--------------------------------------
+// Repository Maturity
+//--------------------------------------
 
+let maturity = "Prototype";
+
+if (productionScore >= 90) {
+  maturity = "World Class";
+}
+else if (productionScore >= 80) {
+  maturity = "Enterprise";
+}
+else if (productionScore >= 65) {
+  maturity = "Production Ready";
+}
+else if (productionScore >= 45) {
+  maturity = "Developing";
+}
+else {
+  maturity = "Prototype";
+}
 //--------------------------------------
 // Deployment Ready
 //--------------------------------------
@@ -469,6 +489,8 @@ deploymentReady,
 riskLevel,
 
 quality,
+
+maturity,
 
 recommendations,
 

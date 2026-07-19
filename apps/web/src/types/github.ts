@@ -81,6 +81,8 @@ export interface RepositoryAnalytics {
     // | "Good"
     // | "Growing";
 
+  maturity: string;
+
   recommendations: Recommendation[];
 }
 

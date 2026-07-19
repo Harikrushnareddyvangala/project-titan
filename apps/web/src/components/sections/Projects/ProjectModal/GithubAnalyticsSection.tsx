@@ -38,6 +38,7 @@ import { RepositoryRadarChart } from "./GithubAnalytics/RepositoryRadarChart";
 import { RepositoryScoreTimeline } from "./GithubAnalytics/RepositoryScoreTimeline";
 import { TechnologyDependencyGraph } from "./GithubAnalytics/TechnologyDependencyGraph";
 import { RepositoryActivityHeatmap } from "./GithubAnalytics/RepositoryActivityHeatmap";
+import { RepositoryMaturityCard } from "./GithubAnalytics/RepositoryMaturityCard";
 interface GithubAnalyticsSectionProps {
   repository: GithubRepository | null;
   analytics: RepositoryAnalytics | null;
@@ -156,6 +157,9 @@ analytics={analytics}
 <EngineeringScoreDashboard
 repository={repository}
 analytics={analytics}
+/>
+<RepositoryMaturityCard
+    analytics={analytics}
 />
 <RepositoryRiskAssessment 
 repository={repository} 
