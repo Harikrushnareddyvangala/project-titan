@@ -112,6 +112,16 @@ vectorDatabase: string;
 cloud: string;
 
 packageManager: string;
+
+frontendFramework:string;
+
+backendFramework:string;
+
+aiLibrary:string;
+
+dependencyRisk:string;
+
+technologyMaturity:string;
 }
 
 export type GithubLanguages = Record<

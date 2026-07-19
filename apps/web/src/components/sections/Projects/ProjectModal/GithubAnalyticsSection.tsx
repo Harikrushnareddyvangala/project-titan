@@ -40,6 +40,7 @@ import { TechnologyDependencyGraph } from "./GithubAnalytics/TechnologyDependenc
 import { RepositoryActivityHeatmap } from "./GithubAnalytics/RepositoryActivityHeatmap";
 import { RepositoryMaturityCard } from "./GithubAnalytics/RepositoryMaturityCard";
 import { RepositorySecurityDashboard } from "./GithubAnalytics/RepositorySecurityDashboard";
+import { DependencyIntelligence } from "./GithubAnalytics/DependencyIntelligence";
 interface GithubAnalyticsSectionProps {
   repository: GithubRepository | null;
   analytics: RepositoryAnalytics | null;
@@ -237,6 +238,9 @@ analytics={analytics}
 />
 <RepositorySecurityDashboard
 analytics={analytics}
+/>
+<DependencyIntelligence
+    analytics={analytics}
 />
 <AIExecutiveEngineeringReport
 repository={repository}

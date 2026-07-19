@@ -805,6 +805,84 @@ packageManager="pip";
 
 }
 
+//------------------------------------------------------
+// Dependency Intelligence Engine
+//------------------------------------------------------
+
+let frontendFramework = "Unknown";
+
+let backendFramework = "Unknown";
+
+let aiLibrary = "None";
+
+let dependencyRisk = "Medium";
+
+let technologyMaturity = "Standard";
+
+if (frontend === "Next.js") {
+
+  frontendFramework = "React Ecosystem";
+
+}
+
+if (backend === "FastAPI") {
+
+  backendFramework = "FastAPI";
+
+}
+
+if (backend === "Django") {
+
+  backendFramework = "Django";
+
+}
+
+if (aiFramework === "LangChain") {
+
+  aiLibrary = "LangChain";
+
+}
+
+if (aiFramework === "OpenAI") {
+
+  aiLibrary = "OpenAI SDK";
+
+}
+
+if (
+
+engineeringScore > 90 &&
+
+productionScore > 85
+
+){
+
+technologyMaturity = "Enterprise";
+
+dependencyRisk = "Low";
+
+}
+
+else if(
+
+engineeringScore > 75
+
+){
+
+technologyMaturity = "Production";
+
+dependencyRisk = "Medium";
+
+}
+
+else{
+
+technologyMaturity = "Learning";
+
+dependencyRisk = "High";
+
+}
+
     
 const analytics={
 
@@ -863,6 +941,16 @@ cloud,
 packageManager,
 
 vectorDatabase,
+
+frontendFramework,
+
+backendFramework,
+
+aiLibrary,
+
+dependencyRisk,
+
+technologyMaturity,
 
 };
 
