@@ -39,6 +39,7 @@ import { RepositoryScoreTimeline } from "./GithubAnalytics/RepositoryScoreTimeli
 import { TechnologyDependencyGraph } from "./GithubAnalytics/TechnologyDependencyGraph";
 import { RepositoryActivityHeatmap } from "./GithubAnalytics/RepositoryActivityHeatmap";
 import { RepositoryMaturityCard } from "./GithubAnalytics/RepositoryMaturityCard";
+import { RepositorySecurityDashboard } from "./GithubAnalytics/RepositorySecurityDashboard";
 interface GithubAnalyticsSectionProps {
   repository: GithubRepository | null;
   analytics: RepositoryAnalytics | null;
@@ -202,8 +203,8 @@ languages={languages}
 analytics={analytics}
 />
 <TechnologyDependencyGraph
-    repository={repository}
-    languages={languages}
+repository={repository}
+languages={languages}
 />
 <RepositorySecurityAnalysis
 repository={repository}
@@ -234,6 +235,9 @@ repository={repository}
 repository={repository}
 analytics={analytics}
 />
+<RepositorySecurityDashboard
+analytics={analytics}
+/>
 <AIExecutiveEngineeringReport
 repository={repository}
 analytics={analytics}
@@ -246,13 +250,13 @@ repository={repository}
 analytics={analytics}
 />
 <RepositoryRadarChart
-    analytics={analytics}
+analytics={analytics}
 />
 <RepositoryScoreTimeline
-    analytics={analytics}
+analytics={analytics}
 />
 <RepositoryActivityHeatmap
-    commits={commitActivity}
+commits={commitActivity}
 />
 
   </div>

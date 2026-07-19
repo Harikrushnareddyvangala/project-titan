@@ -84,6 +84,20 @@ export interface RepositoryAnalytics {
   maturity: string;
 
   recommendations: Recommendation[];
+
+  securityScore:number;
+
+devopsScore:number;
+
+hasLicense:boolean;
+
+archived:boolean;
+
+hasWiki:boolean;
+
+hasProjects:boolean;
+
+hasIssues:boolean;
 }
 
 export type GithubLanguages = Record<

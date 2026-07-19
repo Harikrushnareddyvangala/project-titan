@@ -91,12 +91,12 @@ const languageData = languageResponse.ok
   : {};
 
 const commitActivityData: GithubCommitWeek[] =
-  commitResponse.ok
+  commitResponse.status === 200
     ? ((await commitResponse.json()) as GithubCommitWeek[])
     : [];
 
 const contributorsData: GithubContributor[] =
-  contributorResponse.ok
+  contributorResponse.status === 200
     ? ((await contributorResponse.json()) as GithubContributor[])
     : [];
 
@@ -463,7 +463,55 @@ if (recommendations.length === 0) {
     "Excellent repository health.",
   );
 }
+//--------------------------------------
+// Security & DevOps
+//--------------------------------------
 
+const hasLicense =
+  repositoryData.license !== null;
+
+const archived =
+  repositoryData.archived;
+
+const hasWiki =
+  repositoryData.has_wiki;
+
+const hasProjects =
+  repositoryData.has_projects;
+
+const hasIssues =
+  repositoryData.has_issues;
+
+const releases =
+  repositoryData.releases_url
+    ? true
+    : false;
+
+let securityScore = 100;
+
+if (!hasLicense) securityScore -= 15;
+
+if (archived) securityScore -= 40;
+
+if (!hasIssues) securityScore -= 15;
+
+if (!hasProjects) securityScore -= 10;
+
+if (!hasWiki) securityScore -= 5;
+
+securityScore = Math.max(
+  0,
+  Math.min(100, securityScore),
+);
+
+const devopsScore =
+  Math.round(
+
+    productionScore * 0.55 +
+
+    securityScore * 0.45,
+
+  );
 const analytics={
 
 repositoryAge,
@@ -494,7 +542,23 @@ maturity,
 
 recommendations,
 
+securityScore,
+
+devopsScore,
+
+hasLicense,
+
+archived,
+
+hasWiki,
+
+hasProjects,
+
+hasIssues,
+
 };
+
+
     return NextResponse.json({
   repository: repositoryData,
 
