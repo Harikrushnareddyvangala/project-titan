@@ -9,6 +9,9 @@ import {
   GitFork,
   Activity,
   ShieldCheck,
+  Cpu,
+  Server,
+  Database,
 } from "lucide-react";
 
 import type {
@@ -311,6 +314,33 @@ The repository is currently
 
 deployment risk.
 </p>
+<div className="mt-8 grid md:grid-cols-2 gap-5">
+
+<MetricCard
+icon={<Cpu size={18}/>}
+label="Frontend"
+value={analytics?.frontend ?? "Unknown"}
+/>
+
+<MetricCard
+icon={<Server size={18}/>}
+label="Backend"
+value={analytics?.backend ?? "Unknown"}
+/>
+
+<MetricCard
+icon={<Database size={18}/>}
+label="Database"
+value={analytics?.database ?? "Unknown"}
+/>
+
+<MetricCard
+icon={<Brain size={18}/>}
+label="AI"
+value={analytics?.aiFramework ?? "None"}
+/>
+
+</div>
 </motion.div>
 <motion.div
 initial={{ scaleX: 0 }}

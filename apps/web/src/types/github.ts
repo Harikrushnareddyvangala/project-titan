@@ -98,6 +98,20 @@ hasWiki:boolean;
 hasProjects:boolean;
 
 hasIssues:boolean;
+
+frontend: string;
+
+backend: string;
+
+database: string;
+
+aiFramework: string;
+
+vectorDatabase: string;
+
+cloud: string;
+
+packageManager: string;
 }
 
 export type GithubLanguages = Record<

@@ -512,6 +512,300 @@ const devopsScore =
     securityScore * 0.45,
 
   );
+
+  //--------------------------------------
+// Technology Stack Detection
+//--------------------------------------
+
+const languageNames = Object.keys(languageData).map(l=>l.toLowerCase());
+
+let frontend = "Unknown";
+let backend = "Unknown";
+let database = "Unknown";
+let aiFramework = "None";
+let cloud = "Unknown";
+let packageManager = "Unknown";
+let vectorDatabase = "None"
+
+// if (languageNames.includes("TypeScript")) {
+//   frontend = "Next.js / React";
+// }
+
+// if (languageNames.includes("JavaScript")) {
+//   frontend = "React / Node.js";
+// }
+
+// if (languageNames.includes("Python")) {
+//   backend = "FastAPI / Flask";
+// }
+
+const description =
+  (repositoryData.description ?? "").toLowerCase();
+
+const topics =
+(repositoryData.topics ?? [])
+.join(" ")
+.toLowerCase();
+
+
+
+// if (
+//   description.includes("rag") ||
+//   description.includes("llm") ||
+//   description.includes("transformer")
+// ) {
+//   aiFramework = "LangChain + LLM";
+// }
+
+// if (
+//   description.includes("postgres")
+// ) {
+//   database = "PostgreSQL";
+// }
+
+// if (
+//   description.includes("mongodb")
+// ) {
+//   database = "MongoDB";
+// }
+
+// if (
+//   description.includes("aws")
+// ) {
+//   cloud = "AWS";
+// }
+
+//------------------------------------------------------
+// Frontend Detection
+//------------------------------------------------------
+
+if(
+
+languageNames.includes("typescript")
+
+||
+
+languageNames.includes("javascript")
+
+){
+
+frontend="React";
+
+}
+
+if(
+
+description.includes("next")
+
+||
+
+topics.includes("nextjs")
+
+){
+
+frontend="Next.js";
+
+}
+
+if(description.includes("vue")){
+
+frontend="Vue";
+
+}
+
+if(description.includes("angular")){
+
+frontend="Angular";
+
+}
+
+//------------------------------------------------------
+// Backend Detection
+//------------------------------------------------------
+
+if(languageNames.includes("python")){
+
+backend="Python";
+
+}
+
+if(description.includes("fastapi")){
+
+backend="FastAPI";
+
+}
+
+if(description.includes("django")){
+
+backend="Django";
+
+}
+
+if(description.includes("flask")){
+
+backend="Flask";
+
+}
+
+if(description.includes("node")){
+
+backend="Node.js";
+
+}
+
+if(description.includes("spring")){
+
+backend="Spring Boot";
+
+}
+
+//------------------------------------------------------
+// AI Framework Detection
+//------------------------------------------------------
+
+if(description.includes("langchain")){
+
+aiFramework="LangChain";
+
+}
+
+if(description.includes("llamaindex")){
+
+aiFramework="LlamaIndex";
+
+}
+
+if(description.includes("huggingface")){
+
+aiFramework="Hugging Face";
+
+}
+
+if(description.includes("transformer")){
+
+aiFramework="Transformers";
+
+}
+
+if(description.includes("openai")){
+
+aiFramework="OpenAI";
+
+}
+
+if(description.includes("gemini")){
+
+aiFramework="Google Gemini";
+
+}
+
+//------------------------------------------------------
+// Database Detection
+//------------------------------------------------------
+
+if(description.includes("postgres")){
+
+database="PostgreSQL";
+
+}
+
+if(description.includes("mysql")){
+
+database="MySQL";
+
+}
+
+if(description.includes("mongodb")){
+
+database="MongoDB";
+
+}
+
+if(description.includes("sqlite")){
+
+database="SQLite";
+
+}
+
+if(description.includes("redis")){
+
+database="Redis";
+
+}//------------------------------------------------------
+// Vector Database
+//------------------------------------------------------
+
+if(description.includes("pinecone")){
+
+vectorDatabase="Pinecone";
+
+}
+
+if(description.includes("qdrant")){
+
+vectorDatabase="Qdrant";
+
+}
+
+if(description.includes("milvus")){
+
+vectorDatabase="Milvus";
+
+}
+
+if(description.includes("chromadb")){
+
+vectorDatabase="ChromaDB";
+
+}
+
+if(description.includes("weaviate")){
+
+vectorDatabase="Weaviate";
+
+}
+
+//------------------------------------------------------
+// Cloud
+//------------------------------------------------------
+
+if(description.includes("aws")){
+
+cloud="AWS";
+
+}
+
+if(description.includes("azure")){
+
+cloud="Azure";
+
+}
+
+if(description.includes("gcp")){
+
+cloud="Google Cloud";
+
+}
+
+
+
+// //------------------------------------------------------
+// Package Manager
+//------------------------------------------------------
+
+if(frontend==="Next.js"){
+
+packageManager="pnpm / npm";
+
+}
+
+if(backend==="Python"){
+
+packageManager="pip";
+
+}
+
+    
 const analytics={
 
 repositoryAge,
@@ -555,6 +849,20 @@ hasWiki,
 hasProjects,
 
 hasIssues,
+
+frontend,
+
+backend,
+
+database,
+
+aiFramework,
+
+cloud,
+
+packageManager,
+
+vectorDatabase,
 
 };
 
