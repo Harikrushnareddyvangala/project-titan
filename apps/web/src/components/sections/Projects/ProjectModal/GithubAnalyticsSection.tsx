@@ -37,7 +37,7 @@ import { RepositoryPerformanceAnalysis } from "./GithubAnalytics/RepositoryPerfo
 import { RepositoryRadarChart } from "./GithubAnalytics/RepositoryRadarChart";
 import { RepositoryScoreTimeline } from "./GithubAnalytics/RepositoryScoreTimeline";
 import { TechnologyDependencyGraph } from "./GithubAnalytics/TechnologyDependencyGraph";
-
+import { RepositoryActivityHeatmap } from "./GithubAnalytics/RepositoryActivityHeatmap";
 interface GithubAnalyticsSectionProps {
   repository: GithubRepository | null;
   analytics: RepositoryAnalytics | null;
@@ -246,6 +246,9 @@ analytics={analytics}
 />
 <RepositoryScoreTimeline
     analytics={analytics}
+/>
+<RepositoryActivityHeatmap
+    commits={commitActivity}
 />
 
   </div>
