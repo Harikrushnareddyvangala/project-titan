@@ -36,6 +36,7 @@ import { RepositoryCodeQualityAnalysis } from "./GithubAnalytics/RepositoryCodeQ
 import { RepositoryPerformanceAnalysis } from "./GithubAnalytics/RepositoryPerformanceAnalysis";
 import { RepositoryRadarChart } from "./GithubAnalytics/RepositoryRadarChart";
 import { RepositoryScoreTimeline } from "./GithubAnalytics/RepositoryScoreTimeline";
+import { TechnologyDependencyGraph } from "./GithubAnalytics/TechnologyDependencyGraph";
 
 interface GithubAnalyticsSectionProps {
   repository: GithubRepository | null;
@@ -195,6 +196,10 @@ languages={languages}
 repository={repository}
 languages={languages}
 analytics={analytics}
+/>
+<TechnologyDependencyGraph
+    repository={repository}
+    languages={languages}
 />
 <RepositorySecurityAnalysis
 repository={repository}
