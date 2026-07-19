@@ -35,6 +35,7 @@ import { RepositoryDevOpsAnalysis } from "./GithubAnalytics/RepositoryDevOpsAnal
 import { RepositoryCodeQualityAnalysis } from "./GithubAnalytics/RepositoryCodeQualityAnalysis";
 import { RepositoryPerformanceAnalysis } from "./GithubAnalytics/RepositoryPerformanceAnalysis";
 import { RepositoryRadarChart } from "./GithubAnalytics/RepositoryRadarChart";
+import { RepositoryScoreTimeline } from "./GithubAnalytics/RepositoryScoreTimeline";
 
 interface GithubAnalyticsSectionProps {
   repository: GithubRepository | null;
@@ -236,6 +237,9 @@ repository={repository}
 analytics={analytics}
 />
 <RepositoryRadarChart
+    analytics={analytics}
+/>
+<RepositoryScoreTimeline
     analytics={analytics}
 />
 
