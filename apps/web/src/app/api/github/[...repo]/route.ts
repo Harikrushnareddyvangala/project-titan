@@ -1,5 +1,10 @@
 import { NextResponse } from "next/server";
 import type { GithubCommitWeek, GithubContributor } from "@/types/github";
+import {
+
+buildRepositoryMetrics,
+
+} from "@/lib/github/analyticsEngine";
 
 export async function GET(
   request: Request,
@@ -103,57 +108,46 @@ const contributorsData: GithubContributor[] =
 // ------------------------------------------------------
 // Repository Intelligence Metrics
 // ------------------------------------------------------
+const {
 
-const languageCount =
-  Object.keys(languageData).length;
+repositoryAge,
 
-const contributorCount =
-  contributorsData.length;
+inactiveDays,
 
-const totalCommits =
-  commitActivityData.reduce(
-    (sum: number, week: GithubCommitWeek) => sum + week.total,
-    0,
-  );
+languageCount,
 
-const recentCommits =
-  commitActivityData
-    .slice(-4)
-    .reduce(
-      (sum: number, week: GithubCommitWeek) => sum + week.total,
-      0,
-    );
+contributorCount,
 
-const commitsPerWeek =
-  Math.round(
-    totalCommits /
-      Math.max(commitActivityData.length, 1),
-  );
+totalCommits,
+
+recentCommits,
+
+commitsPerWeek,
+
+}=buildRepositoryMetrics({
+
+repository:repositoryData,
+
+languages:languageData,
+
+commitActivity:commitActivityData,
+
+contributors:contributorsData,
+
+});
+
+
+
+
+
     //----------------------------------------------------
 // Repository Analytics Engine
 //----------------------------------------------------
 
-const DAY = 1000 * 60 * 60 * 24;
 
-const now = new Date();
 
-const created = new Date(
-  repositoryData.created_at,
-);
 
-const updated = new Date(
-  repositoryData.updated_at,
-);
 
-const repositoryAge = Math.floor(
-  (now.getTime() - created.getTime()) /
-    DAY,
-);
-
-const inactiveDays = Math.floor(
-  (now.getTime() - updated.getTime()) /
-    DAY,
-);
 
 //--------------------------------------
 // Engineering Score
