@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
 import type { GithubCommitWeek, GithubContributor } from "@/types/github";
 import {
-
 buildRepositoryMetrics,
-
 } from "@/lib/github/analyticsEngine";
+
+import { buildTechnologyStack } from "@/lib/github/technologyEngine";
 
 export async function GET(
   request: Request,
@@ -510,16 +510,47 @@ const devopsScore =
   //--------------------------------------
 // Technology Stack Detection
 //--------------------------------------
+const {
 
-const languageNames = Object.keys(languageData).map(l=>l.toLowerCase());
+  frontend,
 
-let frontend = "Unknown";
-let backend = "Unknown";
-let database = "Unknown";
-let aiFramework = "None";
-let cloud = "Unknown";
-let packageManager = "Unknown";
-let vectorDatabase = "None"
+  backend,
+
+  aiFramework,
+
+  database,
+
+  vectorDatabase,
+
+  cloud,
+
+  packageManager,
+
+} = buildTechnologyStack({
+
+  description:
+
+    repositoryData.description ?? "",
+
+  topics:
+
+    repositoryData.topics ?? [],
+
+  languages:
+
+    Object.keys(languageData),
+
+});
+
+// const languageNames = Object.keys(languageData).map(l=>l.toLowerCase());
+
+// let frontend = "Unknown";
+// let backend = "Unknown";
+// let database = "Unknown";
+// let aiFramework = "None";
+// let cloud = "Unknown";
+// let packageManager = "Unknown";
+// let vectorDatabase = "None"
 
 // if (languageNames.includes("TypeScript")) {
 //   frontend = "Next.js / React";
@@ -533,13 +564,13 @@ let vectorDatabase = "None"
 //   backend = "FastAPI / Flask";
 // }
 
-const description =
-  (repositoryData.description ?? "").toLowerCase();
+// const description =
+//   (repositoryData.description ?? "").toLowerCase();
 
-const topics =
-(repositoryData.topics ?? [])
-.join(" ")
-.toLowerCase();
+// const topics =
+// (repositoryData.topics ?? [])
+// .join(" ")
+// .toLowerCase();
 
 
 
