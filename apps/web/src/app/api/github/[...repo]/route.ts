@@ -3,6 +3,7 @@ import type { GithubCommitWeek, GithubContributor } from "@/types/github";
 import { buildRepositoryMetrics,} from "@/lib/github/analyticsEngine";
 import { buildTechnologyStack } from "@/lib/github/technologyEngine";
 import { buildRepositoryScores, } from "@/lib/github/scoringEngine";
+import { buildRepositoryRecommendations, } from "@/lib/github/recommendationEngine";
 
 export async function GET(
   request: Request,
@@ -227,83 +228,42 @@ inactiveDays,
 },
 
 });
+
+const recommendations =
+
+buildRepositoryRecommendations({
+
+stars:
+
+repositoryData.stargazers_count,
+
+forks:
+
+repositoryData.forks_count,
+
+watchers:
+
+repositoryData.watchers_count,
+
+issues:
+
+repositoryData.open_issues_count,
+
+inactiveDays,
+
+languageCount,
+
+contributorCount,
+
+recentCommits,
+
+});
 //--------------------------------------
 // Recommendations
 //--------------------------------------
 
-const recommendations: string[] = [];
 
-if (
-  repositoryData.open_issues_count > 10
-) {
-  recommendations.push(
-    "Reduce open issues to improve maintainability.",
-  );
-}
 
-if (
-  repositoryData.stargazers_count < 20
-) {
-  recommendations.push(
-    "Increase repository visibility using an improved README and demonstrations.",
-  );
-}
-
-if (
-  repositoryData.watchers_count < 5
-) {
-  recommendations.push(
-    "Increase community engagement.",
-  );
-}
-
-if (
-  repositoryData.forks_count < 3
-) {
-  recommendations.push(
-    "Encourage community contributions.",
-  );
-}
-
-if (inactiveDays > 90) {
-  recommendations.push(
-    "Repository appears inactive. Consider regular maintenance updates.",
-  );
-}
-if(languageCount===1){
-
-recommendations.push(
-
-"Support additional tooling or languages where appropriate."
-
-);
-
-}
-
-if(contributorCount<=1){
-
-recommendations.push(
-
-"Repository depends on a single contributor."
-
-);
-
-}
-
-if(recentCommits<10){
-
-recommendations.push(
-
-"Development activity has slowed during the last month."
-
-);
-
-}
-if (recommendations.length === 0) {
-  recommendations.push(
-    "Excellent repository health.",
-  );
-}
 //--------------------------------------
 // Security & DevOps
 //--------------------------------------
