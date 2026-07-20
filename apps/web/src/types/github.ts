@@ -1,56 +1,110 @@
 export interface GithubRepository {
   id: number;
 
-  name: string;
+node_id: string;
 
-  full_name: string;
+name: string;
 
-  description: string | null;
+full_name: string;
 
-  html_url: string;
+private: boolean;
 
-  homepage: string | null;
+visibility: string;
 
-  language: string | null;
+html_url: string;
 
-  default_branch: string;
+description: string | null;
 
-  stargazers_count: number;
+homepage: string | null;
 
-  watchers_count: number;
+language: string | null;
 
-  forks_count: number;
+fork: boolean;
 
-  open_issues_count: number;
+archived: boolean;
 
-  subscribers_count: number;
+disabled: boolean;
 
-  size: number;
+default_branch: string;
 
-  visibility: string;
+size: number;
 
-  archived: boolean;
+stargazers_count: number;
 
-  disabled: boolean;
+watchers_count: number;
 
-  created_at: string;
+forks_count: number;
 
-  updated_at: string;
+open_issues_count: number;
 
-  pushed_at: string;
+subscribers_count?: number;
 
-  topics?: string[];
+network_count?: number;
+has_issues: boolean;
 
-  private: boolean;
+has_projects: boolean;
 
-  license: {
-  name: string;
+has_wiki: boolean;
+
+has_pages: boolean;
+
+has_downloads: boolean;
+
+has_discussions?: boolean;
+
+topics: string[];
+
+license: {
+
+key: string;
+
+name: string;
+
+spdx_id: string;
+
+url: string | null;
+
 } | null;
-  owner: {
-  login: string;
-  avatar_url: string;
-  html_url: string;
+
+created_at: string;
+
+updated_at: string;
+
+pushed_at: string;
+
+owner: {
+
+login: string;
+
+avatar_url: string;
+
+html_url: string;
+
+type: string;
+
 };
+
+clone_url: string;
+
+ssh_url: string;
+
+git_url: string;
+
+svn_url: string;
+
+watchers: number;
+
+forks: number;
+
+open_issues: number;
+
+is_template: boolean;
+
+allow_forking: boolean;
+
+web_commit_signoff_required: boolean;
+
+analytics?: RepositoryAnalytics;
 }
 export interface Recommendation {
   title: string;
@@ -122,6 +176,8 @@ aiLibrary:string;
 dependencyRisk:string;
 
 technologyMaturity:string;
+
+
 }
 
 export type GithubLanguages = Record<
