@@ -110,7 +110,7 @@ export interface Recommendation {
   title: string;
   description: string;
 }
-
+  
 export interface RepositoryAnalytics {
   repositoryAge: number;
 
