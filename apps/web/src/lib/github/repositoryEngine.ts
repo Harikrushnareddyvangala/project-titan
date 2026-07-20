@@ -178,6 +178,6 @@ export function buildRepositoryAnalytics({
 
     recommendations,
 
-  };
+  };  
 
 }

@@ -194,4 +194,4 @@ securityScore = Math.max(
       },
     );
   }
-}
+} 
