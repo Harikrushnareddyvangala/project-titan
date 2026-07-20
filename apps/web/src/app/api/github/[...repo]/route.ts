@@ -1,10 +1,8 @@
 import { NextResponse } from "next/server";
 import type { GithubCommitWeek, GithubContributor } from "@/types/github";
-import {
-buildRepositoryMetrics,
-} from "@/lib/github/analyticsEngine";
-
+import { buildRepositoryMetrics,} from "@/lib/github/analyticsEngine";
 import { buildTechnologyStack } from "@/lib/github/technologyEngine";
+import { buildRepositoryScores, } from "@/lib/github/scoringEngine";
 
 export async function GET(
   request: Request,
@@ -153,233 +151,82 @@ contributors:contributorsData,
 // Engineering Score
 //--------------------------------------
 
-let engineeringScore = 0;
 
-// Repository popularity
-
-engineeringScore +=
-
-Math.min(
-repositoryData.stargazers_count,
-25,
-);
-
-// Community contribution
-
-engineeringScore +=
-
-Math.min(
-repositoryData.forks_count*2,
-20,
-);
-
-// Repository followers
-
-engineeringScore +=
-
-Math.min(
-repositoryData.watchers_count,
-10,
-);
-
-// Language diversity
-
-engineeringScore +=
-
-Math.min(
-languageCount*4,
-12,
-);
-
-// Contributor diversity
-
-engineeringScore +=
-
-Math.min(
-contributorCount*3,
-12,
-);
-
-// Commit activity
-
-engineeringScore +=
-
-Math.min(
-commitsPerWeek,
-12,
-);
-
-// Repository maturity
-
-engineeringScore +=
-
-Math.min(
-
-Math.floor(repositoryAge/365),
-
-6,
-
-);
-
-// Issues penalty
-
-engineeringScore -=
-
-Math.min(
-
-repositoryData.open_issues_count,
-
-15,
-
-);
-
-engineeringScore=Math.max(
-
-0,
-
-Math.min(
-
-100,
-
-Math.round(engineeringScore),
-
-),
-
-);
-
-//--------------------------------------
-// Health Score
-//--------------------------------------
-
-let healthScore=100;
-
-// inactivity
-
-healthScore-=Math.floor(
-
-inactiveDays/20,
-
-);
-
-// issues
-
-healthScore-=
-
-repositoryData.open_issues_count;
-
-// low contributors
-
-if(contributorCount<3){
-
-healthScore-=8;
-
-}
-
-// inactive commits
-
-if(recentCommits<10){
-
-healthScore-=12;
-
-}
-
-healthScore=Math.max(
-
-0,
-
-Math.min(
-
-100,
-
-healthScore,
-
-),
-
-);
 
 //--------------------------------------
 // Production Score
 //--------------------------------------
 
-const productionScore=
 
-Math.round(
-
-engineeringScore*0.45+
-
-healthScore*0.30+
-
-Math.min(
-
-contributorCount*3,
-
-10,
-
-)+
-
-Math.min(
-
-recentCommits/2,
-
-15,
-
-),
-
-);
 
 //--------------------------------------
 // Risk Level
 //--------------------------------------
 
-const riskLevel =
-  productionScore >= 85
-    ? "Low"
-    : productionScore >= 65
-      ? "Medium"
-      : "High";
 
 //--------------------------------------
 // Quality
 //--------------------------------------
 
-const quality =
-  productionScore >= 90
-    ? "Outstanding"
-    : productionScore >= 80
-      ? "Excellent"
-      : productionScore >= 65
-        ? "Good"
-        : "Growing";
+
 //--------------------------------------
 // Repository Maturity
 //--------------------------------------
 
-let maturity = "Prototype";
 
-if (productionScore >= 90) {
-  maturity = "World Class";
-}
-else if (productionScore >= 80) {
-  maturity = "Enterprise";
-}
-else if (productionScore >= 65) {
-  maturity = "Production Ready";
-}
-else if (productionScore >= 45) {
-  maturity = "Developing";
-}
-else {
-  maturity = "Prototype";
-}
 //--------------------------------------
 // Deployment Ready
 //--------------------------------------
 
-const deploymentReady =
-  productionScore >= 80 &&
-  repositoryData.open_issues_count < 10 &&
-  inactiveDays < 90;
+const {
 
+engineeringScore,
+
+healthScore,
+
+productionScore,
+
+riskLevel,
+
+quality,
+
+deploymentReady,
+
+}=buildRepositoryScores({
+
+engineeringInputs:{
+
+stars:
+
+repositoryData.stargazers_count,
+
+forks:
+
+repositoryData.forks_count,
+
+watchers:
+
+repositoryData.watchers_count,
+
+issues:
+
+repositoryData.open_issues_count,
+
+repositoryAge,
+
+languageCount,
+
+contributorCount,
+
+commitsPerWeek,
+
+recentCommits,
+
+inactiveDays,
+
+},
+
+});
 //--------------------------------------
 // Recommendations
 //--------------------------------------
@@ -542,298 +389,9 @@ const {
 
 });
 
-// const languageNames = Object.keys(languageData).map(l=>l.toLowerCase());
-
-// let frontend = "Unknown";
-// let backend = "Unknown";
-// let database = "Unknown";
-// let aiFramework = "None";
-// let cloud = "Unknown";
-// let packageManager = "Unknown";
-// let vectorDatabase = "None"
-
-// if (languageNames.includes("TypeScript")) {
-//   frontend = "Next.js / React";
-// }
-
-// if (languageNames.includes("JavaScript")) {
-//   frontend = "React / Node.js";
-// }
-
-// if (languageNames.includes("Python")) {
-//   backend = "FastAPI / Flask";
-// }
-
-// const description =
-//   (repositoryData.description ?? "").toLowerCase();
-
-// const topics =
-// (repositoryData.topics ?? [])
-// .join(" ")
-// .toLowerCase();
-
-
-
-// if (
-//   description.includes("rag") ||
-//   description.includes("llm") ||
-//   description.includes("transformer")
-// ) {
-//   aiFramework = "LangChain + LLM";
-// }
-
-// if (
-//   description.includes("postgres")
-// ) {
-//   database = "PostgreSQL";
-// }
-
-// if (
-//   description.includes("mongodb")
-// ) {
-//   database = "MongoDB";
-// }
-
-// if (
-//   description.includes("aws")
-// ) {
-//   cloud = "AWS";
-// }
-
-//------------------------------------------------------
-// Frontend Detection
-//------------------------------------------------------
-
-if(
-
-languageNames.includes("typescript")
-
-||
-
-languageNames.includes("javascript")
-
-){
-
-frontend="React";
-
-}
-
-if(
-
-description.includes("next")
-
-||
-
-topics.includes("nextjs")
-
-){
-
-frontend="Next.js";
-
-}
-
-if(description.includes("vue")){
-
-frontend="Vue";
-
-}
-
-if(description.includes("angular")){
-
-frontend="Angular";
-
-}
-
-//------------------------------------------------------
-// Backend Detection
-//------------------------------------------------------
-
-if(languageNames.includes("python")){
-
-backend="Python";
-
-}
-
-if(description.includes("fastapi")){
-
-backend="FastAPI";
-
-}
-
-if(description.includes("django")){
-
-backend="Django";
-
-}
-
-if(description.includes("flask")){
-
-backend="Flask";
-
-}
-
-if(description.includes("node")){
-
-backend="Node.js";
-
-}
-
-if(description.includes("spring")){
-
-backend="Spring Boot";
-
-}
-
-//------------------------------------------------------
-// AI Framework Detection
-//------------------------------------------------------
-
-if(description.includes("langchain")){
-
-aiFramework="LangChain";
-
-}
-
-if(description.includes("llamaindex")){
-
-aiFramework="LlamaIndex";
-
-}
-
-if(description.includes("huggingface")){
-
-aiFramework="Hugging Face";
-
-}
-
-if(description.includes("transformer")){
-
-aiFramework="Transformers";
-
-}
-
-if(description.includes("openai")){
-
-aiFramework="OpenAI";
-
-}
-
-if(description.includes("gemini")){
-
-aiFramework="Google Gemini";
-
-}
-
-//------------------------------------------------------
-// Database Detection
-//------------------------------------------------------
-
-if(description.includes("postgres")){
-
-database="PostgreSQL";
-
-}
-
-if(description.includes("mysql")){
-
-database="MySQL";
-
-}
-
-if(description.includes("mongodb")){
-
-database="MongoDB";
-
-}
-
-if(description.includes("sqlite")){
-
-database="SQLite";
-
-}
-
-if(description.includes("redis")){
-
-database="Redis";
-
-}//------------------------------------------------------
-// Vector Database
-//------------------------------------------------------
-
-if(description.includes("pinecone")){
-
-vectorDatabase="Pinecone";
-
-}
-
-if(description.includes("qdrant")){
-
-vectorDatabase="Qdrant";
-
-}
-
-if(description.includes("milvus")){
-
-vectorDatabase="Milvus";
-
-}
-
-if(description.includes("chromadb")){
-
-vectorDatabase="ChromaDB";
-
-}
-
-if(description.includes("weaviate")){
-
-vectorDatabase="Weaviate";
-
-}
-
-//------------------------------------------------------
-// Cloud
-//------------------------------------------------------
-
-if(description.includes("aws")){
-
-cloud="AWS";
-
-}
-
-if(description.includes("azure")){
-
-cloud="Azure";
-
-}
-
-if(description.includes("gcp")){
-
-cloud="Google Cloud";
-
-}
-
-
-
-// //------------------------------------------------------
-// Package Manager
-//------------------------------------------------------
-
-if(frontend==="Next.js"){
-
-packageManager="pnpm / npm";
-
-}
-
-if(backend==="Python"){
-
-packageManager="pip";
-
-}
-
 //------------------------------------------------------
 // Dependency Intelligence Engine
 //------------------------------------------------------
-
 let frontendFramework = "Unknown";
 
 let backendFramework = "Unknown";
@@ -907,7 +465,7 @@ technologyMaturity = "Learning";
 dependencyRisk = "High";
 
 }
-
+const maturity = technologyMaturity;
     
 const analytics={
 
