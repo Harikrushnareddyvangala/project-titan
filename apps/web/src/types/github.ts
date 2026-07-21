@@ -197,6 +197,16 @@ topContributorShare: number;
 
 contributorDistribution: string;
 
+developmentVelocity: number;
+
+developmentMomentum: number;
+
+engineeringStability: number;
+
+releaseReadiness: number;
+
+activityTrend: string;
+
 
 }
 

@@ -12,6 +12,7 @@ import { buildRepositoryRecommendations, } from "./recommendationEngine";
 import { buildSecurityAnalysis, } from "./securityEngine";
 import { buildCodeIntelligence, } from "./codeIntelligenceEngine";
 import { buildContributorIntelligence, } from "./contributorIntelligenceEngine";
+import { buildCommitIntelligence } from "./commitIntelligenceEngine";
 
 export function buildRepositoryAnalytics({
   repository,
@@ -153,6 +154,10 @@ const codeIntelligence =
     contributors,
   );
 
+  const commitIntelligence =
+  buildCommitIntelligence(
+    commitActivity,
+  );  
   //----------------------------------------
   // Recommendations
   //----------------------------------------
@@ -201,6 +206,8 @@ const codeIntelligence =
     ...codeIntelligence,
 
     ...contributorIntelligence,
+
+    ...commitIntelligence,
 
     recommendations,
 
