@@ -7,6 +7,8 @@ import { EngineeringScoreCard } from "./EngineeringScoreCard";
 import { TechnologyStackCard } from "./TechnologyStackCard";
 import { RiskAssessmentCard } from "./RiskAssessmentCard";
 import { HiringSignalCard } from "./HiringSignalCard";
+import { DeploymentReadinessCard } from "./DeploymentReadinessCard";
+import { TeamHealthCard } from "./TeamHealthCard";
 
 interface ExecutiveDashboardProps {
   analytics: RepositoryAnalytics | null;
@@ -38,6 +40,13 @@ export function ExecutiveDashboard({
   />
 
   <HiringSignalCard
+    analytics={analytics}
+  />
+  <DeploymentReadinessCard
+    analytics={analytics}
+  />
+
+  <TeamHealthCard
     analytics={analytics}
   />
 
