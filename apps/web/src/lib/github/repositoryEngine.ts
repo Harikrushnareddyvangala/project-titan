@@ -26,6 +26,9 @@ import {
   buildSecurityAnalysis,
 
 } from "./securityEngine";
+import {
+  buildCodeIntelligence,
+} from "./codeIntelligenceEngine";
 
 export function buildRepositoryAnalytics({
   repository,
@@ -130,6 +133,37 @@ export function buildRepositoryAnalytics({
     scores.productionScore,
 
 });
+const codeIntelligence =
+  buildCodeIntelligence({
+
+    stars:
+      repository.stargazers_count,
+
+    forks:
+      repository.forks_count,
+
+    issues:
+      repository.open_issues_count,
+
+    languageCount:
+      metrics.languageCount,
+
+    contributorCount:
+      metrics.contributorCount,
+
+    recentCommits:
+      metrics.recentCommits,
+
+    repositoryAge:
+      metrics.repositoryAge,
+
+    hasWiki:
+      repository.has_wiki,
+
+    hasLicense:
+      repository.license !== null,
+
+  });
 
   //----------------------------------------
   // Recommendations
@@ -175,6 +209,8 @@ export function buildRepositoryAnalytics({
     ...scores,
 
     ...security,
+
+    ...codeIntelligence,
 
     recommendations,
 
