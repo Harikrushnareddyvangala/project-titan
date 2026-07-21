@@ -3,6 +3,8 @@
 import type { RepositoryAnalytics } from "@/types/github";
 
 import { ExecutiveSummaryCard } from "./ExecutiveSummaryCard";
+import { EngineeringScoreCard } from "./EngineeringScoreCard";
+import { TechnologyStackCard } from "./TechnologyStackCard";
 
 interface ExecutiveDashboardProps {
   analytics: RepositoryAnalytics | null;
@@ -14,28 +16,24 @@ export function ExecutiveDashboard({
   if (!analytics) return null;
 
   return (
-    <section className="mt-8 space-y-8">
+    <section className="mt-10 space-y-8">
 
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-3xl font-bold">
-            Executive AI Dashboard
-          </h2>
+  <ExecutiveSummaryCard
+    analytics={analytics}
+  />
 
-          <p className="mt-2 text-sm text-muted-foreground">
-            AI-generated engineering assessment and enterprise readiness
-          </p>
-        </div>
+  <div className="grid gap-8 lg:grid-cols-2">
 
-        <div className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-4 py-2">
-          <span className="text-sm font-semibold text-emerald-400">
-            Enterprise Intelligence
-          </span>
-        </div>
-      </div>
+    <EngineeringScoreCard
+      analytics={analytics}
+    />
 
-      <ExecutiveSummaryCard analytics={analytics} />
+    <TechnologyStackCard
+      analytics={analytics}
+    />
 
-    </section>
+  </div>
+
+</section>
   );
 }

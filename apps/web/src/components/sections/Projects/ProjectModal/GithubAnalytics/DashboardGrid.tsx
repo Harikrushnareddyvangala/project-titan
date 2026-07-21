@@ -10,7 +10,7 @@ import { GithubLanguageDonut } from "./GithubLanguageDonut";
 import { GithubCommitHeatmap } from "./GithubCommitHeatmap";
 import { GithubContributorLeaderboard } from "./GithubContributorLeaderboard";
 import { GithubActivityTimeline } from "./GithubActivityTimeline";
-import { ExecutiveDashboard } from "./ExecutiveDashboard//ExecutiveDashboard";
+import { ExecutiveDashboard } from "./ExecutiveDashboard";
 
 import type {
   GithubLanguages,
