@@ -42,6 +42,7 @@ import { RepositoryMaturityCard } from "./GithubAnalytics/RepositoryMaturityCard
 import { RepositorySecurityDashboard } from "./GithubAnalytics/RepositorySecurityDashboard";
 import { DependencyIntelligence } from "./GithubAnalytics/DependencyIntelligence";
 import { RepositoryEngineeringDashboard } from "@/components/github/RepositoryEngineeringDashboard";
+import { RepositoryContributorDashboard, } from "@/components/github/RepositoryContributorDashboard";
 interface GithubAnalyticsSectionProps {
   repository: GithubRepository | null;
   analytics: RepositoryAnalytics | null;
@@ -255,6 +256,9 @@ repository={repository}
 analytics={analytics}
 />
 <RepositoryEngineeringDashboard
+  analytics={analytics}
+/>
+<RepositoryContributorDashboard
   analytics={analytics}
 />
 <RepositoryRadarChart
