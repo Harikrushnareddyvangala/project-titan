@@ -1,4 +1,5 @@
 "use client";
+import { useState } from "react";
 import { motion } from "framer-motion";
 import type {
   GithubLanguages,
@@ -46,6 +47,7 @@ import { RepositoryContributorDashboard, } from "@/components/github/RepositoryC
 import { RepositoryCommitDashboard, } from "@/components/github/RepositoryCommitDashboard";
 import { ExecutiveDashboard } from "./GithubAnalytics/ExecutiveDashboard/ExecutiveDashboard";
 import { RepositoryBenchmark } from "./GithubAnalytics/RepositoryBenchmark";
+import { RepositoryComparison, } from "./GithubAnalytics/RepositoryComparison";
 interface GithubAnalyticsSectionProps {
   repository: GithubRepository | null;
   analytics: RepositoryAnalytics | null;
@@ -55,6 +57,10 @@ interface GithubAnalyticsSectionProps {
   loading: boolean;
 }
 
+
+
+
+
 export function GithubAnalyticsSection({
   repository,
   analytics,
@@ -63,6 +69,21 @@ export function GithubAnalyticsSection({
   contributors,
   loading,
 }: GithubAnalyticsSectionProps) {
+  const [
+  selectedRepositories,
+  setSelectedRepositories,
+] = useState<number[]>([]);
+const comparisonRepositories =
+  repository && analytics
+    ? [
+        {
+          id: repository.id,
+          name: repository.name,
+          fullName: repository.full_name,
+          analytics,
+        },
+      ]
+    : [];
   if (loading) {
     return <GithubAnalyticsSkeleton />;
 }
@@ -264,6 +285,11 @@ analytics={analytics}
 
 <RepositoryBenchmark
   analytics={analytics}
+/>
+<RepositoryComparison
+  repositories={comparisonRepositories}
+  selected={selectedRepositories}
+  onSelectionChange={setSelectedRepositories}
 />
 
 <RepositoryEngineeringDashboard
