@@ -1,4 +1,4 @@
-export interface SecurityInput {
+export interface SecurityAnalysisInput {
 
   hasLicense: boolean;
 
@@ -20,6 +20,10 @@ export interface SecurityResult {
 
   devopsScore: number;
 
+  hasLicense: boolean;
+
+  archived: boolean;
+
 }
 
 export function buildSecurityAnalysis({
@@ -36,60 +40,38 @@ export function buildSecurityAnalysis({
 
   productionScore,
 
-}: SecurityInput): SecurityResult {
+}: SecurityAnalysisInput): SecurityResult {
 
   let securityScore = 100;
 
   if (!hasLicense) {
-
     securityScore -= 15;
-
   }
 
   if (archived) {
-
     securityScore -= 40;
-
   }
 
   if (!hasIssues) {
-
     securityScore -= 15;
-
   }
 
   if (!hasProjects) {
-
     securityScore -= 10;
-
   }
 
   if (!hasWiki) {
-
     securityScore -= 5;
-
   }
 
   securityScore = Math.max(
-
     0,
-
-    Math.min(
-
-      100,
-
-      securityScore,
-
-    ),
-
+    Math.min(100, securityScore),
   );
 
   const devopsScore = Math.round(
-
     productionScore * 0.55 +
-
     securityScore * 0.45,
-
   );
 
   return {
@@ -97,6 +79,10 @@ export function buildSecurityAnalysis({
     securityScore,
 
     devopsScore,
+
+    hasLicense,
+
+    archived,
 
   };
 

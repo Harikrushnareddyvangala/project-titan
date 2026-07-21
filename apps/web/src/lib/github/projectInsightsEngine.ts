@@ -1,4 +1,4 @@
-import type { RepositoryAnalytics, } from "@/types/github";
+
 
 export interface ProjectInsights {
 
@@ -16,9 +16,33 @@ export interface ProjectInsights {
 
 }
 
+interface ProjectInsightsInput {
+
+  engineeringScore: number;
+
+  codeQuality: number;
+
+  documentationQuality: number;
+
+  teamHealth: number;
+
+  releaseReadiness: number;
+
+  enterpriseReadiness: number;
+
+  repositoryGrade: string;
+
+  activityTrend: string;
+
+  busFactor: number;
+
+  securityScore: number;
+
+}
+
 export function buildProjectInsights(
 
-  analytics: RepositoryAnalytics,
+  analytics: ProjectInsightsInput,
 
 ): ProjectInsights {
 

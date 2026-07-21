@@ -116,6 +116,10 @@ export interface RepositoryAnalytics {
 
   inactiveDays: number;
 
+  languageCount: number;
+
+  contributorCount: number;
+
   engineeringScore: number;
 
   healthScore: number;
@@ -197,14 +201,24 @@ topContributorShare: number;
 
 contributorDistribution: string;
 
+
+executiveSummary: string;
+
+strengths: string[];
+
+risks: string[];
+
+hiringSignal: string; 
+
+enterpriseSummary: string;
+
+totalCommits: number;
+commitsPerWeek: number;
+recentCommits: number;
 developmentVelocity: number;
-
 developmentMomentum: number;
-
 engineeringStability: number;
-
 releaseReadiness: number;
-
 activityTrend: string;
 
 

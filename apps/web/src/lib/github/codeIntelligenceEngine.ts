@@ -20,7 +20,7 @@ export interface CodeIntelligenceInput {
 
 }
 
-export interface CodeIntelligence {
+export interface CodeIntelligenceResult {
 
   codeQuality: number;
 
@@ -54,7 +54,7 @@ export function buildCodeIntelligence({
 
   hasLicense,
 
-}: CodeIntelligenceInput): CodeIntelligence {
+}: CodeIntelligenceInput): CodeIntelligenceResult {
 
   //------------------------------------------------
   // Code Quality

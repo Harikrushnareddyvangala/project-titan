@@ -13,6 +13,7 @@ import { buildSecurityAnalysis, } from "./securityEngine";
 import { buildCodeIntelligence, } from "./codeIntelligenceEngine";
 import { buildContributorIntelligence, } from "./contributorIntelligenceEngine";
 import { buildCommitIntelligence } from "./commitIntelligenceEngine";
+import { buildProjectInsights, } from "./projectInsightsEngine";
 
 export function buildRepositoryAnalytics({
   repository,
@@ -158,6 +159,31 @@ const codeIntelligence =
   buildCommitIntelligence(
     commitActivity,
   );  
+
+  const projectInsights =
+  buildProjectInsights({
+
+    engineeringScore: scores.engineeringScore,
+
+    codeQuality: codeIntelligence.codeQuality,
+
+    documentationQuality: codeIntelligence.documentationQuality,
+
+    teamHealth: contributorIntelligence.teamHealth,
+
+    releaseReadiness: commitIntelligence.releaseReadiness,
+
+    enterpriseReadiness: codeIntelligence.enterpriseReadiness,
+
+    repositoryGrade: codeIntelligence.repositoryGrade,
+
+    activityTrend: commitIntelligence.activityTrend,
+
+    busFactor: contributorIntelligence.busFactor,
+
+    securityScore: security.securityScore,
+
+  });
   //----------------------------------------
   // Recommendations
   //----------------------------------------
@@ -208,6 +234,8 @@ const codeIntelligence =
     ...contributorIntelligence,
 
     ...commitIntelligence,
+
+    ...projectInsights,
 
     recommendations,
 

@@ -44,6 +44,7 @@ import { DependencyIntelligence } from "./GithubAnalytics/DependencyIntelligence
 import { RepositoryEngineeringDashboard } from "@/components/github/RepositoryEngineeringDashboard";
 import { RepositoryContributorDashboard, } from "@/components/github/RepositoryContributorDashboard";
 import { RepositoryCommitDashboard, } from "@/components/github/RepositoryCommitDashboard";
+import { ExecutiveDashboard } from "./GithubAnalytics/ExecutiveDashboard/ExecutiveDashboard";
 interface GithubAnalyticsSectionProps {
   repository: GithubRepository | null;
   analytics: RepositoryAnalytics | null;
@@ -255,6 +256,9 @@ commits={commitActivity}
 <RepositoryHealthDashboard
 repository={repository}
 analytics={analytics}
+/>
+<ExecutiveDashboard
+  analytics={analytics}
 />
 <RepositoryEngineeringDashboard
   analytics={analytics}
