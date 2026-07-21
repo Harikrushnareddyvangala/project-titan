@@ -5,6 +5,8 @@ import type { RepositoryAnalytics } from "@/types/github";
 import { ExecutiveSummaryCard } from "./ExecutiveSummaryCard";
 import { EngineeringScoreCard } from "./EngineeringScoreCard";
 import { TechnologyStackCard } from "./TechnologyStackCard";
+import { RiskAssessmentCard } from "./RiskAssessmentCard";
+import { HiringSignalCard } from "./HiringSignalCard";
 
 interface ExecutiveDashboardProps {
   analytics: RepositoryAnalytics | null;
@@ -31,6 +33,13 @@ export function ExecutiveDashboard({
     <TechnologyStackCard
       analytics={analytics}
     />
+    <RiskAssessmentCard
+    analytics={analytics}
+  />
+
+  <HiringSignalCard
+    analytics={analytics}
+  />
 
   </div>
 
