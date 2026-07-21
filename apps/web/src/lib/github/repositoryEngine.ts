@@ -5,30 +5,13 @@ import type {
   GithubContributor,
 } from "@/types/github";
 
-import {
-  buildRepositoryMetrics,
-} from "./analyticsEngine";
-
-import {
-  buildTechnologyStack,
-} from "./technologyEngine";
-
-import {
-  buildRepositoryScores,
-} from "./scoringEngine";
-
-import {
-  buildRepositoryRecommendations,
-} from "./recommendationEngine";
-
-import {
-
-  buildSecurityAnalysis,
-
-} from "./securityEngine";
-import {
-  buildCodeIntelligence,
-} from "./codeIntelligenceEngine";
+import { buildRepositoryMetrics, } from "./analyticsEngine";
+import { buildTechnologyStack, } from "./technologyEngine";
+import { buildRepositoryScores, } from "./scoringEngine";
+import { buildRepositoryRecommendations, } from "./recommendationEngine";
+import { buildSecurityAnalysis, } from "./securityEngine";
+import { buildCodeIntelligence, } from "./codeIntelligenceEngine";
+import { buildContributorIntelligence, } from "./contributorIntelligenceEngine";
 
 export function buildRepositoryAnalytics({
   repository,
@@ -165,6 +148,11 @@ const codeIntelligence =
 
   });
 
+  const contributorIntelligence =
+  buildContributorIntelligence(
+    contributors,
+  );
+
   //----------------------------------------
   // Recommendations
   //----------------------------------------
@@ -211,6 +199,8 @@ const codeIntelligence =
     ...security,
 
     ...codeIntelligence,
+
+    ...contributorIntelligence,
 
     recommendations,
 

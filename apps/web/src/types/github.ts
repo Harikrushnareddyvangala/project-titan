@@ -187,6 +187,16 @@ enterpriseReadiness: number;
 
 repositoryGrade: string;
 
+busFactor: number;
+
+collaborationIndex: number;
+
+teamHealth: number;
+
+topContributorShare: number;
+
+contributorDistribution: string;
+
 
 }
 
