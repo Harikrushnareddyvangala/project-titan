@@ -5,6 +5,10 @@ import type { RepositoryAnalytics } from "@/types/github";
 
 import { BenchmarkCard } from "./BenchmarkCard";
 import { BenchmarkSummary } from "./BenchmarkSummary";
+import { BenchmarkMetricsGrid } from "./BenchmarkMetricsGrid";
+import { BenchmarkRadarChart } from "./BenchmarkRadarChart";
+import { BenchmarkComparisonChart } from "./BenchmarkComparisonChart";
+import { BenchmarkTrendChart } from "./BenchmarkTrendChart";
 
 interface RepositoryBenchmarkProps {
   analytics: RepositoryAnalytics | null;
@@ -90,6 +94,20 @@ export function RepositoryBenchmark({
       </div>
 
       <BenchmarkSummary analytics={analytics} />
+
+      <BenchmarkMetricsGrid
+  analytics={analytics}
+/>
+
+<BenchmarkRadarChart
+  analytics={analytics}
+/>
+<BenchmarkComparisonChart
+  analytics={analytics}
+/>
+<BenchmarkTrendChart
+  analytics={analytics}
+/>
 
       <div
         className="
