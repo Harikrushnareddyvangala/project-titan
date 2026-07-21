@@ -232,6 +232,7 @@ export function DashboardGrid({
           <motion.div variants={itemVariants}>
             <RepositoryHealthRing
               repository={repository}
+              analytics={analytics}
             />
           </motion.div>
 
