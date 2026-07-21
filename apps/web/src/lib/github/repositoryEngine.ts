@@ -14,6 +14,7 @@ import { buildCodeIntelligence, } from "./codeIntelligenceEngine";
 import { buildContributorIntelligence, } from "./contributorIntelligenceEngine";
 import { buildCommitIntelligence } from "./commitIntelligenceEngine";
 import { buildProjectInsights, } from "./projectInsightsEngine";
+import { buildBenchmarkAnalysis } from "./benchmarkEngine";
 
 export function buildRepositoryAnalytics({
   repository,
@@ -184,6 +185,39 @@ const codeIntelligence =
     securityScore: security.securityScore,
 
   });
+
+  //----------------------------------------
+// Enterprise Benchmark
+//----------------------------------------
+
+const benchmark =
+  buildBenchmarkAnalysis({
+
+    engineeringScore:
+      scores.engineeringScore,
+
+    healthScore:
+      scores.healthScore,
+
+    productionScore:
+      scores.productionScore,
+
+    securityScore:
+      security.securityScore,
+
+    devopsScore:
+      security.devopsScore,
+
+    codeQuality:
+      codeIntelligence.codeQuality,
+
+    enterpriseReadiness:
+      codeIntelligence.enterpriseReadiness,
+
+    teamHealth:
+      contributorIntelligence.teamHealth,
+
+  });
   //----------------------------------------
   // Recommendations
   //----------------------------------------
@@ -236,6 +270,8 @@ const codeIntelligence =
     ...commitIntelligence,
 
     ...projectInsights,
+
+    ...benchmark,
 
     recommendations,
 

@@ -221,6 +221,38 @@ engineeringStability: number;
 releaseReadiness: number;
 activityTrend: string;
 
+// ------------------------------------
+// Enterprise Benchmark Intelligence
+// ------------------------------------
+
+benchmarkEngineering: number;
+
+benchmarkSecurity: number;
+
+benchmarkDevOps: number;
+
+benchmarkCodeQuality: number;
+
+benchmarkEnterprise: number;
+
+engineeringGap: number;
+
+securityGap: number;
+
+devopsGap: number;
+
+codeQualityGap: number;
+
+enterpriseGap: number;
+
+overallBenchmarkScore: number;
+
+enterprisePercentile: number;
+
+overallRanking: string;
+
+benchmarkSummary: string;
+
 
 }
 
