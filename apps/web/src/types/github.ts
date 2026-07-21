@@ -177,6 +177,16 @@ dependencyRisk:string;
 
 technologyMaturity:string;
 
+codeQuality: number;
+
+documentationQuality: number;
+
+maintainability: number;
+
+enterpriseReadiness: number;
+
+repositoryGrade: string;
+
 
 }
 

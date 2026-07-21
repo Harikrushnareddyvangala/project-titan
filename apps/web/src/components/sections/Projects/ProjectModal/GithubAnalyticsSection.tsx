@@ -41,6 +41,7 @@ import { RepositoryActivityHeatmap } from "./GithubAnalytics/RepositoryActivityH
 import { RepositoryMaturityCard } from "./GithubAnalytics/RepositoryMaturityCard";
 import { RepositorySecurityDashboard } from "./GithubAnalytics/RepositorySecurityDashboard";
 import { DependencyIntelligence } from "./GithubAnalytics/DependencyIntelligence";
+import { RepositoryEngineeringDashboard } from "@/components/github/RepositoryEngineeringDashboard";
 interface GithubAnalyticsSectionProps {
   repository: GithubRepository | null;
   analytics: RepositoryAnalytics | null;
@@ -252,6 +253,9 @@ commits={commitActivity}
 <RepositoryHealthDashboard
 repository={repository}
 analytics={analytics}
+/>
+<RepositoryEngineeringDashboard
+  analytics={analytics}
 />
 <RepositoryRadarChart
 analytics={analytics}
