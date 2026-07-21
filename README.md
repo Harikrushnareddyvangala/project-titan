@@ -39,5 +39,5 @@ An enterprise-grade AI & Data Science platform built with modern technologies.
 ## License
 
 [![License: CC BY-NC-ND 4.0](https://shields.io)](https://creativecommons.org/licenses/by-nc-nd/4.0/)
-
+ 
 This work is licensed under a [Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License](https://creativecommons.org/licenses/by-nc-nd/4.0/).
