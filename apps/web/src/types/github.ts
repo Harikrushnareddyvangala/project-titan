@@ -112,6 +112,19 @@ export interface Recommendation {
 }
   
 export interface RepositoryAnalytics {
+
+  repositoryName: string;
+
+repositoryFullName: string;
+
+stars: number;
+
+forks: number;
+
+watchers: number;
+
+issues: number;
+
   repositoryAge: number;
 
   inactiveDays: number;
@@ -252,7 +265,6 @@ enterprisePercentile: number;
 overallRanking: string;
 
 benchmarkSummary: string;
-
 
 }
 

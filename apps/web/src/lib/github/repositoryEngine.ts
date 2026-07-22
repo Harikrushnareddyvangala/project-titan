@@ -254,6 +254,17 @@ const benchmark =
   //----------------------------------------
 
   return {
+    repositoryName: repository.name,
+
+  repositoryFullName: repository.full_name,
+
+  stars: repository.stargazers_count,
+
+  forks: repository.forks_count,
+
+  watchers: repository.watchers_count,
+
+  issues: repository.open_issues_count,
 
     ...metrics,
 
