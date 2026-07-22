@@ -320,3 +320,31 @@ export interface GithubApiError {
 export type GithubApiResponse =
   | GithubRepositoryResponse
   | GithubApiError;
+
+  export interface PortfolioAnalytics {
+
+  totalRepositories: number;
+
+  totalStars: number;
+
+  totalForks: number;
+
+  totalLanguages: number;
+
+  averageEngineeringScore: number;
+
+  averageHealthScore: number;
+
+  averageProductionScore: number;
+
+  strongestRepository: string;
+
+  weakestRepository: string;
+
+  enterpriseReadiness: number;
+
+  portfolioGrade: string;
+
+  totalRecommendations: number;
+
+}

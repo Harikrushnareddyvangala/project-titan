@@ -1,142 +1,204 @@
-import type { RepositoryAnalytics } from "@/types/github";
-
-export interface PortfolioAnalytics {
-  totalRepositories: number;
-  totalStars: number;
-  totalForks: number;
-  totalLanguages: number;
-
-  averageEngineeringScore: number;
-  averageProductionScore: number;
-  averageHealthScore: number;
-
-  strongestRepository: string;
-  weakestRepository: string;
-
-  portfolioGrade: string;
-
-  enterpriseReadiness: number;
-
-  totalRecommendations: number;
-}
+import type {
+  RepositoryAnalytics,
+  PortfolioAnalytics,
+} from "@/types/github";
 
 export function buildPortfolioAnalytics(
   repositories: RepositoryAnalytics[],
 ): PortfolioAnalytics {
 
   if (repositories.length === 0) {
+
     return {
+
       totalRepositories: 0,
+
       totalStars: 0,
+
       totalForks: 0,
+
       totalLanguages: 0,
+
       averageEngineeringScore: 0,
-      averageProductionScore: 0,
+
       averageHealthScore: 0,
+
+      averageProductionScore: 0,
+
       strongestRepository: "",
+
       weakestRepository: "",
-      portfolioGrade: "N/A",
+
       enterpriseReadiness: 0,
+
+      portfolioGrade: "N/A",
+
       totalRecommendations: 0,
+
     };
+
   }
 
-  const totalRepositories = repositories.length;
+  const totalRepositories =
+    repositories.length;
 
-  const totalStars = repositories.reduce(
-    (sum, repo) => sum + (repo.stars ?? 0),
-    0,
-  );
-
-  const totalForks = repositories.reduce(
-    (sum, repo) => sum + (repo.forks ?? 0),
-    0,
-  );
-
-  const totalLanguages = repositories.reduce(
-    (sum, repo) => sum + (repo.languageCount ?? 0),
-    0,
-  );
-
-  const averageEngineeringScore = Math.round(
+  const totalStars =
     repositories.reduce(
-      (sum, repo) => sum + (repo.engineeringScore ?? 0),
+      (sum, repo) => sum + repo.stars,
       0,
-    ) / totalRepositories,
-  );
+    );
 
-  const averageProductionScore = Math.round(
+  const totalForks =
     repositories.reduce(
-      (sum, repo) => sum + (repo.productionScore ?? 0),
+      (sum, repo) => sum + repo.forks,
       0,
-    ) / totalRepositories,
-  );
+    );
 
-  const averageHealthScore = Math.round(
+  const totalLanguages =
     repositories.reduce(
-      (sum, repo) => sum + (repo.healthScore ?? 0),
+      (sum, repo) =>
+        sum + repo.languageCount,
       0,
-    ) / totalRepositories,
-  );
+    );
 
-  const strongest = repositories.reduce((best, current) =>
-    current.engineeringScore > best.engineeringScore
-      ? current
-      : best,
-  );
+  const averageEngineeringScore =
+    Math.round(
 
-  const weakest = repositories.reduce((worst, current) =>
-    current.engineeringScore < worst.engineeringScore
-      ? current
-      : worst,
-  );
+      repositories.reduce(
 
-  const enterpriseReadiness = Math.round(
-    averageEngineeringScore * 0.4 +
-      averageProductionScore * 0.4 +
-      averageHealthScore * 0.2,
-  );
+        (sum, repo) =>
+          sum + repo.engineeringScore,
+
+        0,
+
+      ) / totalRepositories,
+
+    );
+
+  const averageHealthScore =
+    Math.round(
+
+      repositories.reduce(
+
+        (sum, repo) =>
+          sum + repo.healthScore,
+
+        0,
+
+      ) / totalRepositories,
+
+    );
+
+  const averageProductionScore =
+    Math.round(
+
+      repositories.reduce(
+
+        (sum, repo) =>
+          sum + repo.productionScore,
+
+        0,
+
+      ) / totalRepositories,
+
+    );
+
+  const strongestRepository =
+    repositories.reduce(
+
+      (best, current) =>
+
+        current.engineeringScore >
+        best.engineeringScore
+
+          ? current
+
+          : best,
+
+    );
+
+  const weakestRepository =
+    repositories.reduce(
+
+      (worst, current) =>
+
+        current.engineeringScore <
+        worst.engineeringScore
+
+          ? current
+
+          : worst,
+
+    );
+
+  const enterpriseReadiness =
+    Math.round(
+
+      averageEngineeringScore * 0.4 +
+
+      averageHealthScore * 0.3 +
+
+      averageProductionScore * 0.3,
+
+    );
 
   let portfolioGrade = "C";
 
-  if (enterpriseReadiness >= 95) {
+  if (enterpriseReadiness >= 95)
     portfolioGrade = "A+";
-  } else if (enterpriseReadiness >= 90) {
-    portfolioGrade = "A";
-  } else if (enterpriseReadiness >= 85) {
-    portfolioGrade = "B+";
-  } else if (enterpriseReadiness >= 75) {
-    portfolioGrade = "B";
-  } else if (enterpriseReadiness >= 65) {
-    portfolioGrade = "C+";
-  }
 
-  const totalRecommendations = repositories.reduce(
-    (sum, repo) =>
-      sum + (repo.recommendations?.length ?? 0),
-    0,
-  );
+  else if (enterpriseReadiness >= 90)
+    portfolioGrade = "A";
+
+  else if (enterpriseReadiness >= 80)
+    portfolioGrade = "B+";
+
+  else if (enterpriseReadiness >= 70)
+    portfolioGrade = "B";
+
+  else if (enterpriseReadiness >= 60)
+    portfolioGrade = "C+";
+
+  const totalRecommendations =
+    repositories.reduce(
+
+      (sum, repo) =>
+
+        sum +
+        repo.recommendations.length,
+
+      0,
+
+    );
 
   return {
+
     totalRepositories,
+
     totalStars,
+
     totalForks,
+
     totalLanguages,
 
     averageEngineeringScore,
-    averageProductionScore,
+
     averageHealthScore,
 
+    averageProductionScore,
+
     strongestRepository:
-      strongest.repositoryName ?? "",
+      strongestRepository.repositoryName,
 
     weakestRepository:
-      weakest.repositoryName ?? "",
-
-    portfolioGrade,
+      weakestRepository.repositoryName,
 
     enterpriseReadiness,
 
+    portfolioGrade,
+
     totalRecommendations,
+
   };
+
 }
