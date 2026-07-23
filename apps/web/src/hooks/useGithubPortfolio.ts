@@ -8,6 +8,8 @@ import type {
 } from "@/types/github";
 
 import { buildPortfolioAnalytics } from "@/lib/github/portfolioEngine";
+import { buildExecutiveSummary, } from "@/lib/github/executiveSummaryEngine";
+import type { ExecutiveSummary, } from "@/types/github";
 
 interface PortfolioRepository {
 
@@ -50,6 +52,12 @@ export function useGithubPortfolio(
     setPortfolio,
 
   ] = useState<PortfolioAnalytics | null>(null);
+  const [
+executiveSummary,
+setExecutiveSummary,
+] = useState<ExecutiveSummary | null>(
+  null,
+);
 
   const [
 
@@ -113,16 +121,20 @@ export function useGithubPortfolio(
 
         );
 
-        setPortfolio(
+        const portfolioAnalytics =
+  buildPortfolioAnalytics(
+    analytics,
+  );
 
-          buildPortfolioAnalytics(
+setPortfolio(
+  portfolioAnalytics,
+);
 
-            analytics,
-
-          ),
-
-        );
-
+setExecutiveSummary(
+  buildExecutiveSummary(
+    portfolioAnalytics,
+  ),
+);
       }
 
       catch (err) {
@@ -174,6 +186,8 @@ export function useGithubPortfolio(
     repositories,
 
     portfolio,
+
+    executiveSummary,
 
     loading,
 

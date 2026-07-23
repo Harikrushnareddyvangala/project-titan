@@ -9,12 +9,17 @@ import { PortfolioIntelligenceDashboard } from "./PortfolioIntelligenceDashboard
 import { RepositoryLeaderboard } from "./RepositoryLeaderboard";
 import { EngineeringRadar } from "./EngineeringRadar";
 import { TechnologyDistribution } from "./TechnologyDistribution";
+import { ExecutiveSummaryCard, } from "./ExecutiveSummaryCard";
+
+import type { ExecutiveSummary, } from "@/types/github";
 
 interface Props {
 
-  portfolio: PortfolioAnalytics;
+portfolio: PortfolioAnalytics;
 
-  repositories: RepositoryAnalytics[];
+repositories: RepositoryAnalytics[];
+
+executiveSummary: ExecutiveSummary;
 
 }
 
@@ -23,6 +28,8 @@ export function ExecutivePortfolioDashboard({
   portfolio,
 
   repositories,
+
+  executiveSummary,
 
 }: Props) {
 
@@ -35,6 +42,11 @@ export function ExecutivePortfolioDashboard({
         portfolio={portfolio}
 
       />
+      <ExecutiveSummaryCard
+
+summary={executiveSummary}
+
+/>
 
       <div
 
