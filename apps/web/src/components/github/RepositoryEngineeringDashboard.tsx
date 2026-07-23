@@ -11,6 +11,7 @@ import {
 
 import type { RepositoryAnalytics } from "@/types/github";
 
+
 interface Props {
   analytics: RepositoryAnalytics | null;
 }
