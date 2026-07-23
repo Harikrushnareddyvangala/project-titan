@@ -7,6 +7,7 @@ import type {
 
 import { PortfolioIntelligenceDashboard } from "./PortfolioIntelligenceDashboard";
 import { RepositoryLeaderboard } from "./RepositoryLeaderboard";
+import { EngineeringRadar } from "./EngineeringRadar";
 
 interface Props {
 
@@ -43,13 +44,16 @@ export function ExecutivePortfolioDashboard({
         {/* Commit 0169B */}
 
         {/* Repository Leaderboard */}
-        <RepositoryLeaderboard
+<RepositoryLeaderboard
 
   repositories={repositories}
 
 />
+ <EngineeringRadar
 
-        {/* Commit 0169C */}
+  repository={repositories[0]}
+
+/>
 
         {/* Engineering Radar */}
 
