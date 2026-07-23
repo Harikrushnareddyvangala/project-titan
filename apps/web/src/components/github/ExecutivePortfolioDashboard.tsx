@@ -8,6 +8,7 @@ import type {
 import { PortfolioIntelligenceDashboard } from "./PortfolioIntelligenceDashboard";
 import { RepositoryLeaderboard } from "./RepositoryLeaderboard";
 import { EngineeringRadar } from "./EngineeringRadar";
+import { TechnologyDistribution } from "./TechnologyDistribution";
 
 interface Props {
 
@@ -52,6 +53,11 @@ export function ExecutivePortfolioDashboard({
  <EngineeringRadar
 
   repository={repositories[0]}
+
+/>
+<TechnologyDistribution
+
+  repositories={repositories}
 
 />
 
