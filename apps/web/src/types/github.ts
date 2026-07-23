@@ -348,3 +348,16 @@ export type GithubApiResponse =
   totalRecommendations: number;
 
 }
+export interface ExecutiveSummary {
+
+  headline: string;
+
+  summary: string;
+
+  strengths: string[];
+
+  improvements: string[];
+
+  recommendation: string;
+
+}
