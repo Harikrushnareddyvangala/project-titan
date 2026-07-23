@@ -6,6 +6,7 @@ import type {
 } from "@/types/github";
 
 import { PortfolioIntelligenceDashboard } from "./PortfolioIntelligenceDashboard";
+import { RepositoryLeaderboard } from "./RepositoryLeaderboard";
 
 interface Props {
 
@@ -42,6 +43,11 @@ export function ExecutivePortfolioDashboard({
         {/* Commit 0169B */}
 
         {/* Repository Leaderboard */}
+        <RepositoryLeaderboard
+
+  repositories={repositories}
+
+/>
 
         {/* Commit 0169C */}
 
