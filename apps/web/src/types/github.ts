@@ -283,6 +283,8 @@ aiRecommendations: AIRecommendation[];
 
 executiveReport: ExecutiveEngineeringReport;
 
+recruiterIntelligence: RecruiterIntelligence;
+
 }
 
 export interface ExecutiveEngineeringReport {
@@ -302,6 +304,26 @@ export interface ExecutiveEngineeringReport {
   concerns: string[];
 
   recommendations: Recommendation[];
+
+}
+export interface RecruiterIntelligence {
+
+  hiringScore: number;
+
+  engineeringLevel:
+    | "Junior"
+    | "Mid-Level"
+    | "Senior"
+    | "Staff"
+    | "Principal";
+
+  recruiterVerdict: string;
+
+  salaryRange: string;
+
+  hiringConfidence: number;
+
+  recommendedRoles: string[];
 
 }
 
