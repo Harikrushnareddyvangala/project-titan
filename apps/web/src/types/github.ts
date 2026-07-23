@@ -289,6 +289,8 @@ developerDNA: DeveloperDNA;
 
 careerIntelligence: CareerIntelligence;
 
+engineeringMentor: EngineeringMentor;
+
 }
 
 export interface ExecutiveEngineeringReport {
@@ -472,5 +474,23 @@ export interface CareerIntelligence {
   nextCareerStep: string;
 
   executiveSummary: string;
+
+}
+export interface EngineeringMentor {
+
+  maturityLevel:
+    | "Junior"
+    | "Intermediate"
+    | "Advanced"
+    | "Senior"
+    | "Principal";
+
+  learningPriority: string;
+
+  recommendedSkills: string[];
+
+  roadmap: string[];
+
+  mentorSummary: string;
 
 }

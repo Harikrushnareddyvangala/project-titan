@@ -20,6 +20,7 @@ import { buildExecutiveEngineeringReport, } from "./executiveReportEngine";
 import { buildRecruiterIntelligence, } from "./recruiterIntelligenceEngine";
 import { buildDeveloperDNA, } from "./developerDNAEngine";
 import { buildCareerIntelligence, } from "./careerIntelligenceEngine";
+import { buildEngineeringMentor } from "./engineeringMentorEngine";
 
 export function buildRepositoryAnalytics({
   repository,
@@ -399,6 +400,26 @@ const benchmark =
 
   });
 
+  const engineeringMentor =
+  buildEngineeringMentor({
+
+    engineeringScore:
+      scores.engineeringScore,
+
+    architectureScore:
+      developerDNA.architectureScore,
+
+    innovationScore:
+      developerDNA.innovationScore,
+
+    enterpriseReadiness:
+      codeIntelligence.enterpriseReadiness,
+
+    codeQuality:
+      codeIntelligence.codeQuality,
+
+  });
+
   //----------------------------------------
 
   return {
@@ -443,6 +464,8 @@ const benchmark =
     developerDNA,
 
     careerIntelligence,
+
+    engineeringMentor,
 
   };  
 
