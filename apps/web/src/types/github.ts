@@ -287,6 +287,8 @@ recruiterIntelligence: RecruiterIntelligence;
 
 developerDNA: DeveloperDNA;
 
+careerIntelligence: CareerIntelligence;
+
 }
 
 export interface ExecutiveEngineeringReport {
@@ -445,5 +447,30 @@ export interface DeveloperDNA {
   dnaSummary: string;
 
   strengths: string[];
+
+}
+
+export interface CareerIntelligence {
+
+  careerStage:
+    | "Early Career"
+    | "Growing Engineer"
+    | "Senior Engineer"
+    | "Technical Leader"
+    | "Engineering Executive";
+
+  promotionReadiness: number;
+
+  marketDemand: number;
+
+  leadershipPotential: number;
+
+  careerRisk: number;
+
+  estimatedMarketValue: string;
+
+  nextCareerStep: string;
+
+  executiveSummary: string;
 
 }
