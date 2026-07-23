@@ -16,6 +16,7 @@ import { buildCommitIntelligence } from "./commitIntelligenceEngine";
 import { buildProjectInsights, } from "./projectInsightsEngine";
 import { buildBenchmarkAnalysis } from "./benchmarkEngine";
 import { buildAIRecommendations, } from "./aiRecommendationEngine";
+import { buildExecutiveEngineeringReport, } from "./executiveReportEngine";
 
 export function buildRepositoryAnalytics({
   repository,
@@ -275,6 +276,46 @@ const benchmark =
 
   });
 
+  const executiveReport =
+  buildExecutiveEngineeringReport({
+
+    repositoryName:
+      repository.name,
+
+    engineeringScore:
+      scores.engineeringScore,
+
+    productionScore:
+      scores.productionScore,
+
+    securityScore:
+      security.securityScore,
+
+    codeQuality:
+      codeIntelligence.codeQuality,
+
+    documentationQuality:
+      codeIntelligence.documentationQuality,
+
+    enterpriseReadiness:
+      codeIntelligence.enterpriseReadiness,
+
+    collaborationIndex:
+      contributorIntelligence.collaborationIndex,
+
+    teamHealth:
+      contributorIntelligence.teamHealth,
+
+    benchmarkSummary:
+      benchmark.benchmarkSummary,
+
+    executiveSummary:
+      projectInsights.executiveSummary,
+
+    recommendations,
+
+  });
+
   //----------------------------------------
 
   return {
@@ -311,6 +352,8 @@ const benchmark =
     recommendations,
 
     aiRecommendations,
+
+    executiveReport,
 
   };  
 

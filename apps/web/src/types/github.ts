@@ -281,6 +281,28 @@ benchmarkSummary: string;
 
 aiRecommendations: AIRecommendation[];
 
+executiveReport: ExecutiveEngineeringReport;
+
+}
+
+export interface ExecutiveEngineeringReport {
+
+  title: string;
+
+  summary: string;
+
+  engineeringVerdict: string;
+
+  recruiterVerdict: string;
+
+  enterpriseVerdict: string;
+
+  strengths: string[];
+
+  concerns: string[];
+
+  recommendations: Recommendation[];
+
 }
 
 export type GithubLanguages = Record<
