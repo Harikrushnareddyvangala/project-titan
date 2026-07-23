@@ -25,6 +25,8 @@ interface GithubPortfolioResult {
 
   portfolio: PortfolioAnalytics | null;
 
+  executiveSummary: ExecutiveSummary | null;
+
   loading: boolean;
 
   error: string | null;

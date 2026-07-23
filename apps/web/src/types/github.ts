@@ -110,6 +110,19 @@ export interface Recommendation {
   title: string;
   description: string;
 }
+
+export interface AIRecommendation {
+
+  priority:
+    | "High"
+    | "Medium"
+    | "Low";
+
+  category: string;
+
+  recommendation: string;
+
+}
   
 export interface RepositoryAnalytics {
 
@@ -266,6 +279,8 @@ overallRanking: string;
 
 benchmarkSummary: string;
 
+aiRecommendations: AIRecommendation[];
+
 }
 
 export type GithubLanguages = Record<
@@ -273,11 +288,25 @@ export type GithubLanguages = Record<
   number
 >;
 
+export interface ExecutiveSummary {
 
+  headline: string;
+
+  summary: string;
+
+  strengths: string[];
+
+  improvements: string[];
+
+  recommendation: string;
+
+}
 export interface GithubRepositoryResult {
   repository: GithubRepository | null;
 
   languages: GithubLanguages;
+
+  executiveSummary: ExecutiveSummary | null;
 
   loading: boolean;
 
@@ -346,18 +375,5 @@ export type GithubApiResponse =
   portfolioGrade: string;
 
   totalRecommendations: number;
-
-}
-export interface ExecutiveSummary {
-
-  headline: string;
-
-  summary: string;
-
-  strengths: string[];
-
-  improvements: string[];
-
-  recommendation: string;
 
 }

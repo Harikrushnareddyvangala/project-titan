@@ -1,3 +1,7 @@
+import type {
+  Recommendation,
+} from "@/types/github";
+
 export interface RecommendationInput {
 
   stars: number;
@@ -36,9 +40,9 @@ export function buildRepositoryRecommendations({
 
   recentCommits,
 
-}: RecommendationInput): string[] {
+}: RecommendationInput): Recommendation[] {
 
-  const recommendations: string[] = [];
+  const recommendations: Recommendation[] = [];
 
   //------------------------------------
   // Issues
@@ -46,11 +50,14 @@ export function buildRepositoryRecommendations({
 
   if (issues > 10) {
 
-    recommendations.push(
+    recommendations.push({
 
-      "Reduce open issues to improve maintainability."
+      title: "Repository Maintenance",
 
-    );
+      description:
+        "Reduce open issues to improve maintainability.",
+
+    });
 
   }
 
@@ -60,11 +67,14 @@ export function buildRepositoryRecommendations({
 
   if (stars < 20) {
 
-    recommendations.push(
+    recommendations.push({
 
-      "Increase repository visibility using a stronger README and project demonstrations."
+      title: "Visibility",
 
-    );
+      description:
+        "Increase repository visibility using a stronger README and project demonstrations.",
+
+    });
 
   }
 
@@ -74,11 +84,14 @@ export function buildRepositoryRecommendations({
 
   if (watchers < 5) {
 
-    recommendations.push(
+    recommendations.push({
 
-      "Increase community engagement."
+      title: "Community",
 
-    );
+      description:
+        "Increase community engagement by encouraging discussions and stars.",
+
+    });
 
   }
 
@@ -88,11 +101,14 @@ export function buildRepositoryRecommendations({
 
   if (forks < 3) {
 
-    recommendations.push(
+    recommendations.push({
 
-      "Encourage external contributors."
+      title: "Open Source",
 
-    );
+      description:
+        "Encourage external contributors through issues and pull requests.",
+
+    });
 
   }
 
@@ -102,11 +118,14 @@ export function buildRepositoryRecommendations({
 
   if (languageCount === 1) {
 
-    recommendations.push(
+    recommendations.push({
 
-      "Consider improving tooling and project modularity."
+      title: "Architecture",
 
-    );
+      description:
+        "Consider improving tooling and project modularity.",
+
+    });
 
   }
 
@@ -116,11 +135,14 @@ export function buildRepositoryRecommendations({
 
   if (contributorCount <= 1) {
 
-    recommendations.push(
+    recommendations.push({
 
-      "Repository depends heavily on a single contributor."
+      title: "Collaboration",
 
-    );
+      description:
+        "Repository depends heavily on a single contributor.",
+
+    });
 
   }
 
@@ -130,11 +152,14 @@ export function buildRepositoryRecommendations({
 
   if (recentCommits < 10) {
 
-    recommendations.push(
+    recommendations.push({
 
-      "Development activity has slowed during the last month."
+      title: "Development",
 
-    );
+      description:
+        "Development activity has slowed during the last month.",
+
+    });
 
   }
 
@@ -144,23 +169,31 @@ export function buildRepositoryRecommendations({
 
   if (inactiveDays > 90) {
 
-    recommendations.push(
+    recommendations.push({
 
-      "Repository appears inactive. Consider regular maintenance updates."
+      title: "Maintenance",
 
-    );
+      description:
+        "Repository appears inactive. Consider regular maintenance updates.",
+
+    });
 
   }
 
   //------------------------------------
+  // Excellent
+  //------------------------------------
 
   if (recommendations.length === 0) {
 
-    recommendations.push(
+    recommendations.push({
 
-      "Excellent repository health."
+      title: "Excellent",
 
-    );
+      description:
+        "Excellent repository health.",
+
+    });
 
   }
 
