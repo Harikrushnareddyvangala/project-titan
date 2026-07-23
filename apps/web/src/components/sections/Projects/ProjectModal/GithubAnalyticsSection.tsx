@@ -48,6 +48,7 @@ import { RepositoryCommitDashboard, } from "@/components/github/RepositoryCommit
 import { ExecutiveDashboard } from "./GithubAnalytics/ExecutiveDashboard/ExecutiveDashboard";
 import { RepositoryBenchmark } from "./GithubAnalytics/RepositoryBenchmark";
 import { RepositoryComparison, } from "./GithubAnalytics/RepositoryComparison";
+import { RecruiterIntelligenceDashboard,} from "@/components/github/RecruiterIntelligenceDashboard";
 interface GithubAnalyticsSectionProps {
   repository: GithubRepository | null;
   analytics: RepositoryAnalytics | null;
@@ -282,7 +283,9 @@ analytics={analytics}
 <ExecutiveDashboard
   analytics={analytics}
 />
-
+<RecruiterIntelligenceDashboard
+analytics={analytics}
+/>
 <RepositoryBenchmark
   analytics={analytics}
 />
