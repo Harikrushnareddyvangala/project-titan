@@ -51,7 +51,7 @@ import { RepositoryComparison, } from "./GithubAnalytics/RepositoryComparison";
 import { RecruiterIntelligenceDashboard,} from "@/components/github/RecruiterIntelligenceDashboard";
 import { DeveloperDNADashboard, } from "@/components/github/DeveloperDNADashboard";
 import { CareerIntelligenceDashboard, } from "@/components/github/CareerIntelligenceDashboard";
-
+import { EngineeringMentorDashboard,} from "@/components/github/EngineeringMentorDashboard";
 interface GithubAnalyticsSectionProps {
   repository: GithubRepository | null;
   analytics: RepositoryAnalytics | null;
@@ -293,6 +293,9 @@ analytics={analytics}
     analytics={analytics}
 />
 <CareerIntelligenceDashboard
+    analytics={analytics}
+/>
+<EngineeringMentorDashboard
     analytics={analytics}
 />
 <RepositoryBenchmark
