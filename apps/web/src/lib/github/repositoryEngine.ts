@@ -18,6 +18,7 @@ import { buildBenchmarkAnalysis } from "./benchmarkEngine";
 import { buildAIRecommendations, } from "./aiRecommendationEngine";
 import { buildExecutiveEngineeringReport, } from "./executiveReportEngine";
 import { buildRecruiterIntelligence, } from "./recruiterIntelligenceEngine";
+import { buildDeveloperDNA, } from "./developerDNAEngine";
 
 export function buildRepositoryAnalytics({
   repository,
@@ -345,6 +346,35 @@ const benchmark =
 
   });
 
+  const developerDNA =
+    buildDeveloperDNA({
+
+        engineeringScore:
+            scores.engineeringScore,
+
+        codeQuality:
+            codeIntelligence.codeQuality,
+
+        documentationQuality:
+            codeIntelligence.documentationQuality,
+
+        enterpriseReadiness:
+            codeIntelligence.enterpriseReadiness,
+
+        contributorCount:
+            metrics.contributorCount,
+
+        collaborationIndex:
+            contributorIntelligence.collaborationIndex,
+
+        commitsPerWeek:
+            metrics.commitsPerWeek,
+
+        languageCount:
+            metrics.languageCount,
+
+    });
+
   //----------------------------------------
 
   return {
@@ -385,6 +415,8 @@ const benchmark =
     executiveReport,
 
     recruiterIntelligence,
+
+    developerDNA,
 
   };  
 

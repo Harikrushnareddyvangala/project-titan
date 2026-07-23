@@ -285,6 +285,8 @@ executiveReport: ExecutiveEngineeringReport;
 
 recruiterIntelligence: RecruiterIntelligence;
 
+developerDNA: DeveloperDNA;
+
 }
 
 export interface ExecutiveEngineeringReport {
@@ -419,5 +421,29 @@ export type GithubApiResponse =
   portfolioGrade: string;
 
   totalRecommendations: number;
+
+}
+export interface DeveloperDNA {
+
+  archetype:
+    | "Architect"
+    | "Builder"
+    | "Researcher"
+    | "Maintainer"
+    | "Full-Stack Innovator";
+
+  innovationScore: number;
+
+  architectureScore: number;
+
+  executionScore: number;
+
+  collaborationScore: number;
+
+  learningScore: number;
+
+  dnaSummary: string;
+
+  strengths: string[];
 
 }
