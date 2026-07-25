@@ -21,6 +21,7 @@ import { buildRecruiterIntelligence, } from "./recruiterIntelligenceEngine";
 import { buildDeveloperDNA, } from "./developerDNAEngine";
 import { buildCareerIntelligence, } from "./careerIntelligenceEngine";
 import { buildEngineeringMentor } from "./engineeringMentorEngine";
+import { buildTeamCompatibility, } from "./teamCompatibilityEngine";
 
 export function buildRepositoryAnalytics({
   repository,
@@ -420,6 +421,25 @@ const benchmark =
 
   });
 
+  const teamCompatibility =
+  buildTeamCompatibility({
+
+    engineeringScore:
+      scores.engineeringScore,
+
+    collaborationScore:
+      contributorIntelligence.collaborationIndex,
+
+    architectureScore:
+      developerDNA.architectureScore,
+
+    innovationScore:
+      developerDNA.innovationScore,
+
+    contributorCount:
+      metrics.contributorCount,
+
+  });
   //----------------------------------------
 
   return {
@@ -466,6 +486,8 @@ const benchmark =
     careerIntelligence,
 
     engineeringMentor,
+
+    teamCompatibility,
 
   };  
 

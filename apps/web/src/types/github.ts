@@ -291,6 +291,8 @@ careerIntelligence: CareerIntelligence;
 
 engineeringMentor: EngineeringMentor;
 
+teamCompatibility: TeamCompatibility;
+
 }
 
 export interface ExecutiveEngineeringReport {
@@ -492,5 +494,33 @@ export interface EngineeringMentor {
   roadmap: string[];
 
   mentorSummary: string;
+
+}
+export interface TeamCompatibility {
+
+  compatibilityScore:number;
+
+  communicationStyle:
+    | "Independent"
+    | "Collaborative"
+    | "Leadership";
+
+  idealRole:
+    | "Backend Engineer"
+    | "Frontend Engineer"
+    | "Full Stack Engineer"
+    | "Architect"
+    | "Tech Lead"
+    | "Engineering Manager";
+
+  leadershipReadiness:number;
+
+  mentoringPotential:number;
+
+  collaborationIndex:number;
+
+  preferredTeamSize:string;
+
+  executiveSummary:string;
 
 }
