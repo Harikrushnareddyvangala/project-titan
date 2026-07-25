@@ -1,37 +1,43 @@
 export const workspaceNavigation = [
   {
     title: "Repository Intelligence",
-    description: "Analyze a single GitHub repository.",
+    description:
+      "Enterprise repository engineering analysis.",
     href: "/workspace/repository",
     status: "Available",
   },
   {
     title: "Portfolio Intelligence",
-    description: "Analyze your complete GitHub portfolio.",
+    description:
+      "Multi-repository engineering portfolio analysis.",
     href: "/workspace/portfolio",
     status: "Coming Soon",
   },
   {
     title: "Recruiter Intelligence",
-    description: "Generate recruiter-focused reports.",
+    description:
+      "ATS and hiring intelligence.",
     href: "/workspace/recruiter",
     status: "Coming Soon",
   },
   {
-    title: "Developer Intelligence",
-    description: "Developer DNA and engineering profile.",
+    title: "Developer DNA",
+    description:
+      "Engineering personality analysis.",
     href: "/workspace/developer",
     status: "Coming Soon",
   },
   {
     title: "Organization Intelligence",
-    description: "Enterprise readiness and leadership analysis.",
+    description:
+      "Enterprise architecture readiness.",
     href: "/workspace/organization",
     status: "Coming Soon",
   },
   {
     title: "Research Laboratory",
-    description: "Experimental AI capabilities.",
+    description:
+      "Experimental AGI research modules.",
     href: "/workspace/research",
     status: "Future",
   },
