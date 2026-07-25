@@ -10,9 +10,11 @@ import {
   TrendingUp,
 } from "lucide-react";
 
-import { ExecutivePortfolioDashboard } from "@/components/github/ExecutivePortfolioDashboard";
 import { useGithubPortfolio } from "@/hooks/useGithubPortfolio";
 import { buildPortfolioIntelligence } from "@/lib/github/portfolioIntelligenceEngine";
+
+import { ExecutivePortfolioDashboard } from "@/components/github/ExecutivePortfolioDashboard";
+import { PortfolioIntelligenceDashboard } from "@/components/github/PortfolioIntelligenceDashboard";
 
 type PortfolioRepository = {
   owner: string;
@@ -41,10 +43,11 @@ export function PortfolioWorkspace() {
   const [repositoryInput, setRepositoryInput] = useState(
     defaultRepositories.join("\n"),
   );
+  const [submittedInput, setSubmittedInput] = useState(repositoryInput);
 
   const repositoryList = useMemo(
-    () => parseRepositoryList(repositoryInput),
-    [repositoryInput],
+    () => parseRepositoryList(submittedInput),
+    [submittedInput],
   );
 
   const {
@@ -79,15 +82,15 @@ export function PortfolioWorkspace() {
 
           <p className="mt-6 max-w-4xl text-lg leading-8 text-zinc-400 md:text-xl">
             Analyze an entire GitHub portfolio with executive, engineering,
-            security, technology, and intelligence layers designed for
-            recruiters, CTOs, and engineering leaders.
+            security, technology, and intelligence layers designed for recruiters,
+            CTOs, and engineering leaders.
           </p>
 
           <form
             className="mt-8 flex flex-col gap-4"
             onSubmit={(event) => {
               event.preventDefault();
-              setRepositoryInput((value) => value.trim());
+              setSubmittedInput(repositoryInput.trim());
             }}
           >
             <label className="text-sm font-semibold uppercase tracking-[0.25em] text-zinc-400">
@@ -160,13 +163,7 @@ export function PortfolioWorkspace() {
           </div>
         </section>
 
-        {!hasInput ? (
-          <section className="mt-10 rounded-[34px] border border-white/10 bg-white/[0.04] p-8 backdrop-blur-3xl">
-            <p className="text-zinc-400">
-              Add at least one repository to begin portfolio analysis.
-            </p>
-          </section>
-        ) : loading ? (
+        {loading ? (
           <section className="mt-10 rounded-[34px] border border-white/10 bg-white/[0.04] p-8 backdrop-blur-3xl">
             <p className="text-zinc-400">Loading portfolio intelligence...</p>
           </section>
@@ -176,6 +173,11 @@ export function PortfolioWorkspace() {
           </section>
         ) : portfolio && executiveSummary ? (
           <div className="mt-10 space-y-10">
+            <PortfolioIntelligenceDashboard
+              portfolio={portfolio}
+              intelligence={intelligence}
+            />
+
             <ExecutivePortfolioDashboard
               portfolio={portfolio}
               intelligence={intelligence}
@@ -183,54 +185,13 @@ export function PortfolioWorkspace() {
               executiveSummary={executiveSummary}
             />
           </div>
-        ) : null}
-
-        <section className="mt-10 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-          <article className="rounded-3xl border border-white/10 bg-white/[0.04] p-6">
-            <h2 className="text-xl font-bold text-white">
-              Executive Portfolio Dashboard
-            </h2>
-            <p className="mt-4 leading-7 text-zinc-400">
-              A top-level executive view of the entire engineering portfolio.
+        ) : (
+          <section className="mt-10 rounded-[34px] border border-white/10 bg-white/[0.04] p-8 backdrop-blur-3xl">
+            <p className="text-zinc-400">
+              Add at least one repository to begin portfolio analysis.
             </p>
-          </article>
-
-          <article className="rounded-3xl border border-white/10 bg-white/[0.04] p-6">
-            <h2 className="text-xl font-bold text-white">
-              Portfolio Intelligence Dashboard
-            </h2>
-            <p className="mt-4 leading-7 text-zinc-400">
-              Aggregate engineering metrics across all repositories.
-            </p>
-          </article>
-
-          <article className="rounded-3xl border border-white/10 bg-white/[0.04] p-6">
-            <h2 className="text-xl font-bold text-white">
-              Repository Leaderboard
-            </h2>
-            <p className="mt-4 leading-7 text-zinc-400">
-              Rank repositories by engineering quality and enterprise readiness.
-            </p>
-          </article>
-
-          <article className="rounded-3xl border border-white/10 bg-white/[0.04] p-6">
-            <h2 className="text-xl font-bold text-white">
-              Engineering Radar
-            </h2>
-            <p className="mt-4 leading-7 text-zinc-400">
-              Visualize portfolio-wide engineering strengths and gaps.
-            </p>
-          </article>
-
-          <article className="rounded-3xl border border-white/10 bg-white/[0.04] p-6">
-            <h2 className="text-xl font-bold text-white">
-              Technology Distribution
-            </h2>
-            <p className="mt-4 leading-7 text-zinc-400">
-              See which languages and frameworks dominate the portfolio.
-            </p>
-          </article>
-        </section>
+          </section>
+        )}
 
         <section className="mt-10 rounded-[34px] border border-white/10 bg-white/[0.04] p-8 backdrop-blur-3xl">
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
