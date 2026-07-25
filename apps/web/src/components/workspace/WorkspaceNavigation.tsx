@@ -24,9 +24,11 @@ export function WorkspaceNavigation() {
               p-8
               transition-all
               duration-300
-              ${live
-                ? "border-white/10 bg-white/[0.04] hover:-translate-y-1 hover:border-cyan-400/40 hover:bg-white/[0.06]"
-                : "border-white/10 bg-white/[0.03] opacity-70"}
+              ${
+                live
+                  ? "border-white/10 bg-white/[0.04] hover:-translate-y-1 hover:border-cyan-400/40 hover:bg-white/[0.06]"
+                  : "border-white/10 bg-white/[0.03] opacity-70"
+              }
             `}
           >
             <div className="flex items-start justify-between gap-4">
@@ -49,9 +51,11 @@ export function WorkspaceNavigation() {
                   font-semibold
                   uppercase
                   tracking-[0.25em]
-                  ${live
-                    ? "border border-cyan-400/30 bg-cyan-500/10 text-cyan-300"
-                    : "border border-white/10 bg-white/[0.04] text-zinc-500"}
+                  ${
+                    live
+                      ? "border border-cyan-400/30 bg-cyan-500/10 text-cyan-300"
+                      : "border border-white/10 bg-white/[0.04] text-zinc-500"
+                  }
                 `}
               >
                 {module.status}
