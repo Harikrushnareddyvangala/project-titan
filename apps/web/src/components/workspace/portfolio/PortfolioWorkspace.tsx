@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -10,39 +10,57 @@ import {
   TrendingUp,
 } from "lucide-react";
 
-const modules = [
-  {
-    title: "Executive Portfolio Dashboard",
-    description:
-      "A top-level executive view of the entire engineering portfolio.",
-  },
-  {
-    title: "Portfolio Intelligence Dashboard",
-    description:
-      "Aggregate engineering metrics across all repositories.",
-  },
-  {
-    title: "Repository Leaderboard",
-    description:
-      "Rank repositories by engineering quality and enterprise readiness.",
-  },
-  {
-    title: "Engineering Radar",
-    description:
-      "Visualize portfolio-wide engineering strengths and gaps.",
-  },
-  {
-    title: "Technology Distribution",
-    description:
-      "See which languages and frameworks dominate the portfolio.",
-  },
+import { ExecutivePortfolioDashboard } from "@/components/github/ExecutivePortfolioDashboard";
+import { useGithubPortfolio } from "@/hooks/useGithubPortfolio";
+import { buildPortfolioIntelligence } from "@/lib/github/portfolioIntelligenceEngine";
+
+type PortfolioRepository = {
+  owner: string;
+  repo: string;
+};
+
+const defaultRepositories = [
+  "vercel/next.js",
+  "openai/openai-cookbook",
+  "tailwindlabs/tailwindcss",
 ];
 
-export function PortfolioWorkspace() {
-  const [username, setUsername] = useState("harikrushnareddyvangala");
-  const [submittedUsername, setSubmittedUsername] = useState(username);
+function parseRepositoryList(input: string): PortfolioRepository[] {
+  return input
+    .split(/[\n,]/g)
+    .map((item) => item.trim())
+    .filter(Boolean)
+    .map((item) => {
+      const [owner, repo] = item.split("/").map((part) => part.trim());
+      return owner && repo ? { owner, repo } : null;
+    })
+    .filter((item): item is PortfolioRepository => item !== null);
+}
 
-  const normalizedUsername = submittedUsername.trim().replace(/^@/, "");
+export function PortfolioWorkspace() {
+  const [repositoryInput, setRepositoryInput] = useState(
+    defaultRepositories.join("\n"),
+  );
+
+  const repositoryList = useMemo(
+    () => parseRepositoryList(repositoryInput),
+    [repositoryInput],
+  );
+
+  const {
+    repositories,
+    portfolio,
+    executiveSummary,
+    loading,
+    error,
+  } = useGithubPortfolio(repositoryList);
+
+  const intelligence = useMemo(
+    () => buildPortfolioIntelligence({ repositories }),
+    [repositories],
+  );
+
+  const hasInput = repositoryList.length > 0;
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-zinc-950 via-black to-zinc-900 text-white">
@@ -66,18 +84,21 @@ export function PortfolioWorkspace() {
           </p>
 
           <form
-            className="mt-8 flex flex-col gap-4 md:flex-row"
+            className="mt-8 flex flex-col gap-4"
             onSubmit={(event) => {
               event.preventDefault();
-              const value = username.trim();
-              if (!value) return;
-              setSubmittedUsername(value);
+              setRepositoryInput((value) => value.trim());
             }}
           >
-            <input
-              value={username}
-              onChange={(event) => setUsername(event.target.value)}
-              placeholder="GitHub username"
+            <label className="text-sm font-semibold uppercase tracking-[0.25em] text-zinc-400">
+              GitHub repositories
+            </label>
+
+            <textarea
+              value={repositoryInput}
+              onChange={(event) => setRepositoryInput(event.target.value)}
+              placeholder={"vercel/next.js\nopenai/openai-cookbook"}
+              rows={6}
               className="
                 w-full
                 rounded-2xl
@@ -85,7 +106,7 @@ export function PortfolioWorkspace() {
                 border-white/10
                 bg-black/40
                 px-5
-                py-3
+                py-4
                 text-white
                 outline-none
                 placeholder:text-zinc-500
@@ -93,9 +114,17 @@ export function PortfolioWorkspace() {
               "
             />
 
+            <p className="text-sm text-zinc-500">
+              Enter one repository per line in owner/repo format, or separate
+              them with commas.
+            </p>
+
             <button
               type="submit"
               className="
+                inline-flex
+                w-fit
+                items-center
                 rounded-2xl
                 border
                 border-cyan-400/40
@@ -116,42 +145,91 @@ export function PortfolioWorkspace() {
             <StatCard
               icon={<GitFork className="h-5 w-5" />}
               title="Portfolio Mode"
-              value="Ready"
+              value={hasInput ? "Ready" : "Waiting for input"}
             />
             <StatCard
               icon={<TrendingUp className="h-5 w-5" />}
               title="Scope"
-              value="Multi-repository"
+              value={`${repositoryList.length} repositories`}
             />
             <StatCard
               icon={<Sparkles className="h-5 w-5" />}
               title="Active Profile"
-              value={`@${normalizedUsername}`}
+              value={hasInput ? "Custom portfolio" : "Not loaded"}
             />
           </div>
         </section>
 
+        {!hasInput ? (
+          <section className="mt-10 rounded-[34px] border border-white/10 bg-white/[0.04] p-8 backdrop-blur-3xl">
+            <p className="text-zinc-400">
+              Add at least one repository to begin portfolio analysis.
+            </p>
+          </section>
+        ) : loading ? (
+          <section className="mt-10 rounded-[34px] border border-white/10 bg-white/[0.04] p-8 backdrop-blur-3xl">
+            <p className="text-zinc-400">Loading portfolio intelligence...</p>
+          </section>
+        ) : error ? (
+          <section className="mt-10 rounded-[34px] border border-red-500/20 bg-red-500/10 p-8 backdrop-blur-3xl">
+            <p className="text-red-300">{error}</p>
+          </section>
+        ) : portfolio && executiveSummary ? (
+          <div className="mt-10 space-y-10">
+            <ExecutivePortfolioDashboard
+              portfolio={portfolio}
+              intelligence={intelligence}
+              repositories={repositories}
+              executiveSummary={executiveSummary}
+            />
+          </div>
+        ) : null}
+
         <section className="mt-10 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-          {modules.map((module) => (
-            <article
-              key={module.title}
-              className="
-                rounded-3xl
-                border
-                border-white/10
-                bg-white/[0.04]
-                p-6
-                transition
-                hover:border-cyan-400/40
-                hover:bg-white/[0.06]
-              "
-            >
-              <h2 className="text-xl font-bold text-white">{module.title}</h2>
-              <p className="mt-4 leading-7 text-zinc-400">
-                {module.description}
-              </p>
-            </article>
-          ))}
+          <article className="rounded-3xl border border-white/10 bg-white/[0.04] p-6">
+            <h2 className="text-xl font-bold text-white">
+              Executive Portfolio Dashboard
+            </h2>
+            <p className="mt-4 leading-7 text-zinc-400">
+              A top-level executive view of the entire engineering portfolio.
+            </p>
+          </article>
+
+          <article className="rounded-3xl border border-white/10 bg-white/[0.04] p-6">
+            <h2 className="text-xl font-bold text-white">
+              Portfolio Intelligence Dashboard
+            </h2>
+            <p className="mt-4 leading-7 text-zinc-400">
+              Aggregate engineering metrics across all repositories.
+            </p>
+          </article>
+
+          <article className="rounded-3xl border border-white/10 bg-white/[0.04] p-6">
+            <h2 className="text-xl font-bold text-white">
+              Repository Leaderboard
+            </h2>
+            <p className="mt-4 leading-7 text-zinc-400">
+              Rank repositories by engineering quality and enterprise readiness.
+            </p>
+          </article>
+
+          <article className="rounded-3xl border border-white/10 bg-white/[0.04] p-6">
+            <h2 className="text-xl font-bold text-white">
+              Engineering Radar
+            </h2>
+            <p className="mt-4 leading-7 text-zinc-400">
+              Visualize portfolio-wide engineering strengths and gaps.
+            </p>
+          </article>
+
+          <article className="rounded-3xl border border-white/10 bg-white/[0.04] p-6">
+            <h2 className="text-xl font-bold text-white">
+              Technology Distribution
+            </h2>
+            <p className="mt-4 leading-7 text-zinc-400">
+              See which languages and frameworks dominate the portfolio.
+            </p>
+          </article>
         </section>
 
         <section className="mt-10 rounded-[34px] border border-white/10 bg-white/[0.04] p-8 backdrop-blur-3xl">
@@ -161,12 +239,12 @@ export function PortfolioWorkspace() {
                 Next step
               </p>
               <h2 className="mt-3 text-2xl font-bold text-white">
-                Connect Portfolio Analytics in the next commit
+                Portfolio Intelligence is now connected
               </h2>
               <p className="mt-3 max-w-3xl text-zinc-400">
-                This page is now the portfolio entry point inside TITAN’s
-                Workspace. The next step is to wire the existing portfolio
-                engines and dashboards into this route.
+                This workspace now loads repository lists, computes portfolio
+                analytics, and renders the executive portfolio dashboard using
+                the engines already in your codebase.
               </p>
             </div>
 
