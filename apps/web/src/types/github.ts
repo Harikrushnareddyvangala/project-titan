@@ -431,6 +431,39 @@ export type GithubApiResponse =
   totalRecommendations: number;
 
 }
+
+export interface PortfolioIntelligence {
+
+  totalRepositories:number;
+
+  totalStars:number;
+
+  totalForks:number;
+
+  averageEngineeringScore:number;
+
+  averageSecurityScore:number;
+
+  averageEnterpriseReadiness:number;
+
+  portfolioHealth:number;
+
+  engineeringBrand:string;
+
+  specialization:string;
+
+  portfolioMaturity:string;
+
+  executiveSummary:string;
+
+}
+export interface CompletePortfolioAnalytics {
+
+  portfolio: PortfolioAnalytics;
+
+  intelligence: PortfolioIntelligence;
+
+}
 export interface DeveloperDNA {
 
   archetype:

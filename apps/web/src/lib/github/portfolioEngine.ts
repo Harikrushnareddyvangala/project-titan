@@ -2,6 +2,9 @@ import type {
   RepositoryAnalytics,
   PortfolioAnalytics,
 } from "@/types/github";
+import {
+  buildPortfolioIntelligence,
+} from "./portfolioIntelligenceEngine";
 
 export function buildPortfolioAnalytics(
   repositories: RepositoryAnalytics[],
@@ -198,6 +201,31 @@ export function buildPortfolioAnalytics(
     portfolioGrade,
 
     totalRecommendations,
+
+  };
+
+}
+export function buildCompletePortfolioAnalytics(
+  repositories: RepositoryAnalytics[],
+) {
+
+  const portfolio =
+    buildPortfolioAnalytics(
+      repositories,
+    );
+
+  const intelligence =
+    buildPortfolioIntelligence({
+
+      repositories,
+
+    });
+
+  return {
+
+    portfolio,
+
+    intelligence,
 
   };
 

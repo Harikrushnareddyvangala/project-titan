@@ -1,30 +1,9 @@
-import type { RepositoryAnalytics } from "@/types/github";
 
-export interface PortfolioIntelligence {
 
-  totalRepositories:number;
-
-  totalStars:number;
-
-  totalForks:number;
-
-  averageEngineeringScore:number;
-
-  averageSecurityScore:number;
-
-  averageEnterpriseReadiness:number;
-
-  portfolioHealth:number;
-
-  engineeringBrand:string;
-
-  specialization:string;
-
-  portfolioMaturity:string;
-
-  executiveSummary:string;
-
-}
+import type {
+  RepositoryAnalytics,
+  PortfolioIntelligence,
+} from "@/types/github";
 
 export interface PortfolioInput{
 
