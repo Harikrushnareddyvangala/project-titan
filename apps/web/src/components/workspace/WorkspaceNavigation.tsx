@@ -6,10 +6,10 @@ import { workspaceNavigation } from "@/lib/constants/workspaceNavigation";
 export function WorkspaceNavigation() {
   return (
     <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-      {workspaceNavigation.map((item) => (
+      {workspaceNavigation.map((module) => (
         <Link
-          key={item.title}
-          href={item.href}
+          key={module.title}
+          href={module.href}
           className="
           rounded-3xl
           border
@@ -20,14 +20,14 @@ export function WorkspaceNavigation() {
           transition
           "
         >
-          <h2 className="text-xl font-bold">{item.title}</h2>
+          <h2 className="text-xl font-bold">{module.title}</h2>
 
           <p className="mt-3 text-zinc-400">
-            {item.description}
+            {module.description}
           </p>
 
           <p className="mt-6 text-sm text-cyan-400">
-            {item.status}
+            {module.status}
           </p>
         </Link>
       ))}

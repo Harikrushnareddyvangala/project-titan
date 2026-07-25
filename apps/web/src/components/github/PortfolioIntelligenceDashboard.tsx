@@ -12,10 +12,12 @@ import {
 
 import type {
   PortfolioAnalytics,
+  PortfolioIntelligence,
 } from "@/types/github";
 
 interface Props {
   portfolio: PortfolioAnalytics;
+  intelligence: PortfolioIntelligence;
 }
 
 export function PortfolioIntelligenceDashboard({

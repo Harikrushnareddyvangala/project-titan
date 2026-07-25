@@ -3,6 +3,7 @@
 import type {
   PortfolioAnalytics,
   RepositoryAnalytics,
+  PortfolioIntelligence,
 } from "@/types/github";
 
 import { PortfolioIntelligenceDashboard } from "./PortfolioIntelligenceDashboard";
@@ -17,6 +18,8 @@ interface Props {
 
 portfolio: PortfolioAnalytics;
 
+intelligence: PortfolioIntelligence;
+
 repositories: RepositoryAnalytics[];
 
 executiveSummary: ExecutiveSummary;
@@ -26,6 +29,8 @@ executiveSummary: ExecutiveSummary;
 export function ExecutivePortfolioDashboard({
 
   portfolio,
+
+  intelligence,
 
   repositories,
 
@@ -40,6 +45,7 @@ export function ExecutivePortfolioDashboard({
       <PortfolioIntelligenceDashboard
 
         portfolio={portfolio}
+        intelligence={intelligence}
 
       />
       <ExecutiveSummaryCard
