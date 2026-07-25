@@ -53,6 +53,7 @@ import { DeveloperDNADashboard, } from "@/components/github/DeveloperDNADashboar
 import { CareerIntelligenceDashboard, } from "@/components/github/CareerIntelligenceDashboard";
 import { EngineeringMentorDashboard,} from "@/components/github/EngineeringMentorDashboard";
 import { TeamCompatibilityDashboard, } from "@/components/github/TeamCompatibilityDashboard";
+import { OrganizationIntelligenceDashboard, } from "@/components/github/OrganizationIntelligenceDashboard";
 interface GithubAnalyticsSectionProps {
   repository: GithubRepository | null;
   analytics: RepositoryAnalytics | null;
@@ -61,10 +62,6 @@ interface GithubAnalyticsSectionProps {
   contributors: GithubContributor[];
   loading: boolean;
 }
-
-
-
-
 
 export function GithubAnalyticsSection({
   repository,
@@ -300,6 +297,9 @@ analytics={analytics}
     analytics={analytics}
 />
 <TeamCompatibilityDashboard
+    analytics={analytics}
+/>
+<OrganizationIntelligenceDashboard
     analytics={analytics}
 />
 <RepositoryBenchmark
