@@ -12,8 +12,8 @@ function isLiveModule(status: string) {
 export function WorkspaceNavigation() {
   return (
     <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-      {workspaceNavigation.map((module) => {
-        const live = isLiveModule(module.status);
+      {workspaceNavigation.map((workspaceModule) => {
+        const live = isLiveModule(workspaceModule.status);
 
         const card = (
           <div
@@ -34,11 +34,11 @@ export function WorkspaceNavigation() {
             <div className="flex items-start justify-between gap-4">
               <div>
                 <h2 className="text-2xl font-bold text-white">
-                  {module.title}
+                  {workspaceModule.title}
                 </h2>
 
                 <p className="mt-4 leading-7 text-zinc-400">
-                  {module.description}
+                  {workspaceModule.description}
                 </p>
               </div>
 
@@ -58,7 +58,7 @@ export function WorkspaceNavigation() {
                   }
                 `}
               >
-                {module.status}
+                {workspaceModule.status}
               </span>
             </div>
 
@@ -72,11 +72,11 @@ export function WorkspaceNavigation() {
         );
 
         if (!live) {
-          return <div key={module.title}>{card}</div>;
+          return <div key={workspaceModule.title}>{card}</div>;
         }
 
         return (
-          <Link key={module.title} href={module.href}>
+          <Link key={workspaceModule.title} href={workspaceModule.href}>
             {card}
           </Link>
         );
