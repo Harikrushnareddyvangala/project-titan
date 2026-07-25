@@ -48,16 +48,16 @@ export function RepositoryMaturityAssessment({
     );
 
   const testing =
-    Math.min(
+    Math.round(Math.min(
       100,
       engineering * 0.9,
-    );
+    ));
 
   const security =
-    Math.min(
+    Math.round(Math.min(
       100,
       health * 0.95,
-    );
+    ));
 
   const categories: Category[] = [
     {

@@ -40,13 +40,13 @@ const health =
 const deploymentReady =
   analytics?.deploymentReady ?? false;
 
-const complexity = Math.min(
+const complexity = Math.round(Math.min(
   100,
   languageCount * 10 +
   engineering * 0.30 +
   production * 0.30 +
   health * 0.30
-);
+));
 
 const maintainability =
   Math.round((engineering + health) / 2);
