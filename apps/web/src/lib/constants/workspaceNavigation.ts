@@ -7,12 +7,11 @@ export const workspaceNavigation = [
     status: "Available",
   },
   {
-    title: "Portfolio Intelligence",
-    description:
-      "Multi-repository engineering portfolio analysis.",
-    href: "/workspace/portfolio",
-    status: "Coming Soon",
-  },
+  title: "Portfolio Intelligence",
+  description: "Multi-repository engineering portfolio analysis.",
+  href: "/workspace/portfolio",
+  status: "Preview",
+},
   {
     title: "Recruiter Intelligence",
     description:
