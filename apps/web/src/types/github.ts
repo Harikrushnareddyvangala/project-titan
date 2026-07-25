@@ -293,6 +293,8 @@ engineeringMentor: EngineeringMentor;
 
 teamCompatibility: TeamCompatibility;
 
+organizationIntelligence: OrganizationIntelligence;
+
 }
 
 export interface ExecutiveEngineeringReport {
@@ -520,6 +522,25 @@ export interface TeamCompatibility {
   collaborationIndex:number;
 
   preferredTeamSize:string;
+
+  executiveSummary:string;
+
+}
+export interface OrganizationIntelligence {
+
+  engineeringCulture:number;
+
+  deliveryMaturity:number;
+
+  innovationCulture:number;
+
+  technicalDebt:number;
+
+  organizationalReadiness:number;
+
+  scalingReadiness:number;
+
+  engineeringGovernance:number;
 
   executiveSummary:string;
 
