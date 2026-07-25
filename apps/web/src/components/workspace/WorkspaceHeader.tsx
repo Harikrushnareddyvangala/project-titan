@@ -6,7 +6,7 @@ import { workspaceNavigation } from "@/lib/constants/workspaceNavigation";
 
 export function WorkspaceHeader() {
   const liveModules = workspaceNavigation.filter(
-    (module) => module.status === "Available",
+    (module) => module.status === "Available" || module.status === "Preview",
   ).length;
 
   return (
