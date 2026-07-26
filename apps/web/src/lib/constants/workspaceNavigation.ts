@@ -15,24 +15,24 @@ export const workspaceNavigation = [
     title: "Recruiter Intelligence",
     description: "ATS and hiring intelligence.",
     href: "/workspace/recruiter",
-    status: "Coming Soon",
+    status: "Available",
   },
   {
     title: "Developer DNA",
     description: "Engineering personality analysis.",
     href: "/workspace/developer",
-    status: "Coming Soon",
+    status: "Available",
   },
   {
     title: "Organization Intelligence",
     description: "Enterprise architecture readiness.",
     href: "/workspace/organization",
-    status: "Coming Soon",
+    status: "Available",
   },
   {
     title: "Research Laboratory",
     description: "Experimental AGI research modules.",
     href: "/workspace/research",
-    status: "Future",
+    status: "Available",
   },
 ];
