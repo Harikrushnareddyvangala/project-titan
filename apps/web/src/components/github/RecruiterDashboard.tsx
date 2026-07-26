@@ -3,12 +3,17 @@
 import type { RecruiterIntelligence } from "@/types/github";
 
 import {
+  BadgeDollarSign,
   Briefcase,
-  DollarSign,
-  BadgeCheck,
-  Users,
-  Award,
+  CheckCircle2,
+  Target,
+  UserCheck,
 } from "lucide-react";
+
+import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
+import { DashboardSection } from "@/components/dashboard/DashboardSection";
+import { MetricCard } from "@/components/dashboard/MetricCard";
+import { MetricGrid } from "@/components/dashboard/MetricGrid";
 
 interface RecruiterDashboardProps {
   recruiter: RecruiterIntelligence;
@@ -19,127 +24,56 @@ export function RecruiterDashboard({
 }: RecruiterDashboardProps) {
   return (
     <section className="space-y-8">
+      <DashboardHeader
+        title="Recruiter Intelligence"
+        description="AI assessment of hiring readiness based on repository analytics."
+        icon={<UserCheck className="h-8 w-8 text-cyan-400" />}
+      />
 
-      <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-8">
-
-        <h2 className="text-3xl font-bold">
-          Recruiter Intelligence
-        </h2>
-
-        <p className="mt-3 text-zinc-400">
-          Executive hiring assessment generated from repository
-          engineering analytics.
-        </p>
-
-      </div>
-
-      <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
-
+      <MetricGrid>
         <MetricCard
-          icon={<Award className="h-6 w-6" />}
           title="Hiring Score"
           value={`${recruiter.hiringScore}%`}
+          icon={<Target className="h-6 w-6" />}
         />
 
         <MetricCard
-          icon={<BadgeCheck className="h-6 w-6" />}
-          title="Engineering Level"
-          value={recruiter.engineeringLevel}
-        />
-
-        <MetricCard
-          icon={<Users className="h-6 w-6" />}
           title="Hiring Confidence"
           value={`${recruiter.hiringConfidence}%`}
+          icon={<CheckCircle2 className="h-6 w-6" />}
         />
 
         <MetricCard
-          icon={<DollarSign className="h-6 w-6" />}
-          title="Salary Range"
-          value={recruiter.salaryRange}
+          title="Engineering Level"
+          value={recruiter.engineeringLevel}
+          icon={<Briefcase className="h-6 w-6" />}
         />
 
-      </div>
+        <MetricCard
+          title="Salary Range"
+          value={recruiter.salaryRange}
+          icon={<BadgeDollarSign className="h-6 w-6" />}
+        />
+      </MetricGrid>
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      <DashboardSection title="Recruiter Verdict">
+        <p className="leading-8 text-zinc-300">
+          {recruiter.recruiterVerdict}
+        </p>
+      </DashboardSection>
 
-        <div className="rounded-3xl border border-white/10 bg-black/30 p-6">
-
-          <div className="flex items-center gap-3">
-
-            <Briefcase className="h-6 w-6 text-cyan-400" />
-
-            <h3 className="text-xl font-semibold">
-              Recommended Roles
-            </h3>
-
-          </div>
-
-          <ul className="mt-6 space-y-3">
-
-            {recruiter.recommendedRoles.map((role) => (
-
-              <li
-                key={role}
-                className="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3"
-              >
-                {role}
-              </li>
-
-            ))}
-
-          </ul>
-
+      <DashboardSection title="Recommended Roles">
+        <div className="grid gap-4">
+          {recruiter.recommendedRoles.map((role) => (
+            <div
+              key={role}
+              className="rounded-2xl border border-cyan-500/20 bg-cyan-500/5 p-4"
+            >
+              {role}
+            </div>
+          ))}
         </div>
-
-        <div className="rounded-3xl border border-white/10 bg-black/30 p-6">
-
-          <h3 className="text-xl font-semibold">
-            Recruiter Verdict
-          </h3>
-
-          <p className="mt-5 leading-8 text-zinc-300">
-
-            {recruiter.recruiterVerdict}
-
-          </p>
-
-        </div>
-
-      </div>
-
+      </DashboardSection>
     </section>
-  );
-}
-
-interface MetricCardProps {
-  icon: React.ReactNode;
-  title: string;
-  value: string | number;
-}
-
-function MetricCard({
-  icon,
-  title,
-  value,
-}: MetricCardProps) {
-  return (
-    <div className="rounded-3xl border border-white/10 bg-black/30 p-6">
-
-      <div className="flex items-center justify-between">
-
-        {icon}
-
-        <span className="text-sm text-zinc-500">
-          {title}
-        </span>
-
-      </div>
-
-      <div className="mt-6 text-3xl font-black">
-        {value}
-      </div>
-
-    </div>
   );
 }
