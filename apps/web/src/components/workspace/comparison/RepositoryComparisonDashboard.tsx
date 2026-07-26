@@ -23,7 +23,7 @@ export function RepositoryComparisonDashboard({
         </p>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-3">
+      <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-5">
 
         <MetricCard
           title="Strongest Repository"
@@ -36,9 +36,19 @@ export function RepositoryComparisonDashboard({
         />
 
         <MetricCard
-          title="Average Engineering"
-          value={`${comparison.averageEngineeringScore.toFixed(1)}`}
-        />
+    title="Engineering"
+    value={comparison.averageEngineeringScore.toFixed(1)}
+/>
+
+<MetricCard
+    title="Security"
+    value={comparison.averageSecurityScore.toFixed(1)}
+/>
+
+<MetricCard
+    title="Enterprise"
+    value={comparison.averageEnterpriseReadiness.toFixed(1)}
+/>
 
       </div>
 
@@ -126,11 +136,11 @@ function MetricCard({
 }) {
   return (
     <div className="rounded-3xl border border-white/10 bg-black/30 p-6">
-      <p className="text-sm uppercase tracking-[0.25em] text-zinc-500">
+      <p className="text-center text-sm uppercase tracking-[0.25em] text-zinc-500">
         {title}
       </p>
 
-      <p className="mt-5 text-2xl font-bold text-white">
+      <p className="mt-5 text-center text-3xl font-bold text-white">
         {value}
       </p>
     </div>
