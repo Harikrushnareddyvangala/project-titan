@@ -587,13 +587,35 @@ export interface RepositoryComparison {
 
   weakestRepository: string;
 
+  engineeringLeader: string;
+
+  securityLeader: string;
+
+  productionLeader: string;
+
+  enterpriseLeader: string;
+
+  hiringLeader: string;
+
   averageEngineeringScore: number;
 
   averageSecurityScore: number;
 
   averageEnterpriseReadiness: number;
 
+  averageHiringScore: number;
+
+  highestRepositoryGrade: string;
+
+  comparisonStrengths: string[];
+
+  comparisonRisks: string[];
+
+  comparisonRecommendations: Recommendation[];
+
   executiveSummary: string;
+
+  executiveVerdict: string;
 
 }
 
