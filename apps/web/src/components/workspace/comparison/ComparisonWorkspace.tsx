@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 
 import { WorkspaceHeader } from "@/components/workspace/shared/WorkspaceHeader";
+import { ComparisonRepositoryAnalytics } from "./ComparisonRepositoryAnalytics";
 
 export function ComparisonWorkspace() {
   const [repository, setRepository] = useState("");
@@ -146,6 +147,14 @@ export function ComparisonWorkspace() {
           )}
 
         </section>
+        <section className="mt-10 space-y-10">
+    {repositories.map((repository) => (
+        <ComparisonRepositoryAnalytics
+            key={repository}
+            repository={repository}
+        />
+    ))}
+</section>
 
       </div>
     </main>
