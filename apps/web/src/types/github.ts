@@ -578,3 +578,39 @@ export interface OrganizationIntelligence {
   executiveSummary:string;
 
 }
+
+export interface RepositoryComparison {
+
+  repositories: ComparedRepository[];
+
+  strongestRepository: string;
+
+  weakestRepository: string;
+
+  averageEngineeringScore: number;
+
+  averageSecurityScore: number;
+
+  averageEnterpriseReadiness: number;
+
+  executiveSummary: string;
+
+}
+
+export interface ComparedRepository {
+
+  name: string;
+
+  engineeringScore: number;
+
+  securityScore: number;
+
+  productionScore: number;
+
+  enterpriseReadiness: number;
+
+  hiringScore: number;
+
+  repositoryGrade: string;
+
+}
