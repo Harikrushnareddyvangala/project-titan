@@ -19,6 +19,8 @@ export interface RecruiterIntelligence {
 
   recommendedRoles: string[];
 
+  
+
 }
 
 export interface RecruiterInput {
@@ -245,6 +247,8 @@ export function buildRecruiterIntelligence({
     hiringConfidence,
 
     recommendedRoles,
+
+    
 
   };
 
