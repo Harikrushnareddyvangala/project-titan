@@ -617,6 +617,9 @@ export interface RepositoryComparison {
 
   executiveVerdict: string;
 
+  rankings: RankedRepository[];
+
+
 }
 
 export interface ComparedRepository {
@@ -634,5 +637,32 @@ export interface ComparedRepository {
   hiringScore: number;
 
   repositoryGrade: string;
+
+}
+export interface RankedRepository {
+
+  repositoryName: string;
+
+  overallScore: number;
+
+  engineeringScore: number;
+
+  securityScore: number;
+
+  productionScore: number;
+
+  enterpriseReadiness: number;
+
+  hiringScore: number;
+
+  repositoryGrade: string;
+
+  rank: number;
+
+  medal:
+    | "🥇"
+    | "🥈"
+    | "🥉"
+    | "";
 
 }

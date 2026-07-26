@@ -5,12 +5,19 @@ import type {
   RepositoryComparison,
 } from "@/types/github";
 
+import { buildRepositoryRanking } from "./repositoryRankingEngine";
+
 export function buildRepositoryComparison(
   repositories: RepositoryAnalytics[],
 ): RepositoryComparison {
+
+
   if (repositories.length === 0) {
+    
     return {
       repositories: [],
+
+      rankings: [],
 
       strongestRepository: "",
       weakestRepository: "",
@@ -36,6 +43,9 @@ export function buildRepositoryComparison(
       executiveVerdict: "Repository comparison unavailable.",
     };
   }
+  const rankings = buildRepositoryRanking(
+    repositories,
+  );
 
   const compared: ComparedRepository[] = repositories.map(
     (repository) => ({
@@ -168,6 +178,8 @@ export function buildRepositoryComparison(
 
   return {
     repositories: compared,
+
+    rankings,
 
     strongestRepository:
       engineeringLeader.repositoryName,
