@@ -19,6 +19,25 @@ interface Props{
     analytics: RepositoryAnalytics | null;
 
 }
+const getScoreLabel = (score: number) => {
+    if (score >= 90) {
+        return "Excellent";
+    }
+
+    if (score >= 80) {
+        return "Strong";
+    }
+
+    if (score >= 70) {
+        return "Good";
+    }
+
+    if (score >= 60) {
+        return "Developing";
+    }
+
+    return "Needs Improvement";
+};
 
 export function OrganizationIntelligenceDashboard({
 
@@ -30,6 +49,7 @@ export function OrganizationIntelligenceDashboard({
 
     const org =
         analytics.organizationIntelligence;
+
 
     return(
 
@@ -122,37 +142,42 @@ md:grid-cols-3
 <Card
 icon={<Users size={20}/>}
 title="Engineering Culture"
-value={`${org.engineeringCulture}%`}
+value={org.engineeringCulture}
 />
+<Card
+    icon={<Building2 size={20} />}
+    title="Organizational Readiness"
+    value={org.organizationalReadiness}
+ />
 
 <Card
 icon={<Rocket size={20}/>}
 title="Delivery Maturity"
-value={`${org.deliveryMaturity}%`}
+value={org.deliveryMaturity}
 />
 
 <Card
 icon={<ShieldCheck size={20}/>}
 title="Governance"
-value={`${org.engineeringGovernance}%`}
+value={org.engineeringGovernance}
 />
 
 <Card
 icon={<Gauge size={20}/>}
 title="Scaling"
-value={`${org.scalingReadiness}%`}
+value={org.scalingReadiness}
 />
 
 <Card
 icon={<Rocket size={20}/>}
 title="Innovation"
-value={`${org.innovationCulture}%`}
+value={org.innovationCulture}
 />
 
 <Card
 icon={<ShieldCheck size={20}/>}
 title="Technical Debt"
-value={`${org.technicalDebt}%`}
+value={org.technicalDebt}
 />
 
 </div>
@@ -169,72 +194,88 @@ icon:React.ReactNode;
 
 title:string;
 
-value:string;
+value:number;
 
 }
 
 function Card({
 
-icon,
+    icon,
 
-title,
+    title,
 
-value,
+    value,
 
-}:CardProps){
+}: CardProps) {
 
-return(
+    const label =
+        getScoreLabel(value);
 
-<motion.div
+    return (
 
-whileHover={{
-y:-5,
-scale:1.02,
-}}
+        <motion.div
 
-className="
-rounded-3xl
-border
-border-white/10
-bg-white/[0.03]
-p-6
-"
+            whileHover={{
+                y: -5,
+                scale: 1.02,
+            }}
 
->
+            className="
+            rounded-3xl
+            border
+            border-white/10
+            bg-white/[0.03]
+            p-6
+            "
 
-<div className="text-orange-400">
+        >
 
-{icon}
+            <div className="text-orange-400">
 
-</div>
+                {icon}
 
-<p
-className="
-mt-4
-text-sm
-text-zinc-500
-"
->
+            </div>
 
-{title}
+            <p
+                className="
+                mt-4
+                text-sm
+                text-zinc-500
+                "
+            >
 
-</p>
+                {title}
 
-<h2
-className="
-mt-2
-text-2xl
-font-bold
-text-white
-"
->
+            </p>
 
-{value}
+            <h2
+                className="
+                mt-2
+                text-3xl
+                font-bold
+                text-white
+                "
+            >
 
-</h2>
+                {value}%
 
-</motion.div>
+            </h2>
 
-);
+            <p
+                className="
+                mt-2
+                text-sm
+                font-medium
+                text-orange-300
+                "
+            >
+
+                {label}
+
+            </p>
+
+        </motion.div>
+
+    );
 
 }
