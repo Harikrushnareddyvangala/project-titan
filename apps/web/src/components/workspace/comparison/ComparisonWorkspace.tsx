@@ -10,10 +10,36 @@ import {
 
 import { WorkspaceHeader } from "@/components/workspace/shared/WorkspaceHeader";
 import { ComparisonRepositoryAnalytics } from "./ComparisonRepositoryAnalytics";
+import type { RepositoryAnalytics } from "@/types/github";
 
 export function ComparisonWorkspace() {
   const [repository, setRepository] = useState("");
   const [repositories, setRepositories] = useState<string[]>([]);
+  const [analyticsMap, setAnalyticsMap] =
+    useState<Record<string, RepositoryAnalytics>>({});
+    const handleAnalyticsLoaded = (
+    repository: string,
+    analytics: RepositoryAnalytics,
+) => {
+    setAnalyticsMap((previous) => {
+        if (previous[repository] === analytics) {
+            return previous;
+        }
+
+        return {
+            ...previous,
+            [repository]: analytics,
+        };
+    });
+};
+    const analytics = repositories
+    .map((repository) => analyticsMap[repository])
+    .filter(
+        (
+            repository,
+        ): repository is RepositoryAnalytics =>
+            repository !== undefined,
+    );
 
   function addRepository() {
     const value = repository.trim();
@@ -152,6 +178,7 @@ export function ComparisonWorkspace() {
         <ComparisonRepositoryAnalytics
             key={repository}
             repository={repository}
+             onAnalyticsLoaded={handleAnalyticsLoaded}
         />
     ))}
 </section>
