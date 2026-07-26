@@ -1,9 +1,11 @@
 "use client";
 
-import { CareerDashboard } from "@/components/github/CareerDashboard";
-import { DeveloperDashboard } from "@/components/github/DeveloperDashboard";
-import { EngineeringMentorDashboard } from "@/components/github/EngineeringMentorDashboard";
 import { RepositoryAnalysisContainer } from "@/components/workspace/shared/RepositoryAnalysisContainer";
+
+import { DeveloperDashboard } from "@/components/github/DeveloperDashboard";
+import { CareerDashboard } from "@/components/github/CareerDashboard";
+import { EngineeringMentorDashboard } from "@/components/github/EngineeringMentorDashboard";
+import { TeamCompatibilityDashboard } from "@/components/github/TeamCompatibilityDashboard";
 
 export function DeveloperWorkspace() {
   return (
@@ -20,6 +22,10 @@ export function DeveloperWorkspace() {
             />
 
             <EngineeringMentorDashboard
+              analytics={github.analytics}
+            />
+
+            <TeamCompatibilityDashboard
               analytics={github.analytics}
             />
           </div>
