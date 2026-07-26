@@ -2,6 +2,7 @@
 
 import { CareerDashboard } from "@/components/github/CareerDashboard";
 import { DeveloperDashboard } from "@/components/github/DeveloperDashboard";
+import { EngineeringMentorDashboard } from "@/components/github/EngineeringMentorDashboard";
 import { RepositoryAnalysisContainer } from "@/components/workspace/shared/RepositoryAnalysisContainer";
 
 export function DeveloperWorkspace() {
@@ -16,6 +17,10 @@ export function DeveloperWorkspace() {
 
             <CareerDashboard
               career={github.analytics.careerIntelligence}
+            />
+
+            <EngineeringMentorDashboard
+              analytics={github.analytics}
             />
           </div>
         )
