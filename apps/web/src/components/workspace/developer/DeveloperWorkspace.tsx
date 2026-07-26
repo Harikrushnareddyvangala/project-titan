@@ -6,6 +6,7 @@ import { DeveloperDashboard } from "@/components/github/DeveloperDashboard";
 import { CareerDashboard } from "@/components/github/CareerDashboard";
 import { EngineeringMentorDashboard } from "@/components/github/EngineeringMentorDashboard";
 import { TeamCompatibilityDashboard } from "@/components/github/TeamCompatibilityDashboard";
+import { ExecutiveEngineeringReportDashboard } from "@/components/github/ExecutiveEngineeringReportDashboard";
 
 export function DeveloperWorkspace() {
   return (
@@ -13,6 +14,9 @@ export function DeveloperWorkspace() {
       {(github) =>
         github.analytics && (
           <div className="space-y-12">
+            <ExecutiveEngineeringReportDashboard
+    analytics={github.analytics}
+/>
             <DeveloperDashboard
               developer={github.analytics.developerDNA}
             />
