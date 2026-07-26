@@ -1,26 +1,51 @@
 import type {
+  ComparedRepository,
+  Recommendation,
   RepositoryAnalytics,
   RepositoryComparison,
-  ComparedRepository,
 } from "@/types/github";
 
 export function buildRepositoryComparison(
   repositories: RepositoryAnalytics[],
 ): RepositoryComparison {
+  if (repositories.length === 0) {
+    return {
+      repositories: [],
 
-  const compared: ComparedRepository[] =
-    repositories.map((repository) => ({
+      strongestRepository: "",
+      weakestRepository: "",
 
+      engineeringLeader: "",
+      securityLeader: "",
+      productionLeader: "",
+      enterpriseLeader: "",
+      hiringLeader: "",
+
+      averageEngineeringScore: 0,
+      averageSecurityScore: 0,
+      averageEnterpriseReadiness: 0,
+      averageHiringScore: 0,
+
+      highestRepositoryGrade: "",
+
+      comparisonStrengths: [],
+      comparisonRisks: [],
+      comparisonRecommendations: [],
+
+      executiveSummary: "No repositories available for comparison.",
+      executiveVerdict: "Repository comparison unavailable.",
+    };
+  }
+
+  const compared: ComparedRepository[] = repositories.map(
+    (repository) => ({
       name: repository.repositoryName,
 
-      engineeringScore:
-        repository.engineeringScore,
+      engineeringScore: repository.engineeringScore,
 
-      securityScore:
-        repository.securityScore,
+      securityScore: repository.securityScore,
 
-      productionScore:
-        repository.productionScore,
+      productionScore: repository.productionScore,
 
       enterpriseReadiness:
         repository.enterpriseReadiness,
@@ -30,22 +55,44 @@ export function buildRepositoryComparison(
 
       repositoryGrade:
         repository.repositoryGrade,
+    }),
+  );
 
-    }));
+  const engineeringLeader = [...repositories].sort(
+    (a, b) =>
+      b.engineeringScore -
+      a.engineeringScore,
+  )[0];
 
-  const strongest =
-    [...repositories].sort(
-      (a, b) =>
-        b.engineeringScore -
-        a.engineeringScore,
-    )[0];
+  const weakestEngineering = [...repositories].sort(
+    (a, b) =>
+      a.engineeringScore -
+      b.engineeringScore,
+  )[0];
 
-  const weakest =
-    [...repositories].sort(
-      (a, b) =>
-        a.engineeringScore -
-        b.engineeringScore,
-    )[0];
+  const securityLeader = [...repositories].sort(
+    (a, b) =>
+      b.securityScore -
+      a.securityScore,
+  )[0];
+
+  const productionLeader = [...repositories].sort(
+    (a, b) =>
+      b.productionScore -
+      a.productionScore,
+  )[0];
+
+  const enterpriseLeader = [...repositories].sort(
+    (a, b) =>
+      b.enterpriseReadiness -
+      a.enterpriseReadiness,
+  )[0];
+
+  const hiringLeader = [...repositories].sort(
+    (a, b) =>
+      b.recruiterIntelligence.hiringScore -
+      a.recruiterIntelligence.hiringScore,
+  )[0];
 
   const averageEngineeringScore =
     repositories.reduce(
@@ -68,15 +115,80 @@ export function buildRepositoryComparison(
       0,
     ) / repositories.length;
 
-  return {
+  const averageHiringScore =
+    repositories.reduce(
+      (sum, repository) =>
+        sum +
+        repository.recruiterIntelligence.hiringScore,
+      0,
+    ) / repositories.length;
 
+  const highestRepositoryGrade =
+    [...repositories].sort(
+      (a, b) =>
+        b.engineeringScore -
+        a.engineeringScore,
+    )[0].repositoryGrade;
+
+  const comparisonStrengths = [
+    ...new Set(
+      repositories.flatMap(
+        (repository) =>
+          repository.strengths,
+      ),
+    ),
+  ];
+
+  const comparisonRisks = [
+    ...new Set(
+      repositories.flatMap(
+        (repository) =>
+          repository.risks,
+      ),
+    ),
+  ];
+
+  const comparisonRecommendations: Recommendation[] =
+    repositories.flatMap(
+      (repository) =>
+        repository.recommendations,
+    );
+
+  const executiveSummary =
+    `${engineeringLeader.repositoryName} demonstrates the strongest engineering maturity while ${weakestEngineering.repositoryName} presents the greatest opportunity for improvement.`;
+
+  const executiveVerdict =
+    `Across ${repositories.length} repositories, the portfolio averages ${averageEngineeringScore.toFixed(
+      1,
+    )}% engineering maturity, ${averageSecurityScore.toFixed(
+      1,
+    )}% security readiness, and ${averageEnterpriseReadiness.toFixed(
+      1,
+    )}% enterprise readiness. ${engineeringLeader.repositoryName} currently leads the comparison.`;
+
+  return {
     repositories: compared,
 
     strongestRepository:
-      strongest.repositoryName,
+      engineeringLeader.repositoryName,
 
     weakestRepository:
-      weakest.repositoryName,
+      weakestEngineering.repositoryName,
+
+    engineeringLeader:
+      engineeringLeader.repositoryName,
+
+    securityLeader:
+      securityLeader.repositoryName,
+
+    productionLeader:
+      productionLeader.repositoryName,
+
+    enterpriseLeader:
+      enterpriseLeader.repositoryName,
+
+    hiringLeader:
+      hiringLeader.repositoryName,
 
     averageEngineeringScore,
 
@@ -84,9 +196,18 @@ export function buildRepositoryComparison(
 
     averageEnterpriseReadiness,
 
-    executiveSummary:
-      `${strongest.repositoryName} demonstrates the strongest engineering maturity while ${weakest.repositoryName} presents the greatest opportunity for improvement.`,
+    averageHiringScore,
 
+    highestRepositoryGrade,
+
+    comparisonStrengths,
+
+    comparisonRisks,
+
+    comparisonRecommendations,
+
+    executiveSummary,
+
+    executiveVerdict,
   };
-
 }
