@@ -35,4 +35,12 @@ export const workspaceNavigation = [
     href: "/workspace/research",
     status: "Available",
   },
+  {
+    id: "comparison",
+    title: "Comparison Workspace",
+    description:
+        "Compare multiple GitHub repositories using TITAN engineering intelligence.",
+    href: "/workspace/comparison",
+    status: "Available",
+}
 ];
