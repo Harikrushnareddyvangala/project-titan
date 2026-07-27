@@ -3,7 +3,7 @@
 import type { RepositoryComparison } from "@/types/github";
 
 import { MetricCard } from "./MetricCard";
-import { RepositoryRankingTable } from "./RepositoryRankingTable";
+import { RepositoryComparisonWorkspace } from "./RepositoryComparisonWorkspace";
 import { TopRepositoryCard } from "./TopRepositoryCard";
 
 interface RepositoryComparisonDashboardProps {
@@ -84,15 +84,13 @@ export function RepositoryComparisonDashboard({
 
       {/* Repository Rankings */}
 
-      <RepositoryRankingTable
-        rankings={comparison.rankings}
-      />
+      <RepositoryComparisonWorkspace
+    rankings={comparison.rankings}
+/>
 
       {/* Top Repository */}
 
-      <TopRepositoryCard
-        repository={comparison.rankings[0]}
-      />
+      
 
       {/* Executive Summary */}
 

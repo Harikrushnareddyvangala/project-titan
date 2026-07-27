@@ -4,10 +4,14 @@ import type { RankedRepository } from "@/types/github";
 
 interface RepositoryRankingTableProps {
   rankings: RankedRepository[];
+  selectedRepository: RankedRepository;
+  onRepositorySelect: (repository: RankedRepository) => void;
 }
 
 export function RepositoryRankingTable({
   rankings,
+  selectedRepository,
+  onRepositorySelect,
 }: RepositoryRankingTableProps) {
   return (
     <div className="overflow-hidden rounded-[34px] border border-white/10 bg-white/[0.04] backdrop-blur-3xl">
@@ -41,28 +45,48 @@ export function RepositoryRankingTable({
           <tbody>
             {rankings.map((repository) => (
               <tr
-                key={repository.repositoryName}
-                className={`border-t border-white/10 transition hover:bg-white/5 ${
-                  repository.rank === 1
-                    ? "bg-yellow-500/10"
-                    : repository.rank === 2
-                    ? "bg-zinc-300/5"
-                    : repository.rank === 3
-                    ? "bg-orange-500/10"
-                    : ""
-                }`}
-              >
+  key={repository.repositoryName}
+  onClick={() => onRepositorySelect(repository)}
+  className={`cursor-pointer border-t border-white/10 transition-all duration-200
+    ${
+      selectedRepository.repositoryName === repository.repositoryName
+        ? "bg-cyan-500/20 ring-1 ring-cyan-400"
+        : repository.rank === 1
+        ? "bg-yellow-500/10 hover:bg-yellow-500/15"
+        : repository.rank === 2
+        ? "bg-zinc-300/5 hover:bg-zinc-300/10"
+        : repository.rank === 3
+        ? "bg-orange-500/10 hover:bg-orange-500/15"
+        : "hover:bg-white/5"
+    }`}
+>
                 <BodyCell>
                   {repository.medal || repository.rank}
                 </BodyCell>
 
                 <BodyCell>
-                  {repository.repositoryName}
-                </BodyCell>
+  <div className="flex items-center gap-3">
+
+    {selectedRepository.repositoryName === repository.repositoryName && (
+      <div className="h-2.5 w-2.5 rounded-full bg-cyan-400" />
+    )}
+
+    <span>{repository.repositoryName}</span>
+
+  </div>
+</BodyCell>
 
                 <BodyCell>
-                  {repository.overallScore.toFixed(1)}
-                </BodyCell>
+  <span
+    className={
+      selectedRepository.repositoryName === repository.repositoryName
+        ? "font-bold text-cyan-300"
+        : ""
+    }
+  >
+    {repository.overallScore.toFixed(1)}
+  </span>
+</BodyCell>
 
                 <BodyCell>
                   {repository.engineeringScore}
