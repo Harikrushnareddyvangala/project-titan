@@ -158,12 +158,16 @@ export function buildRepositoryComparison(
     ),
   ];
 
-  const comparisonRecommendations: Recommendation[] =
-    repositories.flatMap(
-      (repository) =>
-        repository.recommendations,
-    );
-
+  const comparisonRecommendations = Array.from(
+  new Map(
+    repositories
+      .flatMap((repository) => repository.recommendations)
+      .map((recommendation) => [
+        `${recommendation.title}:${recommendation.description}`,
+        recommendation,
+      ]),
+  ).values(),
+);
   const executiveSummary =
     `${engineeringLeader.repositoryName} demonstrates the strongest engineering maturity while ${weakestEngineering.repositoryName} presents the greatest opportunity for improvement.`;
 

@@ -13,6 +13,7 @@ import { ComparisonRepositoryAnalytics } from "./ComparisonRepositoryAnalytics";
 import type { RepositoryAnalytics } from "@/types/github";
 import { buildRepositoryComparison } from "@/lib/github/repositoryComparisonEngine";
 import type { RepositoryComparison } from "@/types/github";
+import { RepositoryComparisonDashboard } from "./RepositoryComparisonDashboard";
 
 export function ComparisonWorkspace() {
   const [repository, setRepository] = useState("");
@@ -191,42 +192,11 @@ const comparison =
     ))}
 </section>
 {comparison && (
-    <section className="mt-10 rounded-[34px] border border-emerald-500/20 bg-emerald-500/5 p-8">
-        <h2 className="text-2xl font-bold text-emerald-300">
-            Comparison Engine Output
-        </h2>
-
-        <div className="mt-6 space-y-3">
-            <p>
-                <strong>Strongest Repository:</strong>{" "}
-                {comparison.strongestRepository}
-            </p>
-
-            <p>
-                <strong>Weakest Repository:</strong>{" "}
-                {comparison.weakestRepository}
-            </p>
-
-            <p>
-                <strong>Average Engineering:</strong>{" "}
-                {comparison.averageEngineeringScore.toFixed(1)}
-            </p>
-
-            <p>
-                <strong>Average Security:</strong>{" "}
-                {comparison.averageSecurityScore.toFixed(1)}
-            </p>
-
-            <p>
-                <strong>Average Enterprise:</strong>{" "}
-                {comparison.averageEnterpriseReadiness.toFixed(1)}
-            </p>
-
-            <p className="pt-4 text-zinc-300">
-                {comparison.executiveSummary}
-            </p>
-        </div>
-    </section>
+    <div className="mt-10">
+        <RepositoryComparisonDashboard
+            comparison={comparison}
+        />
+    </div>
 )}
 
       </div>

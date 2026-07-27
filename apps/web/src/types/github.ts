@@ -122,7 +122,7 @@ export interface AIRecommendation {
 
   recommendation: string;
 
-}
+} 
   
 export interface RepositoryAnalytics {
 
@@ -665,4 +665,40 @@ export interface RankedRepository {
     | "🥉"
     | "";
 
+}
+export interface RepositorySimilarity {
+  repositoryA: string;
+
+  repositoryB: string;
+
+  engineeringSimilarity: number;
+
+  securitySimilarity: number;
+
+  productionSimilarity: number;
+
+  enterpriseSimilarity: number;
+
+  hiringSimilarity: number;
+
+  technologySimilarity: number;
+
+  overallSimilarity: number;
+
+  relationship:
+    | "Nearly Identical"
+    | "Highly Similar"
+    | "Moderately Similar"
+    | "Different"
+    | "Very Different";
+}
+
+export interface RepositorySimilarityAnalysis {
+  similarities: RepositorySimilarity[];
+
+  closestRepositories: RepositorySimilarity[];
+
+  mostDifferentRepositories: RepositorySimilarity[];
+
+  averageSimilarity: number;
 }
