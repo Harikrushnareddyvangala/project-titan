@@ -4,9 +4,9 @@ import { useMemo, useState } from "react";
 
 import type { RankedRepository } from "@/types/github";
 
+import { RepositoryEngineeringInsightsCard } from "./RepositoryEngineeringInsightsCard";
 import { RepositoryRankingTable } from "./RepositoryRankingTable";
 import { RepositoryScoreBreakdownCard } from "./RepositoryScoreBreakdownCard";
-
 interface RepositoryComparisonWorkspaceProps {
   rankings: RankedRepository[];
 }
@@ -26,18 +26,22 @@ export function RepositoryComparisonWorkspace({
     useState<RankedRepository>(defaultRepository);
 
   return (
-    <div className="space-y-8">
+  <div className="space-y-8">
 
-      <RepositoryRankingTable
-        rankings={rankings}
-        selectedRepository={selectedRepository}
-        onRepositorySelect={setSelectedRepository}
-      />
+    <RepositoryRankingTable
+      rankings={rankings}
+      selectedRepository={selectedRepository}
+      onRepositorySelect={setSelectedRepository}
+    />
 
-      <RepositoryScoreBreakdownCard
-        repository={selectedRepository}
-      />
+    <RepositoryScoreBreakdownCard
+      repository={selectedRepository}
+    />
 
-    </div>
-  );
+    <RepositoryEngineeringInsightsCard
+      repository={selectedRepository}
+    />
+
+  </div>
+);
 }
