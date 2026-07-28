@@ -3,6 +3,10 @@ import type { GithubCommitWeek, GithubContributor } from "@/types/github";
 import {
   buildRepositoryAnalytics,
 } from "@/lib/github/repositoryEngine";
+
+import {
+  buildRepositoryTechnologyAnalysis,
+} from "@/lib/github/repositoryTechnologyEngine";
 export async function GET(
   request: Request,
   {
@@ -122,7 +126,10 @@ const analytics =
 
   });
 
-
+const technologyAnalysis =
+  buildRepositoryTechnologyAnalysis([
+    analytics,
+  ]);
 
 //--------------------------------------
 // Security & DevOps
@@ -165,17 +172,12 @@ securityScore = Math.max(
   Math.min(100, securityScore),
 );
 
-
-
- 
-
-
-
-
     return NextResponse.json({
   repository: repositoryData,
 
   analytics,
+
+  technologyAnalysis,
 
   languages: languageData,
 

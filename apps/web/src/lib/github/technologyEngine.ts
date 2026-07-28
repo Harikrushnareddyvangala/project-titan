@@ -1,11 +1,23 @@
 export interface TechnologyStack {
   frontend: string;
   backend: string;
+
+  frontendFramework: string;
+  backendFramework: string;
+
   aiFramework: string;
+  aiLibrary: string;
+
   database: string;
   vectorDatabase: string;
+
   cloud: string;
+
   packageManager: string;
+
+  dependencyRisk: string;
+
+  technologyMaturity: string;
 }
 
 interface BuildTechnologyStackInput {
@@ -33,6 +45,15 @@ export function buildTechnologyStack({
   let vectorDatabase = "None";
   let cloud = "Unknown";
   let packageManager = "Unknown";
+  let frontendFramework = "Unknown";
+
+let backendFramework = "Unknown";
+
+let aiLibrary = "None";
+
+let dependencyRisk = "Low";
+
+let technologyMaturity = "Emerging";
 
   //-----------------------
   // Frontend
@@ -54,6 +75,7 @@ export function buildTechnologyStack({
 
   if (desc.includes("angular")) frontend = "Angular";
 
+  frontendFramework = frontend;
   //-----------------------
   // Backend
   //-----------------------
@@ -70,6 +92,8 @@ export function buildTechnologyStack({
 
   else if (lang.includes("python")) backend = "Python";
 
+
+  backendFramework = backend;
   //-----------------------
   // AI
   //-----------------------
@@ -103,6 +127,9 @@ export function buildTechnologyStack({
     aiFramework = "Gemini";
 
   }
+  if (aiFramework !== "None") {
+  aiLibrary = aiFramework;
+}
 
   //-----------------------
   // Database
@@ -177,23 +204,55 @@ export function buildTechnologyStack({
     packageManager = "pip";
 
   }
+  const detectedTechnologies = [
+  frontend,
+  backend,
+  database,
+  cloud,
+  aiFramework,
+].filter(
+  (value) =>
+    value !== "Unknown" &&
+    value !== "None",
+).length;
+
+if (detectedTechnologies >= 5) {
+  technologyMaturity = "Advanced";
+} else if (detectedTechnologies >= 3) {
+  technologyMaturity = "Modern";
+} else if (detectedTechnologies >= 2) {
+  technologyMaturity = "Intermediate";
+} else {
+  technologyMaturity = "Emerging";
+}
+
+if (
+  packageManager === "Unknown" ||
+  frontend === "Unknown"
+) {
+  dependencyRisk = "Medium";
+}
 
   return {
+  frontend,
+  backend,
 
-    frontend,
+  frontendFramework,
+  backendFramework,
 
-    backend,
+  aiFramework,
+  aiLibrary,
 
-    aiFramework,
+  database,
+  vectorDatabase,
 
-    database,
+  cloud,
 
-    vectorDatabase,
+  packageManager,
 
-    cloud,
+  dependencyRisk,
 
-    packageManager,
-
-  };
+  technologyMaturity,
+};
 
 }

@@ -619,6 +619,8 @@ export interface RepositoryComparison {
 
   rankings: RankedRepository[];
 
+  technologyAnalysis: RepositoryTechnologyAnalysis;
+
 
 }
 

@@ -2,6 +2,8 @@
 
 export interface ProjectInsights {
 
+  maturity: string;
+
   executiveSummary: string;
 
   strengths: string[];
@@ -157,6 +159,22 @@ export function buildProjectInsights(
 
   }
 
+  let maturity = "Growing";
+
+if (
+  analytics.engineeringScore >= 90 &&
+  analytics.enterpriseReadiness >= 90
+) {
+  maturity = "Outstanding";
+} else if (
+  analytics.engineeringScore >= 80
+) {
+  maturity = "Excellent";
+} else if (
+  analytics.engineeringScore >= 65
+) {
+  maturity = "Good";
+}
   //----------------------------------
   // Executive Summary
   //----------------------------------
@@ -175,18 +193,20 @@ export function buildProjectInsights(
 
   return {
 
-    executiveSummary,
+  maturity,
 
-    strengths,
+  executiveSummary,
 
-    risks,
+  strengths,
 
-    recommendations,
+  risks,
 
-    hiringSignal,
+  recommendations,
 
-    enterpriseSummary,
+  hiringSignal,
 
-  };
+  enterpriseSummary,
+
+};
 
 }

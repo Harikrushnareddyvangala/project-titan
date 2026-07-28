@@ -6,6 +6,7 @@ import type {
 } from "@/types/github";
 
 import { buildRepositoryRanking } from "./repositoryRankingEngine";
+import { buildRepositoryTechnologyAnalysis } from "./repositoryTechnologyEngine";
 
 export function buildRepositoryComparison(
   repositories: RepositoryAnalytics[],
@@ -41,6 +42,8 @@ export function buildRepositoryComparison(
 
       executiveSummary: "No repositories available for comparison.",
       executiveVerdict: "Repository comparison unavailable.",
+      technologyAnalysis:
+  buildRepositoryTechnologyAnalysis([]),
     };
   }
   const rankings = buildRepositoryRanking(
@@ -179,51 +182,58 @@ export function buildRepositoryComparison(
     )}% security readiness, and ${averageEnterpriseReadiness.toFixed(
       1,
     )}% enterprise readiness. ${engineeringLeader.repositoryName} currently leads the comparison.`;
-
+const technologyAnalysis =
+  buildRepositoryTechnologyAnalysis(
+    repositories,
+  );
   return {
-    repositories: compared,
 
-    rankings,
+  repositories: compared,
 
-    strongestRepository:
-      engineeringLeader.repositoryName,
+  rankings,
 
-    weakestRepository:
-      weakestEngineering.repositoryName,
+  strongestRepository:
+    engineeringLeader.repositoryName,
 
-    engineeringLeader:
-      engineeringLeader.repositoryName,
+  weakestRepository:
+    weakestEngineering.repositoryName,
 
-    securityLeader:
-      securityLeader.repositoryName,
+  engineeringLeader:
+    engineeringLeader.repositoryName,
 
-    productionLeader:
-      productionLeader.repositoryName,
+  securityLeader:
+    securityLeader.repositoryName,
 
-    enterpriseLeader:
-      enterpriseLeader.repositoryName,
+  productionLeader:
+    productionLeader.repositoryName,
 
-    hiringLeader:
-      hiringLeader.repositoryName,
+  enterpriseLeader:
+    enterpriseLeader.repositoryName,
 
-    averageEngineeringScore,
+  hiringLeader:
+    hiringLeader.repositoryName,
 
-    averageSecurityScore,
+  averageEngineeringScore,
 
-    averageEnterpriseReadiness,
+  averageSecurityScore,
 
-    averageHiringScore,
+  averageEnterpriseReadiness,
 
-    highestRepositoryGrade,
+  averageHiringScore,
 
-    comparisonStrengths,
+  highestRepositoryGrade,
 
-    comparisonRisks,
+  comparisonStrengths,
 
-    comparisonRecommendations,
+  comparisonRisks,
 
-    executiveSummary,
+  comparisonRecommendations,
 
-    executiveVerdict,
-  };
+  executiveSummary,
+
+  executiveVerdict,
+
+  technologyAnalysis,
+
+};
 }

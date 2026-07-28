@@ -34,9 +34,13 @@ export interface RepositoryScores {
 
   productionScore: number;
 
-  riskLevel: string;
+  riskLevel: "Low" | "Medium" | "High";
 
-  quality: string;
+  quality:
+  | "Outstanding"
+  | "Excellent"
+  | "Good"
+  | "Growing";
 
   deploymentReady: boolean;
 
@@ -174,17 +178,15 @@ export function buildRepositoryScores({
   // Risk
   //----------------------------------------------------
 
-  const riskLevel =
-
-    productionScore >= 85
-
-      ? "Low"
-
-      : productionScore >= 65
-
-      ? "Medium"
-
-      : "High";
+  const riskLevel:
+  | "Low"
+  | "Medium"
+  | "High" =
+  productionScore >= 85
+    ? "Low"
+    : productionScore >= 65
+    ? "Medium"
+    : "High";
 
   //----------------------------------------------------
   // Quality

@@ -24,6 +24,12 @@ export interface SecurityResult {
 
   archived: boolean;
 
+  hasWiki: boolean;
+
+  hasProjects: boolean;
+
+  hasIssues: boolean;
+
 }
 
 export function buildSecurityAnalysis({
@@ -74,16 +80,22 @@ export function buildSecurityAnalysis({
     securityScore * 0.45,
   );
 
-  return {
+ return {
 
-    securityScore,
+  securityScore,
 
-    devopsScore,
+  devopsScore,
 
-    hasLicense,
+  hasLicense,
 
-    archived,
+  archived,
 
-  };
+  hasWiki,
+
+  hasProjects,
+
+  hasIssues,
+
+};
 
 }
