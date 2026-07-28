@@ -5,7 +5,8 @@ import type { RepositoryComparison } from "@/types/github";
 import { MetricCard } from "./MetricCard";
 import { RepositoryComparisonWorkspace } from "./RepositoryComparisonWorkspace";
 import { TopRepositoryCard } from "./TopRepositoryCard";
-
+import { PortfolioHealthDashboard } from "./PortfolioHealthDashboard";
+import { PortfolioInsightsDashboard } from "./PortfolioInsightsDashboard";
 interface RepositoryComparisonDashboardProps {
   comparison: RepositoryComparison;
 }
@@ -29,6 +30,16 @@ export function RepositoryComparisonDashboard({
         </p>
       </div>
 
+      {/* Portfolio Health Dashboard */}
+
+      <PortfolioHealthDashboard
+       portfolio={comparison.portfolioHealth}
+      />
+      {/* Portfolio Insights Dashboard */}
+
+      <PortfolioInsightsDashboard
+      insights={comparison.portfolioInsights}
+      />
       {/* Engineering Leaders */}
 
       <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-5">

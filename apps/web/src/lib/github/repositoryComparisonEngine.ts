@@ -7,6 +7,8 @@ import type {
 
 import { buildRepositoryRanking } from "./repositoryRankingEngine";
 import { buildRepositoryTechnologyAnalysis } from "./repositoryTechnologyEngine";
+import { buildPortfolioHealth } from "./portfolioHealthEngine";
+import { buildPortfolioInsights } from "./portfolioInsightsEngine";
 
 export function buildRepositoryComparison(
   repositories: RepositoryAnalytics[],
@@ -43,7 +45,20 @@ export function buildRepositoryComparison(
       executiveSummary: "No repositories available for comparison.",
       executiveVerdict: "Repository comparison unavailable.",
       technologyAnalysis:
-  buildRepositoryTechnologyAnalysis([]),
+        buildRepositoryTechnologyAnalysis([]),
+      portfolioHealth:
+        buildPortfolioHealth({
+         repositories: [],
+          }),
+      portfolioInsights:
+        buildPortfolioInsights({
+          repositories: [],
+      portfolioHealth:
+        buildPortfolioHealth({
+          repositories: [],
+       
+  }),
+  }),
     };
   }
   const rankings = buildRepositoryRanking(
@@ -182,10 +197,19 @@ export function buildRepositoryComparison(
     )}% security readiness, and ${averageEnterpriseReadiness.toFixed(
       1,
     )}% enterprise readiness. ${engineeringLeader.repositoryName} currently leads the comparison.`;
-const technologyAnalysis =
+    const technologyAnalysis =
   buildRepositoryTechnologyAnalysis(
     repositories,
   );
+    const portfolioHealth =
+  buildPortfolioHealth({
+    repositories,
+  });
+  const portfolioInsights =
+  buildPortfolioInsights({
+    repositories,
+    portfolioHealth,
+  });
   return {
 
   repositories: compared,
@@ -234,6 +258,11 @@ const technologyAnalysis =
   executiveVerdict,
 
   technologyAnalysis,
+
+  portfolioHealth,
+
+  portfolioInsights,
+
 
 };
 }

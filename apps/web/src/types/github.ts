@@ -1,3 +1,5 @@
+
+
 export interface GithubRepository {
   id: number;
 
@@ -621,6 +623,9 @@ export interface RepositoryComparison {
 
   technologyAnalysis: RepositoryTechnologyAnalysis;
 
+  portfolioHealth: PortfolioHealth;
+
+  portfolioInsights: PortfolioInsights;
 
 }
 
@@ -768,4 +773,36 @@ export interface RepositoryTechnologyAnalysis {
   insights: TechnologyInsight[];
 
   recommendations: TechnologyRecommendation[];
+}
+
+export interface PortfolioHealth {
+
+  overallScore: number;
+
+  engineeringMaturity: number;
+
+  productionReadiness: number;
+
+  securityReadiness: number;
+
+  enterpriseReadiness: number;
+
+  hiringReadiness: number;
+
+  portfolioGrade: string;
+
+  portfolioRisk: "Low" | "Medium" | "High";
+
+}
+
+export interface PortfolioInsights {
+
+  strengths: string[];
+
+  risks: string[];
+
+  priorities: string[];
+
+  executiveSummary: string;
+
 }
