@@ -696,9 +696,74 @@ export interface RepositorySimilarity {
 export interface RepositorySimilarityAnalysis {
   similarities: RepositorySimilarity[];
 
+  technology:RepositorySimilarity[];
+
   closestRepositories: RepositorySimilarity[];
 
   mostDifferentRepositories: RepositorySimilarity[];
 
   averageSimilarity: number;
+}
+
+export interface TechnologyUsage {
+  name: string;
+  category:
+    | "Language"
+    | "Framework"
+    | "Database"
+    | "Cloud"
+    | "DevOps"
+    | "Messaging"
+    | "Monitoring"
+    | "Testing"
+    | "AI/ML"
+    | "Security";
+
+  repositoryCount: number;
+  adoptionPercentage: number;
+}
+
+export interface TechnologyCategorySummary {
+  category: string;
+  technologyCount: number;
+  repositoryCount: number;
+  adoptionPercentage: number;
+}
+
+export interface TechnologyInsight {
+  title: string;
+  description: string;
+  severity: "Info" | "Opportunity" | "Recommendation";
+}
+
+export interface TechnologyRecommendation {
+  title: string;
+  description: string;
+  priority: "Low" | "Medium" | "High";
+}
+
+export interface RepositoryTechnologyAnalysis {
+  totalRepositories: number;
+
+  totalTechnologies: number;
+
+  languageCount: number;
+
+  frameworkCount: number;
+
+  databaseCount: number;
+
+  cloudPlatformCount: number;
+
+  devOpsToolCount: number;
+
+  diversityScore: number;
+
+  technologies: TechnologyUsage[];
+
+  categories: TechnologyCategorySummary[];
+
+  insights: TechnologyInsight[];
+
+  recommendations: TechnologyRecommendation[];
 }

@@ -197,6 +197,7 @@ export function buildRepositorySimilarity(
 
   return {
     similarities: sorted,
+    technology: sorted ,
 
     closestRepositories:
       sorted.slice(0, 5),
