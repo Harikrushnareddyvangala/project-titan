@@ -31,13 +31,22 @@ export function PortfolioInsightsDashboard({
             Strengths
           </h3>
 
-          <ul className="space-y-2">
-            {insights.strengths.map((item) => (
+          {insights.strengths.length === 0 ? (
+  <p className="text-sm text-zinc-500">
+    No major strengths identified yet.
+  </p>
+) : (
+  <ul className="space-y-2">
+            {insights.strengths.map((item, index) => (
               <li key={item} className="text-sm text-zinc-300">
-                • {item}
+                <span className="font-semibold text-amber-300">
+  {index + 1}.
+</span>{" "}
+{item}
               </li>
             ))}
           </ul>
+)}
         </div>
 
         <div className="rounded-2xl border border-red-400/20 p-6">
@@ -45,13 +54,22 @@ export function PortfolioInsightsDashboard({
             Risks
           </h3>
 
-          <ul className="space-y-2">
-            {insights.risks.map((item) => (
+          {insights.risks.length === 0 ? (
+  <p className="text-sm text-zinc-500">
+    No major strengths identified yet.
+  </p>
+) : (
+  <ul className="space-y-2">
+            {insights.risks.map((item, index) => (
               <li key={item} className="text-sm text-zinc-300">
-                • {item}
+                <span className="font-semibold text-amber-300">
+  {index + 1}.
+</span>{" "}
+{item}
               </li>
             ))}
           </ul>
+)}
         </div>
 
         <div className="rounded-2xl border border-amber-400/20 p-6">
@@ -59,7 +77,12 @@ export function PortfolioInsightsDashboard({
             Priorities
           </h3>
 
-          <ul className="space-y-2">
+          {insights.priorities.length === 0 ? (
+  <p className="text-sm text-zinc-500">
+    No major strengths identified yet.
+  </p>
+) : (
+  <ul className="space-y-2">
             {insights.priorities.map((item, index) => (
               <li key={item} className="text-sm text-zinc-300">
                 <span className="font-semibold text-amber-300">
@@ -69,6 +92,7 @@ export function PortfolioInsightsDashboard({
               </li>
             ))}
           </ul>
+)}
         </div>
 
       </div>
