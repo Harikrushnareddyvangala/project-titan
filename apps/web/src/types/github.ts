@@ -806,3 +806,17 @@ export interface PortfolioInsights {
   executiveSummary: string;
 
 }
+
+export interface ArchitectureIntelligence {
+  frontendConsistency: number;
+  backendConsistency: number;
+  frameworkConsistency: number;
+  databaseConsistency: number;
+  cloudConsistency: number;
+  aiConsistency: number;
+  technologyDiversity: number;
+
+  architectureGrade: string;
+
+  recommendations: string[];
+}
