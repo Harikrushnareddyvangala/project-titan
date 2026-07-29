@@ -9,6 +9,7 @@ import { buildRepositoryRanking } from "./repositoryRankingEngine";
 import { buildRepositoryTechnologyAnalysis } from "./repositoryTechnologyEngine";
 import { buildPortfolioHealth } from "./portfolioHealthEngine";
 import { buildPortfolioInsights } from "./portfolioInsightsEngine";
+import { buildArchitectureIntelligence } from "./architectureIntelligenceEngine";
 
 export function buildRepositoryComparison(
   repositories: RepositoryAnalytics[],
@@ -55,9 +56,12 @@ export function buildRepositoryComparison(
           repositories: [],
       portfolioHealth:
         buildPortfolioHealth({
-          repositories: [],
-       
+          repositories: [],}),
   }),
+      architectureIntelligence:
+  buildArchitectureIntelligence({
+    repositories: [],
+  
   }),
     };
   }
@@ -210,6 +214,11 @@ export function buildRepositoryComparison(
     repositories,
     portfolioHealth,
   });
+const architectureIntelligence =
+  buildArchitectureIntelligence({
+    repositories,
+  });
+
   return {
 
   repositories: compared,
@@ -263,6 +272,7 @@ export function buildRepositoryComparison(
 
   portfolioInsights,
 
+  architectureIntelligence,
 
 };
 }

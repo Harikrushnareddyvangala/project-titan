@@ -627,6 +627,8 @@ export interface RepositoryComparison {
 
   portfolioInsights: PortfolioInsights;
 
+  architectureIntelligence: ArchitectureIntelligence;
+
 }
 
 export interface ComparedRepository {
