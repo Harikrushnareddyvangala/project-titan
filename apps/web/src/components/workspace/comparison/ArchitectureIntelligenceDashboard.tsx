@@ -97,7 +97,8 @@ export function ArchitectureIntelligenceDashboard({
         {architecture.recommendations.length === 0 ? (
           <p className="text-zinc-500">
             No architecture improvements are currently recommended.
-The portfolio demonstrates a healthy level of architectural consistency. </p>
+The portfolio demonstrates a healthy level of architectural consistency.
+ </p>
         ) : (
           <ul className="space-y-2">
             {architecture.recommendations.map((recommendation) => (
