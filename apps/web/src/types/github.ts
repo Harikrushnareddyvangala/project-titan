@@ -821,3 +821,14 @@ export interface ArchitectureIntelligence {
 
   recommendations: string[];
 }
+export interface ProductivityIntelligence {
+  activityScore: number;
+  deliveryVelocity: number;
+  maintenanceScore: number;
+  collaborationScore: number;
+  releaseHealth: number;
+
+  productivityGrade: string;
+
+  recommendations: string[];
+}
