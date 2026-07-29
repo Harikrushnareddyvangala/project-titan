@@ -7,6 +7,7 @@ import { RepositoryComparisonWorkspace } from "./RepositoryComparisonWorkspace";
 import { TopRepositoryCard } from "./TopRepositoryCard";
 import { PortfolioHealthDashboard } from "./PortfolioHealthDashboard";
 import { PortfolioInsightsDashboard } from "./PortfolioInsightsDashboard";
+import { ArchitectureIntelligenceDashboard } from "./ArchitectureIntelligenceDashboard";
 interface RepositoryComparisonDashboardProps {
   comparison: RepositoryComparison;
 }
@@ -40,6 +41,12 @@ export function RepositoryComparisonDashboard({
       <PortfolioInsightsDashboard
       insights={comparison.portfolioInsights}
       />
+      {/* Architecture Insights Dashboard */}
+      
+      <ArchitectureIntelligenceDashboard
+      architecture={comparison.architectureIntelligence}
+      />
+
       {/* Engineering Leaders */}
 
       <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-5">
