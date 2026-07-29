@@ -628,6 +628,8 @@ export interface RepositoryComparison {
 
   architectureIntelligence: ArchitectureIntelligence;
 
+  productivityIntelligence: ProductivityIntelligence;
+
 }
 
 export interface ComparedRepository {

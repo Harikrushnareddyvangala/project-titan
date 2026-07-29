@@ -10,6 +10,7 @@ import { buildRepositoryTechnologyAnalysis } from "./repositoryTechnologyEngine"
 import { buildPortfolioHealth } from "./portfolioHealthEngine";
 import { buildPortfolioInsights } from "./portfolioInsightsEngine";
 import { buildArchitectureIntelligence } from "./architectureIntelligenceEngine";
+import { buildProductivityIntelligence } from "./productivityIntelligenceEngine";
 
 export function buildRepositoryComparison(
   repositories: RepositoryAnalytics[],
@@ -17,54 +18,61 @@ export function buildRepositoryComparison(
 
 
   if (repositories.length === 0) {
-    
-    return {
-      repositories: [],
-
-      rankings: [],
-
-      strongestRepository: "",
-      weakestRepository: "",
-
-      engineeringLeader: "",
-      securityLeader: "",
-      productionLeader: "",
-      enterpriseLeader: "",
-      hiringLeader: "",
-
-      averageEngineeringScore: 0,
-      averageSecurityScore: 0,
-      averageEnterpriseReadiness: 0,
-      averageHiringScore: 0,
-
-      highestRepositoryGrade: "",
-
-      comparisonStrengths: [],
-      comparisonRisks: [],
-      comparisonRecommendations: [],
-
-      executiveSummary: "No repositories available for comparison.",
-      executiveVerdict: "Repository comparison unavailable.",
-      technologyAnalysis:
-        buildRepositoryTechnologyAnalysis([]),
-      portfolioHealth:
-        buildPortfolioHealth({
-         repositories: [],
-          }),
-      portfolioInsights:
-        buildPortfolioInsights({
-          repositories: [],
-      portfolioHealth:
-        buildPortfolioHealth({
-          repositories: [],}),
-  }),
-      architectureIntelligence:
-  buildArchitectureIntelligence({
+  const portfolioHealth = buildPortfolioHealth({
     repositories: [],
-  
-  }),
-    };
-  }
+  });
+
+  return {
+    repositories: [],
+
+    rankings: [],
+
+    strongestRepository: "",
+    weakestRepository: "",
+
+    engineeringLeader: "",
+    securityLeader: "",
+    productionLeader: "",
+    enterpriseLeader: "",
+    hiringLeader: "",
+
+    averageEngineeringScore: 0,
+    averageSecurityScore: 0,
+    averageEnterpriseReadiness: 0,
+    averageHiringScore: 0,
+
+    highestRepositoryGrade: "",
+
+    comparisonStrengths: [],
+    comparisonRisks: [],
+    comparisonRecommendations: [],
+
+    executiveSummary: "No repositories available for comparison.",
+    executiveVerdict: "Repository comparison unavailable.",
+
+    technologyAnalysis:
+      buildRepositoryTechnologyAnalysis([]),
+
+    portfolioHealth,
+
+    portfolioInsights:
+      buildPortfolioInsights({
+        repositories: [],
+        portfolioHealth,
+      }),
+
+    architectureIntelligence:
+      buildArchitectureIntelligence({
+        repositories: [],
+      }),
+
+    productivityIntelligence:
+      buildProductivityIntelligence({
+        repositories: [],
+      }),
+  };
+}
+   
   const rankings = buildRepositoryRanking(
     repositories,
   );
@@ -218,6 +226,10 @@ const architectureIntelligence =
   buildArchitectureIntelligence({
     repositories,
   });
+  const productivityIntelligence =
+  buildProductivityIntelligence({
+    repositories,
+  });
 
   return {
 
@@ -273,6 +285,8 @@ const architectureIntelligence =
   portfolioInsights,
 
   architectureIntelligence,
+
+  productivityIntelligence,
 
 };
 }
