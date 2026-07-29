@@ -47,10 +47,7 @@ export function ArchitectureIntelligenceDashboard({
           value={architecture.databaseConsistency.toFixed(1)}
         />
 
-        <MetricCard
-          title="Cloud"
-          value={architecture.cloudConsistency.toFixed(1)}
-        />
+        
 
         <MetricCard
           title="AI"

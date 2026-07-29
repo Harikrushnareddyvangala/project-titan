@@ -196,7 +196,6 @@ aiFramework: string;
 vectorDatabase: string;
 
 cloud: string;
-
 packageManager: string;
 
 frontendFramework:string;
@@ -814,7 +813,7 @@ export interface ArchitectureIntelligence {
   backendConsistency: number;
   frameworkConsistency: number;
   databaseConsistency: number;
-  cloudConsistency: number;
+  
   aiConsistency: number;
   technologyDiversity: number;
 
