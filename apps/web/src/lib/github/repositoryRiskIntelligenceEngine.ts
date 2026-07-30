@@ -90,36 +90,79 @@ export function buildRepositoryRiskIntelligence({
 
   const recommendations: string[] = [];
 
-  if (engineeringRisk > 30) {
-    recommendations.push(
-      "Improve engineering quality to reduce implementation risk.",
-    );
-  }
 
-  if (securityRisk > 30) {
-    recommendations.push(
-      "Strengthen repository security controls and vulnerability management.",
-    );
-  }
+if (engineeringRisk <= 15) {
+  recommendations.push(
+    "Engineering risk is well controlled across the portfolio. Maintain current engineering standards.",
+  );
+} else if (engineeringRisk <= 30) {
+  recommendations.push(
+    "Engineering quality is generally healthy. Continue improving consistency across repositories.",
+  );
+} else {
+  recommendations.push(
+    "Reduce engineering risk by improving code quality, testing, and maintainability.",
+  );
+}
 
-  if (productionRisk > 30) {
-    recommendations.push(
-      "Increase production readiness through deployment automation and testing.",
-    );
-  }
+if (securityRisk <= 15) {
+  recommendations.push(
+    "Security posture is strong across the portfolio.",
+  );
+} else if (securityRisk <= 30) {
+  recommendations.push(
+    "Strengthen vulnerability management and security reviews.",
+  );
+} else {
+  recommendations.push(
+    "Prioritize security improvements including dependency updates, vulnerability remediation, and secure development practices.",
+  );
+}
 
-  if (enterpriseRisk > 30) {
-    recommendations.push(
-      "Improve enterprise readiness by strengthening documentation and governance.",
-    );
-  }
+if (productionRisk <= 15) {
+  recommendations.push(
+    "Production readiness is consistently high.",
+  );
+} else if (productionRisk <= 30) {
+  recommendations.push(
+    "Continue improving deployment automation and operational stability.",
+  );
+} else {
+  recommendations.push(
+    "Increase production reliability through CI/CD improvements, automated testing, monitoring, and rollback strategies.",
+  );
+}
 
-  if (hiringRisk > 30) {
-    recommendations.push(
-      "Increase repository consistency and code quality to improve onboarding.",
-    );
-  }
+if (enterpriseRisk <= 15) {
+  recommendations.push(
+    "Enterprise readiness demonstrates strong governance and maintainability.",
+  );
+} else if (enterpriseRisk <= 30) {
+  recommendations.push(
+    "Continue improving documentation and engineering governance.",
+  );
+} else {
+  recommendations.push(
+    "Reduce enterprise risk through stronger documentation, architecture governance, and repository standardization.",
+  );
+}
 
+if (hiringRisk <= 15) {
+  recommendations.push(
+    "Repository quality supports efficient onboarding and hiring evaluation.",
+  );
+} else if (hiringRisk <= 30) {
+  recommendations.push(
+    "Improve repository consistency to simplify onboarding and collaboration.",
+  );
+} else {
+  recommendations.push(
+    "Improve code organization, documentation, and engineering consistency to reduce hiring and onboarding risk.",
+  );
+}
+const uniqueRecommendations = [
+  ...new Set(recommendations),
+];
   return {
     engineeringRisk,
     securityRisk,
@@ -131,6 +174,6 @@ export function buildRepositoryRiskIntelligence({
 
     riskGrade,
 
-    recommendations,
+    recommendations: uniqueRecommendations,
   };
 }
