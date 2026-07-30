@@ -10,6 +10,7 @@ import { PortfolioInsightsDashboard } from "./PortfolioInsightsDashboard";
 import { ArchitectureIntelligenceDashboard } from "./ArchitectureIntelligenceDashboard";
 import { EngineeringProductivityDashboard } from "./EngineeringProductivityDashboard";
 import { RepositoryRiskIntelligenceDashboard } from "./RepositoryRiskIntelligenceDashboard";
+import { RepositoryTrendIntelligenceDashboard } from "./RepositoryTrendIntelligenceDashboard";
 interface RepositoryComparisonDashboardProps {
   comparison: RepositoryComparison;
 }
@@ -57,6 +58,11 @@ export function RepositoryComparisonDashboard({
 
       <RepositoryRiskIntelligenceDashboard
       risk={comparison.repositoryRiskIntelligence}
+      />
+      {/*Repository Trend Intelligence Dashboard*/}
+
+      <RepositoryTrendIntelligenceDashboard
+      trend={comparison.repositoryTrendIntelligence}
       />
 
       {/* Engineering Leaders */}
