@@ -77,7 +77,10 @@ export function buildRepositoryComparison(
   }),
     repositoryTrendIntelligence:
   buildRepositoryTrendIntelligence({
-    repositories: [],
+    current: {
+      timestamp: new Date(),
+      repositories: [],
+    },
   }),
   };
 }
@@ -245,7 +248,10 @@ const architectureIntelligence =
   });
   const repositoryTrendIntelligence =
   buildRepositoryTrendIntelligence({
-    repositories,
+    current: {
+      timestamp: new Date(),
+      repositories,
+    },
   });
 
   return {
