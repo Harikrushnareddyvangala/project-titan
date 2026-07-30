@@ -11,7 +11,7 @@ import { buildPortfolioHealth } from "./portfolioHealthEngine";
 import { buildPortfolioInsights } from "./portfolioInsightsEngine";
 import { buildArchitectureIntelligence } from "./architectureIntelligenceEngine";
 import { buildProductivityIntelligence } from "./productivityIntelligenceEngine";
-
+import { buildRepositoryRiskIntelligence } from "./repositoryRiskIntelligenceEngine";
 export function buildRepositoryComparison(
   repositories: RepositoryAnalytics[],
 ): RepositoryComparison {
@@ -70,6 +70,10 @@ export function buildRepositoryComparison(
       buildProductivityIntelligence({
         repositories: [],
       }),
+    repositoryRiskIntelligence:
+  buildRepositoryRiskIntelligence({
+    repositories: [],
+  }),
   };
 }
    
@@ -230,6 +234,10 @@ const architectureIntelligence =
   buildProductivityIntelligence({
     repositories,
   });
+  const repositoryRiskIntelligence =
+  buildRepositoryRiskIntelligence({
+    repositories,
+  });
 
   return {
 
@@ -287,6 +295,8 @@ const architectureIntelligence =
   architectureIntelligence,
 
   productivityIntelligence,
+
+  repositoryRiskIntelligence,
 
 };
 }

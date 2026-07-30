@@ -630,6 +630,8 @@ export interface RepositoryComparison {
 
   productivityIntelligence: ProductivityIntelligence;
 
+  repositoryRiskIntelligence: RepositoryRiskIntelligence;
+
 }
 
 export interface ComparedRepository {
