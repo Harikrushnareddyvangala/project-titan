@@ -834,3 +834,21 @@ export interface ProductivityIntelligence {
 
   recommendations: string[];
 }
+
+export interface RepositoryRiskIntelligence {
+  engineeringRisk: number;
+
+  securityRisk: number;
+
+  productionRisk: number;
+
+  enterpriseRisk: number;
+
+  hiringRisk: number;
+
+  overallRisk: number;
+
+  riskGrade: string;
+
+  recommendations: string[];
+}
