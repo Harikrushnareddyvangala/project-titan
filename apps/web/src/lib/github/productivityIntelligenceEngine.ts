@@ -86,35 +86,76 @@ else if (overallScore >= 50)
   productivityGrade = "D";
 const recommendations: string[] = [];
 
-if (activityScore < 75) {
+if (activityScore >= 90) {
   recommendations.push(
-    "Increase engineering activity across repositories.",
+    "Engineering activity is consistently strong across the portfolio. Maintain current development practices.",
+  );
+} else if (activityScore >= 75) {
+  recommendations.push(
+    "Engineering activity is healthy. Focus on increasing consistency across repositories.",
+  );
+} else {
+  recommendations.push(
+    "Increase engineering activity by improving development cadence and repository maintenance.",
   );
 }
 
-if (deliveryVelocity < 75) {
+if (deliveryVelocity >= 85) {
   recommendations.push(
-    "Improve delivery automation and deployment readiness.",
+    "Delivery processes demonstrate strong production readiness and deployment maturity.",
+  );
+} else if (deliveryVelocity >= 70) {
+  recommendations.push(
+    "Delivery maturity is good. Continue investing in automation and deployment workflows.",
+  );
+} else {
+  recommendations.push(
+    "Improve CI/CD pipelines and deployment automation to increase delivery velocity.",
   );
 }
 
-if (maintenanceScore < 75) {
+if (maintenanceScore >= 85) {
   recommendations.push(
-    "Invest in long-term maintainability and documentation.",
+    "Repository maintenance practices are well established across the portfolio.",
+  );
+} else if (maintenanceScore >= 70) {
+  recommendations.push(
+    "Continue improving documentation, refactoring, and long-term maintainability.",
+  );
+} else {
+  recommendations.push(
+    "Prioritize technical debt reduction, documentation, and maintainability improvements.",
   );
 }
 
-if (collaborationScore < 75) {
+if (collaborationScore >= 85) {
   recommendations.push(
-    "Strengthen collaboration and engineering best practices.",
+    "Collaboration maturity is excellent. Current engineering practices support effective teamwork.",
+  );
+} else if (collaborationScore >= 70) {
+  recommendations.push(
+    "Strengthen collaboration through code reviews, shared ownership, and engineering standards.",
+  );
+} else {
+  recommendations.push(
+    "Improve collaboration practices by encouraging reviews, documentation, and contributor engagement.",
   );
 }
 
-if (releaseHealth < 75) {
+if (releaseHealth >= 85) {
   recommendations.push(
-    "Improve release stability through testing and security hardening.",
+    "Release quality is consistently high across repositories.",
+  );
+} else if (releaseHealth >= 70) {
+  recommendations.push(
+    "Improve release reliability with expanded testing and security validation.",
+  );
+} else {
+  recommendations.push(
+    "Strengthen release health through automated testing, security checks, and deployment validation.",
   );
 }
+const uniqueRecommendations = [...new Set(recommendations)];
 return {
   activityScore,
   deliveryVelocity,
@@ -124,6 +165,6 @@ return {
 
   productivityGrade,
 
-  recommendations,
+  recommendations: uniqueRecommendations,
 };
 }
