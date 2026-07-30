@@ -46,27 +46,27 @@ export function EngineeringProductivityDashboard({
 
         <MetricCard
           title="Activity"
-          value={`${productivity.activityScore}%`}
+          value={`${Math.round(productivity.activityScore)}%`}
         />
 
         <MetricCard
           title="Delivery"
-          value={`${productivity.deliveryVelocity}%`}
+          value={`${Math.round(productivity.deliveryVelocity)}%`}
         />
 
         <MetricCard
           title="Maintenance"
-          value={`${productivity.maintenanceScore}%`}
+          value={`${Math.round(productivity.maintenanceScore)}%`}
         />
 
         <MetricCard
           title="Collaboration"
-          value={`${productivity.collaborationScore}%`}
+          value={`${Math.round(productivity.collaborationScore)}%`}
         />
 
         <MetricCard
           title="Release Health"
-          value={`${productivity.releaseHealth}%`}
+          value={`${Math.round(productivity.releaseHealth)}%`}
         />
 
       </div>

@@ -52,37 +52,7 @@ export function RepositoryRiskIntelligenceDashboard({
 
       </div>
     
-        <div className="grid gap-4 md:grid-cols-4">
-
-  <ExecutiveCard
-    title="Risk Grade"
-    value={risk.riskGrade}
-  />
-
-  <ExecutiveCard
-    title="Overall Risk"
-    value={`${Math.round(risk.overallRisk)}%`}
-  />
-
-  <ExecutiveCard
-    title="Highest Risk"
-    value={`${Math.round(
-      Math.max(
-        risk.engineeringRisk,
-        risk.securityRisk,
-        risk.productionRisk,
-        risk.enterpriseRisk,
-        risk.hiringRisk,
-      ),
-    )}%`}
-  />
-
-  <ExecutiveCard
-    title="Recommendations"
-    value={`${risk.recommendations.length}`}
-  />
-
-</div>
+        
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
 
         <MetricCard
