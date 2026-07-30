@@ -12,6 +12,7 @@ import { buildPortfolioInsights } from "./portfolioInsightsEngine";
 import { buildArchitectureIntelligence } from "./architectureIntelligenceEngine";
 import { buildProductivityIntelligence } from "./productivityIntelligenceEngine";
 import { buildRepositoryRiskIntelligence } from "./repositoryRiskIntelligenceEngine";
+import { buildRepositoryTrendIntelligence } from "./repositoryTrendIntelligenceEngine";
 export function buildRepositoryComparison(
   repositories: RepositoryAnalytics[],
 ): RepositoryComparison {
@@ -72,6 +73,10 @@ export function buildRepositoryComparison(
       }),
     repositoryRiskIntelligence:
   buildRepositoryRiskIntelligence({
+    repositories: [],
+  }),
+    repositoryTrendIntelligence:
+  buildRepositoryTrendIntelligence({
     repositories: [],
   }),
   };
@@ -238,6 +243,10 @@ const architectureIntelligence =
   buildRepositoryRiskIntelligence({
     repositories,
   });
+  const repositoryTrendIntelligence =
+  buildRepositoryTrendIntelligence({
+    repositories,
+  });
 
   return {
 
@@ -297,6 +306,8 @@ const architectureIntelligence =
   productivityIntelligence,
 
   repositoryRiskIntelligence,
+
+  repositoryTrendIntelligence,
 
 };
 }

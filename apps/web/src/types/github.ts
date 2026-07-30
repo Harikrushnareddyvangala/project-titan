@@ -632,6 +632,8 @@ export interface RepositoryComparison {
 
   repositoryRiskIntelligence: RepositoryRiskIntelligence;
 
+  repositoryTrendIntelligence: RepositoryTrendIntelligence;
+
 }
 
 export interface ComparedRepository {
