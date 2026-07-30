@@ -33,9 +33,17 @@ export function RepositoryRiskIntelligenceDashboard({
         />
 
         <ExecutiveCard
-          title="Security Risk"
-          value={`${Math.round(risk.securityRisk)}%`}
-        />
+    title="Highest Risk"
+    value={`${Math.round(
+      Math.max(
+        risk.engineeringRisk,
+        risk.securityRisk,
+        risk.productionRisk,
+        risk.enterpriseRisk,
+        risk.hiringRisk,
+      ),
+    )}%`}
+  />
 
         <ExecutiveCard
           title="Recommendations"
