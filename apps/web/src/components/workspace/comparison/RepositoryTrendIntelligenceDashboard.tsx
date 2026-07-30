@@ -80,6 +80,103 @@ export function RepositoryTrendIntelligenceDashboard({
         />
 
       </div>
+      <div className="rounded-lg border p-4">
+
+  <h3 className="font-medium mb-2">
+    Executive Summary
+  </h3>
+
+  <p className="text-sm text-muted-foreground">
+    {trend.executiveSummary}
+  </p>
+
+</div>
+<div>
+
+  <h3 className="font-medium mb-4">
+    Repository Distribution
+  </h3>
+
+  <div className="grid gap-4 md:grid-cols-3">
+
+    <MetricCard
+      title="Improving"
+      value={`${trend.improvingRepositories}`}
+    />
+
+    <MetricCard
+      title="Stable"
+      value={`${trend.stableRepositories}`}
+    />
+
+    <MetricCard
+      title="Declining"
+      value={`${trend.decliningRepositories}`}
+    />
+
+  </div>
+
+</div>
+<div>
+
+  <h3 className="font-medium mb-4">
+    Trend Breakdown
+  </h3>
+
+  <div className="grid gap-4 md:grid-cols-2">
+
+    <div className="rounded-lg border p-4">
+
+      <div className="text-sm text-muted-foreground">
+        Strongest Dimension
+      </div>
+
+      <div className="mt-2 text-xl font-semibold">
+        {trend.strongestDimension}
+      </div>
+
+      <div className="text-muted-foreground">
+        {trend.strongestDimensionScore.toFixed(1)}
+      </div>
+
+    </div>
+
+    <div className="rounded-lg border p-4">
+
+      <div className="text-sm text-muted-foreground">
+        Weakest Dimension
+      </div>
+
+      <div className="mt-2 text-xl font-semibold">
+        {trend.weakestDimension}
+      </div>
+
+      <div className="text-muted-foreground">
+        {trend.weakestDimensionScore.toFixed(1)}
+      </div>
+
+    </div>
+
+  </div>
+
+</div>  
+<div className="rounded-lg border p-4">
+
+  <h3 className="font-medium mb-4">
+    Executive Insights
+  </h3>
+
+  <ul className="space-y-2">
+
+    {trend.executiveInsights.map((insight) => (
+      <li key={insight}>
+        • {insight}
+      </li>
+    ))}
+
+  </ul>
+
+</div>
 
       <div className="rounded-lg border p-4">
 

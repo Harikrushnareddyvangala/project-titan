@@ -870,6 +870,21 @@ export interface RepositoryTrendIntelligence {
     | "Improving"
     | "Stable"
     | "Declining";
+  
+  improvingRepositories: number;
+stableRepositories: number;
+decliningRepositories: number;
+
+  strongestDimension: string;
+strongestDimensionScore: number;
+
+weakestDimension: string;
+weakestDimensionScore: number;
+
+
+  executiveSummary: string;
+
+  executiveInsights: string[];
 
   recommendations: string[];
 }

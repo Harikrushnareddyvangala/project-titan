@@ -3,21 +3,15 @@ import type {
   RepositoryTrendIntelligence,
 } from "@/types/github";
 
-interface RepositoryTrendSnapshot {
-  timestamp: Date;
+interface RepositoryTrendInput {
   repositories: RepositoryAnalytics[];
 }
 
-interface RepositoryTrendInput {
-  current: RepositoryTrendSnapshot;
-  previous?: RepositoryTrendSnapshot;
-}
-
 export function buildRepositoryTrendIntelligence({
-  current,
-  previous,
+  repositories,
 }: RepositoryTrendInput): RepositoryTrendIntelligence {
-  if (!previous) {
+
+  if (repositories.length === 0) {
     return {
       engineeringTrend: 0,
       securityTrend: 0,
@@ -29,66 +23,60 @@ export function buildRepositoryTrendIntelligence({
 
       trendDirection: "Stable",
 
-      recommendations: [
-        "Historical trend analysis will become available after multiple repository snapshots have been collected.",
-      ],
+improvingRepositories: 0,
+stableRepositories: 0,
+decliningRepositories: 0,
+
+strongestDimension: "N/A",
+strongestDimensionScore: 0,
+
+weakestDimension: "N/A",
+weakestDimensionScore: 0,
+
+executiveSummary:
+  "No repositories are available for trend analysis.",
+
+executiveInsights: [],
+
+recommendations: [],
     };
   }
 
   const engineeringTrend =
-    current.repositories.reduce(
-      (sum, repository, index) =>
-        sum +
-        (
-          repository.engineeringScore -
-          previous.repositories[index].engineeringScore
-        ),
+    repositories.reduce(
+      (sum, repository) =>
+        sum + repository.engineeringStability,
       0,
-    ) / current.repositories.length;
+    ) / repositories.length;
 
   const securityTrend =
-    current.repositories.reduce(
-      (sum, repository, index) =>
-        sum +
-        (
-          repository.securityScore -
-          previous.repositories[index].securityScore
-        ),
+    repositories.reduce(
+      (sum, repository) =>
+        sum + repository.securityScore,
       0,
-    ) / current.repositories.length;
+    ) / repositories.length;
 
   const productionTrend =
-    current.repositories.reduce(
-      (sum, repository, index) =>
-        sum +
-        (
-          repository.productionScore -
-          previous.repositories[index].productionScore
-        ),
+    repositories.reduce(
+      (sum, repository) =>
+        sum + repository.releaseReadiness,
       0,
-    ) / current.repositories.length;
+    ) / repositories.length;
 
   const enterpriseTrend =
-    current.repositories.reduce(
-      (sum, repository, index) =>
-        sum +
-        (
-          repository.enterpriseReadiness -
-          previous.repositories[index].enterpriseReadiness
-        ),
+    repositories.reduce(
+      (sum, repository) =>
+        sum + repository.enterpriseReadiness,
       0,
-    ) / current.repositories.length;
+    ) / repositories.length;
 
   const hiringTrend =
-    current.repositories.reduce(
-      (sum, repository, index) =>
+    repositories.reduce(
+      (sum, repository) =>
         sum +
-        (
-          repository.recruiterIntelligence.hiringScore -
-          previous.repositories[index].recruiterIntelligence.hiringScore
-        ),
+        repository.recruiterIntelligence.hiringScore,
       0,
-    ) / current.repositories.length;
+    ) / repositories.length;
 
   const overallTrend =
     (
@@ -98,36 +86,166 @@ export function buildRepositoryTrendIntelligence({
       enterpriseTrend +
       hiringTrend
     ) / 5;
+  const dimensions = [
+  {
+    name: "Engineering",
+    score: engineeringTrend,
+  },
+  {
+    name: "Security",
+    score: securityTrend,
+  },
+  {
+    name: "Production",
+    score: productionTrend,
+  },
+  {
+    name: "Enterprise",
+    score: enterpriseTrend,
+  },
+  {
+    name: "Hiring",
+    score: hiringTrend,
+  },
+];
 
-  let trendDirection: "Improving" | "Stable" | "Declining";
+const strongestDimension = dimensions.reduce(
+  (best, current) =>
+    current.score > best.score ? current : best,
+);
 
-  if (overallTrend > 5) {
-    trendDirection = "Improving";
-  } else if (overallTrend < -5) {
-    trendDirection = "Declining";
+const weakestDimension = dimensions.reduce(
+  (worst, current) =>
+    current.score < worst.score ? current : worst,
+);
+
+  let improvingRepositories = 0;
+let stableRepositories = 0;
+let decliningRepositories = 0;
+
+repositories.forEach((repository) => {
+  const score =
+    (
+      repository.engineeringStability +
+      repository.securityScore +
+      repository.productionScore +
+      repository.enterpriseReadiness +
+      repository.recruiterIntelligence.hiringScore
+    ) / 5;
+
+  if (score >= 80) {
+    improvingRepositories++;
+  } else if (score >= 60) {
+    stableRepositories++;
   } else {
-    trendDirection = "Stable";
+    decliningRepositories++;
   }
+});
+
+  let trendDirection:
+    | "Improving"
+    | "Stable"
+    | "Declining";
+
+  if (overallTrend >= 80) {
+    trendDirection = "Improving";
+  } else if (overallTrend >= 60) {
+    trendDirection = "Stable";
+  } else {
+    trendDirection = "Declining";
+  }
+
+  let executiveSummary = "";
+
+if (trendDirection === "Improving") {
+  executiveSummary =
+    "Repository portfolio demonstrates strong engineering maturity with improving overall quality.";
+} else if (trendDirection === "Stable") {
+  executiveSummary =
+    "Repository portfolio is stable with consistent engineering practices across repositories.";
+} else {
+  executiveSummary =
+    "Repository portfolio shows declining engineering quality and requires focused improvements.";
+}
 
   const recommendations: string[] = [];
+  const executiveInsights: string[] = [];
 
-  if (trendDirection === "Improving") {
+  if (engineeringTrend < 70) {
     recommendations.push(
-      "Repository quality is improving across the portfolio. Continue current engineering practices.",
+      "Improve engineering stability through testing and code quality improvements.",
     );
   }
 
-  if (trendDirection === "Stable") {
+  if (securityTrend < 70) {
     recommendations.push(
-      "Repository quality is stable. Continue monitoring long-term engineering trends.",
+      "Strengthen repository security practices and dependency management.",
     );
   }
 
-  if (trendDirection === "Declining") {
+  if (productionTrend < 70) {
     recommendations.push(
-      "Repository quality is declining. Investigate engineering, security, and operational metrics to identify regression causes.",
+      "Increase release readiness through CI/CD and deployment automation.",
     );
   }
+
+  if (enterpriseTrend < 70) {
+    recommendations.push(
+      "Improve documentation, governance, and enterprise engineering practices.",
+    );
+  }
+
+  if (hiringTrend < 70) {
+    recommendations.push(
+      "Improve repository consistency to support onboarding and hiring evaluation.",
+    );
+  }
+
+  if (recommendations.length === 0) {
+    recommendations.push(
+      "Current engineering indicators are healthy. Continue maintaining engineering excellence.",
+    );
+  }
+
+  executiveInsights.push(
+  `${strongestDimension.name} is currently the strongest engineering dimension.`,
+);
+
+executiveInsights.push(
+  `${weakestDimension.name} requires the greatest improvement across the portfolio.`,
+);
+
+if (overallTrend >= 80) {
+  executiveInsights.push(
+    "Overall repository health is excellent and demonstrates mature engineering practices.",
+  );
+} else if (overallTrend >= 60) {
+  executiveInsights.push(
+    "Repository portfolio is healthy with opportunities for targeted improvements.",
+  );
+} else {
+  executiveInsights.push(
+    "Repository portfolio requires engineering attention to improve overall quality.",
+  );
+}
+
+if (engineeringTrend > securityTrend) {
+  executiveInsights.push(
+    "Engineering maturity currently exceeds security maturity.",
+  );
+}
+
+if (productionTrend < engineeringTrend) {
+  executiveInsights.push(
+    "Production readiness is lagging behind engineering maturity.",
+  );
+}
+
+if (enterpriseTrend >= 80) {
+  executiveInsights.push(
+    "Repositories demonstrate strong enterprise readiness.",
+  );
+}
 
   return {
     engineeringTrend,
@@ -140,6 +258,21 @@ export function buildRepositoryTrendIntelligence({
 
     trendDirection,
 
-    recommendations,
+    improvingRepositories,
+stableRepositories,
+decliningRepositories,
+
+strongestDimension: strongestDimension.name,
+strongestDimensionScore: strongestDimension.score,
+
+weakestDimension: weakestDimension.name,
+weakestDimensionScore: weakestDimension.score,
+
+
+executiveSummary,
+
+executiveInsights,
+
+recommendations,
   };
 }
