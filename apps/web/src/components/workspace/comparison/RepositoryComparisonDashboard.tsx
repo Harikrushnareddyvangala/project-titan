@@ -8,6 +8,7 @@ import { TopRepositoryCard } from "./TopRepositoryCard";
 import { PortfolioHealthDashboard } from "./PortfolioHealthDashboard";
 import { PortfolioInsightsDashboard } from "./PortfolioInsightsDashboard";
 import { ArchitectureIntelligenceDashboard } from "./ArchitectureIntelligenceDashboard";
+import { EngineeringProductivityDashboard } from "./EngineeringProductivityDashboard";
 interface RepositoryComparisonDashboardProps {
   comparison: RepositoryComparison;
 }
@@ -41,10 +42,15 @@ export function RepositoryComparisonDashboard({
       <PortfolioInsightsDashboard
       insights={comparison.portfolioInsights}
       />
-      {/* Architecture Insights Dashboard */}
+      {/* Architecture Intelligence Dashboard */}
       
       <ArchitectureIntelligenceDashboard
       architecture={comparison.architectureIntelligence}
+      />
+      {/*Engineering Productivity Dashboard*/}
+
+      <EngineeringProductivityDashboard
+       productivity={comparison.productivityIntelligence}
       />
 
       {/* Engineering Leaders */}

@@ -1,0 +1,110 @@
+import type { ProductivityIntelligence } from "@/types/github";
+
+interface EngineeringProductivityDashboardProps {
+  productivity: ProductivityIntelligence;
+}
+
+export function EngineeringProductivityDashboard({
+  productivity,
+}: EngineeringProductivityDashboardProps) {
+  return (
+    <div className="rounded-xl border p-6 space-y-6">
+
+      <div>
+        <h2 className="text-xl font-semibold">
+          Engineering Productivity Intelligence
+        </h2>
+
+        <p className="text-sm text-muted-foreground">
+          Portfolio-wide engineering productivity analysis.
+        </p>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+
+        <MetricCard
+          title="Activity"
+          value={`${productivity.activityScore}%`}
+        />
+
+        <MetricCard
+          title="Delivery"
+          value={`${productivity.deliveryVelocity}%`}
+        />
+
+        <MetricCard
+          title="Maintenance"
+          value={`${productivity.maintenanceScore}%`}
+        />
+
+        <MetricCard
+          title="Collaboration"
+          value={`${productivity.collaborationScore}%`}
+        />
+
+        <MetricCard
+          title="Release Health"
+          value={`${productivity.releaseHealth}%`}
+        />
+
+      </div>
+
+      <div className="rounded-lg border p-4">
+
+        <h3 className="font-medium mb-2">
+          Productivity Grade
+        </h3>
+
+        <p className="text-3xl font-bold">
+          {productivity.productivityGrade}
+        </p>
+
+      </div>
+
+      <div className="rounded-lg border p-4">
+
+        <h3 className="font-medium mb-2">
+          Recommendations
+        </h3>
+
+        {productivity.recommendations.length === 0 ? (
+          <p className="text-sm text-muted-foreground">
+            No recommendations available.
+          </p>
+        ) : (
+          <ul className="space-y-2">
+            {productivity.recommendations.map((item) => (
+              <li key={item}>• {item}</li>
+            ))}
+          </ul>
+        )}
+
+      </div>
+
+    </div>
+  );
+}
+
+interface MetricCardProps {
+  title: string;
+  value: string;
+}
+
+function MetricCard({
+  title,
+  value,
+}: MetricCardProps) {
+  return (
+    <div className="rounded-lg border p-4">
+
+      <div className="text-sm text-muted-foreground">
+        {title}
+      </div>
+
+      <div className="mt-2 text-2xl font-bold">
+        {value}
+      </div>
+
+    </div>
+  );
+}
