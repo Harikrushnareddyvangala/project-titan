@@ -854,3 +854,20 @@ export interface RepositoryRiskIntelligence {
 
   recommendations: string[];
 }
+
+export interface RepositoryTrendIntelligence {
+  engineeringTrend: number;
+  securityTrend: number;
+  productionTrend: number;
+  enterpriseTrend: number;
+  hiringTrend: number;
+
+  overallTrend: number;
+
+  trendDirection:
+    | "Improving"
+    | "Stable"
+    | "Declining";
+
+  recommendations: string[];
+}
