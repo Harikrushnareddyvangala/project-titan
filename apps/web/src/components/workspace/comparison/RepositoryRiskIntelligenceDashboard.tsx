@@ -43,7 +43,38 @@ export function RepositoryRiskIntelligenceDashboard({
         />
 
       </div>
+    
+        <div className="grid gap-4 md:grid-cols-4">
 
+  <ExecutiveCard
+    title="Risk Grade"
+    value={risk.riskGrade}
+  />
+
+  <ExecutiveCard
+    title="Overall Risk"
+    value={`${Math.round(risk.overallRisk)}%`}
+  />
+
+  <ExecutiveCard
+    title="Highest Risk"
+    value={`${Math.round(
+      Math.max(
+        risk.engineeringRisk,
+        risk.securityRisk,
+        risk.productionRisk,
+        risk.enterpriseRisk,
+        risk.hiringRisk,
+      ),
+    )}%`}
+  />
+
+  <ExecutiveCard
+    title="Recommendations"
+    value={`${risk.recommendations.length}`}
+  />
+
+</div>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
 
         <MetricCard
@@ -81,8 +112,10 @@ export function RepositoryRiskIntelligenceDashboard({
 
         {risk.recommendations.length === 0 ? (
           <p className="text-sm text-muted-foreground">
-            No significant engineering risks detected.
-          </p>
+  The portfolio currently demonstrates a healthy engineering
+  risk profile. Continue monitoring repositories to maintain
+  engineering quality and operational stability.
+</p>
         ) : (
           <ul className="space-y-2">
             {risk.recommendations.map((item) => (
