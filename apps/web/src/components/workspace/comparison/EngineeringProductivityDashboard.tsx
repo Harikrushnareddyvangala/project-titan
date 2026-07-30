@@ -19,7 +19,29 @@ export function EngineeringProductivityDashboard({
           Portfolio-wide engineering productivity analysis.
         </p>
       </div>
+        <div className="grid gap-4 md:grid-cols-4">
 
+  <ExecutiveCard
+    title="Productivity Grade"
+    value={productivity.productivityGrade}
+  />
+
+  <ExecutiveCard
+    title="Activity Score"
+    value={`${Math.round(productivity.activityScore)}%`}
+  />
+
+  <ExecutiveCard
+    title="Release Health"
+    value={`${Math.round(productivity.releaseHealth)}%`}
+  />
+
+  <ExecutiveCard
+    title="Recommendations"
+    value={`${productivity.recommendations.length}`}
+  />
+
+</div>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
 
         <MetricCard
@@ -69,8 +91,9 @@ export function EngineeringProductivityDashboard({
 
         {productivity.recommendations.length === 0 ? (
           <p className="text-sm text-muted-foreground">
-            No recommendations available.
-          </p>
+  Engineering productivity is performing well across the portfolio.
+  No additional recommendations are currently required.
+</p>
         ) : (
           <ul className="space-y-2">
             {productivity.recommendations.map((item) => (
@@ -102,6 +125,29 @@ function MetricCard({
       </div>
 
       <div className="mt-2 text-2xl font-bold">
+        {value}
+      </div>
+
+    </div>
+  );
+}
+interface ExecutiveCardProps {
+  title: string;
+  value: string;
+}
+
+function ExecutiveCard({
+  title,
+  value,
+}: ExecutiveCardProps) {
+  return (
+    <div className="rounded-xl border p-5">
+
+      <div className="text-sm text-muted-foreground">
+        {title}
+      </div>
+
+      <div className="mt-3 text-3xl font-bold">
         {value}
       </div>
 
