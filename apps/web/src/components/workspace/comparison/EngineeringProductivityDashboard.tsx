@@ -99,7 +99,7 @@ export function EngineeringProductivityDashboard({
             {productivity.recommendations.map((item) => (
               <li key={item}>• {item}</li>
             ))}
-          </ul>
+          </ul> 
         )}
 
       </div>
