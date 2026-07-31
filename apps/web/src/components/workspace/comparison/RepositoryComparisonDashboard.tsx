@@ -11,6 +11,7 @@ import { ArchitectureIntelligenceDashboard } from "./ArchitectureIntelligenceDas
 import { EngineeringProductivityDashboard } from "./EngineeringProductivityDashboard";
 import { RepositoryRiskIntelligenceDashboard } from "./RepositoryRiskIntelligenceDashboard";
 import { RepositoryTrendIntelligenceDashboard } from "./RepositoryTrendIntelligenceDashboard";
+import { RepositorySnapshotDashboard } from "./RepositorySnapshotDashboard";
 interface RepositoryComparisonDashboardProps {
   comparison: RepositoryComparison;
 }
@@ -64,6 +65,13 @@ export function RepositoryComparisonDashboard({
       <RepositoryTrendIntelligenceDashboard
       trend={comparison.repositoryTrendIntelligence}
       />
+      {/*Repository Snapshot Dashboard*/}
+
+      <RepositorySnapshotDashboard
+  latestSnapshot={comparison.latestSnapshot}
+  previousSnapshot={comparison.previousSnapshot}
+  snapshotComparison={comparison.snapshotComparison}
+/>
 
       {/* Engineering Leaders */}
 

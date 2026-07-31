@@ -44,7 +44,12 @@ export function ComparisonWorkspace() {
         ): repository is RepositoryAnalytics =>
             repository !== undefined,
     );
-  
+  console.log({
+    repositories,
+    analytics,
+    analyticsCount: analytics.length,
+    analyticsMap,
+});
 const comparison =
     analytics.length >= 2
         ? buildRepositoryComparison(analytics)

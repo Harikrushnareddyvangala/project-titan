@@ -1,4 +1,7 @@
-
+import type {
+  PortfolioSnapshot,
+  SnapshotComparison,
+} from "@/lib/github/repositorySnapshotService";
 
 export interface GithubRepository {
   id: number;
@@ -633,6 +636,13 @@ export interface RepositoryComparison {
   repositoryRiskIntelligence: RepositoryRiskIntelligence;
 
   repositoryTrendIntelligence: RepositoryTrendIntelligence;
+
+  latestSnapshot?: PortfolioSnapshot;
+
+previousSnapshot?: PortfolioSnapshot;
+
+
+snapshotComparison?: SnapshotComparison;
 
 }
 
