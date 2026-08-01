@@ -13,6 +13,7 @@ import { RepositoryRiskIntelligenceDashboard } from "./RepositoryRiskIntelligenc
 import { RepositoryTrendIntelligenceDashboard } from "./RepositoryTrendIntelligenceDashboard";
 import { RepositorySnapshotDashboard } from "./RepositorySnapshotDashboard";
 import { RepositoryEvolutionDashboard } from "./RepositoryEvolutionDashboard";
+import { RepositoryHistoricalTrendDashboard } from "./RepositoryHistoricalTrendDashboard";
 interface RepositoryComparisonDashboardProps {
   comparison: RepositoryComparison;
 }
@@ -79,6 +80,14 @@ export function RepositoryComparisonDashboard({
         evolution={comparison.repositoryEvolution}
       />
     )}
+
+    {comparison.historicalTrend && (
+    <RepositoryHistoricalTrendDashboard
+        historicalTrend={
+            comparison.historicalTrend
+        }
+    />
+)}
 
       {/* Engineering Leaders */}
 

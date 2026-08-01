@@ -15,6 +15,7 @@ import { buildRepositoryRiskIntelligence } from "./repositoryRiskIntelligenceEng
 import { buildRepositoryTrendIntelligence } from "./repositoryTrendIntelligenceEngine";
 import { repositorySnapshotService, } from "@/lib/github/repositorySnapshotService";
 import { buildPortfolioEvolution, } from "./repositoryEvolutionService";
+import { buildHistoricalTrend, } from "./repositoryHistoricalTrendService";
 export function buildRepositoryComparison(
   repositories: RepositoryAnalytics[],
 ): RepositoryComparison {
@@ -267,6 +268,13 @@ const architectureIntelligence =
       })
     : undefined;
 
+  const historicalTrend =
+  buildHistoricalTrend({
+    snapshots:
+      repositorySnapshotService
+        .getSnapshotHistory(),
+  });
+
   return {
 
   repositories: compared,
@@ -335,6 +343,8 @@ const architectureIntelligence =
   snapshotComparison,
 
   repositoryEvolution,
+
+  historicalTrend,
 
 };
 }
