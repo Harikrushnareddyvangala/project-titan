@@ -1,7 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import {  useState   } from "react";
+import {
+  portfolioComparisonController,
+} from "@/lib/github/portfolioComparisonController";
 import {
   ArrowLeft,
   GitCompareArrows,
@@ -10,50 +13,70 @@ import {
 
 import { WorkspaceHeader } from "@/components/workspace/shared/WorkspaceHeader";
 import { ComparisonRepositoryAnalytics } from "./ComparisonRepositoryAnalytics";
-import type { RepositoryAnalytics } from "@/types/github";
-import { buildRepositoryComparison } from "@/lib/github/repositoryComparisonEngine";
-import type { RepositoryComparison } from "@/types/github";
+import type { RepositoryAnalytics, } from "@/types/github";
 import { RepositoryComparisonDashboard } from "./RepositoryComparisonDashboard";
+
 
 export function ComparisonWorkspace() {
   const [repository, setRepository] = useState("");
   const [repositories, setRepositories] = useState<string[]>([]);
   const [analyticsMap, setAnalyticsMap] =
     useState<Record<string, RepositoryAnalytics>>({});
+  //   const [comparison, setComparison] =
+  // useState<RepositoryComparison | null>(null);
   
     const handleAnalyticsLoaded = (
-    repository: string,
-    analytics: RepositoryAnalytics,
+  repository: string,
+  analytics: RepositoryAnalytics,
 ) => {
-    setAnalyticsMap((previous) => {
-        if (previous[repository] === analytics) {
-            return previous;
-        }
+  setAnalyticsMap((previous) => {
 
-        return {
-            ...previous,
-            [repository]: analytics,
-        };
-    });
+    if (previous[repository] === analytics) {
+      return previous;
+    }
+
+    const updated = {
+      ...previous,
+      [repository]: analytics,
+    };
+
+    const analyticsList =
+    repositories
+        .map(
+            (name) =>
+                updated[name],
+        )
+        .filter(
+            (
+                repository,
+            ): repository is RepositoryAnalytics =>
+                repository !== undefined,
+        );
+
+portfolioComparisonController
+    .captureSnapshotIfNeeded(
+        analyticsList,
+    );
+
+
+    return updated;
+
+  });
 };
     const analytics = repositories
-    .map((repository) => analyticsMap[repository])
-    .filter(
-        (
-            repository,
-        ): repository is RepositoryAnalytics =>
-            repository !== undefined,
-    );
-  console.log({
-    repositories,
-    analytics,
-    analyticsCount: analytics.length,
-    analyticsMap,
-});
-const comparison =
-    analytics.length >= 2
-        ? buildRepositoryComparison(analytics)
-        : null;
+  .map((repository) => analyticsMap[repository])
+  .filter(
+    (
+      repository,
+    ): repository is RepositoryAnalytics =>
+      repository !== undefined,
+  );
+  const comparison =
+  analytics.length >= 2
+    ? portfolioComparisonController.buildComparison(
+        analytics,
+      )
+    : null;
         
   function addRepository() {
     const value = repository.trim();

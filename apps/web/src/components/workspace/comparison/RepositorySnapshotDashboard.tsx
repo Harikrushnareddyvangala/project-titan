@@ -14,11 +14,6 @@ export function RepositorySnapshotDashboard({
   previousSnapshot, 
   snapshotComparison,
 }: RepositorySnapshotDashboardProps) {
-    console.log({
-        latestSnapshot,
-        previousSnapshot,
-        snapshotComparison,
-    });
     if (!latestSnapshot) {
   return (
     

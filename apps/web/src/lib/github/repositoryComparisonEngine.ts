@@ -14,6 +14,7 @@ import { buildProductivityIntelligence } from "./productivityIntelligenceEngine"
 import { buildRepositoryRiskIntelligence } from "./repositoryRiskIntelligenceEngine";
 import { buildRepositoryTrendIntelligence } from "./repositoryTrendIntelligenceEngine";
 import { repositorySnapshotService, } from "@/lib/github/repositorySnapshotService";
+import { buildPortfolioEvolution, } from "./repositoryEvolutionService";
 export function buildRepositoryComparison(
   repositories: RepositoryAnalytics[],
 ): RepositoryComparison {
@@ -80,6 +81,7 @@ export function buildRepositoryComparison(
   buildRepositoryTrendIntelligence({
      repositories: [],
   }),
+  repositoryEvolution: undefined,
   };
 }
    
@@ -248,25 +250,22 @@ const architectureIntelligence =
   buildRepositoryTrendIntelligence({
     repositories,
   });
-  const snapshot =
-  repositorySnapshotService.buildPortfolioSnapshot(
-    repositories,
-  );
-
-repositorySnapshotService.addSnapshot(
-    snapshot,
-);
-const latestSnapshot =
+  const latestSnapshot =
   repositorySnapshotService.getLatestSnapshot();
   
-const previousSnapshot =
+  const previousSnapshot =
   repositorySnapshotService.getPreviousSnapshot();
+
   const snapshotComparison =
   repositorySnapshotService.compareLatestSnapshots();
 
-console.log("Latest Snapshot:", latestSnapshot);
-console.log("Previous Snapshot:", previousSnapshot);
-console.log("Comparison:", snapshotComparison);
+  const repositoryEvolution =
+  latestSnapshot && previousSnapshot
+    ? buildPortfolioEvolution({
+        current: latestSnapshot,
+        previous: previousSnapshot,
+      })
+    : undefined;
 
   return {
 
@@ -334,6 +333,8 @@ console.log("Comparison:", snapshotComparison);
   previousSnapshot,
 
   snapshotComparison,
+
+  repositoryEvolution,
 
 };
 }

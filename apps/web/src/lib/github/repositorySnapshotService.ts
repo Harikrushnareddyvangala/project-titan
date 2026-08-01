@@ -135,6 +135,7 @@ class RepositorySnapshotService {
       averageEnterpriseScore +
       averageHiringScore
     ) / 5;
+  const SNAPSHOT_VERSION = "1.0.0";
 
   return {
     metadata: {
@@ -142,7 +143,7 @@ class RepositorySnapshotService {
 
       capturedAt: new Date(),
 
-      version: "1.0.0",
+      version: SNAPSHOT_VERSION,
     },
 
     repositories,
@@ -164,30 +165,17 @@ class RepositorySnapshotService {
     },
   };
 }
-//   private readonly snapshotHistory: PortfolioSnapshot[] = [];
+
 
   addSnapshot(
   snapshot: PortfolioSnapshot,
 ): void {
-    console.log("Adding snapshot:", snapshot);
-
-
-  const latest = this.getLatestSnapshot();
-
-  if (
-    latest &&
-    latest.metrics.repositoryCount ===
-        snapshot.metrics.repositoryCount &&
-    latest.metrics.overallPortfolioScore ===
-      snapshot.metrics.overallPortfolioScore
-  ) {
-    console.log("Duplicate snapshot skipped.");
-        
-    return;
-  }
-
-  this.snapshotHistory.push(snapshot);
-  console.log("History length:", this.snapshotHistory.length);
+    
+// Freeze snapshots (recommended) istaed of this.snapshotHistory.push(snapshot);//
+  this.snapshotHistory.push(
+  Object.freeze(snapshot),
+);
+  
   if (
         this.snapshotHistory.length >
         RepositorySnapshotService.MAX_HISTORY
@@ -199,11 +187,6 @@ class RepositorySnapshotService {
   getLatestSnapshot():
     | PortfolioSnapshot
     | undefined {
-        console.log(
-        "History:",
-        this.snapshotHistory,
-    );
-
     return this.snapshotHistory.at(-1);
   }
 
@@ -221,7 +204,7 @@ class RepositorySnapshotService {
   getSnapshotHistory():
     readonly PortfolioSnapshot[] {
 
-    return this.snapshotHistory;
+    return [...this.snapshotHistory];
   }
 
   clearSnapshotHistory(): void {
