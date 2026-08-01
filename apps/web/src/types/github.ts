@@ -8,6 +8,9 @@ import type {
 import type {
   PortfolioHistoricalTrend,
 } from "@/lib/github/repositoryHistoricalTrendService";
+import type {
+  PortfolioForecast,
+} from "@/lib/github/repositoryForecastService";
 
 export interface GithubRepository {
   id: number;
@@ -652,6 +655,8 @@ snapshotComparison?: SnapshotComparison;
 repositoryEvolution?: PortfolioEvolution;
 
 historicalTrend?: PortfolioHistoricalTrend;
+
+forecast?: PortfolioForecast;
 }
 
 export interface ComparedRepository {

@@ -14,6 +14,7 @@ import { RepositoryTrendIntelligenceDashboard } from "./RepositoryTrendIntellige
 import { RepositorySnapshotDashboard } from "./RepositorySnapshotDashboard";
 import { RepositoryEvolutionDashboard } from "./RepositoryEvolutionDashboard";
 import { RepositoryHistoricalTrendDashboard } from "./RepositoryHistoricalTrendDashboard";
+import { RepositoryForecastDashboard } from "./RepositoryForecastDashboard";
 interface RepositoryComparisonDashboardProps {
   comparison: RepositoryComparison;
 }
@@ -87,6 +88,13 @@ export function RepositoryComparisonDashboard({
             comparison.historicalTrend
         }
     />
+)}
+    {comparison.forecast && (
+      <div className="mt-10">
+  <RepositoryForecastDashboard
+    forecast={comparison.forecast}
+  />
+  </div>
 )}
 
       {/* Engineering Leaders */}

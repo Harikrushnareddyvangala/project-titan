@@ -16,6 +16,7 @@ import { buildRepositoryTrendIntelligence } from "./repositoryTrendIntelligenceE
 import { repositorySnapshotService, } from "@/lib/github/repositorySnapshotService";
 import { buildPortfolioEvolution, } from "./repositoryEvolutionService";
 import { buildHistoricalTrend, } from "./repositoryHistoricalTrendService";
+import { buildRepositoryForecast, } from "./repositoryForecastService";
 export function buildRepositoryComparison(
   repositories: RepositoryAnalytics[],
 ): RepositoryComparison {
@@ -275,6 +276,11 @@ const architectureIntelligence =
         .getSnapshotHistory(),
   });
 
+  const forecast =
+  buildRepositoryForecast({
+    historicalTrend,
+  });
+
   return {
 
   repositories: compared,
@@ -345,6 +351,8 @@ const architectureIntelligence =
   repositoryEvolution,
 
   historicalTrend,
+
+  forecast,
 
 };
 }
