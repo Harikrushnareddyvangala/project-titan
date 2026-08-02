@@ -2,12 +2,12 @@ import type {
   PortfolioHistoricalTrend,
 } from "./repositoryHistoricalTrendService";
 
-export type ForecastDirection =
-  | "Strong Growth"
-  | "Growing"
-  | "Stable"
-  | "Declining"
-  | "High Risk";
+import type {
+  ForecastDirection,
+  RiskLevel,
+} from "@/types/intelligence";
+
+
 
 export interface RepositoryForecast {
 
@@ -34,7 +34,7 @@ export interface RepositoryForecast {
 
   forecastDirection: ForecastDirection;
 
-  predictedRisk: string;
+  predictedRisk: RiskLevel;
 
 }
 
@@ -174,12 +174,12 @@ const predictedHiring =
           repository,
         );
 
-      const forecastDirection =
+      const forecastDirection: ForecastDirection =
         determineForecastDirection(
           repository.overallGrowth,
         );
 
-      const predictedRisk =
+      const predictedRisk: RiskLevel =
         determinePredictedRisk(
           overallPrediction,
         );
@@ -282,7 +282,7 @@ function determineForecastDirection(
 }
 function determinePredictedRisk(
   prediction: number,
-): string {
+): RiskLevel {
 
   if (prediction >= 90)
     return "Very Low";

@@ -1,6 +1,19 @@
+import {
+  DashboardSection,
+  DashboardGrid,
+  MetricCard,
+  ExecutiveCard,
+  DeltaMetricCard,
+  BaseCard,
+  GrowthBadge,
+  TrendBadge,  
+  Database,
+  Shield,
+  TrendingUp,
+} from "@/components/ui";
+
 import type {
   PortfolioHistoricalTrend,
-  TrendDirection,
 } from "@/lib/github/repositoryHistoricalTrendService";
 
 interface RepositoryHistoricalTrendDashboardProps {
@@ -22,222 +35,239 @@ export function RepositoryHistoricalTrendDashboard({
   return (
     <div className="space-y-8 rounded-2xl border border-white/10 bg-white/[0.03] p-8">
 
-      <div>
+      <DashboardSection
+  title="Historical Trend Analytics"
+  description="Long-term engineering intelligence across portfolio snapshots."
+> 
 
-        <h2 className="text-2xl font-bold">
-          Historical Trend Analytics
-        </h2>
-
-        <p className="mt-2 text-sm text-zinc-400">
-          Long-term engineering intelligence across portfolio snapshots.
-        </p>
-
-      </div>
-
-      <div className="grid gap-4 md:grid-cols-4">
+      <DashboardGrid columns={4}>
 
         <MetricCard
-          title="Snapshots"
-          value={
-            historicalTrend.summary.snapshotCount
-          }
-        />
+  title="Snapshots"
+  value={historicalTrend.summary.snapshotCount}
+  icon={
+    <Database className="h-6 w-6 text-cyan-400" />
+  }
+/>
 
-        <MetricCard
-          title="Repositories"
-          value={
-            historicalTrend.summary.repositoryCount
-          }
-        />
+<MetricCard
+  title="Repositories"
+  value={historicalTrend.summary.repositoryCount}
+  icon={
+    <Database className="h-6 w-6 text-blue-400" />
+  }
+/>
 
-        <MetricCard
-          title="Portfolio Stability"
-          value={`${historicalTrend.summary.portfolioStability.toFixed(
-            1,
-          )}%`}
-        />
+<MetricCard
+  title="Portfolio Stability"
+  value={historicalTrend.summary.portfolioStability}
+  suffix="%"
+  precision={1}
+  icon={
+    <Shield className="h-6 w-6 text-emerald-400" />
+  }
+/>
 
-        <MetricCard
-          title="Trend Confidence"
-          value={`${historicalTrend.summary.trendConfidence.toFixed(
-            1,
-          )}%`}
-        />
+<MetricCard
+  title="Trend Confidence"
+  value={historicalTrend.summary.trendConfidence}
+  suffix="%"
+  precision={1}
+  icon={
+    <TrendingUp className="h-6 w-6 text-purple-400" />
+  }
+/>
 
-      </div>
+      </DashboardGrid> 
 
-      <section className="rounded-xl border border-white/10 bg-black/20 p-6">
+      <DashboardSection
+  className="mt-10"
+>
 
-        <h3 className="text-lg font-semibold">
-          Executive Intelligence
-        </h3>
+  <ExecutiveCard
 
-        <div className="mt-5 space-y-5">
+    title={
+      historicalTrend.executiveInsight.title
+    }
 
-          <div>
+    summary={
+      historicalTrend.executiveInsight.summary
+    }
 
-            <div className="text-xs uppercase tracking-widest text-zinc-500">
-              Title
-            </div>
+    recommendation={
+      historicalTrend.executiveInsight.recommendation
+    }
 
-            <div className="mt-2 text-xl font-bold">
-              {historicalTrend.executiveInsight.title}
-            </div>
+  />
 
-          </div>
+</DashboardSection>
 
-          <div>
+      <DashboardSection
 
-            <div className="text-xs uppercase tracking-widest text-zinc-500">
-              Summary
-            </div>
+  title="Portfolio Growth"
 
-            <p className="mt-2 leading-7 text-zinc-300">
-              {
-                historicalTrend.executiveInsight
-                  .summary
-              }
-            </p>
+  className="mt-10"
 
-          </div>
+>
 
-          <div>
+  <BaseCard>
 
-            <div className="text-xs uppercase tracking-widest text-zinc-500">
-              Recommendation
-            </div>
+    <DashboardGrid columns={3}>
 
-            <p className="mt-2 leading-7 text-cyan-300">
-              {
-                historicalTrend.executiveInsight
-                  .recommendation
-              }
-            </p>
+      <DeltaMetricCard
 
-          </div>
+        title="Engineering"
 
-        </div>
+        value={
+          historicalTrend.summary
+            .averageEngineeringGrowth
+        }
 
-      </section>
+      />
 
-      <section className="rounded-xl border border-white/10 bg-black/20 p-6">
+      <DeltaMetricCard
 
-        <h3 className="mb-5 text-lg font-semibold">
-          Portfolio Growth
-        </h3>
+        title="Security"
 
-        <div className="grid gap-4 md:grid-cols-3">
+        value={
+          historicalTrend.summary
+            .averageSecurityGrowth
+        }
 
-          <GrowthCard
-            title="Engineering"
-            value={
-              historicalTrend.summary
-                .averageEngineeringGrowth
-            }
-          />
+      />
 
-          <GrowthCard
-            title="Security"
-            value={
-              historicalTrend.summary
-                .averageSecurityGrowth
-            }
-          />
+      <DeltaMetricCard
 
-          <GrowthCard
-            title="Production"
-            value={
-              historicalTrend.summary
-                .averageProductionGrowth
-            }
-          />
+        title="Production"
 
-          <GrowthCard
-            title="Enterprise"
-            value={
-              historicalTrend.summary
-                .averageEnterpriseGrowth
-            }
-          />
+        value={
+          historicalTrend.summary
+            .averageProductionGrowth
+        }
 
-          <GrowthCard
-            title="Hiring"
-            value={
-              historicalTrend.summary
-                .averageHiringGrowth
-            }
-          />
+      />
 
-          <GrowthCard
-            title="Overall"
-            value={
-              historicalTrend.summary
-                .overallPortfolioGrowth
-            }
-          />
+      <DeltaMetricCard
 
-        </div>
+        title="Enterprise"
 
-      </section>
-            <section className="rounded-xl border border-white/10 bg-black/20 p-6">
+        value={
+          historicalTrend.summary
+            .averageEnterpriseGrowth
+        }
 
-        <h3 className="mb-5 text-lg font-semibold">
-          Historical Highlights
-        </h3>
+      />
 
-        <div className="grid gap-4 md:grid-cols-3">
+      <DeltaMetricCard
 
-          <ExecutiveCard
-            title="Fastest Growing"
-            value={
-              historicalTrend.highlights
-                .fastestGrowingRepository
-            }
-          />
+        title="Hiring"
 
-          <ExecutiveCard
-            title="Most Stable"
-            value={
-              historicalTrend.highlights
-                .mostStableRepository
-            }
-          />
+        value={
+          historicalTrend.summary
+            .averageHiringGrowth
+        }
 
-          <ExecutiveCard
-            title="Highest Engineering"
-            value={
-              historicalTrend.highlights
-                .highestEngineeringRepository
-            }
-          />
+      />
 
-          <ExecutiveCard
-            title="Highest Security"
-            value={
-              historicalTrend.highlights
-                .highestSecurityRepository
-            }
-          />
+      <DeltaMetricCard
 
-          <ExecutiveCard
-            title="Highest Production"
-            value={
-              historicalTrend.highlights
-                .highestProductionRepository
-            }
-          />
+        title="Overall"
 
-          <ExecutiveCard
-            title="Needs Attention"
-            value={
-              historicalTrend.highlights
-                .needsAttentionRepository
-            }
-          />
+        value={
+          historicalTrend.summary
+            .overallPortfolioGrowth
+        }
 
-        </div>
+      />
 
-      </section>
+    </DashboardGrid>
+
+  </BaseCard>
+
+</DashboardSection>
+            <DashboardSection
+
+  title="Historical Highlights"
+
+  className="mt-10"
+
+>
+
+  <BaseCard>
+
+    <DashboardGrid columns={3}>
+
+      <MetricCard
+
+        title="Fastest Growing"
+
+        value={
+          historicalTrend.highlights
+            .fastestGrowingRepository
+        }
+
+      />
+
+      <MetricCard
+
+        title="Most Stable"
+
+        value={
+          historicalTrend.highlights
+            .mostStableRepository
+        }
+
+      />
+
+      <MetricCard
+
+        title="Highest Engineering"
+
+        value={
+          historicalTrend.highlights
+            .highestEngineeringRepository
+        }
+
+      />
+
+      <MetricCard
+
+        title="Highest Security"
+
+        value={
+          historicalTrend.highlights
+            .highestSecurityRepository
+        }
+
+      />
+
+      <MetricCard
+
+        title="Highest Production"
+
+        value={
+          historicalTrend.highlights
+            .highestProductionRepository
+        }
+
+      />
+
+      <MetricCard
+
+        title="Needs Attention"
+
+        value={
+          historicalTrend.highlights
+            .needsAttentionRepository
+        }
+
+      />
+
+    </DashboardGrid>
+
+  </BaseCard>
+
+</DashboardSection>
 
       <section className="rounded-xl border border-white/10 bg-black/20 p-6">
 
@@ -364,145 +394,13 @@ export function RepositoryHistoricalTrendDashboard({
         </div>
 
       </footer>
-
-    </div>
-
-  );
-
-}
-interface MetricCardProps {
-  title: string;
-  value: string | number;
-}
-
-function MetricCard({
-  title,
-  value,
-}: MetricCardProps) {
-  return (
-    <div className="rounded-xl border border-white/10 bg-black/30 p-5">
-
-      <div className="text-sm uppercase tracking-wider text-zinc-500">
-        {title}
-      </div>
-
-      <div className="mt-3 text-3xl font-bold text-white">
-        {value}
-      </div>
-
-    </div>
-  );
-}
-
-interface GrowthCardProps {
-  title: string;
-  value: number;
-}
-
-function GrowthCard({
-  title,
-  value,
-}: GrowthCardProps) {
-
-  const positive = value > 0;
-  const negative = value < 0;
-
-  const color = positive
-    ? "text-emerald-400"
-    : negative
-      ? "text-red-400"
-      : "text-zinc-300";
-
-  const icon = positive
-    ? "▲"
-    : negative
-      ? "▼"
-      : "●";
-
-  return (
-    <div className="rounded-xl border border-white/10 bg-black/30 p-5">
-
-      <div className="text-sm uppercase tracking-wider text-zinc-500">
-        {title}
-      </div>
-
-      <div className={`mt-3 text-3xl font-bold ${color}`}>
-
-        {icon}{" "}
-        {value >= 0 ? "+" : ""}
-        {value.toFixed(2)}
-
-      </div>
-
-    </div>
-  );
-
-}
-
-interface ExecutiveCardProps {
-  title: string;
-  value: string;
-}
-
-function ExecutiveCard({
-  title,
-  value,
-}: ExecutiveCardProps) {
-
-  return (
-
-    <div className="rounded-xl border border-white/10 bg-black/30 p-5">
-
-      <div className="text-sm uppercase tracking-wider text-zinc-500">
-        {title}
-      </div>
-
-      <div className="mt-3 text-lg font-semibold text-white">
-
-        {value || "N/A"}
-
-      </div>
-
+</DashboardSection>
     </div>
 
   );
 
 }
 
-function GrowthBadge({
-  value,
-}: {
-  value: number;
-}) {
-
-  const positive = value > 0;
-  const negative = value < 0;
-
-  const color = positive
-    ? "text-emerald-400"
-    : negative
-      ? "text-red-400"
-      : "text-zinc-300";
-
-  const icon = positive
-    ? "▲"
-    : negative
-      ? "▼"
-      : "●";
-
-  return (
-
-    <span className={`font-semibold ${color}`}>
-
-      {icon}{" "}
-      {value >= 0 ? "+" : ""}
-      {value.toFixed(2)}
-
-    </span>
-
-  );
-
-}
 interface RepositoryTrendRowProps {
   repository: PortfolioHistoricalTrend["repositories"][number];
   portfolioLeader?: boolean;
@@ -513,7 +411,11 @@ function RepositoryTrendRow({
   portfolioLeader = false,
 }: RepositoryTrendRowProps) {
   return (
-    <div className="rounded-xl border border-white/10 bg-black/30 p-6">
+    <BaseCard
+
+  title={repository.repositoryName}
+
+>
 
       <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
 
@@ -521,9 +423,7 @@ function RepositoryTrendRow({
 
           <div className="flex flex-wrap items-center gap-3">
 
-            <div className="text-lg font-semibold">
-              {repository.repositoryName}
-            </div>
+            
 
             {portfolioLeader && (
               <span className="rounded-full border border-yellow-500/40 bg-yellow-500/10 px-3 py-1 text-xs font-semibold text-yellow-300">
@@ -623,41 +523,6 @@ function RepositoryTrendRow({
 
       </div>
 
-    </div>
-  );
-}
-
-function TrendBadge({
-  direction,
-}: {
-  direction: TrendDirection;
-}) {
-
-  const styles: Record<
-    TrendDirection,
-    string
-  > = {
-    "Rapid Growth":
-      "border-emerald-500/30 bg-emerald-500/10 text-emerald-300",
-
-    Growing:
-      "border-green-500/30 bg-green-500/10 text-green-300",
-
-    Stable:
-      "border-zinc-500/30 bg-zinc-500/10 text-zinc-300",
-
-    Declining:
-      "border-orange-500/30 bg-orange-500/10 text-orange-300",
-
-    Critical:
-      "border-red-500/30 bg-red-500/10 text-red-300",
-  };
-
-  return (
-    <span
-      className={`rounded-full border px-3 py-1 text-xs font-semibold ${styles[direction]}`}
-    >
-      {direction}
-    </span>
+    </BaseCard>
   );
 }

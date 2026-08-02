@@ -1,6 +1,4 @@
 "use client";
-
-import type { ReactNode } from "react";
 import type { DeveloperDNA } from "@/types/github";
 
 import {

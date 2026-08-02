@@ -1,7 +1,6 @@
 import type {
   PortfolioSnapshot,
 } from "./repositorySnapshotService";
-
 export type TrendDirection =
   | "Rapid Growth"
   | "Growing"

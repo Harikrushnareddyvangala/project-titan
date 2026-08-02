@@ -1,93 +1,146 @@
-import { TrendMetricCard } from "@/components/ui/TrendMetricCard";
+import {
+  DashboardSection,
+  DashboardGrid,
+  MetricCard,
+  BaseCard,
+} from "@/components/ui";
+
+import {
+  Activity,
+  Briefcase,
+  Factory,
+  Database,
+  Layers,
+  Shield,
+} from "@/components/ui";
+
 import type {
   PortfolioSnapshot,
   SnapshotComparison,
 } from "@/lib/github/repositorySnapshotService";
-
 interface RepositorySnapshotDashboardProps {
   latestSnapshot?: PortfolioSnapshot;
   previousSnapshot?: PortfolioSnapshot;
   snapshotComparison?: SnapshotComparison;
 }
 export function RepositorySnapshotDashboard({
-  latestSnapshot,
-  previousSnapshot, 
-  snapshotComparison,
-}: RepositorySnapshotDashboardProps) {
-    if (!latestSnapshot) {
-  return (
-    
-    <div className="rounded-xl border p-6">
-      <h2 className="text-xl font-semibold">
-        Repository Snapshot Service
-      </h2>
 
-      <p className="mt-4 text-sm text-muted-foreground">
-        No repository snapshot is available.
-      </p>
-    </div>
-  );
-}
+  latestSnapshot,
+
+  previousSnapshot,
+
+  snapshotComparison,
+
+}: RepositorySnapshotDashboardProps) {
+
+  if (!latestSnapshot) {
+
+    return (
+
+      <DashboardSection
+        title="Repository Snapshot Service"
+        description="Historical snapshot collection for engineering intelligence."
+      >
+
+        <BaseCard variant="warning" title="No Snapshot Available">
+
+          <p className="text-sm text-zinc-300">
+
+            Repository analysis has not yet produced
+            a portfolio snapshot.
+
+            Run the snapshot service to generate
+            the first engineering intelligence report.
+
+          </p>
+
+        </BaseCard>
+
+      </DashboardSection>
+
+    );
+
+  }
 
   const latest = latestSnapshot;
-//   if (!latest) {
-//     return (
-//       <div className="rounded-xl border p-6">
-//         <h2 className="text-xl font-semibold">
-//           Repository Snapshot Service
-//         </h2>
-
-//         <p className="mt-4 text-sm text-muted-foreground">
-//           No repository snapshots have been captured.
-//         </p>
-//       </div>
-//     );
-//   }
 
   return (
-    <div className="rounded-xl border p-6 space-y-6">
 
-      <div>
+<DashboardSection
 
-        <h2 className="text-xl font-semibold">
-          Repository Snapshot Service
-        </h2>
+  title="Repository Snapshot Service"
 
-        <p className="text-sm text-muted-foreground">
-          Historical snapshot collection for engineering intelligence.
-        </p>
+  description="Historical snapshot collection for engineering intelligence."
 
-      </div>
+  className="mt-10"
 
-      <div className="grid gap-4 md:grid-cols-3">
+>
+<BaseCard>
+      <DashboardGrid columns={3}>
 
         {/* <ExecutiveCard
           title="Snapshots"
           value={`${history.length}`}
         /> */}
 
-        <ExecutiveCard
-          title="Repositories"
-          value={`${latest.metrics.repositoryCount}`}
-        />
+        <MetricCard
 
-        <ExecutiveCard
-          title="Portfolio Score"
-          value={`${Math.round(
-            latest.metrics.overallPortfolioScore,
-          )}`}
-        />
+  title="Repositories"
 
-        <ExecutiveCard
-          title="Version"
-          value={latest.metadata.version}
-        />
+  value={latest.metrics.repositoryCount}
 
-      </div>
+  icon={
+    <Database
+      className="h-6 w-6 text-cyan-400"
+    />
+  }
 
-      <div className="rounded-lg border p-4">
+/>
 
-        <SnapshotCard
+        <MetricCard
+
+  title="Portfolio Score"
+
+  value={latest.metrics.overallPortfolioScore}
+
+  precision={1}
+
+  suffix="%"
+
+  icon={
+    <Activity
+      className="h-6 w-6 text-emerald-400"
+    />
+  }
+
+/>
+
+       <MetricCard
+
+  title="Version"
+
+  value={latest.metadata.version}
+
+  icon={
+    <Layers
+      className="h-6 w-6 text-amber-400"
+    />
+  }
+
+/>
+
+      </DashboardGrid>
+      </BaseCard>
+
+      <DashboardSection
+  title="Repository Snapshots"
+  description="Compare the latest portfolio snapshot against the previous capture."
+  className="mt-10"
+>
+
+        <DashboardGrid columns={2}>
+
+  <SnapshotCard
     title="Latest Snapshot"
     snapshot={latestSnapshot}
   />
@@ -101,154 +154,186 @@ export function RepositorySnapshotDashboard({
 
   )}
 
+</DashboardGrid>
 
-      </div>
+
+      </DashboardSection>
           {snapshotComparison && (
-  <div className="rounded-lg border p-4">
 
-    <h3 className="font-semibold">
-      Portfolio Change
-    </h3>
+  <DashboardSection
+    title="Portfolio Change"
+    description="Engineering evolution compared with the previous snapshot."
+  >
+    <BaseCard>
+    <DashboardGrid
+  columns={3}
+  className="mt-4"
+>
 
-    <div className="mt-4 grid gap-4 md:grid-cols-3">
-
-      <TrendMetricCard
+      <MetricCard
   title="Engineering"
-  value={latestSnapshot.metrics.averageEngineeringScore}
-  delta={snapshotComparison.engineeringDelta}
+  value={latest.metrics.averageEngineeringScore}
+  suffix="%"
+  change={snapshotComparison.engineeringDelta}
+  precision={1}
+  icon={
+    <Activity className="h-5 w-5 text-cyan-400" />
+  }
 />
-<TrendMetricCard
+<MetricCard
   title="Security"
-  value={latestSnapshot.metrics.averageSecurityScore}
-  delta={snapshotComparison.securityDelta}
+  value={latest.metrics.averageSecurityScore}
+  suffix="%"
+  change={snapshotComparison.securityDelta}
+  precision={1}
+  icon={
+    <Shield className="h-5 w-5 text-emerald-400" />
+  }
 />
-<TrendMetricCard
+<MetricCard
   title="Production"
-  value={latestSnapshot.metrics.averageProductionScore}
-  delta={snapshotComparison.productionDelta}
+  value={latest.metrics.averageProductionScore}
+  suffix="%"
+  change={snapshotComparison.productionDelta}
+  precision={1}
+  icon={
+    <Factory className="h-5 w-5 text-amber-400" />
+  }
 />
       
-      <TrendMetricCard
+      <MetricCard
   title="Enterprise"
-  value={latestSnapshot.metrics.averageEnterpriseScore}
-  delta={snapshotComparison.enterpriseDelta}
+  value={latest.metrics.averageEnterpriseScore}
+  suffix="%"
+  change={snapshotComparison.enterpriseDelta}
+  precision={1}
+  icon={
+    <Layers className="h-5 w-5 text-purple-400" />
+  }
 />
 
-<TrendMetricCard
+<MetricCard
   title="Hiring"
-  value={latestSnapshot.metrics.averageHiringScore}
-  delta={snapshotComparison.hiringDelta}
+  value={latest.metrics.averageHiringScore}
+  suffix="%"
+  change={snapshotComparison.hiringDelta}
+  precision={1}
+  icon={
+    <Briefcase className="h-5 w-5 text-blue-400" />
+  }
 />
       
-<TrendMetricCard
+<MetricCard
   title="Overall"
-  value={latestSnapshot.metrics.overallPortfolioScore}
-  delta={snapshotComparison.overallDelta}
+  value={latest.metrics.overallPortfolioScore}
+  suffix="%"
+  change={snapshotComparison.overallDelta}
+  precision={1}
+  icon={
+    <Activity className="h-5 w-5 text-red-400" />
+  }
 />
 
 
-    </div>
+    </DashboardGrid>
+    </BaseCard>
 
-  </div>
+  </DashboardSection>
 )}
-    </div>
+    </DashboardSection>
     
   );
   
 }
 
-interface ExecutiveCardProps {
-  title: string;
-  value: string;
-}
 
-function ExecutiveCard({
-  title,
-  value,
-}: ExecutiveCardProps) {
-  return (
-    <div className="rounded-lg border p-4">
 
-      <div className="text-sm text-muted-foreground">
-        {title}
-      </div>
 
-      <div className="mt-2 text-2xl font-bold">
-        {value}
-      </div>
-
-    </div>
-  );
-}
 interface SnapshotCardProps {
+
   title: string;
+
   snapshot: PortfolioSnapshot;
+
 }
 
 function SnapshotCard({
+
   title,
+
   snapshot,
+
 }: SnapshotCardProps) {
 
   return (
 
-    <div className="rounded-xl border p-5 space-y-4">
+    <BaseCard
+      title={title}
+      variant="default"
+    >
 
-      <h3 className="text-lg font-semibold">
-        {title}
-      </h3>
+      <div className="space-y-4">
 
-      <div className="space-y-2 text-sm">
+        <SnapshotMetric
+          label="Captured"
+          value={snapshot.metadata.capturedAt.toLocaleString()}
+        />
 
-        <div className="flex justify-between">
+        <SnapshotMetric
+          label="Repositories"
+          value={snapshot.metrics.repositoryCount}
+        />
 
-          <span className="text-muted-foreground">
-            Captured
-          </span>
+        <SnapshotMetric
+          label="Portfolio Score"
+          value={`${snapshot.metrics.overallPortfolioScore.toFixed(
+            1,
+          )}%`}
+        />
 
-          <span>
-            {snapshot.metadata.capturedAt.toLocaleString()}
-          </span>
-
-        </div>
-
-        <div className="flex justify-between">
-
-          <span className="text-muted-foreground">
-            Repositories
-          </span>
-
-          <span>
-            {snapshot.metrics.repositoryCount}
-          </span>
-
-        </div>
-
-        <div className="flex justify-between">
-
-          <span className="text-muted-foreground">
-            Portfolio Score
-          </span>
-
-          <span className="font-semibold">
-            {snapshot.metrics.overallPortfolioScore.toFixed(2)}
-          </span>
-
-        </div>
-
-        <div className="flex justify-between">
-
-          <span className="text-muted-foreground">
-            Version
-          </span>
-
-          <span>
-            {snapshot.metadata.version}
-          </span>
-
-        </div>
+        <SnapshotMetric
+          label="Version"
+          value={snapshot.metadata.version}
+        />
 
       </div>
+
+    </BaseCard>
+
+  );
+
+}
+interface SnapshotMetricProps {
+
+  label: string;
+
+  value: string | number;
+
+}
+
+function SnapshotMetric({
+
+  label,
+
+  value,
+
+}: SnapshotMetricProps) {
+
+  return (
+
+    <div className="flex items-center justify-between">
+
+      <span className="text-sm text-zinc-400">
+
+        {label}
+
+      </span>
+
+      <span className="font-medium">
+
+        {value}
+
+      </span>
 
     </div>
 

@@ -1,7 +1,33 @@
+import {
+  DashboardSection,
+  DashboardGrid,
+
+  BaseCard,
+
+  MetricCard,
+  ExecutiveCard,
+  ForecastMetricCard,
+  DeltaMetricCard,
+
+  GrowthBadge,
+  StatusBadge,
+
+  Activity,
+  Database,
+  Shield,
+  TrendingUp,
+  Factory,
+  Briefcase,
+
+} from "@/components/ui";
+
 import type {
   PortfolioForecast,
-  ForecastDirection,
 } from "@/lib/github/repositoryForecastService";
+
+import type {
+  ForecastDirection,
+} from "@/types/intelligence";
 
 interface RepositoryForecastDashboardProps {
   forecast: PortfolioForecast;
@@ -21,147 +47,178 @@ export function RepositoryForecastDashboard({
 
   return (
 
-    <div className="space-y-8 rounded-2xl border border-white/10 bg-white/[0.03] p-8">
+    <>
+      <DashboardSection
+  title="Engineering Forecast Intelligence"
+  description="AI-powered engineering prediction based on repository evolution and historical portfolio intelligence."
+>
 
-      <div>
-
-        <h2 className="text-2xl font-bold">
-          Engineering Forecast Intelligence
-        </h2>
-
-        <p className="mt-2 text-sm text-zinc-400">
-          AI-powered engineering prediction based on repository evolution and historical portfolio intelligence.
-        </p>
-
-      </div>
-
-      <div className="grid gap-4 md:grid-cols-4">
+      <DashboardGrid columns={4}>
 
         <MetricCard
-          title="Repositories"
-          value={forecast.repositories.length}
-        />
+  title="Repositories"
+  value={forecast.repositories.length}
+  icon={
+    <Database className="h-6 w-6 text-cyan-400" />
+  }
+/>
 
-        <MetricCard
-          title="Portfolio Forecast"
-          value={`${forecast.overallPortfolioForecast.toFixed(
-            1,
-          )}%`}
-        />
+<MetricCard
+  title="Portfolio Forecast"
+  value={forecast.overallPortfolioForecast}
+  suffix="%"
+  precision={1}
+  icon={
+    <TrendingUp className="h-6 w-6 text-emerald-400" />
+  }
+/>
 
-        <MetricCard
-          title="Forecast Confidence"
-          value={`${forecast.forecastConfidence.toFixed(
-            1,
-          )}%`}
-        />
+<MetricCard
+  title="Forecast Confidence"
+  value={forecast.forecastConfidence}
+  suffix="%"
+  precision={1}
+  icon={
+    <Shield className="h-6 w-6 text-blue-400" />
+  }
+/>
 
-        <MetricCard
-          title="Engineering Forecast"
-          value={`${forecast.averageEngineeringForecast.toFixed(
-            1,
-          )}%`}
-        />
+<MetricCard
+  title="Engineering Forecast"
+  value={forecast.averageEngineeringForecast}
+  suffix="%"
+  precision={1}
+  icon={
+    <Activity className="h-6 w-6 text-purple-400" />
+  }
+/>
 
-      </div>
+      </DashboardGrid>
 
-      <section className="rounded-xl border border-white/10 bg-black/20 p-6">
+</DashboardSection>
 
-        <h3 className="text-lg font-semibold">
-          Executive Forecast
-        </h3>
+      <DashboardSection
+  className="mt-10"
+>
 
-        <div className="mt-6 space-y-5">
+  <ExecutiveCard
 
-          <div>
+    title={
+      forecast.executiveForecast.title
+    }
 
-            <div className="text-xs uppercase tracking-widest text-zinc-500">
-              Forecast
-            </div>
+    summary={
+      forecast.executiveForecast.summary
+    }
 
-            <div className="mt-2 text-2xl font-bold">
+    recommendation={
+      forecast.executiveForecast.recommendation
+    }
 
-              {forecast.executiveForecast.title}
+  />
 
-            </div>
+</DashboardSection>
 
-          </div>
+      <DashboardSection
 
-          <div>
+  title="Portfolio Forecast"
 
-            <div className="text-xs uppercase tracking-widest text-zinc-500">
-              Summary
-            </div>
+  className="mt-10"
 
-            <p className="mt-2 leading-7 text-zinc-300">
+>
 
-              {forecast.executiveForecast.summary}
+  <BaseCard>
 
-            </p>
+    <DashboardGrid columns={3}>
 
-          </div>
+      <ForecastMetricCard
 
-          <div>
+        title="Engineering"
 
-            <div className="text-xs uppercase tracking-widest text-zinc-500">
-              Recommendation
-            </div>
+        value={
+          forecast.averageEngineeringForecast
+        }
+        icon={
+    <Activity className="h-5 w-5 text-cyan-400" />
+  }
 
-            <p className="mt-2 leading-7 text-cyan-300">
+      />
 
-              {forecast.executiveForecast.recommendation}
+      <ForecastMetricCard
 
-            </p>
+        title="Security"
 
-          </div>
+        value={
+          forecast.averageSecurityForecast
+        }
+        icon={
+    <Shield className="h-5 w-5 text-blue-400" />
+  }
 
-        </div>
+      />
 
-      </section>
+      <ForecastMetricCard
 
-      <section className="rounded-xl border border-white/10 bg-black/20 p-6">
+        title="Production"
 
-        <h3 className="mb-5 text-lg font-semibold">
-          Portfolio Forecast
-        </h3>
+        value={
+          forecast.averageProductionForecast
+        }
+        icon={
+    <Factory className="h-5 w-5 text-gray-400" />
+  }
 
-        <div className="grid gap-4 md:grid-cols-3">
+      />
 
-          <ForecastCard
-            title="Engineering"
-            value={forecast.averageEngineeringForecast}
-          />
+      <ForecastMetricCard
 
-          <ForecastCard
-            title="Security"
-            value={forecast.averageSecurityForecast}
-          />
+        title="Enterprise"
 
-          <ForecastCard
-            title="Production"
-            value={forecast.averageProductionForecast}
-          />
+        value={
+          forecast.averageEnterpriseForecast
+        }
+        icon={
+    <Briefcase className="h-5 w-5 text-yellow-400" />
+  }
 
-          <ForecastCard
-            title="Enterprise"
-            value={forecast.averageEnterpriseForecast}
-          />
+      />
 
-          <ForecastCard
-            title="Hiring"
-            value={forecast.averageHiringForecast}
-          />
+      <ForecastMetricCard
 
-          <ForecastCard
-            title="Overall"
-            value={forecast.overallPortfolioForecast}
-          />
+        title="Hiring"
 
-        </div>
+        value={
+          forecast.averageHiringForecast
+        }
+        icon={
+    <Briefcase className="h-5 w-5 text-purple-400" />
+  }
 
-      </section>
-            <section className="rounded-xl border border-white/10 bg-black/20 p-6">
+      />
 
+      <ForecastMetricCard
+
+        title="Overall"
+
+        value={
+          forecast.overallPortfolioForecast
+        }
+        icon={
+    <TrendingUp className="h-5 w-5 text-emerald-400" />
+  }
+
+      />
+
+    </DashboardGrid>
+
+  </BaseCard>
+
+</DashboardSection>
+      <DashboardSection
+  title="Repository Engineering Forecast"
+  description="Predicted engineering maturity based on historical repository evolution."
+  className="mt-10"
+>
         <div className="flex items-center justify-between">
 
           <div>
@@ -211,7 +268,7 @@ export function RepositoryForecastDashboard({
 
         )}
 
-      </section>
+      </DashboardSection>
 
       <section className="rounded-xl border border-cyan-500/20 bg-cyan-500/5 p-6">
 
@@ -275,69 +332,7 @@ export function RepositoryForecastDashboard({
 
       </section>
 
-    </div>
-
-  );
-
-}
-interface MetricCardProps {
-  title: string;
-  value: string | number;
-}
-
-function MetricCard({
-  title,
-  value,
-}: MetricCardProps) {
-  return (
-    <div className="rounded-xl border border-white/10 bg-black/30 p-5">
-
-      <div className="text-sm uppercase tracking-wider text-zinc-500">
-        {title}
-      </div>
-
-      <div className="mt-3 text-3xl font-bold text-white">
-        {value}
-      </div>
-
-    </div>
-  );
-}
-
-interface ForecastCardProps {
-  title: string;
-  value: number;
-}
-
-function ForecastCard({
-  title,
-  value,
-}: ForecastCardProps) {
-
-  const positive = value >= 80;
-  const warning = value >= 60 && value < 80;
-
-  const color = positive
-    ? "text-emerald-400"
-    : warning
-      ? "text-amber-400"
-      : "text-red-400";
-
-  return (
-
-    <div className="rounded-xl border border-white/10 bg-black/30 p-5">
-
-      <div className="text-sm uppercase tracking-wider text-zinc-500">
-        {title}
-      </div>
-
-      <div className={`mt-3 text-3xl font-bold ${color}`}>
-
-        {value.toFixed(1)}%
-
-      </div>
-
-    </div>
+    </>
 
   );
 
@@ -349,40 +344,22 @@ function ForecastBadge({
   direction: ForecastDirection;
 }) {
 
-  const styles: Record<
-    ForecastDirection,
-    string
-  > = {
-
-    "Strong Growth":
-      "border-emerald-500/30 bg-emerald-500/10 text-emerald-300",
-
-    Growing:
-      "border-green-500/30 bg-green-500/10 text-green-300",
-
-    Stable:
-      "border-zinc-500/30 bg-zinc-500/10 text-zinc-300",
-
-    Declining:
-      "border-orange-500/30 bg-orange-500/10 text-orange-300",
-
-    "High Risk":
-      "border-red-500/30 bg-red-500/10 text-red-300",
-
-  };
+  const variant =
+    direction === "Strong Growth"
+      ? "success"
+      : direction === "Growing"
+      ? "info"
+      : direction === "Stable"
+      ? "neutral"
+      : direction === "Declining"
+      ? "warning"
+      : "danger";
 
   return (
-
-    <span
-      className={`rounded-full border px-3 py-1 text-xs font-semibold ${styles[direction]}`}
-    >
-
+    <StatusBadge variant={variant}>
       {direction}
-
-    </span>
-
+    </StatusBadge>
   );
-
 }
 
 function RiskBadge({
@@ -391,27 +368,22 @@ function RiskBadge({
   risk: string;
 }) {
 
-  const color =
+  const variant =
     risk === "Very Low"
-      ? "text-emerald-400"
+      ? "success"
       : risk === "Low"
-        ? "text-green-400"
-        : risk === "Moderate"
-          ? "text-yellow-400"
-          : risk === "Elevated"
-            ? "text-orange-400"
-            : "text-red-400";
+      ? "info"
+      : risk === "Moderate"
+      ? "warning"
+      : risk === "Elevated"
+      ? "warning"
+      : "danger";
 
   return (
-
-    <span className={`font-semibold ${color}`}>
-
+    <StatusBadge variant={variant}>
       {risk}
-
-    </span>
-
+    </StatusBadge>
   );
-
 }
 interface ForecastRepositoryRowProps {
   repository:
@@ -431,19 +403,15 @@ function ForecastRepositoryRow({
 
   return (
 
-    <div className="rounded-xl border border-white/10 bg-black/30 p-6">
+    <BaseCard
+  title={repository.repositoryName}
+>
 
       <div className="flex flex-col gap-8 xl:flex-row xl:items-center xl:justify-between">
 
         <div className="min-w-[260px]">
 
           <div className="flex flex-wrap items-center gap-3">
-
-            <div className="text-lg font-semibold">
-
-              {repository.repositoryName}
-
-            </div>
 
             {portfolioLeader && (
 
@@ -491,11 +459,12 @@ function ForecastRepositoryRow({
             }
           />
 
-          <ForecastMetric
-            title="Growth"
-            value={growth}
-            signed
-          />
+          <DeltaMetricCard
+  title="Growth"
+  value={growth}
+  suffix=""
+  precision={2}
+/>
 
           <ForecastProgress
             title="Confidence"
@@ -517,7 +486,7 @@ function ForecastRepositoryRow({
 
       </div>
 
-    </div>
+    </BaseCard>
 
   );
 

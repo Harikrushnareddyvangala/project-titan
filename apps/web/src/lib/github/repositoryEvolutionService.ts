@@ -2,17 +2,10 @@ import type {
   PortfolioSnapshot,
 } from "./repositorySnapshotService";
 
-export type EvolutionDirection =
-  | "Rapidly Improving"
-  | "Improving"
-  | "Stable"
-  | "Declining"
-  | "Critical";
-
-export type RepositoryLifecycle =
-  | "Existing"
-  | "New"
-  | "Removed";
+import type {
+  EvolutionDirection,
+  RepositoryLifecycle,
+} from "@/types/intelligence";
 
 export interface RepositoryEvolution {
   repositoryName: string;

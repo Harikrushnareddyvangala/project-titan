@@ -1,6 +1,36 @@
+import {
+
+  DashboardGrid,
+  DashboardSection,
+
+  BaseCard,
+
+  ExecutiveCard,
+  MetricCard,
+  DeltaMetricCard,
+
+  EvolutionBadge,
+  GrowthBadge,
+  StatusBadge,
+
+} from "@/components/ui";
+
+import {
+
+  Activity,
+  AlertTriangle,
+  Factory,
+  Briefcase,
+  Shield,
+  TrendingUp,
+
+} from "@/components/ui";
+
 import type {
+
   PortfolioEvolution,
   RepositoryEvolution,
+
 } from "@/lib/github/repositoryEvolutionService";
 
 interface RepositoryEvolutionDashboardProps {
@@ -11,185 +41,177 @@ export function RepositoryEvolutionDashboard({
   evolution,
 }: RepositoryEvolutionDashboardProps) {
   return (
-    <div className="rounded-xl border p-6 space-y-6">
+    <>
+      <DashboardSection
 
-      <div>
+  title="Repository Evolution Intelligence"
 
-        <h2 className="text-xl font-semibold">
-          Repository Evolution Intelligence
-        </h2>
+  description="Engineering evolution across repository snapshots."
 
-        <p className="text-sm text-muted-foreground">
-          Engineering evolution across repository snapshots.
-        </p>
+>
 
-      </div>
+<DashboardGrid columns={4}>
 
-      <div className="grid gap-4 md:grid-cols-4">
+        <MetricCard
 
-        <ExecutiveCard
-          title="Most Improved"
-          value={evolution.highlights.mostImprovedRepository}
+    title="Most Improved"
+
+    value={evolution.highlights.mostImprovedRepository}
+
+    icon={
+        <TrendingUp
+            className="h-6 w-6 text-emerald-400"
         />
+    }
 
-        <ExecutiveCard
+/>
+
+        <MetricCard
           title="Fastest Growing"
           value={evolution.highlights.fastestGrowingRepository}
+          icon={
+            <TrendingUp
+              className="h-6 w-6 text-emerald-400"
+            />
+          }
         />
 
-        <ExecutiveCard
+        <MetricCard
           title="Most Stable"
           value={evolution.highlights.mostStableRepository}
+          icon={
+            <Shield
+              className="h-6 w-6 text-blue-400"
+            />
+          }
         />
 
-        <ExecutiveCard
+        <MetricCard
           title="Needs Attention"
           value={evolution.highlights.needsAttentionRepository}
+          icon={
+            <AlertTriangle
+              className="h-6 w-6 text-amber-400"
+            />
+          }
         />
 
-      </div>
+      </DashboardGrid>
 
-      <div className="rounded-lg border p-5">
+</DashboardSection>
 
-        <h3 className="font-medium">
-          Executive Summary
-        </h3>
+      <DashboardSection
+    className="mt-10"
+>
 
-        <p className="mt-3 text-sm text-muted-foreground">
-          {evolution.executiveSummary}
-        </p>
+<ExecutiveCard
 
-      </div>
+    title="Portfolio Evolution"
 
-      <div className="rounded-lg border p-5">
+    summary={evolution.executiveSummary}
 
-        <h3 className="font-medium mb-4">
-          Portfolio Evolution
-        </h3>
+/>
 
-        <div className="grid gap-4 md:grid-cols-3">
+</DashboardSection>
+
+      <DashboardSection
+  title="Portfolio Evolution"
+  className="mt-10"
+>
+        <BaseCard>
+
+        <DashboardGrid columns={3}>
 
           <MetricCard
             title="Engineering"
             value={evolution.summary.averageEngineeringChange}
+            change={evolution.summary.averageEngineeringChange}
+            suffix="%"
+            icon={
+              <Activity className="h-5 w-5 text-cyan-400"/>
+            }
           />
 
           <MetricCard
             title="Security"
             value={evolution.summary.averageSecurityChange}
+            change={evolution.summary.averageSecurityChange}
+            suffix="%"
+            icon={
+              <Shield className="h-5 w-5 text-blue-400"/>
+            }
           />
 
           <MetricCard
             title="Production"
             value={evolution.summary.averageProductionChange}
+            change={evolution.summary.averageProductionChange}
+            suffix="%"
+            icon={
+              <Factory className="h-5 w-5 text-gray-400"/>
+            }
           />
 
           <MetricCard
             title="Enterprise"
             value={evolution.summary.averageEnterpriseChange}
+            change={evolution.summary.averageEnterpriseChange}
+            suffix="%"
+            icon={
+              <Briefcase className="h-5 w-5 text-amber-400"/>
+            }
           />
 
           <MetricCard
             title="Hiring"
             value={evolution.summary.averageHiringChange}
+            change={evolution.summary.averageHiringChange}
+            suffix="%"
+            icon={
+              <Briefcase className="h-5 w-5 text-purple-400"/>
+            }
           />
-
+          
           <MetricCard
             title="Overall"
             value={evolution.summary.overallPortfolioChange}
+            change={evolution.summary.overallPortfolioChange}
+            suffix="%"
+            icon={
+              <TrendingUp className="h-5 w-5 text-emerald-400"/>
+            }
           />
 
-        </div>
+        </DashboardGrid>
+          </BaseCard>
+      </DashboardSection>
 
-      </div>
+      <DashboardSection
+  title="Repository Evolution"
+  description="Repository-by-repository engineering evolution."
+  className="mt-10"
+>
 
-      <div className="rounded-lg border p-5">
+  <div className="space-y-4">
 
-        <h3 className="font-medium mb-4">
-          Repository Evolution
-        </h3>
+    {evolution.repositories.map((repository) => (
 
-        <div className="space-y-3">
+      <RepositoryRow
+        key={repository.repositoryName}
+        repository={repository}
+      />
 
-          {evolution.repositories.map(
-            (repository) => (
-              <RepositoryRow
-                key={repository.repositoryName}
-                repository={repository}
-              />
-            ),
-          )}
+    ))}
 
-        </div>
+  </div>
 
-      </div>
+</DashboardSection>
 
-    </div>
+    </>
   );
 }
 
-interface ExecutiveCardProps {
-  title: string;
-  value: string;
-}
 
-function ExecutiveCard({
-  title,
-  value,
-}: ExecutiveCardProps) {
-  return (
-    <div className="rounded-lg border p-4">
-
-      <div className="text-sm text-muted-foreground">
-        {title}
-      </div>
-
-      <div className="mt-2 text-lg font-semibold">
-        {value || "N/A"}
-      </div>
-
-    </div>
-  );
-}
-
-interface MetricCardProps {
-  title: string;
-  value: number;
-}
-
-function MetricCard({
-  title,
-  value,
-}: MetricCardProps) {
-  const color =
-    value > 0
-      ? "text-green-600"
-      : value < 0
-        ? "text-red-600"
-        : "text-gray-500";
-
-  const icon =
-    value > 0
-      ? "▲"
-      : value < 0
-        ? "▼"
-        : "●";
-
-  return (
-    <div className="rounded-lg border p-4">
-
-      <div className="text-sm text-muted-foreground">
-        {title}
-      </div>
-
-      <div className={`mt-2 text-2xl font-bold ${color}`}>
-        {icon} {value >= 0 ? "+" : ""}
-        {value.toFixed(2)}
-      </div>
-
-    </div>
-  );
-}
 
 interface RepositoryRowProps {
   repository: RepositoryEvolution;
@@ -199,7 +221,9 @@ function RepositoryRow({
   repository,
 }: RepositoryRowProps) {
   return (
-    <div className="rounded-lg border p-5 space-y-5">
+    <BaseCard
+  title={repository.repositoryName}
+>
 
       <div className="flex items-center justify-between">
 
@@ -211,9 +235,13 @@ function RepositoryRow({
               {repository.repositoryName}
             </h4>
 
-            <span className="rounded-full border px-2 py-1 text-xs">
-              {repository.lifecycle}
-            </span>
+            <StatusBadge
+    variant="info"
+>
+
+{repository.lifecycle}
+
+</StatusBadge>
 
             <EvolutionBadge
               direction={
@@ -225,126 +253,65 @@ function RepositoryRow({
 
         </div>
 
-        <div
-          className={
-            repository.overallChange >= 0
-              ? "text-green-600 font-bold"
-              : "text-red-600 font-bold"
-          }
-        >
-          {repository.overallChange >= 0 ? "▲ +" : "▼ "}
+        <GrowthBadge
+
+    value={repository.overallChange}
+
+    suffix=""
+
+    precision={2}
+
+/>
+          {/* {repository.overallChange >= 0 ? "▲ +" : "▼ "}
           {repository.overallChange.toFixed(2)}
-        </div>
+        </div> */}
 
       </div>
 
-      <div className="grid gap-3 md:grid-cols-5">
+      <div className="grid gap-4 md:grid-cols-5">
 
-        <TrendMetricCard
-          title="Engineering"
-          value={repository.engineeringChange}
-        />
+        <DeltaMetricCard
 
-        <TrendMetricCard
+    title="Engineering"
+
+    value={repository.engineeringChange}
+
+    suffix=""
+
+    precision={2}
+
+/>
+
+        <DeltaMetricCard
           title="Security"
           value={repository.securityChange}
+          suffix=""
+          precision={2}
         />
 
-        <TrendMetricCard
+        <DeltaMetricCard
           title="Production"
           value={repository.productionChange}
+          suffix=""
+          precision={2}
         />
 
-        <TrendMetricCard
+        <DeltaMetricCard
           title="Enterprise"
           value={repository.enterpriseChange}
+          suffix=""
+          precision={2}
         />
 
-        <TrendMetricCard
+        <DeltaMetricCard
           title="Hiring"
           value={repository.hiringChange}
+          suffix=""
+          precision={2}
         />
 
       </div>
 
-    </div>
-  );
-}
-interface TrendMetricCardProps {
-  title: string;
-  value: number;
-}
-
-function TrendMetricCard({
-  title,
-  value,
-}: TrendMetricCardProps) {
-
-  const color =
-    value > 0
-      ? "text-green-600"
-      : value < 0
-        ? "text-red-600"
-        : "text-gray-500";
-
-  const icon =
-    value > 0
-      ? "▲"
-      : value < 0
-        ? "▼"
-        : "●";
-
-  return (
-    <div className="rounded-lg border p-3">
-
-      <div className="text-xs text-muted-foreground">
-        {title}
-      </div>
-
-      <div className={`mt-2 font-semibold ${color}`}>
-        {icon} {value >= 0 ? "+" : ""}
-        {value.toFixed(2)}
-      </div>
-
-    </div>
-  );
-}
-interface EvolutionBadgeProps {
-  direction: RepositoryEvolution["evolutionDirection"];
-}
-
-function EvolutionBadge({
-  direction,
-}: EvolutionBadgeProps) {
-
-  const className = (() => {
-
-    switch (direction) {
-
-      case "Rapidly Improving":
-        return "bg-emerald-600/20 text-emerald-400";
-
-      case "Improving":
-        return "bg-green-600/20 text-green-400";
-
-      case "Stable":
-        return "bg-gray-600/20 text-gray-300";
-
-      case "Declining":
-        return "bg-orange-600/20 text-orange-300";
-
-      case "Critical":
-        return "bg-red-600/20 text-red-400";
-
-    }
-
-  })();
-
-  return (
-    <span
-      className={`rounded-full px-2 py-1 text-xs ${className}`}
-    >
-      {direction}
-    </span>
+    </BaseCard>
   );
 }
