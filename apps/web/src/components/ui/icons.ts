@@ -9,7 +9,8 @@ export {
   Shield,
 
   Activity,
-
+  Award,
+  ClipboardCheck,
   Brain,
 
   Gauge,
@@ -29,6 +30,16 @@ export {
   Database,
   Factory,
   Layers,
+  LayoutDashboard,
+  ListChecks,
+  Lock,
+  MapPin,
+  PieChart,
+  Server,
+  Settings2,
+  Star,
+  User,
+  Users,
   
   
   

@@ -4,6 +4,9 @@ import type {
   RepositoryAnalytics,
   RepositoryComparison,
 } from "@/types/github";
+import {
+  buildExecutiveIntelligence,
+} from "./repositoryExecutiveIntelligenceService";
 
 import { buildRepositoryRanking } from "./repositoryRankingEngine";
 import { buildRepositoryTechnologyAnalysis } from "./repositoryTechnologyEngine";
@@ -90,6 +93,7 @@ export function buildRepositoryComparison(
      repositories: [],
   }),
   repositoryEvolution: undefined,
+  executiveIntelligence: undefined,
   
 
   };
@@ -277,11 +281,17 @@ const architectureIntelligence =
       })
     : undefined;
 
+    const history =
+  repositorySnapshotService.getSnapshotHistory();
+
+console.log("Snapshot History Count:", history.length);
+
+console.log(history);
+
   const historicalTrend =
   buildHistoricalTrend({
     snapshots:
-      repositorySnapshotService
-        .getSnapshotHistory(),
+      history,
   });
 
   const forecast =
@@ -297,6 +307,30 @@ const architectureIntelligence =
     historicalTrend,
 
   });
+
+  console.log({
+  latestSnapshot,
+  previousSnapshot,
+  repositoryEvolution,
+  historicalTrend,
+  forecast,
+  risk,
+});
+
+  const executiveIntelligence =
+  repositoryEvolution
+    ? buildExecutiveIntelligence({
+
+        evolution: repositoryEvolution,
+
+        historicalTrend,
+
+        forecast,
+
+        risk,
+
+      })
+    : undefined;
 
   return {
 
@@ -372,6 +406,8 @@ const architectureIntelligence =
   forecast,
 
   risk,
+
+  executiveIntelligence,
 
 };
 }

@@ -14,6 +14,9 @@ import type {
 import type {
   PortfolioRisk,
 } from "@/types/risk";
+import type {
+  ExecutiveIntelligence,
+} from "./executive";
 
 export interface GithubRepository {
   id: number;
@@ -662,6 +665,8 @@ historicalTrend?: PortfolioHistoricalTrend;
 forecast?: PortfolioForecast;
 
 risk?: PortfolioRisk;
+
+executiveIntelligence?: ExecutiveIntelligence;
 }
 
 export interface ComparedRepository {
