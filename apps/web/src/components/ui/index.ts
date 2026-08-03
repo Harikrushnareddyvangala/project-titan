@@ -35,3 +35,7 @@ export * from "./layout";
 /* Cards */
 
 export * from "./cards";
+
+/* Badges */
+
+export * from "./badges";

@@ -15,6 +15,7 @@ import { RepositorySnapshotDashboard } from "./RepositorySnapshotDashboard";
 import { RepositoryEvolutionDashboard } from "./RepositoryEvolutionDashboard";
 import { RepositoryHistoricalTrendDashboard } from "./RepositoryHistoricalTrendDashboard";
 import { RepositoryForecastDashboard } from "./RepositoryForecastDashboard";
+import { RepositoryRiskDashboard } from "@/components/dashboard/RepositoryRiskDashboard";
 interface RepositoryComparisonDashboardProps {
   comparison: RepositoryComparison;
 }
@@ -96,6 +97,13 @@ export function RepositoryComparisonDashboard({
   />
   </div>
 )}
+     {comparison.risk && (
+  <RepositoryRiskDashboard
+    risk={comparison.risk}
+  />
+)}
+
+
 
       {/* Engineering Leaders */}
 

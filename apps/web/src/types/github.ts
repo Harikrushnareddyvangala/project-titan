@@ -11,6 +11,9 @@ import type {
 import type {
   PortfolioForecast,
 } from "@/lib/github/repositoryForecastService";
+import type {
+  PortfolioRisk,
+} from "@/types/risk";
 
 export interface GithubRepository {
   id: number;
@@ -657,6 +660,8 @@ repositoryEvolution?: PortfolioEvolution;
 historicalTrend?: PortfolioHistoricalTrend;
 
 forecast?: PortfolioForecast;
+
+risk?: PortfolioRisk;
 }
 
 export interface ComparedRepository {

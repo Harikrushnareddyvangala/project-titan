@@ -29,7 +29,8 @@ export type RiskLevel =
   | "Low"
   | "Moderate"
   | "Elevated"
-  | "High";
+  | "High"
+  | "Critical";
 
 /* -------------------------------------------------------------------------- */
 /*                               Grade Types                                  */

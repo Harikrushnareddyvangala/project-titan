@@ -11,7 +11,13 @@ import { buildPortfolioHealth } from "./portfolioHealthEngine";
 import { buildPortfolioInsights } from "./portfolioInsightsEngine";
 import { buildArchitectureIntelligence } from "./architectureIntelligenceEngine";
 import { buildProductivityIntelligence } from "./productivityIntelligenceEngine";
-import { buildRepositoryRiskIntelligence } from "./repositoryRiskIntelligenceEngine";
+import {
+  buildRepositoryRiskIntelligence as buildRepositoryRiskEngine,
+} from "./repositoryRiskIntelligenceEngine";
+
+import {
+  buildRepositoryRiskIntelligence as buildRepositoryRiskService,
+} from "./repositoryRiskIntelligenceService";
 import { buildRepositoryTrendIntelligence } from "./repositoryTrendIntelligenceEngine";
 import { repositorySnapshotService, } from "@/lib/github/repositorySnapshotService";
 import { buildPortfolioEvolution, } from "./repositoryEvolutionService";
@@ -76,7 +82,7 @@ export function buildRepositoryComparison(
         repositories: [],
       }),
     repositoryRiskIntelligence:
-  buildRepositoryRiskIntelligence({
+  buildRepositoryRiskEngine({
     repositories: [],
   }),
     repositoryTrendIntelligence:
@@ -84,6 +90,8 @@ export function buildRepositoryComparison(
      repositories: [],
   }),
   repositoryEvolution: undefined,
+  
+
   };
 }
    
@@ -245,7 +253,7 @@ const architectureIntelligence =
     repositories,
   });
   const repositoryRiskIntelligence =
-  buildRepositoryRiskIntelligence({
+  buildRepositoryRiskEngine({
     repositories,
   });
   const repositoryTrendIntelligence =
@@ -279,6 +287,15 @@ const architectureIntelligence =
   const forecast =
   buildRepositoryForecast({
     historicalTrend,
+  });
+
+  const risk =
+  buildRepositoryRiskService({
+
+    forecast,
+
+    historicalTrend,
+
   });
 
   return {
@@ -353,6 +370,8 @@ const architectureIntelligence =
   historicalTrend,
 
   forecast,
+
+  risk,
 
 };
 }
