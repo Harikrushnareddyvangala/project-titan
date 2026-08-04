@@ -17,6 +17,9 @@ import type {
 import type {
   ExecutiveIntelligence,
 } from "./executive";
+import type {
+  DecisionIntelligence,
+} from "./decision";
 
 export interface GithubRepository {
   id: number;
@@ -667,6 +670,8 @@ forecast?: PortfolioForecast;
 risk?: PortfolioRisk;
 
 executiveIntelligence?: ExecutiveIntelligence;
+
+decisionIntelligence?: DecisionIntelligence;
 }
 
 export interface ComparedRepository {

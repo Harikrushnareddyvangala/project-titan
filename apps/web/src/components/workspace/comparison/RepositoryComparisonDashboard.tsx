@@ -18,6 +18,7 @@ import { RepositoryForecastDashboard } from "./RepositoryForecastDashboard";
 import { RepositoryRiskDashboard } from "@/components/dashboard/RepositoryRiskDashboard";
 
 import { RepositoryExecutiveDashboard } from "@/components/dashboard/RepositoryExecutiveDashboard";
+import { RepositoryDecisionDashboard } from "@/components/dashboard/RepositoryDecisionDashboard";
 interface RepositoryComparisonDashboardProps {
   comparison: RepositoryComparison;
 }
@@ -108,6 +109,13 @@ export function RepositoryComparisonDashboard({
   <RepositoryExecutiveDashboard
     executive={
       comparison.executiveIntelligence
+    }
+  />
+)}
+{comparison.decisionIntelligence && (
+  <RepositoryDecisionDashboard
+    decision={
+      comparison.decisionIntelligence
     }
   />
 )}

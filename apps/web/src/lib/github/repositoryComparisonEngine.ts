@@ -26,6 +26,7 @@ import { repositorySnapshotService, } from "@/lib/github/repositorySnapshotServi
 import { buildPortfolioEvolution, } from "./repositoryEvolutionService";
 import { buildHistoricalTrend, } from "./repositoryHistoricalTrendService";
 import { buildRepositoryForecast, } from "./repositoryForecastService";
+import { buildDecisionIntelligence, } from "./repositoryDecisionIntelligenceService";
 export function buildRepositoryComparison(
   repositories: RepositoryAnalytics[],
 ): RepositoryComparison {
@@ -94,6 +95,7 @@ export function buildRepositoryComparison(
   }),
   repositoryEvolution: undefined,
   executiveIntelligence: undefined,
+  decisionIntelligence: undefined,
   
 
   };
@@ -284,10 +286,6 @@ const architectureIntelligence =
     const history =
   repositorySnapshotService.getSnapshotHistory();
 
-console.log("Snapshot History Count:", history.length);
-
-console.log(history);
-
   const historicalTrend =
   buildHistoricalTrend({
     snapshots:
@@ -308,15 +306,6 @@ console.log(history);
 
   });
 
-  console.log({
-  latestSnapshot,
-  previousSnapshot,
-  repositoryEvolution,
-  historicalTrend,
-  forecast,
-  risk,
-});
-
   const executiveIntelligence =
   repositoryEvolution
     ? buildExecutiveIntelligence({
@@ -328,6 +317,16 @@ console.log(history);
         forecast,
 
         risk,
+
+      })
+    : undefined;
+
+    const decisionIntelligence =
+  executiveIntelligence
+    ? buildDecisionIntelligence({
+
+        executive:
+          executiveIntelligence,
 
       })
     : undefined;
@@ -408,6 +407,8 @@ console.log(history);
   risk,
 
   executiveIntelligence,
+
+  decisionIntelligence,
 
 };
 }
