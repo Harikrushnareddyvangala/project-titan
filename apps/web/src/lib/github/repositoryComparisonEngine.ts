@@ -28,6 +28,7 @@ import { buildHistoricalTrend, } from "./repositoryHistoricalTrendService";
 import { buildRepositoryForecast, } from "./repositoryForecastService";
 import { buildDecisionIntelligence, } from "./repositoryDecisionIntelligenceService";
 import { buildPlanningIntelligence, } from "./repositoryPlanningService";
+import { buildExecutionIntelligence, } from "./repositoryExecutionService";
 export function buildRepositoryComparison(
   repositories: RepositoryAnalytics[],
 ): RepositoryComparison {
@@ -98,6 +99,7 @@ export function buildRepositoryComparison(
   executiveIntelligence: undefined,
   decisionIntelligence: undefined,
   planningIntelligence: undefined,
+  executionIntelligence: undefined,
   
 
   };
@@ -342,6 +344,15 @@ const architectureIntelligence =
 
       })
     : undefined;
+    const executionIntelligence =
+  planningIntelligence
+    ? buildExecutionIntelligence({
+
+        planning:
+          planningIntelligence,
+
+      })
+    : undefined;
 
   return {
 
@@ -423,6 +434,8 @@ const architectureIntelligence =
   decisionIntelligence,
 
   planningIntelligence,
+
+  executionIntelligence,
 
 };
 }
