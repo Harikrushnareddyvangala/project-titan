@@ -20,6 +20,9 @@ import type {
 import type {
   DecisionIntelligence,
 } from "./decision";
+import type {
+  PlanningIntelligence,
+} from "./planning";
 
 export interface GithubRepository {
   id: number;
@@ -672,6 +675,8 @@ risk?: PortfolioRisk;
 executiveIntelligence?: ExecutiveIntelligence;
 
 decisionIntelligence?: DecisionIntelligence;
+
+planningIntelligence?: PlanningIntelligence;
 }
 
 export interface ComparedRepository {

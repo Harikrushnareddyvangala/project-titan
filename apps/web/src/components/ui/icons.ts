@@ -81,6 +81,9 @@ export {
   VideoOff,
   X,
   Zap,
+
+  ClipboardList,
+  Compass,
   
   
   
