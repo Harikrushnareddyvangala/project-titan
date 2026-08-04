@@ -16,6 +16,9 @@ export {
   Gauge,
 
   GitBranch,
+  Lightbulb,
+  Sparkles,
+
 
   AlertTriangle,
 
