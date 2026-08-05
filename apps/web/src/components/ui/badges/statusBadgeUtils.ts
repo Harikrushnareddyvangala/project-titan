@@ -6,7 +6,7 @@ import type {
 } from "@/types/intelligence";
 import type {
   BadgeVariant,
-} from "./StatusBadge";
+} from "./badgeTypes";
 
 
 

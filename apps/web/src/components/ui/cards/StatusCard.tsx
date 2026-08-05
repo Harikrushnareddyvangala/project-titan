@@ -6,7 +6,7 @@ import { StatusBadge } from "../badges/StatusBadge";
 
 import type {
   BadgeVariant,
-} from "../badges/StatusBadge";
+} from "../badges/badgeTypes";
 
 interface StatusCardProps {
 

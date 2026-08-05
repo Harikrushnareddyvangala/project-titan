@@ -1,28 +1,14 @@
 import {
-
   DashboardGrid,
   DashboardSection,
-
   BaseCard,
   ExecutiveCard,
   MetricCard,
-  StatusBadge,
-
-} from "@/components/ui";
-
-import {
-
-  Brain,
-  Lightbulb,
-  Sparkles,
-
-} from "@/components/ui";
-
-import type {
-
-  AdvisorIntelligence,
-
-} from "@/types/advisor";
+  StatusBadge,} from "@/components/ui";
+import { Brain, Lightbulb, Sparkles,} from "@/components/ui";
+import type { AdvisorIntelligence, } from "@/types/advisor";
+import { severityBadge, } from "@/components/ui/badges/utils";
+import { ExecutiveSummary, } from "@/components/intelligence";
 
 interface RepositoryAdvisorDashboardProps {
 
@@ -82,15 +68,15 @@ export function RepositoryAdvisorDashboard({
 
       </DashboardGrid>
 
-      <ExecutiveCard
+      <ExecutiveSummary
 
-        title="Executive Narrative"
+  title="Executive Narrative"
 
-        summary={
-          advisor.summary.executiveNarrative
-        }
+  summary={
+    advisor.summary.executiveNarrative
+  }
 
-      />
+/>
       <DashboardSection
 
   title="Engineering Recommendations"
@@ -125,15 +111,7 @@ export function RepositoryAdvisorDashboard({
 
             <StatusBadge
 
-              variant={
-                insight.severity === "Critical"
-                  ? "danger"
-                  : insight.severity === "Warning"
-                  ? "warning"
-                  : insight.severity === "Recommendation"
-                  ? "info"
-                  : "neutral"
-              }
+              variant={severityBadge(insight.severity)}
 
             >
 

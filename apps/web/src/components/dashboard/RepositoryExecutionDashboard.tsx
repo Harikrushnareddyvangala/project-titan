@@ -17,6 +17,7 @@ import {
   Gauge,
 
 } from "@/components/ui";
+import { statusBadge, } from "@/components/ui/badges/utils";
 
 import type {
 
@@ -169,15 +170,7 @@ export function RepositoryExecutionDashboard({
 
               <StatusBadge
 
-                variant={
-                  item.status === "Completed"
-                    ? "success"
-                    : item.status === "In Progress"
-                    ? "info"
-                    : item.status === "Blocked"
-                    ? "danger"
-                    : "neutral"
-                }
+                variant={statusBadge(item.status)}
 
               >
 
