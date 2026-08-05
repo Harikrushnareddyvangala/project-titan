@@ -6,20 +6,28 @@ export const navigation: NavigationItem[] = [
     href: "/",
   },
   {
-    label: "About",
-    href: "/about",
+    label: "Engineering",
+    href: "/engineering",
+  },
+  {
+    label: "Architecture",
+    href: "/architecture",
   },
   {
     label: "Projects",
     href: "/projects",
   },
   {
-    label: "Blog",
-    href: "/blog",
+    label: "Research",
+    href: "/research",
   },
   {
     label: "Resume",
     href: "/resume",
+  },
+  {
+    label: "About",
+    href: "/about",
   },
   {
     label: "Contact",
