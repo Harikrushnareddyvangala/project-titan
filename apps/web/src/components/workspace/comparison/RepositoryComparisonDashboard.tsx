@@ -24,6 +24,7 @@ import { RepositoryExecutionDashboard } from "@/components/dashboard/RepositoryE
 import { RepositoryAdvisorDashboard }from "@/components/dashboard/RepositoryAdvisorDashboard";
 import { RepositoryQualityDashboard, } from "@/components/dashboard/RepositoryQualityDashboard";
 import { RepositoryObservabilityDashboard, } from "@/components/dashboard/RepositoryObservabilityDashboard";
+import { UnifiedCorrelationPanel, } from "@/components/dashboard/UnifiedCorrelationPanel";
 interface RepositoryComparisonDashboardProps {
   comparison: RepositoryComparison;
 }
@@ -158,6 +159,13 @@ export function RepositoryComparisonDashboard({
   <RepositoryObservabilityDashboard
     observability={
       comparison.engineeringObservability
+    }
+  />
+)}
+{comparison.unifiedCorrelation && (
+  <UnifiedCorrelationPanel
+    correlation={
+      comparison.unifiedCorrelation
     }
   />
 )}

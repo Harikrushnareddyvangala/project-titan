@@ -32,6 +32,7 @@ import { buildExecutionIntelligence, } from "./repositoryExecutionService";
 import { buildAdvisorIntelligence, } from "./repositoryAdvisorService";
 import { buildEngineeringQuality, } from "./repositoryQualityService";
 import { buildEngineeringObservability, } from "./repositoryObservabilityService";
+import { buildUnifiedCorrelation, } from "./repositoryCorrelationService";
 export function buildRepositoryComparison(
   repositories: RepositoryAnalytics[],
 ): RepositoryComparison {
@@ -106,6 +107,7 @@ export function buildRepositoryComparison(
   advisorIntelligence: undefined,
   engineeringQuality: undefined,
   engineeringObservability: undefined,
+  unifiedCorrelation: undefined,
   
 
   };
@@ -473,5 +475,14 @@ const engineeringObservability =
 
   comparison.engineeringObservability =
   engineeringObservability;
+
+  const unifiedCorrelation =
+  buildUnifiedCorrelation(
+    comparison,
+  );
+
+comparison.unifiedCorrelation =
+  unifiedCorrelation;
+
   return comparison;
 }

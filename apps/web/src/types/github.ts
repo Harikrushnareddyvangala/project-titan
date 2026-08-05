@@ -35,6 +35,9 @@ import type {
 import type {
   EngineeringObservability,
 } from "./observability";
+import type {
+  UnifiedCorrelationIntelligence,
+} from "./correlation";
 
 export interface GithubRepository {
   id: number;
@@ -697,6 +700,8 @@ advisorIntelligence?: AdvisorIntelligence;
 engineeringQuality?: EngineeringQualityIntelligence;
 
 engineeringObservability?: EngineeringObservability;
+
+unifiedCorrelation?: UnifiedCorrelationIntelligence;
 }
 
 export interface ComparedRepository {
