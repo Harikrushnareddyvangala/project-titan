@@ -23,6 +23,7 @@ import { RepositoryPlanningDashboard } from "@/components/dashboard/RepositoryPl
 import { RepositoryExecutionDashboard } from "@/components/dashboard/RepositoryExecutionDashboard";
 import { RepositoryAdvisorDashboard }from "@/components/dashboard/RepositoryAdvisorDashboard";
 import { RepositoryQualityDashboard, } from "@/components/dashboard/RepositoryQualityDashboard";
+import { RepositoryObservabilityDashboard, } from "@/components/dashboard/RepositoryObservabilityDashboard";
 interface RepositoryComparisonDashboardProps {
   comparison: RepositoryComparison;
 }
@@ -150,6 +151,13 @@ export function RepositoryComparisonDashboard({
   <RepositoryQualityDashboard
     quality={
       comparison.engineeringQuality
+    }
+  />
+)}
+{comparison.engineeringObservability && (
+  <RepositoryObservabilityDashboard
+    observability={
+      comparison.engineeringObservability
     }
   />
 )}
