@@ -29,6 +29,9 @@ import type {
 import type {
   AdvisorIntelligence,
 } from "./advisor";
+import type {
+  EngineeringQualityIntelligence,
+} from "./quality";
 
 export interface GithubRepository {
   id: number;
@@ -687,6 +690,8 @@ planningIntelligence?: PlanningIntelligence;
 executionIntelligence?: ExecutionIntelligence;
 
 advisorIntelligence?: AdvisorIntelligence;
+
+engineeringQuality?: EngineeringQualityIntelligence;
 }
 
 export interface ComparedRepository {

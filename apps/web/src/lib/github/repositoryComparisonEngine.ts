@@ -30,6 +30,7 @@ import { buildDecisionIntelligence, } from "./repositoryDecisionIntelligenceServ
 import { buildPlanningIntelligence, } from "./repositoryPlanningService";
 import { buildExecutionIntelligence, } from "./repositoryExecutionService";
 import { buildAdvisorIntelligence, } from "./repositoryAdvisorService";
+import { buildEngineeringQuality, } from "./repositoryQualityService";
 export function buildRepositoryComparison(
   repositories: RepositoryAnalytics[],
 ): RepositoryComparison {
@@ -102,6 +103,7 @@ export function buildRepositoryComparison(
   planningIntelligence: undefined,
   executionIntelligence: undefined,
   advisorIntelligence: undefined,
+  engineeringQuality: undefined,
   
 
   };
@@ -365,8 +367,11 @@ const architectureIntelligence =
 
       })
     : undefined;
+    
+    
+  
 
-  return {
+  const comparison: RepositoryComparison =  {
 
   repositories: compared,
 
@@ -452,4 +457,11 @@ const architectureIntelligence =
   advisorIntelligence,
 
 };
+const engineeringQuality =
+  buildEngineeringQuality(
+    comparison,
+  );
+  comparison.engineeringQuality =
+  engineeringQuality;
+  return comparison;
 }
