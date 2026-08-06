@@ -1,3 +1,8 @@
+"use client";
+
+import { useState } from "react";
+
+
 const skills = {
   "Data Science": ["Python", "Pandas", "Scikit-learn", "NumPy", "Matplotlib", "Seaborn", "Plotly", "Statsmodels", "SciPy", "Jupyter Notebook", "Google Colab", "R", "RStudio", "tidyverse", "ggplot2", "caret", "shiny", "SQL", "PostgreSQL", "MySQL", "MongoDB", "SQLite", "ETL", "Data Cleaning", "Data Wrangling", "Data Visualization", "Exploratory Data Analysis (EDA)", "Feature Engineering", "Model Evaluation", "Cross-Validation", "Hyperparameter Tuning", "Time Series Analysis", "Natural Language Processing (NLP)", "Deep Learning"],
   "Machine Learning": ["Regression", "Classification", "XGBoost", "LightGBM", "CatBoost", "TensorFlow", "PyTorch", "Keras", "Convolutional Neural Networks (CNNs)", "Recurrent Neural Networks (RNNs)", "Long Short-Term Memory (LSTM)", "Generative Adversarial Networks (GANs)", "Autoencoders", "Transfer Learning", "Reinforcement Learning", "Unsupervised Learning", "Clustering", "Dimensionality Reduction", "Principal Component Analysis (PCA)", "t-SNE", "UMAP", "Anomaly Detection", "Recommendation Systems", "Ensemble Methods", "Bagging", "Boosting", "Stacking"],
@@ -17,19 +22,72 @@ const skills = {
 };
 
 export function AboutSkills() {
-  return (
-    <div className="grid gap-6 md:grid-cols-2">
-      {Object.entries(skills).map(([group, items]) => (
-        <div
-          key={group}
-          className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-xl"
-        >
-          <h3 className="mb-4 text-lg font-semibold text-white">
-            {group}
-          </h3>
+  const categories = Object.keys(skills);
 
-          <div className="flex flex-wrap gap-2">
-            {items.map((skill) => (
+  const [selected, setSelected] = useState(categories[0]);
+
+  return (
+    <div>
+      <div className="mb-10">
+        <span className="text-sm font-semibold uppercase tracking-[0.35em] text-cyan-300">
+          Skills
+        </span>
+
+        <h3 className="mt-4 text-3xl font-bold text-white">
+          Engineering Expertise
+        </h3>
+
+        <p className="mt-4 max-w-xl leading-8 text-zinc-400">
+          Rather than listing every technology, explore the
+          domains where I build production-grade solutions.
+        </p>
+      </div>
+
+      <div className="grid gap-8 lg:grid-cols-[260px_1fr]">
+
+        {/* Categories */}
+
+        <div className="space-y-3">
+
+          {categories.map((category) => (
+
+            <button
+              key={category}
+              onClick={() => setSelected(category)}
+              className={`
+                w-full
+                rounded-2xl
+                border
+                px-5
+                py-4
+                text-left
+                transition-all
+                ${
+                  selected === category
+                    ? "border-cyan-400 bg-cyan-500/20 text-white"
+                    : "border-white/10 bg-white/5 text-zinc-400 hover:border-cyan-500/40"
+                }
+              `}
+            >
+              {category}
+            </button>
+
+          ))}
+
+        </div>
+
+        {/* Skills */}
+
+        <div className="rounded-3xl border border-white/10 bg-white/5 p-8 backdrop-blur-xl">
+
+          <h4 className="text-2xl font-bold text-white">
+            {selected}
+          </h4>
+
+          <div className="mt-8 flex flex-wrap gap-3">
+
+            {skills[selected as keyof typeof skills].map((skill) => (
+
               <span
                 key={skill}
                 className="
@@ -37,9 +95,9 @@ export function AboutSkills() {
                   border
                   border-cyan-500/20
                   bg-cyan-500/10
-                  px-3
-                  py-1
-                  text-xs
+                  px-4
+                  py-2
+                  text-sm
                   font-medium
                   text-cyan-300
                   transition
@@ -49,10 +107,14 @@ export function AboutSkills() {
               >
                 {skill}
               </span>
+
             ))}
+
           </div>
+
         </div>
-      ))}
+
+      </div>
     </div>
   );
 }
