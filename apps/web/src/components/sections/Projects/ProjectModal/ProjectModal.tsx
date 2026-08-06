@@ -185,7 +185,6 @@ useEffect(() => {
 }, [open]);
 const repoName = project?.githubRepo ?? "";
 
-console.log("repoName =", repoName);
 
 const github = useGithubRepository(repoName);
 

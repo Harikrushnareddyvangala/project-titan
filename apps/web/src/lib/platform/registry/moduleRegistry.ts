@@ -1,39 +1,62 @@
-export interface PlatformModule {
+import type {
+  ModuleCategory,
+  PlatformModule,
+} from "./moduleTypes";
 
-  id: string;
+const registry = new Map<string, PlatformModule>();
 
-  name: string;
+export const ModuleRegistry = {
+  register(module: PlatformModule): void {
+    registry.set(module.id, module);
+  },
 
-  category: string;
+  unregister(id: string): boolean {
+    return registry.delete(id);
+  },
 
-  version: string;
+  get(id: string): PlatformModule | undefined {
+    return registry.get(id);
+  },
 
-}
+  has(id: string): boolean {
+    return registry.has(id);
+  },
 
-export class ModuleRegistry {
+  getAll(): PlatformModule[] {
+    return [...registry.values()];
+  },
 
-  private readonly modules:
-
-    PlatformModule[] = [];
-
-  register(
-
-    module: PlatformModule,
-
-  ) {
-
-    this.modules.push(
-
-      module,
-
+  getByCategory(
+    category: ModuleCategory
+  ): PlatformModule[] {
+    return this.getAll().filter(
+      (module) => module.category === category
     );
+  },
 
-  }
+  getEnabled(): PlatformModule[] {
+    return this.getAll().filter(
+      (module) => module.enabled
+    );
+  },
 
-  getModules() {
+  getExperimental(): PlatformModule[] {
+    return this.getAll().filter(
+      (module) => module.experimental
+    );
+  },
 
-    return [...this.modules];
+  getByPriority(): PlatformModule[] {
+    return [...this.getAll()].sort(
+      (a, b) => a.priority - b.priority
+    );
+  },
 
-  }
+  clear(): void {
+    registry.clear();
+  },
 
-}
+  size(): number {
+    return registry.size;
+  },
+};

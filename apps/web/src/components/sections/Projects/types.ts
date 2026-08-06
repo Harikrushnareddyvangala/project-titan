@@ -44,7 +44,7 @@ export interface Project {
   image: string;
 
   // External Links
-  github?: string;
+  github: string;
   live?: string;
 
   // Future Internal Navigation
