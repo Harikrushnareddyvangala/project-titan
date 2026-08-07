@@ -2,26 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { navigation } from "./navigation";
 
-const links = [
-  { href: "/", label: "Home" },
-
-  { href: "/projects", label: "Projects" },
-
-  { href: "/workspace", label: "Workspace" },
-
-  { href: "/blog", label: "Blog" },
-
-  { href: "/resume", label: "Resume" },
-
-  { href: "/contact", label: "Contact" },
-];
 export function NavLinks() {
   const pathname = usePathname();
 
   return (
     <nav className="hidden items-center gap-8 md:flex">
-      {links.map((link) => (
+      {navigation.map((link) => (
         <Link
           key={link.href}
           href={link.href}

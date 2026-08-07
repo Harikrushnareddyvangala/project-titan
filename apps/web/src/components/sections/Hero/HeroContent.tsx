@@ -45,14 +45,17 @@ export function HeroContent() {
 
       {/* Description */}
       <motion.p
-        variants={fadeUp}
-        className="mt-8 max-w-2xl text-lg leading-8 text-zinc-300"
-      >
-        Building enterprise-grade AI, Machine Learning,
-        Data Science, Analytics and Business Intelligence
-        solutions with modern cloud technologies and
-        exceptional user experiences.
-      </motion.p>
+  variants={fadeUp}
+  className="mt-8 max-w-2xl text-lg leading-8 text-zinc-300"
+>
+  Creator of <span className="font-semibold text-cyan-400">Project TITAN</span>,
+  an Engineering Intelligence Platform that combines AI,
+  repository analytics, software architecture visualization,
+  engineering insights, and modern data science into one
+  production-grade ecosystem. Built to demonstrate how
+  intelligent software engineering platforms can support
+  developers, researchers, and engineering teams.
+</motion.p>
 
       {/* Buttons */}
       <motion.div variants={fadeUp}>

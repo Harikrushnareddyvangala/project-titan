@@ -13,19 +13,19 @@ import { AnalyticsSection } from "./ProjectsAnalytics";
 
 
 export function Projects() {
-  
-const {
-  search,
-  setSearch,
 
-  selectedCategory,
-  setSelectedCategory,
+  const {
+    search,
+    setSearch,
 
-  sortBy,
-  setSortBy,
+    selectedCategory,
+    setSelectedCategory,
 
-  filteredProjects,
-} = useProjectFilters();
+    sortBy,
+    setSortBy,
+
+    filteredProjects,
+  } = useProjectFilters();
 
   return (
     <section
@@ -37,21 +37,21 @@ const {
         <AnalyticsSection />
 
         <ProjectFilters
-  categories={[
-    "All",
-    "AI",
-    "Machine Learning",
-    "Analytics",
-    "Generative AI",
-    "Predictive Analytics",
-    "Data Science",
-    "Business Intelligence",
-    "Web",
-    "Visualization",
-  ]}
-  selected={selectedCategory}
-  onSelect={setSelectedCategory}
-/>
+          categories={[
+            "All",
+            "AI",
+            "Machine Learning",
+            "Analytics",
+            "Generative AI",
+            "Predictive Analytics",
+            "Data Science",
+            "Business Intelligence",
+            "Web",
+            "Visualization",
+          ]}
+          selected={selectedCategory}
+          onSelect={setSelectedCategory}
+        />
 
         <ProjectSearch
           value={search}
@@ -59,44 +59,44 @@ const {
         />
 
         <ProjectSort
-  value={sortBy}
-  onChange={setSortBy}
-/>
+          value={sortBy}
+          onChange={setSortBy}
+        />
 
         {filteredProjects.length > 0 ? (
           <>
-          <motion.div
-  initial={{
-    opacity: 0,
-    y: 15,
-  }}
-  animate={{
-    opacity: 1,
-    y: 0,
-  }}
-  transition={{
-    duration: 0.35,
-  }}
-  className="mb-6 flex items-center justify-between"
->
-  <p className="text-sm text-zinc-400">
-    Showing{" "}
-    <span className="font-semibold text-white">
-      {filteredProjects.length}
-    </span>{" "}
-    project
-    {filteredProjects.length !== 1 && "s"}
-  </p>
-</motion.div> 
-          <ProjectsGrid
-            projects={filteredProjects}
-          />
+            <motion.div
+              initial={{
+                opacity: 0,
+                y: 15,
+              }}
+              animate={{
+                opacity: 1,
+                y: 0,
+              }}
+              transition={{
+                duration: 0.35,
+              }}
+              className="mb-6 flex items-center justify-between"
+            >
+              <p className="text-sm text-zinc-400">
+                Showing{" "}
+                <span className="font-semibold text-white">
+                  {filteredProjects.length}
+                </span>{" "}
+                project
+                {filteredProjects.length !== 1 && "s"}
+              </p>
+            </motion.div>
+            <ProjectsGrid
+              projects={filteredProjects}
+            />
           </>
         ) : (
           <ProjectsEmpty
             search={search}
           />
-          
+
         )}
       </div>
     </section>
