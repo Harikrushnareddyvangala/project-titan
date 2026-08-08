@@ -1,0 +1,709 @@
+.
+├── .DS_Store
+├── .editorconfig
+├── .github
+│   └── workflows
+├── .gitignore
+├── .prettierrc
+├── .vscode
+├── apps
+│   ├── .DS_Store
+│   ├── admin
+│   ├── api
+│   ├── docs
+│   ├── PROJECT_TITAN_PROGRESS.md
+│   └── web
+│       ├── .DS_Store
+│       ├── .env.local
+│       ├── .gitignore
+│       ├── assets
+│       ├── components
+│       ├── constants
+│       ├── eslint.config.mjs
+│       ├── features
+│       ├── hooks
+│       ├── lib
+│       ├── next-env.d.ts
+│       ├── next.config.ts
+│       ├── package.json
+│       ├── pnpm-lock.yaml
+│       ├── pnpm-workspace.yaml
+│       ├── postcss.config.mjs
+│       ├── providers
+│       ├── public
+│       │   ├── .DS_Store
+│       │   ├── file.svg
+│       │   ├── globe.svg
+│       │   ├── next.svg
+│       │   ├── noise.png
+│       │   ├── projects
+│       │   │   ├── churn-prediction.jpg
+│       │   │   ├── fraud-detection.jpg
+│       │   │   ├── placeholder-project.png
+│       │   │   ├── project-image.jpg
+│       │   │   ├── project-mobile.jpg
+│       │   │   └── project-titan.jpg
+│       │   ├── vercel.svg
+│       │   └── window.svg
+│       ├── README.md
+│       ├── services
+│       ├── src
+│       │   ├── .DS_Store
+│       │   ├── app
+│       │   │   ├── .DS_Store
+│       │   │   ├── api
+│       │   │   │   └── github
+│       │   │   │       └── [...repo]
+│       │   │   │           └── route.ts
+│       │   │   ├── architecture
+│       │   │   │   └── page.tsx
+│       │   │   ├── error.tsx
+│       │   │   ├── globals.css
+│       │   │   ├── layout.tsx
+│       │   │   ├── loading.tsx
+│       │   │   ├── not-found.tsx
+│       │   │   ├── page.tsx
+│       │   │   ├── playground
+│       │   │   │   ├── line.tsx
+│       │   │   │   └── page.tsx
+│       │   │   └── workspace
+│       │   │       ├── [module]
+│       │   │       │   └── page.tsx
+│       │   │       ├── comparison
+│       │   │       │   └── page.tsx
+│       │   │       ├── developer
+│       │   │       │   └── page.tsx
+│       │   │       ├── layout.tsx
+│       │   │       ├── loading.tsx
+│       │   │       ├── not-found.tsx
+│       │   │       ├── organization
+│       │   │       │   └── page.tsx
+│       │   │       ├── page.tsx
+│       │   │       ├── portfolio
+│       │   │       │   └── page.tsx
+│       │   │       ├── recruiter
+│       │   │       │   └── page.tsx
+│       │   │       ├── repository
+│       │   │       │   └── page.tsx
+│       │   │       └── research
+│       │   │           └── page.tsx
+│       │   ├── assets
+│       │   │   ├── animations
+│       │   │   ├── icons
+│       │   │   ├── images
+│       │   │   ├── logos
+│       │   │   └── public
+│       │   ├── blog
+│       │   ├── common
+│       │   ├── components
+│       │   │   ├── .DS_Store
+│       │   │   ├── architecture
+│       │   │   │   ├── ArchitectureFlow.tsx
+│       │   │   │   ├── ArchitectureOverview.tsx
+│       │   │   │   ├── EngineeringPrinciples.tsx
+│       │   │   │   └── PlatformStatistics.tsx
+│       │   │   ├── common
+│       │   │   │   ├── Container.tsx
+│       │   │   │   ├── MotionReveal.tsx
+│       │   │   │   ├── ProjectImage.tsx
+│       │   │   │   └── Section.tsx
+│       │   │   ├── Container
+│       │   │   ├── dashboard
+│       │   │   │   ├── DashboardHeader.tsx
+│       │   │   │   ├── DashboardSection.tsx
+│       │   │   │   ├── MetricCard.tsx
+│       │   │   │   ├── MetricGrid.tsx
+│       │   │   │   ├── RepositoryAdvisorDashboard.tsx
+│       │   │   │   ├── RepositoryDecisionDashboard.tsx
+│       │   │   │   ├── RepositoryExecutionDashboard.tsx
+│       │   │   │   ├── RepositoryExecutiveDashboard.tsx
+│       │   │   │   ├── RepositoryObservabilityDashboard.tsx
+│       │   │   │   ├── RepositoryPlanningDashboard.tsx
+│       │   │   │   ├── RepositoryQualityDashboard.tsx
+│       │   │   │   ├── RepositoryRiskDashboard.tsx
+│       │   │   │   ├── UnifiedCorrelationPanel.tsx
+│       │   │   │   └── utils
+│       │   │   │       └── correlationBadgeUtils.ts
+│       │   │   ├── Footer
+│       │   │   ├── github
+│       │   │   │   ├── AIRecommendationCard.tsx
+│       │   │   │   ├── CareerDashboard.tsx
+│       │   │   │   ├── CareerIntelligenceDashboard.tsx
+│       │   │   │   ├── DeveloperDashboard.tsx
+│       │   │   │   ├── DeveloperDNADashboard.tsx
+│       │   │   │   ├── EngineeringMentorDashboard.tsx
+│       │   │   │   ├── EngineeringRadar.tsx
+│       │   │   │   ├── ExecutiveEngineeringReport.tsx
+│       │   │   │   ├── ExecutiveEngineeringReportDashboard.tsx
+│       │   │   │   ├── ExecutivePortfolioDashboard.tsx
+│       │   │   │   ├── ExecutiveSummaryCard.tsx
+│       │   │   │   ├── OrganizationDashboard.tsx
+│       │   │   │   ├── OrganizationIntelligenceDashboard.tsx
+│       │   │   │   ├── PortfolioIntelligenceDashboard.tsx
+│       │   │   │   ├── RecruiterDashboard.tsx
+│       │   │   │   ├── RecruiterIntelligenceDashboard.tsx
+│       │   │   │   ├── RepositoryCommitDashboard.tsx
+│       │   │   │   ├── RepositoryContributorDashboard.tsx
+│       │   │   │   ├── RepositoryEngineeringDashboard.tsx
+│       │   │   │   ├── RepositoryLeaderboard.tsx
+│       │   │   │   ├── RepositorySimilarityDashboard.tsx
+│       │   │   │   ├── TeamCompatibilityDashboard.tsx
+│       │   │   │   └── TechnologyDistribution.tsx
+│       │   │   ├── intelligence
+│       │   │   │   ├── ConfidenceMetric.tsx
+│       │   │   │   ├── ExecutiveSummary.tsx
+│       │   │   │   ├── index.ts
+│       │   │   │   └── RecommendationCard.tsx
+│       │   │   ├── layout
+│       │   │   │   ├── Container
+│       │   │   │   │   ├── Container.tsx
+│       │   │   │   │   └── index.ts
+│       │   │   │   ├── Footer
+│       │   │   │   ├── Navbar
+│       │   │   │   │   ├── DesktopNav.tsx
+│       │   │   │   │   ├── index.ts
+│       │   │   │   │   ├── Logo.tsx
+│       │   │   │   │   ├── MobileMenuButton.tsx
+│       │   │   │   │   ├── MobileNav.tsx
+│       │   │   │   │   ├── navbar-right.tsx
+│       │   │   │   │   ├── Navbar.tsx
+│       │   │   │   │   ├── navigation.ts
+│       │   │   │   │   ├── NavItem.tsx
+│       │   │   │   │   ├── NavLinks.tsx
+│       │   │   │   │   ├── ThemeToggle.tsx
+│       │   │   │   │   ├── types.ts
+│       │   │   │   │   ├── use-navbar-scroll.ts
+│       │   │   │   │   └── UserActions.tsx
+│       │   │   │   └── ThemeToggle
+│       │   │   ├── sections
+│       │   │   │   ├── .DS_Store
+│       │   │   │   ├── About
+│       │   │   │   │   ├── About.tsx
+│       │   │   │   │   ├── AboutAchievements.tsx
+│       │   │   │   │   ├── AboutHeader.tsx
+│       │   │   │   │   ├── AboutSkills.tsx
+│       │   │   │   │   ├── AboutTimeline.tsx
+│       │   │   │   │   ├── data.ts
+│       │   │   │   │   ├── index.ts
+│       │   │   │   │   └── types.ts
+│       │   │   │   ├── GitHub
+│       │   │   │   │   ├── GitHub.tsx
+│       │   │   │   │   ├── GitHubHeader.tsx
+│       │   │   │   │   ├── GitHubImages.tsx
+│       │   │   │   │   ├── GitHubStatsCards.tsx
+│       │   │   │   │   └── types.ts
+│       │   │   │   ├── Hero
+│       │   │   │   │   ├── AvailabilityBadge.tsx
+│       │   │   │   │   ├── Hero.tsx
+│       │   │   │   │   ├── HeroBackground.tsx
+│       │   │   │   │   ├── HeroButtons.tsx
+│       │   │   │   │   ├── HeroContent.tsx
+│       │   │   │   │   ├── HeroSocial.tsx
+│       │   │   │   │   ├── HeroStats.tsx
+│       │   │   │   │   ├── HeroTyping.tsx
+│       │   │   │   │   ├── index.ts
+│       │   │   │   │   └── ScrollIndicator.tsx
+│       │   │   │   └── Projects
+│       │   │   │       ├── categories.ts
+│       │   │   │       ├── data.ts
+│       │   │   │       ├── GithubAnalytics
+│       │   │   │       │   ├── AnalyticsCard.tsx
+│       │   │   │       │   ├── DashboardBackground.tsx
+│       │   │   │       │   └── GridPattern.tsx
+│       │   │   │       ├── index.ts
+│       │   │   │       ├── project-details-data.ts
+│       │   │   │       ├── project-details.ts
+│       │   │   │       ├── ProjectArchitecture
+│       │   │   │       │   ├── ArchitectureBackground.tsx
+│       │   │   │       │   ├── ArchitectureCanvas.tsx
+│       │   │   │       │   ├── ArchitectureConnection.tsx
+│       │   │   │       │   ├── ArchitectureLegend.tsx
+│       │   │   │       │   ├── ArchitectureMiniMap.tsx
+│       │   │   │       │   ├── ArchitectureNode.tsx
+│       │   │   │       │   ├── FloatingParticles.tsx
+│       │   │   │       │   ├── index.ts
+│       │   │   │       │   └── MouseGlow.tsx
+│       │   │   │       ├── ProjectArchitecture.tsx
+│       │   │   │       ├── ProjectCard.tsx
+│       │   │   │       ├── ProjectFeatures.tsx
+│       │   │   │       ├── ProjectFilters.tsx
+│       │   │   │       ├── ProjectGallery.tsx
+│       │   │   │       ├── ProjectGalleryItem.tsx
+│       │   │   │       ├── ProjectLightbox.tsx
+│       │   │   │       ├── ProjectMetrics.tsx
+│       │   │   │       ├── ProjectModal
+│       │   │   │       │   ├── AuroraBackground.tsx
+│       │   │   │       │   ├── GithubAnalytics
+│       │   │   │       │   │   ├── ActivityHeat.tsx
+│       │   │   │       │   │   ├── AIEngineeringRecommendations.tsx
+│       │   │   │       │   │   ├── AIExecutiveEngineeringReport.tsx
+│       │   │   │       │   │   ├── AnalyticsHeader.tsx
+│       │   │   │       │   │   ├── AnalyticsSidebar.tsx
+│       │   │   │       │   │   ├── AnimatedCounter.tsx
+│       │   │   │       │   │   ├── ArchitectureDetection.tsx
+│       │   │   │       │   │   ├── CommitActivityAnalytics.tsx
+│       │   │   │       │   │   ├── CommunityCard.tsx
+│       │   │   │       │   │   ├── ContributorAnalytics.tsx
+│       │   │   │       │   │   ├── DashboardGrid.tsx
+│       │   │   │       │   │   ├── DependencyIntelligence.tsx
+│       │   │   │       │   │   ├── EngineeringScoreDashboard.tsx
+│       │   │   │       │   │   ├── ExecutiveDashboard
+│       │   │   │       │   │   │   ├── DeploymentReadinessCard.tsx
+│       │   │   │       │   │   │   ├── EngineeringScoreCard.tsx
+│       │   │   │       │   │   │   ├── ExecutiveDashboard.tsx
+│       │   │   │       │   │   │   ├── ExecutiveSummaryCard.tsx
+│       │   │   │       │   │   │   ├── HiringSignalCard.tsx
+│       │   │   │       │   │   │   ├── index.ts
+│       │   │   │       │   │   │   ├── RiskAssessmentCard.tsx
+│       │   │   │       │   │   │   ├── TeamHealthCard.tsx
+│       │   │   │       │   │   │   └── TechnologyStackCard.tsx
+│       │   │   │       │   │   ├── ExecutiveSummaryHero.tsx
+│       │   │   │       │   │   ├── GithubActivityTimeline.tsx
+│       │   │   │       │   │   ├── GithubAnalyticsSkeleton.tsx
+│       │   │   │       │   │   ├── GithubCommitActivity.tsx
+│       │   │   │       │   │   ├── GithubCommitHeatmap.tsx
+│       │   │   │       │   │   ├── GithubContributorLeaderboard.tsx
+│       │   │   │       │   │   ├── GithubContributors.tsx
+│       │   │   │       │   │   ├── GithubLanguageDonut.tsx
+│       │   │   │       │   │   ├── GithubLanguagesCard.tsx
+│       │   │   │       │   │   ├── GithubRepositoryMetadata.tsx
+│       │   │   │       │   │   ├── GrowthTimeline.tsx
+│       │   │   │       │   │   ├── index.ts
+│       │   │   │       │   │   ├── KpiCard.tsx
+│       │   │   │       │   │   ├── LanguageAnalytics.tsx
+│       │   │   │       │   │   ├── LanguageProgress.tsx
+│       │   │   │       │   │   ├── PremiumCard.tsx
+│       │   │   │       │   │   ├── ProgressBar.tsx
+│       │   │   │       │   │   ├── RepositoryActivityHeatmap.tsx
+│       │   │   │       │   │   ├── RepositoryAssessment.tsx
+│       │   │   │       │   │   ├── RepositoryBenchmark
+│       │   │   │       │   │   │   ├── BenchmarkCard.tsx
+│       │   │   │       │   │   │   ├── BenchmarkComparisonChart.tsx
+│       │   │   │       │   │   │   ├── BenchmarkMetricsGrid.tsx
+│       │   │   │       │   │   │   ├── BenchmarkProgressBar.tsx
+│       │   │   │       │   │   │   ├── BenchmarkRadarChart.tsx
+│       │   │   │       │   │   │   ├── BenchmarkSummary.tsx
+│       │   │   │       │   │   │   ├── BenchmarkTrendChart.tsx
+│       │   │   │       │   │   │   ├── index.ts
+│       │   │   │       │   │   │   └── RepositoryBenchmark.tsx
+│       │   │   │       │   │   ├── RepositoryCodeQualityAnalysis.tsx
+│       │   │   │       │   │   ├── RepositoryComparison
+│       │   │   │       │   │   │   ├── ComparisonInsights.tsx
+│       │   │   │       │   │   │   ├── ComparisonRadar.tsx
+│       │   │   │       │   │   │   ├── ComparisonRanking.tsx
+│       │   │   │       │   │   │   ├── ComparisonSelector.tsx
+│       │   │   │       │   │   │   ├── ComparisonTable.tsx
+│       │   │   │       │   │   │   ├── index.ts
+│       │   │   │       │   │   │   └── RepositoryComparison.tsx
+│       │   │   │       │   │   ├── RepositoryComplexityAnalysis.tsx
+│       │   │   │       │   │   ├── RepositoryDevOpsAnalysis.tsx
+│       │   │   │       │   │   ├── RepositoryHealthDashboard.tsx
+│       │   │   │       │   │   ├── RepositoryHealthRing.tsx
+│       │   │   │       │   │   ├── RepositoryInsights.tsx
+│       │   │   │       │   │   ├── RepositoryMaturityAssessment.tsx
+│       │   │   │       │   │   ├── RepositoryMaturityCard.tsx
+│       │   │   │       │   │   ├── RepositoryOverviewCard.tsx
+│       │   │   │       │   │   ├── RepositoryPerformanceAnalysis.tsx
+│       │   │   │       │   │   ├── RepositoryRadarChart.tsx
+│       │   │   │       │   │   ├── RepositoryRecommendations.tsx
+│       │   │   │       │   │   ├── RepositoryRiskAssessment.tsx
+│       │   │   │       │   │   ├── RepositoryScore.tsx
+│       │   │   │       │   │   ├── RepositoryScoreTimeline.tsx
+│       │   │   │       │   │   ├── RepositorySecurityAnalysis.tsx
+│       │   │   │       │   │   ├── RepositorySecurityDashboard.tsx
+│       │   │   │       │   │   ├── RepositoryTimeline.tsx
+│       │   │   │       │   │   ├── TechnologyDependencyGraph.tsx
+│       │   │   │       │   │   ├── TechnologyStackAnalysis.tsx
+│       │   │   │       │   │   └── TechnologyStackAnalytics.tsx
+│       │   │   │       │   ├── GithubAnalyticsSection.tsx
+│       │   │   │       │   ├── GithubCard.tsx
+│       │   │   │       │   ├── GithubLanguages.old.tsx
+│       │   │   │       │   ├── GithubRepositoryInfo.tsx
+│       │   │   │       │   ├── GithubSkeleton.tsx
+│       │   │   │       │   ├── index.ts
+│       │   │   │       │   ├── MetricCard.tsx
+│       │   │   │       │   ├── MetricRing.tsx
+│       │   │   │       │   ├── MetricsDashboard.tsx
+│       │   │   │       │   ├── ModalBackground.tsx
+│       │   │   │       │   ├── ProjectActions.tsx
+│       │   │   │       │   ├── ProjectContent.tsx
+│       │   │   │       │   ├── ProjectGallery.tsx
+│       │   │   │       │   ├── ProjectHero.tsx
+│       │   │   │       │   ├── ProjectHeroActions.tsx
+│       │   │   │       │   ├── ProjectMetrics.tsx
+│       │   │   │       │   ├── ProjectModal.tsx
+│       │   │   │       │   ├── ProjectNavigation.tsx
+│       │   │   │       │   ├── ProjectOverview.tsx
+│       │   │   │       │   ├── RepositoryInsights.tsx
+│       │   │   │       │   └── SectionContainer.tsx
+│       │   │   │       ├── Projects.tsx
+│       │   │   │       ├── ProjectsAnalytics
+│       │   │   │       │   ├── analytics.ts
+│       │   │   │       │   ├── AnalyticsSection.tsx
+│       │   │   │       │   ├── AnimatedCounter.tsx
+│       │   │   │       │   ├── CategoryChart.tsx
+│       │   │   │       │   ├── index.ts
+│       │   │   │       │   ├── StatsCards.tsx
+│       │   │   │       │   ├── TechnologyChart.tsx
+│       │   │   │       │   └── Timeline.tsx
+│       │   │   │       ├── ProjectSearch.tsx
+│       │   │   │       ├── ProjectsEmpty.tsx
+│       │   │   │       ├── ProjectsGrid.tsx
+│       │   │   │       ├── ProjectsHeader.tsx
+│       │   │   │       ├── ProjectSort.tsx
+│       │   │   │       ├── ProjectTechStack.tsx
+│       │   │   │       ├── types.ts
+│       │   │   │       └── useProjectFilters.ts
+│       │   │   ├── ui
+│       │   │   │   ├── .DS_Store
+│       │   │   │   ├── Badge
+│       │   │   │   ├── badge.tsx
+│       │   │   │   ├── badges
+│       │   │   │   │   ├── badgeTypes.ts
+│       │   │   │   │   ├── EvolutionBadge.tsx
+│       │   │   │   │   ├── ForecastBadge.tsx
+│       │   │   │   │   ├── GradeBadge.tsx
+│       │   │   │   │   ├── GrowthBadge.tsx
+│       │   │   │   │   ├── index.ts
+│       │   │   │   │   ├── RiskBadge.tsx
+│       │   │   │   │   ├── StatusBadge.tsx
+│       │   │   │   │   ├── statusBadgeUtils.ts
+│       │   │   │   │   ├── TrendBadge.tsx
+│       │   │   │   │   └── utils
+│       │   │   │   │       ├── healthBadge.ts
+│       │   │   │   │       ├── index.ts
+│       │   │   │   │       ├── priorityBadge.ts
+│       │   │   │   │       ├── riskBadge.ts
+│       │   │   │   │       ├── severityBadge.ts
+│       │   │   │   │       ├── statusBadge.ts
+│       │   │   │   │       └── trendBadge.ts
+│       │   │   │   ├── Button.tsx
+│       │   │   │   ├── Card
+│       │   │   │   │   ├── Card.tsx
+│       │   │   │   │   └── index.ts
+│       │   │   │   ├── card.tsx
+│       │   │   │   ├── cards
+│       │   │   │   │   ├── BaseCard.tsx
+│       │   │   │   │   ├── DeltaMetricCard.tsx
+│       │   │   │   │   ├── ExecutiveCard.tsx
+│       │   │   │   │   ├── ForecastMetricCard.tsx
+│       │   │   │   │   ├── index.ts
+│       │   │   │   │   ├── InsightCard.tsx
+│       │   │   │   │   ├── MetricCard.tsx
+│       │   │   │   │   └── StatusCard.tsx
+│       │   │   │   ├── Dialog
+│       │   │   │   ├── icons.ts
+│       │   │   │   ├── index.ts
+│       │   │   │   ├── indicators
+│       │   │   │   │   ├── DeltaIndicator.tsx
+│       │   │   │   │   ├── ScoreIndicator.tsx
+│       │   │   │   │   └── TrendIndicator.tsx
+│       │   │   │   ├── Input
+│       │   │   │   ├── layout
+│       │   │   │   │   ├── DashboardContainer.tsx
+│       │   │   │   │   ├── DashboardGrid.tsx
+│       │   │   │   │   ├── DashboardHeader.tsx
+│       │   │   │   │   ├── DashboardSection.tsx
+│       │   │   │   │   └── index.ts
+│       │   │   │   ├── progress
+│       │   │   │   │   ├── ConfidenceBar.tsx
+│       │   │   │   │   ├── PercentageBar.tsx
+│       │   │   │   │   ├── ProgressBar.tsx
+│       │   │   │   │   └── ScoreBar.tsx
+│       │   │   │   ├── Spinner
+│       │   │   │   ├── Textarea
+│       │   │   │   ├── theme.ts
+│       │   │   │   ├── TrendIndicator.tsx
+│       │   │   │   └── TrendMetricCard.tsx
+│       │   │   └── workspace
+│       │   │       ├── .DS_Store
+│       │   │       ├── comparison
+│       │   │       │   ├── ArchitectureIntelligenceDashboard.tsx
+│       │   │       │   ├── CategoryLaggardsCard.tsx
+│       │   │       │   ├── CategoryLeadersCard.tsx
+│       │   │       │   ├── ComparisonRepositoryAnalytics.tsx
+│       │   │       │   ├── ComparisonWorkspace.tsx
+│       │   │       │   ├── EngineeringProductivityDashboard.tsx
+│       │   │       │   ├── ExecutivePortfolioInsights.tsx
+│       │   │       │   ├── MetricCard.tsx
+│       │   │       │   ├── PortfolioComparisonSummary.tsx
+│       │   │       │   ├── PortfolioHealthDashboard.tsx
+│       │   │       │   ├── PortfolioInsightsDashboard.tsx
+│       │   │       │   ├── RepositoryComparisonDashboard.tsx
+│       │   │       │   ├── RepositoryComparisonWorkspace.tsx
+│       │   │       │   ├── RepositoryEngineeringInsightsCard.tsx
+│       │   │       │   ├── RepositoryEvolutionDashboard.tsx
+│       │   │       │   ├── RepositoryForecastDashboard.tsx
+│       │   │       │   ├── RepositoryHistoricalTrendDashboard.tsx
+│       │   │       │   ├── RepositoryRankingTable.tsx
+│       │   │       │   ├── RepositoryRiskIntelligenceDashboard.tsx
+│       │   │       │   ├── RepositoryScoreBreakdownCard.tsx
+│       │   │       │   ├── RepositorySnapshotDashboard.tsx
+│       │   │       │   ├── RepositoryTechnologyDashboard.tsx
+│       │   │       │   ├── RepositoryTrendIntelligenceDashboard.tsx
+│       │   │       │   ├── shared
+│       │   │       │   │   └── MetricCard.tsx
+│       │   │       │   └── TopRepositoryCard.tsx
+│       │   │       ├── developer
+│       │   │       │   └── DeveloperWorkspace.tsx
+│       │   │       ├── organization
+│       │   │       │   └── OrganizationWorkspace.tsx
+│       │   │       ├── portfolio
+│       │   │       │   └── PortfolioWorkspace.tsx
+│       │   │       ├── recruiter
+│       │   │       │   └── RecruiterWorkspace.tsx
+│       │   │       ├── repository
+│       │   │       │   ├── page.tsx
+│       │   │       │   ├── PortfolioWorkspace.tsx
+│       │   │       │   ├── RepositoryWorkspace.tsx
+│       │   │       │   ├── RepositoryWorkspaceHeader.tsx
+│       │   │       │   └── RepositoryWorkspaceLayout.tsx
+│       │   │       ├── research
+│       │   │       │   └── ResearchWorkspace.tsx
+│       │   │       ├── shared
+│       │   │       │   ├── RepositoryAnalysisContainer.tsx
+│       │   │       │   └── WorkspaceHeader.tsx
+│       │   │       ├── WorkspaceHeader.tsx
+│       │   │       ├── WorkspaceHero.tsx
+│       │   │       ├── WorkspaceModulePage.tsx
+│       │   │       ├── WorkspaceNavigation.tsx
+│       │   │       ├── WorkspaceShell.tsx
+│       │   │       └── WorkspaceSidebar.tsx
+│       │   ├── constants
+│       │   │   ├── navigation.ts
+│       │   │   ├── risk.ts
+│       │   │   ├── routes.ts
+│       │   │   ├── socials.ts
+│       │   │   └── theme.ts
+│       │   ├── contact
+│       │   ├── dashboard
+│       │   ├── features
+│       │   │   ├── .DS_Store
+│       │   │   ├── CTA
+│       │   │   ├── FeaturedProjects
+│       │   │   ├── Hero
+│       │   │   ├── home
+│       │   │   │   ├── .DS_Store
+│       │   │   │   ├── components
+│       │   │   │   │   ├── .DS_Store
+│       │   │   │   │   └── Hero
+│       │   │   │   │       ├── Hero.tsx
+│       │   │   │   │       ├── HeroActions.tsx
+│       │   │   │   │       ├── HeroBackground.tsx
+│       │   │   │   │       ├── HeroBadge.tsx
+│       │   │   │   │       ├── HeroButtons.tsx
+│       │   │   │   │       ├── HeroContent.tsx
+│       │   │   │   │       ├── HeroDescription.tsx
+│       │   │   │   │       ├── HeroHeading.tsx
+│       │   │   │   │       ├── HeroSocials.tsx
+│       │   │   │   │       ├── HeroStats.tsx
+│       │   │   │   │       └── index.ts
+│       │   │   │   ├── constants
+│       │   │   │   │   ├── hero.ts
+│       │   │   │   │   └── roles.ts
+│       │   │   │   ├── hooks
+│       │   │   │   │   └── useTypingEffect.ts
+│       │   │   │   └── types
+│       │   │   │       └── hero.ts
+│       │   │   └── Skills
+│       │   ├── home
+│       │   ├── hooks
+│       │   │   ├── useGithubPortfolio.ts
+│       │   │   ├── useGithubRepository.ts
+│       │   │   ├── useMousePosition.ts
+│       │   │   ├── useRepositoryAnalytics.ts
+│       │   │   ├── useTypingEffect.ts
+│       │   │   └── useWorkspaceRepository.ts
+│       │   ├── layout
+│       │   ├── lib
+│       │   │   ├── .DS_Store
+│       │   │   ├── animations
+│       │   │   │   ├── fade.ts
+│       │   │   │   ├── index.ts
+│       │   │   │   ├── scale.ts
+│       │   │   │   ├── slide.ts
+│       │   │   │   └── stagger.ts
+│       │   │   ├── animations.ts
+│       │   │   ├── constants
+│       │   │   │   ├── navigation.ts
+│       │   │   │   └── workspaceNavigation.ts
+│       │   │   ├── github
+│       │   │   │   ├── .DS_Store
+│       │   │   │   ├── aiRecommendationEngine.ts
+│       │   │   │   ├── analyticsEngine.ts
+│       │   │   │   ├── architectureIntelligenceEngine.ts
+│       │   │   │   ├── benchmarkEngine.ts
+│       │   │   │   ├── careerIntelligenceEngine.ts
+│       │   │   │   ├── codeIntelligenceEngine.ts
+│       │   │   │   ├── commitIntelligenceEngine.ts
+│       │   │   │   ├── comparison
+│       │   │   │   │   └── ComparativeAnalyticsEngine.ts
+│       │   │   │   ├── contributorIntelligenceEngine.ts
+│       │   │   │   ├── correlation
+│       │   │   │   │   ├── ruleEngine.ts
+│       │   │   │   │   └── rules
+│       │   │   │   │       ├── HighRepositoryRiskRule.ts
+│       │   │   │   │       ├── index.ts
+│       │   │   │   │       ├── RegressionRule.ts
+│       │   │   │   │       ├── ReleaseReadinessRule.ts
+│       │   │   │   │       └── TechnicalDebtRule.ts
+│       │   │   │   ├── developerDNAEngine.ts
+│       │   │   │   ├── engineeringExecutiveSummaryEngine.ts
+│       │   │   │   ├── engineeringMentorEngine.ts
+│       │   │   │   ├── executiveReportEngine.ts
+│       │   │   │   ├── executiveSummaryEngine.ts
+│       │   │   │   ├── githubAnalytics.ts
+│       │   │   │   ├── organizationIntelligenceEngine.ts
+│       │   │   │   ├── portfolioComparisonController.ts
+│       │   │   │   ├── portfolioEngine.ts
+│       │   │   │   ├── portfolioHealthEngine.ts
+│       │   │   │   ├── portfolioInsightsEngine.ts
+│       │   │   │   ├── portfolioIntelligenceEngine.ts
+│       │   │   │   ├── productivityIntelligenceEngine.ts
+│       │   │   │   ├── projectInsightsEngine.ts
+│       │   │   │   ├── recommendationEngine.ts
+│       │   │   │   ├── recruiterIntelligenceEngine.ts
+│       │   │   │   ├── reports
+│       │   │   │   ├── repositoryAdvisorService.ts
+│       │   │   │   ├── repositoryComparisonEngine.ts
+│       │   │   │   ├── repositoryCorrelationService.ts
+│       │   │   │   ├── repositoryDecisionIntelligenceService.ts
+│       │   │   │   ├── repositoryEngine.ts
+│       │   │   │   ├── repositoryEvolutionService.ts
+│       │   │   │   ├── repositoryExecutionService.ts
+│       │   │   │   ├── repositoryExecutiveIntelligenceService.ts
+│       │   │   │   ├── repositoryForecastService.ts
+│       │   │   │   ├── repositoryHistoricalTrendService.ts
+│       │   │   │   ├── repositoryObservabilityService.ts
+│       │   │   │   ├── repositoryPlanningService.ts
+│       │   │   │   ├── repositoryQualityService.ts
+│       │   │   │   ├── repositoryRankingEngine.ts
+│       │   │   │   ├── repositoryRiskIntelligenceEngine.ts
+│       │   │   │   ├── repositoryRiskIntelligenceService.ts
+│       │   │   │   ├── repositorySimilarityEngine.ts
+│       │   │   │   ├── repositorySnapshotService.ts
+│       │   │   │   ├── repositoryTechnologyEngine.ts
+│       │   │   │   ├── repositoryTrendIntelligenceEngine.ts
+│       │   │   │   ├── scoringEngine.ts
+│       │   │   │   ├── securityEngine.ts
+│       │   │   │   ├── teamCompatibilityEngine.ts
+│       │   │   │   └── technologyEngine.ts
+│       │   │   ├── github.ts
+│       │   │   ├── hooks
+│       │   │   ├── intelligence
+│       │   │   │   ├── confidence.ts
+│       │   │   │   ├── executive.ts
+│       │   │   │   ├── health.ts
+│       │   │   │   ├── index.ts
+│       │   │   │   ├── risk.ts
+│       │   │   │   ├── score.ts
+│       │   │   │   ├── summary.ts
+│       │   │   │   └── trend.ts
+│       │   │   ├── platform
+│       │   │   │   ├── architecture
+│       │   │   │   │   └── architectureCenter.ts
+│       │   │   │   ├── diagnostics
+│       │   │   │   │   ├── diagnosticRegistry.ts
+│       │   │   │   │   ├── index.ts
+│       │   │   │   │   └── platformDiagnosticsService.ts
+│       │   │   │   ├── metadata
+│       │   │   │   │   └── moduleCatalog.ts
+│       │   │   │   ├── performance
+│       │   │   │   │   ├── index.ts
+│       │   │   │   │   ├── performanceMonitor.ts
+│       │   │   │   │   └── performanceTypes.ts
+│       │   │   │   └── registry
+│       │   │   │       └── moduleRegistry.ts
+│       │   │   ├── types
+│       │   │   └── utils
+│       │   │       ├── cn.ts
+│       │   │       ├── debounce.ts
+│       │   │       ├── index.ts
+│       │   │       ├── is-client.ts
+│       │   │       ├── sleep.ts
+│       │   │       └── throttle.ts
+│       │   ├── projects
+│       │   ├── providers
+│       │   │   ├── query-provider.tsx
+│       │   │   └── theme-provider.tsx
+│       │   ├── resume
+│       │   ├── services
+│       │   ├── styles
+│       │   │   ├── animations.css
+│       │   │   ├── components.css
+│       │   │   ├── index.css
+│       │   │   ├── typography.css
+│       │   │   ├── utilities.css
+│       │   │   └── variables.css
+│       │   ├── types
+│       │   │   ├── advisor.ts
+│       │   │   ├── architectureCenter.ts
+│       │   │   ├── blog.ts
+│       │   │   ├── contact.ts
+│       │   │   ├── correlation.ts
+│       │   │   ├── decision.ts
+│       │   │   ├── execution.ts
+│       │   │   ├── executive.ts
+│       │   │   ├── experience.ts
+│       │   │   ├── github.ts
+│       │   │   ├── intelligence.ts
+│       │   │   ├── observability.ts
+│       │   │   ├── planning.ts
+│       │   │   ├── platform.ts
+│       │   │   ├── platformMetadata.ts
+│       │   │   ├── project.ts
+│       │   │   ├── quality.ts
+│       │   │   ├── risk.ts
+│       │   │   └── skill.ts
+│       │   ├── ui
+│       │   └── utils
+│       │       ├── cn.ts
+│       │       ├── format-date.ts
+│       │       ├── format-number.ts
+│       │       └── sleep.ts
+│       ├── styles
+│       ├── tsconfig.json
+│       ├── tsconfig.tsbuildinfo
+│       ├── types
+│       └── utils
+├── datasets
+├── docs
+│   ├── architecture
+│   │   └── intelligence-platform.md
+│   └── development
+│       ├── coding-standards.md
+│       └── contributing.md
+├── infrastructure
+│   ├── docker
+│   ├── kubernetes
+│   ├── monitoring
+│   ├── nginx
+│   └── terraform
+├── LICENSE.md
+├── notebooks
+├── package.json
+├── packages
+│   ├── analytics
+│   ├── auth
+│   ├── charts
+│   ├── config
+│   ├── database
+│   ├── types
+│   ├── ui
+│   └── utils
+├── pnpm-lock.yaml
+├── pnpm-workspace.yaml
+├── project-tree.txt
+├── README.md
+├── scripts
+├── services
+│   ├── ai
+│   ├── ml
+│   ├── notification
+│   ├── rag
+│   └── search
+├── tests
+├── tsconfig.base.json
+└── turbo.json
+
+167 directories, 540 files
