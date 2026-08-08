@@ -1,0 +1,3 @@
+export {
+  IntelligenceSearch,
+} from "./IntelligenceSearch";
