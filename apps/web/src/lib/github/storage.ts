@@ -4,20 +4,33 @@ const LAST_REPOSITORY_KEY =
 const RECENT_REPOSITORIES_KEY =
   "titan:recent-repositories";
 
-const MAX_RECENT_REPOSITORIES = 5;
-
-/* -------------------------------------------------------------------------- */
-/*                               Last Repository                              */
-/* -------------------------------------------------------------------------- */
+const MAX_RECENT = 5;
 
 export function getLastRepository(): string | null {
   if (typeof window === "undefined") {
     return null;
   }
 
-  return localStorage.getItem(
+  const value = localStorage.getItem(
     LAST_REPOSITORY_KEY,
   );
+
+  if (!value) {
+    return null;
+  }
+
+  /*
+   * Ignore accidentally persisted JSON from the
+   * previous implementation.
+   */
+  if (
+    value.startsWith("[") ||
+    value.startsWith("{")
+  ) {
+    return null;
+  }
+
+  return value;
 }
 
 export function saveLastRepository(
@@ -31,11 +44,13 @@ export function saveLastRepository(
     LAST_REPOSITORY_KEY,
     repository,
   );
-}
 
-/* -------------------------------------------------------------------------- */
-/*                            Recent Repositories                             */
-/* -------------------------------------------------------------------------- */
+  window.dispatchEvent(
+    new Event(
+      "titan:last-repository-change",
+    ),
+  );
+}
 
 export function getRecentRepositories(): string[] {
   if (typeof window === "undefined") {
@@ -51,11 +66,17 @@ export function getRecentRepositories(): string[] {
   }
 
   try {
-    const repositories = JSON.parse(value);
+    const parsed: unknown =
+      JSON.parse(value);
 
-    return Array.isArray(repositories)
-      ? repositories
-      : [];
+    if (!Array.isArray(parsed)) {
+      return [];
+    }
+
+    return parsed.filter(
+      (item): item is string =>
+        typeof item === "string",
+    );
   } catch {
     return [];
   }
@@ -68,9 +89,10 @@ export function saveRecentRepository(
     return;
   }
 
-  const repositories = getRecentRepositories().filter(
-    (item) => item !== repository,
-  );
+  const repositories =
+    getRecentRepositories().filter(
+      (item) => item !== repository,
+    );
 
   repositories.unshift(repository);
 
@@ -79,35 +101,82 @@ export function saveRecentRepository(
     JSON.stringify(
       repositories.slice(
         0,
-        MAX_RECENT_REPOSITORIES,
+        MAX_RECENT,
       ),
+    ),
+  );
+
+  window.dispatchEvent(
+    new Event(
+      "titan:recent-repositories-change",
     ),
   );
 }
 
-export function removeRecentRepository(
-  repository: string,
-): void {
+export function subscribeToRepositoryStorage(
+  callback: () => void,
+): () => void {
   if (typeof window === "undefined") {
-    return;
+    return () => {};
   }
 
-  const repositories = getRecentRepositories().filter(
-    (item) => item !== repository,
+  const handleStorageChange = () => {
+    callback();
+  };
+
+  window.addEventListener(
+    "storage",
+    handleStorageChange,
   );
 
-  localStorage.setItem(
-    RECENT_REPOSITORIES_KEY,
-    JSON.stringify(repositories),
+  window.addEventListener(
+    "titan:last-repository-change",
+    handleStorageChange,
   );
+
+  return () => {
+    window.removeEventListener(
+      "storage",
+      handleStorageChange,
+    );
+
+    window.removeEventListener(
+      "titan:last-repository-change",
+      handleStorageChange,
+    );
+  };
 }
 
-export function clearRecentRepositories(): void {
+export function subscribeToRecentRepositories(
+  callback: () => void,
+): () => void {
   if (typeof window === "undefined") {
-    return;
+    return () => {};
   }
 
-  localStorage.removeItem(
-    RECENT_REPOSITORIES_KEY,
+  const handleStorageChange = () => {
+    callback();
+  };
+
+  window.addEventListener(
+    "storage",
+    handleStorageChange,
   );
+
+  window.addEventListener(
+    "titan:recent-repositories-change",
+    handleStorageChange,
+  );
+
+  return () => {
+    window.removeEventListener(
+      "storage",
+      handleStorageChange,
+    );
+
+    window.removeEventListener(
+      "titan:recent-repositories-change",
+      handleStorageChange,
+    );
+  };
 }
