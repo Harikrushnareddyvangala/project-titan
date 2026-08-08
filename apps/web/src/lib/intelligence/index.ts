@@ -5,3 +5,12 @@ export * from "./risk";
 export * from "./score";
 export * from "./summary";
 export * from "./trend";
+
+export type {
+  IntelligenceSection,
+  IntelligenceSectionId,
+} from "./types";
+
+export {
+  intelligenceSections,
+} from "./sections";
