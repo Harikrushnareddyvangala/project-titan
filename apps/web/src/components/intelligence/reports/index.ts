@@ -1,0 +1,3 @@
+export {
+  IntelligenceReport,
+} from "./IntelligenceReport";

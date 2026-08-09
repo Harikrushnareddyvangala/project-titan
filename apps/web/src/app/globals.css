@@ -192,3 +192,18 @@ img {
 .animate-float-delayed{
     animation:float 12s ease-in-out infinite;
 }
+
+@media print {
+  .titan-report-image {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  #titan-intelligence-report {
+    break-inside: auto;
+    page-break-inside: auto;
+  }
+}

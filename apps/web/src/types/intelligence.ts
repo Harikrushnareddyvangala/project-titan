@@ -1,3 +1,4 @@
+import type { RepositoryAnalytics } from "@/types/github";
 /* -------------------------------------------------------------------------- */
 /*                                Trend Types                                 */
 /* -------------------------------------------------------------------------- */
@@ -93,3 +94,10 @@ export type RepositoryLifecycle =
   | "Existing"
   | "New"
   | "Removed";
+
+export interface IntelligenceSnapshot {
+  id: string;
+  repository: string;
+  createdAt: string;
+  analytics: RepositoryAnalytics;
+}
