@@ -1,16 +1,9 @@
 import "./globals.css";
 
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 
 import { Navbar } from "@/components/layout/Navbar";
 import { ThemeProvider } from "@/providers/theme-provider";
-
-const inter = Inter({
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-inter",
-});
 
 export const metadata: Metadata = {
   title: {
@@ -31,9 +24,9 @@ export default function RootLayout({
       lang="en"
       suppressHydrationWarning
     >
-      <body className={inter.variable}>
+      <body>
         <ThemeProvider>
-           <Navbar /> 
+          <Navbar />
           {children}
         </ThemeProvider>
       </body>

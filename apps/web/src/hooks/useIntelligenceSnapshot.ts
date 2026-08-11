@@ -1,13 +1,24 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 
-import type { RepositoryAnalytics } from "@/types/github";
+import type {
+  RepositoryAnalytics,
+} from "@/types/github";
+
+import type {
+  IntelligenceArtifact,
+  IntelligenceSnapshot,
+} from "@/types/intelligence";
 
 import {
   createIntelligenceSnapshot,
   saveIntelligenceSnapshot,
 } from "@/lib/intelligence/snapshot";
+
+import {
+  createAndSaveIntelligenceArtifact,
+} from "@/lib/intelligence/artifactService";
 
 export function useIntelligenceSnapshot() {
   const [
@@ -15,29 +26,50 @@ export function useIntelligenceSnapshot() {
     setSnapshotCreated,
   ] = useState(false);
 
-  const createSnapshot = (
-    repository: string,
-    analytics: RepositoryAnalytics,
-  ) => {
-    const snapshot =
-      createIntelligenceSnapshot(
-        repository,
-        analytics,
+  
+
+  const createSnapshot = useCallback(
+    (
+      repository: string,
+      analytics: RepositoryAnalytics,
+    ): IntelligenceSnapshot => {
+      const snapshot =
+        createIntelligenceSnapshot(
+          repository,
+          analytics,
+        );
+
+      saveIntelligenceSnapshot(
+        snapshot,
       );
 
-    saveIntelligenceSnapshot(
-      snapshot,
-    );
+      setSnapshotCreated(true);
 
-    setSnapshotCreated(true);
+      
 
-    window.setTimeout(() => {
-      setSnapshotCreated(false);
-    }, 2000);
-  };
+      window.setTimeout(() => {
+        setSnapshotCreated(false);
+      }, 2000);
+
+      return snapshot;
+    },
+    [],
+  );
+
+  const createArtifact = useCallback(
+    (
+      snapshot: IntelligenceSnapshot,
+    ): IntelligenceArtifact => {
+      return createAndSaveIntelligenceArtifact(
+        snapshot,
+      );
+    },
+    [],
+  );
 
   return {
     createSnapshot,
+    createArtifact,
     snapshotCreated,
     
   };

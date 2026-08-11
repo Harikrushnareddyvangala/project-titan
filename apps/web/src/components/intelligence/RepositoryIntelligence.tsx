@@ -18,6 +18,9 @@ import {
   IntelligenceSnapshotHistory,
 } from "./snapshots";
 import {
+  IntelligenceArtifactHistory,
+} from "./artifacts";
+import {
   SharedSnapshotView,
 } from "./snapshots/SharedSnapshotView";
 import {
@@ -187,6 +190,7 @@ export function RepositoryIntelligence({
       ====================================================== */}
       <IntelligenceSnapshotHistory
       />
+      <IntelligenceArtifactHistory />
     </section>
   );
 }

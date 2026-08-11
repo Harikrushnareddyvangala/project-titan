@@ -1,10 +1,14 @@
 "use client";
+import { useState } from "react";
 
-import { Download, Printer } from "lucide-react";
-import Image from "next/image";
-
-import type { IntelligenceSnapshot } from "@/types/intelligence";
-
+import { FileText, Printer } from "lucide-react";
+import {
+  createAndSaveReportArtifact,
+} from "@/lib/intelligence/artifactService";
+import type {
+  IntelligenceArtifact,
+  IntelligenceSnapshot,
+} from "@/types/intelligence";
 interface IntelligenceReportProps {
   snapshot: IntelligenceSnapshot;
   onClose: () => void;
@@ -14,8 +18,15 @@ export function IntelligenceReport({
   snapshot,
   onClose,
 }: IntelligenceReportProps) {
-    const generatedAt = new Date();
-
+  const [generatedAt] = useState(
+  () => new Date()
+);
+const [
+  registeredArtifact,
+  setRegisteredArtifact,
+] = useState<IntelligenceArtifact | null>(
+  null,
+);
   const generatedAtText =
     generatedAt.toLocaleString("en-IN", {
       day: "2-digit",
@@ -27,64 +38,83 @@ export function IntelligenceReport({
       hour12: true,
       timeZone: "Asia/Kolkata",
     });
- const handlePrint = async () => {
-  const report =
-    document.getElementById(
-      "titan-intelligence-report",
-    );
 
-  if (!report) {
-    window.print();
-    return;
-  }
+  const [artifactCreated, setArtifactCreated] =
+    useState(false);
 
-  const images =
-    Array.from(
-      report.querySelectorAll("img"),
-    );
+  const handleCreateReportArtifact = () => {
+  const artifact =
+    createAndSaveReportArtifact(snapshot,);
+    setRegisteredArtifact(
+    artifact,
+  );
 
-  await Promise.all(
-    images.map((image) => {
-      if (
-        image.complete &&
-        image.naturalWidth > 0
-      ) {
-        return Promise.resolve();
-      }
+  setArtifactCreated(true);
 
-      return new Promise<void>((resolve) => {
-        const timeout =
-          window.setTimeout(
-            resolve,
-            2000,
+  window.setTimeout(() => {
+    setArtifactCreated(false);
+  }, 2500);
+};
+
+  const handlePrint = async () => {
+    const report =
+      document.getElementById(
+        "titan-intelligence-report",
+      );
+
+    if (!report) {
+      window.print();
+      return;
+    }
+
+    const images =
+      Array.from(
+        report.querySelectorAll("img"),
+      );
+
+    await Promise.all(
+      images.map((image) => {
+        if (
+          image.complete &&
+          image.naturalWidth > 0
+        ) {
+          return Promise.resolve();
+        }
+
+        return new Promise<void>((resolve) => {
+          const timeout =
+            window.setTimeout(
+              resolve,
+              2000,
+            );
+
+          image.addEventListener(
+            "load",
+            () => {
+              window.clearTimeout(timeout);
+              resolve();
+            },
+            { once: true },
           );
 
-        image.addEventListener(
-          "load",
-          () => {
-            window.clearTimeout(timeout);
-            resolve();
-          },
-          { once: true },
-        );
+          image.addEventListener(
+            "error",
+            () => {
+              window.clearTimeout(timeout);
+              resolve();
+            },
+            { once: true },
+          );
+        });
+      }),
+    );
 
-        image.addEventListener(
-          "error",
-          () => {
-            window.clearTimeout(timeout);
-            resolve();
-          },
-          { once: true },
-        );
-      });
-    }),
-  );
+    window.setTimeout(
+      () => window.print(),
+      100,
+    );
+  };
 
-  window.setTimeout(
-    () => window.print(),
-    100,
-  );
-};
 
   return (
     <section
@@ -167,65 +197,129 @@ export function IntelligenceReport({
 
       {/* Metadata */}
       <section className="mt-8 grid gap-4 md:grid-cols-2 print:grid-cols-2">
-  <ReportMetadata
-    label="Snapshot ID"
-    value={snapshot.id}
-  />
+        <ReportMetadata
+          label="Snapshot ID"
+          value={snapshot.id}
+        />
 
-  <ReportMetadata
-    label="Repository"
-    value={snapshot.repository}
-  />
+        <ReportMetadata
+          label="Repository"
+          value={snapshot.repository}
+        />
 
-  <ReportMetadata
-    label="Snapshot Created"
-    value={new Date(
-      snapshot.createdAt,
-    ).toLocaleString("en-IN", {
-      dateStyle: "medium",
-      timeStyle: "medium",
-      timeZone: "Asia/Kolkata",
-    })}
-  />
+        <ReportMetadata
+          label="Snapshot Created"
+          value={new Date(
+            snapshot.createdAt,
+          ).toLocaleString("en-IN", {
+            dateStyle: "medium",
+            timeStyle: "medium",
+            timeZone: "Asia/Kolkata",
+          })}
+        />
 
-  <ReportMetadata
-    label="Report Generated"
-    value={`${generatedAtText} IST`}
-  />
+        <ReportMetadata
+          label="Report Generated"
+          value={`${generatedAtText} IST`}
+        />
 
-  <ReportMetadata
-    label="Report Source"
-    value="Intelligence Snapshot"
-  />
-</section>
+        <ReportMetadata
+          label="Report Source"
+          value="Intelligence Snapshot"
+        />
+      </section>
+      {artifactCreated ? (
+  <p
+    role="status"
+    className="mt-4 text-sm font-medium text-cyan-300 print:hidden"
+  >
+    Report artifact registered successfully.
+  </p>
+) : null}
+<section className="mt-8 rounded-2xl border border-white/10 bg-white/[0.02] p-5 print:border-zinc-300 print:bg-white">
+  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-cyan-400 print:text-black">
+    Artifact Provenance
+  </p>
 
- {/* =====================================================
-    Author Signature - Print Only
-====================================================== */}
-<section className="mt-12 hidden border-t border-white/10 pt-8 print:block print:border-black/10">
-  <div className="flex flex-col">
-    <img
-      src="/branding/harikrushnareddy-signature-transparent.png"
-      alt="Harikrushnareddy signature"
-      width={1378}
-      height={283}
-      loading="eager"
-      className="titan-report-image h-20 w-auto max-w-[320px] object-contain object-left"
+  <div className="mt-4 grid gap-4 sm:grid-cols-2">
+    {registeredArtifact ? (
+      <ReportMetadata
+        label="Artifact ID"
+        value={registeredArtifact.artifactId}
+      />
+    ) : null}
+
+    <ReportMetadata
+      label="Source Snapshot"
+      value={snapshot.id}
     />
 
-    <p className="mt-2 text-sm font-semibold text-black">
-      Harikrushnareddy
-    </p>
+    <ReportMetadata
+      label="Artifact Type"
+      value={registeredArtifact?.artifactType ?? "Report" }
+    />
 
-    <p className="mt-1 text-xs text-zinc-600">
-      Researcher · Data Scientist · AI Systems Research
-    </p>
+    <ReportMetadata
+      label="Artifact Version"
+      value={
+        registeredArtifact?.version ??
+        "1.0.0"
+      }
+    />
 
-    <p className="mt-1 text-xs text-zinc-500">
-      TITAN Intelligence System
-    </p>
+    <ReportMetadata
+      label="Artifact Format"
+      value={
+        registeredArtifact?.format ??
+        "PDF"
+      }
+    />
+
+    <ReportMetadata
+      label="Author"
+      value={
+        registeredArtifact?.author ??
+        "Harikrushnareddy Vangala"
+      }
+    />
+
+    <ReportMetadata
+      label="Source"
+      value={
+        registeredArtifact?.source ??
+        "Intelligence Snapshot"
+      }
+    />
   </div>
 </section>
+
+      {/* =====================================================
+    Author Signature - Print Only
+====================================================== */}
+      <section className="mt-12 hidden border-t border-white/10 pt-8 print:block print:border-black/10">
+        <div className="flex flex-col">
+          <img
+            src="/branding/harikrushnareddy-signature-transparent.png"
+            alt="Harikrushnareddy signature"
+            width={1378}
+            height={283}
+            loading="eager"
+            className="titan-report-image h-20 w-auto max-w-[320px] object-contain object-left"
+          />
+
+          <p className="mt-2 text-sm font-semibold text-black">
+            Harikrushnareddy Vangala
+          </p>
+
+          <p className="mt-1 text-xs text-zinc-600">
+            Researcher · Data Scientist · AI Systems Research
+          </p>
+
+          <p className="mt-1 text-xs text-zinc-500">
+            TITAN Intelligence System
+          </p>
+        </div>
+      </section>
 
       {/* Actions */}
       <footer className="mt-8 flex flex-col gap-3 border-t border-white/10 pt-6 sm:flex-row sm:items-center sm:justify-between print:hidden">
@@ -234,6 +328,14 @@ export function IntelligenceReport({
         </p>
 
         <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={handleCreateReportArtifact}
+            className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-2.5 text-sm font-semibold text-zinc-300 transition hover:border-cyan-400/30 hover:bg-cyan-400/[0.06] hover:text-cyan-300"
+          >
+            <FileText className="h-4 w-4" />
+            Register Artifact
+          </button>
           <button
             type="button"
             onClick={handlePrint}

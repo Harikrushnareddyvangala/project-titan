@@ -14,3 +14,11 @@ export type {
 export {
   intelligenceSections,
 } from "./sections";
+
+export {
+  createIntelligenceArtifact,
+} from "./artifact";
+
+export type {
+  CreateIntelligenceArtifactOptions,
+} from "./artifact";

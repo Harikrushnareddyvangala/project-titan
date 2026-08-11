@@ -5,6 +5,7 @@ import {
   Share2,
   X,
   FileText,
+  FilePlus2,
 } from "lucide-react";
 
 import type { IntelligenceSnapshot } from "@/types/intelligence";
@@ -20,7 +21,11 @@ import {
 import {
   IntelligenceReport,
 } from "../reports";
-import { useState } from "react";
+import { useState, } from "react";
+
+import {
+  createAndSaveIntelligenceArtifact,
+} from "@/lib/intelligence/artifactService";
 
 interface IntelligenceSnapshotViewerProps {
   snapshot: IntelligenceSnapshot;
@@ -40,6 +45,21 @@ export function IntelligenceSnapshotViewer({
     showReport,
     setShowReport,
   ] = useState(false);
+  const handleCreateArtifact = () => {
+    const artifact =
+      createAndSaveIntelligenceArtifact(
+        snapshot,
+      );
+
+    setArtifactCreated(true);
+
+  window.setTimeout(() => {
+    setArtifactCreated(false);
+  }, 2500);
+  };
+  const [artifactCreated, setArtifactCreated] =
+  useState(false);
+
 
   return (
     <div className="rounded-3xl border border-cyan-400/20 bg-cyan-400/[0.03] p-6">
@@ -93,6 +113,14 @@ export function IntelligenceSnapshotViewer({
               Share
             </span>
           </button>
+          <button
+            type="button"
+            onClick={handleCreateArtifact}
+            className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-sm font-semibold text-zinc-300 transition hover:border-cyan-400/30 hover:bg-cyan-400/[0.06] hover:text-cyan-300"
+          >
+            <FilePlus2 className="h-4 w-4" />
+            Create Artifact
+          </button>
 
           <button
             type="button"
@@ -107,6 +135,23 @@ export function IntelligenceSnapshotViewer({
             <span className="hidden sm:inline">
               Export
             </span>
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              const artifact =
+                createAndSaveIntelligenceArtifact(
+                  snapshot,
+                );
+
+              console.log(
+                "Intelligence artifact created:",
+                artifact,
+              );
+            }}
+            className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-sm font-semibold text-zinc-300 transition hover:border-cyan-400/30 hover:bg-cyan-400/[0.06] hover:text-cyan-300"
+          >
+            Create Artifact
           </button>
 
           <button
@@ -131,6 +176,14 @@ export function IntelligenceSnapshotViewer({
           Snapshot link copied.
         </p>
       ) : null}
+      {artifactCreated ? (
+  <p
+    role="status"
+    className="mt-3 text-sm font-medium text-cyan-300"
+  >
+    Intelligence artifact created and saved.
+  </p>
+) : null}
 
       {/* =====================================================
           Snapshot Metrics

@@ -327,25 +327,151 @@ Enterprise
 Recruiter
 Recommendations
 
+
+---
+
+# `ROADMAP.md`
+
+For `ROADMAP.md`, I recommend adding the following milestone section.
+
+```md
+# Project TITAN — Roadmap
+
+---
+
+# 0240 — Repository Intelligence Actions & Reporting
+
+**Status:** COMPLETE  
+**Milestone Type:** Intelligence Infrastructure  
+**Completion:** 100%  
+**Completed:** 2026-08-09
+
+## Purpose
+
+Establish the first complete lifecycle for Repository Intelligence artifacts.
+
+The milestone transforms repository intelligence from transient dashboard information into persistent and reusable intelligence artifacts.
+
+---
+
+## Milestone Architecture
+
+```text
+Repository
+    ↓
+Analytics
+    ↓
+Intelligence
+    ↓
+Snapshot
+    ↓
+Artifact Lifecycle
+
 ## Phase III — Platform Intelligence
 
 ### Commit 0240
 
-Platform Knowledge Graph
-
-Status
-
-⬜ Planned
 
 ---
 
-### Commit 0241
+# `ROADMAP.md`
 
-Architecture Intelligence
+For `ROADMAP.md`, I recommend adding the following milestone section.
 
-Status
+```md
+# Project TITAN — Roadmap
 
-⬜ Planned
+---
+
+# 0240 — Repository Intelligence Actions & Reporting
+
+**Status:** COMPLETE  
+**Milestone Type:** Intelligence Infrastructure  
+**Completion:** 100%  
+**Completed:** 2026-08-09
+
+## Purpose
+
+Establish the first complete lifecycle for Repository Intelligence artifacts.
+
+The milestone transforms repository intelligence from transient dashboard information into persistent and reusable intelligence artifacts.
+
+---
+
+## Milestone Architecture
+
+```text
+Repository
+    ↓
+Analytics
+    ↓
+Intelligence
+    ↓
+Snapshot
+    ↓
+Artifact Lifecycle
+Create
+  ↓
+Store
+  ↓
+View
+  ↓
+Export
+  ↓
+Share
+  ↓
+Resolve
+  ↓
+Report
+  ↓
+Print
+---
+# 0241 — Intelligence Artifact Governance
+
+**Status:** COMPLETE
+**Milestone Type:** Intelligence Infrastructure
+**Completion:** 100%
+**Completed:** 2026-08-11
+
+## Purpose
+
+Establish a governed lifecycle for Intelligence Artifacts,
+including artifact identity, registry management, provenance,
+integrity, signing, trust, and controlled lifecycle transitions.
+
+## Milestone Architecture
+
+Repository Analytics
+        ↓
+Intelligence
+        ↓
+Artifact
+        ↓
+Registry
+        ↓
+Provenance
+        ↓
+Integrity
+        ↓
+Signing
+        ↓
+Trust
+        ↓
+Lifecycle Governance
+
+## Runtime Validation
+
+Registered
+    ↓
+Published
+    ↓
+Superseded
+    ↓
+Archived
+
+All required lifecycle transitions were successfully
+validated in the live Repository Intelligence UI.
+
 
 ---
 
