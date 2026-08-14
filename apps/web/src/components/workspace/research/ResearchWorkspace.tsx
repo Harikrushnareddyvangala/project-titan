@@ -3,36 +3,38 @@
 import Link from "next/link";
 import { ArrowRight, FlaskConical, Layers3 } from "lucide-react";
 
+import { ResearchInvestigationPanel } from "./ResearchInvestigationPanel";
+
 const researchModules = [
   {
-    title: "Active Research",
+    title: "Active Investigations",
     description:
-      "Track ongoing research initiatives, milestones, and current areas of investigation.",
+      "Track engineering questions, objectives, milestones, and current areas of technical investigation.",
   },
   {
     title: "Experiments",
     description:
-      "Prototype and evaluate new AI models, algorithms, and engineering concepts.",
+      "Prototype and evaluate AI models, algorithms, engineering approaches, and implementation concepts.",
   },
   {
     title: "Architecture Studies",
     description:
-      "Document architecture decisions, system evolution, and technical explorations.",
+      "Document architecture decisions, system evolution, technical trade-offs, and engineering explorations.",
   },
   {
-    title: "Publications",
+    title: "Engineering Findings",
     description:
-      "Manage research papers, technical reports, white papers, and future publications.",
+      "Capture validated technical findings and connect them to supporting engineering evidence.",
   },
   {
-    title: "Unified Intelligence Systems",
+    title: "Research Evidence",
     description:
-      "Central hub for the long-term Unified Intelligence Systems research program.",
+      "Organize repository, metric, analysis, experiment, and artifact evidence supporting investigations.",
   },
   {
-    title: "Research Roadmap",
+    title: "Technical Publications",
     description:
-      "Plan future milestones, experiments, and long-term engineering objectives.",
+      "Organize technical reports, research reports, engineering notes, and publishable technical work.",
   },
 ];
 
@@ -67,7 +69,7 @@ export function ResearchWorkspace() {
             />
           ))}
         </section>
-
+          <ResearchInvestigationPanel />
         <WorkspaceFooter
           href="/workspace"
           label="Return to Workspace"

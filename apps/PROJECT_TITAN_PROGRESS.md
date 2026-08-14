@@ -766,7 +766,7 @@ All analytics engines are now coordinated by a single Repository Engine. The API
 Created
 
 - securityEngine.ts
- 
+
 Updated
 
 - repositoryEngine.ts
@@ -12213,9 +12213,9 @@ Supported hashes include:
 
 ## 0240 — Repository Intelligence Actions & Reporting
 
-**Status:** COMPLETE  
-**Milestone:** Repository Intelligence Actions & Reporting  
-**Completion:** 100%  
+**Status:** COMPLETE
+**Milestone:** Repository Intelligence Actions & Reporting
+**Completion:** 100%
 **Date:** 2026-08-09
 
 ---
@@ -12322,11 +12322,11 @@ Browser download
 
 ## 0241 — Intelligence Artifact Governance
 
-**Status:** COMPLETE  
-**Milestone:** Intelligence Artifact Governance  
-**Completion:** 100%  
-**Date:** 2026-08-11  
-**Commit:** fcbf671
+**Status:** COMPLETE
+**Milestone:** Intelligence Artifact Governance
+**Completion:** 100%
+**Date:** 2026-08-11
+**Commit:** 177c0a6
 
 ---
 
@@ -12414,3 +12414,273 @@ Published
 Superseded
     ↓
 Archived
+
+---
+
+## 0242 — Engineering Research Center
+
+**Status:** IN PROGRESS
+
+### Objective
+
+Establish Project TITAN's structured engineering research environment for managing investigations, experiments, evidence, findings, validation, conclusions, and the relationships between them.
+
+The Engineering Research Center is an engineering capability of Project TITAN. It is separate from the scientific research program of Unified Intelligence Systems.
+
+---
+
+### 0242.1 — Research Domain Foundation
+
+**Status:** COMPLETE
+
+Established the foundational research domain model and supporting research library.
+
+Implemented:
+
+- Research investigation model
+- Research experiment model
+- Research evidence model
+- Research finding model
+- Research status definitions
+- Research lifecycle structures
+- Research persistence utilities
+- Research domain type definitions
+
+---
+
+### 0242.2 — Research Workspace
+
+**Status:** COMPLETE
+
+Established the Research Workspace interface inside Project TITAN.
+
+Implemented:
+
+- Research workspace composition
+- Investigation management interface
+- Investigation creation
+- Investigation persistence
+- Active investigation presentation
+- Research workspace integration
+
+---
+
+### 0242.3 — Investigation Management
+
+**Status:** COMPLETE
+
+Established structured investigation management and experiment lifecycle handling.
+
+Implemented:
+
+- Investigation creation
+- Investigation status management
+- Investigation persistence
+- Experiment creation
+- Experiment lifecycle
+- Experiment-to-investigation relationship
+- Evidence-to-experiment relationship foundations
+- Investigation-to-evidence relationships
+- Investigation-to-finding relationships
+
+---
+
+### 0242.4 — Evidence & Finding Intelligence
+
+**Status:** COMPLETE
+
+Established the evidence assessment and finding-generation foundation.
+
+Implemented:
+
+- Evidence creation
+- Evidence persistence
+- Evidence assessment
+- Supporting evidence classification
+- Contradicting evidence classification
+- Relevance scoring
+- Support-strength scoring
+- Reliability scoring
+- Independence scoring
+- Evidence assessment rationale
+- Finding creation
+- Finding confidence
+- Finding-to-evidence relationships
+- Finding-to-investigation relationships
+- Validation eligibility evaluation
+
+---
+
+### 0242.5 — Finding Validation & Governance
+
+**Status:** COMPLETE
+
+Established a governed validation lifecycle for research findings.
+
+Implemented:
+
+- Finding validation records
+- Validation status model
+- Validation decision model
+- Validation rationale
+- Validator metadata
+- Confidence snapshot at validation
+- Evidence assessment counts
+- Supporting evidence counts
+- Contradicting evidence counts
+- Validation eligibility rules
+- Validation request workflow
+- Pending state
+- In Review state
+- Validated state
+- Rejected state
+- Needs Revision state
+- Accept decision
+- Reject decision
+- Revise decision
+- Validation transition rules
+- Validation history events
+
+Verified lifecycle:
+
+    Pending
+       ↓
+    In Review
+       ↓
+    Validated
+
+The validation workflow has been manually exercised successfully through the Research Workspace.
+
+---
+
+### 0242.6 — Investigation Conclusion Lifecycle
+
+**Status:** COMPLETE
+
+Established the conclusion layer for converting validated research findings into governed investigation conclusions.
+
+Implemented:
+
+- Investigation conclusion model
+- Conclusion statement
+- Supporting finding relationships
+- Contradicting finding relationships
+- Uncertainty representation
+- Recommended next action
+- Conclusion persistence
+- Conclusion status model
+- Conclusion transition rules
+- Conclusion acceptance eligibility evaluation
+- Draft state
+- Proposed state
+- Accepted state
+- Supporting-finding validation requirements
+- Conclusion acceptance gate
+
+The acceptance gate requires supporting findings to have a validated finding validation state before a conclusion can be accepted.
+
+Verified lifecycle:
+
+    Draft
+       ↓
+    Proposed
+       ↓
+    Accepted
+
+The conclusion workflow has been manually exercised successfully through the Research Workspace.
+
+---
+
+### 0242.7 — Research Lifecycle Integration
+
+**Status:** COMPLETE
+
+Integrated the major research entities into a single end-to-end research lifecycle.
+
+Verified workflow:
+
+    Investigation
+         ↓
+    Experiment
+         ↓
+    Evidence
+         ↓
+    Evidence Assessment
+         ↓
+    Finding
+         ↓
+    Finding Validation
+         ↓
+    Conclusion
+         ↓
+    Conclusion Acceptance
+
+End-to-end validation performed through the Research Workspace:
+
+    Evidence
+         ↓
+    Supporting Assessment
+         ↓
+    Finding
+         ↓
+    Request Validation
+         ↓
+    Pending
+         ↓
+    In Review
+         ↓
+    Validated
+         ↓
+    Conclusion
+         ↓
+    Proposed
+         ↓
+    Accepted
+
+This establishes the first complete governed research lifecycle within Project TITAN.
+
+---
+
+### Current 0242 Architecture
+
+    Research Workspace
+          │
+          ▼
+    Investigation
+          │
+          ├──────────────► Experiment
+          │                    │
+          │                    ▼
+          │                 Evidence
+          │                    │
+          │                    ▼
+          │              Evidence Assessment
+          │
+          └──────────────► Finding
+                               │
+                               ▼
+                         Finding Validation
+                               │
+                               ▼
+                            Validated
+                               │
+                               ▼
+                           Conclusion
+                               │
+                               ▼
+                            Proposed
+                               │
+                               ▼
+                            Accepted
+
+---
+
+### 0242 Current State
+
+The Engineering Research Center now provides a complete governed research lifecycle from investigation creation through accepted conclusion.
+
+The current implementation establishes the foundation for future research provenance, reproducibility, artifact management, evaluation, and research intelligence capabilities.
+
+**0242 remains IN PROGRESS.**
+
+Future sub-milestones will extend the Engineering Research Center without altering the completed lifecycle foundation.
