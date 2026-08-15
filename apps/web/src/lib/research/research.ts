@@ -1583,6 +1583,20 @@ export function getResearchProvenanceEventsByEntity(
   );
 }
 
+export function getResearchProvenanceEventsByInvestigationAndEntity(
+  investigationId: string,
+  entityType: ResearchProvenanceEntityType,
+  entityId: string,
+): ResearchProvenanceEvent[] {
+  return getResearchProvenanceEvents().filter(
+    (event) =>
+      event.investigationId ===
+        investigationId &&
+      event.entityType === entityType &&
+      event.entityId === entityId,
+  );
+}
+
 export function getResearchProvenanceEventsByEventType(
   eventType: ResearchProvenanceEventType,
 ): ResearchProvenanceEvent[] {
