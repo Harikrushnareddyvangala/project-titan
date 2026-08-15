@@ -12,6 +12,7 @@ import type {
   ResearchFindingValidationHistoryEvent,
   ResearchInvestigationConclusion,
   ResearchConclusionStatus,
+  ResearchProvenanceEvent,
 } from "@/types/research";
 
 import {
@@ -44,6 +45,9 @@ const INVESTIGATION_CONCLUSION_STORAGE_KEY =
 
 const FINDING_VALIDATION_HISTORY_STORAGE_KEY =
   "titan:research-finding-validation-history";
+
+const RESEARCH_PROVENANCE_STORAGE_KEY =
+  "titan:research-provenance-events";
 
 
 
@@ -1446,7 +1450,64 @@ export function removeResearchFindingEvidenceAssessment(
 
   return updatedFinding;
 }
+/* -------------------------------------------------------------------------- */
+/*                         Research Provenance                                */
+/* -------------------------------------------------------------------------- */
 
+export function getResearchProvenanceEvents():
+  ResearchProvenanceEvent[] {
+  return readCollection<ResearchProvenanceEvent>(
+    RESEARCH_PROVENANCE_STORAGE_KEY,
+  );
+}
+
+export function saveResearchProvenanceEvent(
+  event: ResearchProvenanceEvent,
+): void {
+  const events =
+    getResearchProvenanceEvents();
+
+  const alreadyExists =
+    events.some(
+      (item) =>
+        item.id === event.id,
+    );
+
+  if (alreadyExists) {
+    return;
+  }
+
+  events.unshift(event);
+
+  writeCollection(
+    RESEARCH_PROVENANCE_STORAGE_KEY,
+    events,
+  );
+}
+
+export function createResearchProvenanceEvent(
+  input: Omit<
+    ResearchProvenanceEvent,
+    "id" | "timestamp"
+  >,
+): ResearchProvenanceEvent {
+  const event: ResearchProvenanceEvent = {
+    ...input,
+
+    id: createId(
+      "research-provenance",
+    ),
+
+    timestamp:
+      new Date().toISOString(),
+  };
+
+  saveResearchProvenanceEvent(
+    event,
+  );
+
+  return event;
+}
 /* -------------------------------------------------------------------------- */
 /*                              Subscription                                  */
 /* -------------------------------------------------------------------------- */

@@ -27,4 +27,7 @@ export {
   createResearchInvestigationConclusion,
   attachResearchInvestigationConclusion,
   detachResearchInvestigationConclusion,
+  getResearchProvenanceEvents,
+  saveResearchProvenanceEvent,
+  createResearchProvenanceEvent,
 } from "./research";
