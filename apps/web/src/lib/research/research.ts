@@ -1560,6 +1560,16 @@ export function getResearchProvenanceEvents():
   );
 }
 
+export function getResearchProvenanceEventsByInvestigation(
+  investigationId: string,
+): ResearchProvenanceEvent[] {
+  return getResearchProvenanceEvents().filter(
+    (event) =>
+      event.investigationId ===
+      investigationId,
+  );
+}
+
 export function saveResearchProvenanceEvent(
   event: ResearchProvenanceEvent,
 ): void {
