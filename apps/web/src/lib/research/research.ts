@@ -583,6 +583,30 @@ saveResearchInvestigationConclusion(
   updatedConclusion,
 );
 
+createResearchProvenanceEvent({
+  investigationId:
+    conclusion.investigationId,
+
+  entityType:
+    "Conclusion",
+
+  entityId:
+    conclusion.id,
+
+  eventType:
+    to === "Accepted"
+      ? "Accepted"
+      : to === "Superseded"
+        ? "Superseded"
+        : "StatusChanged",
+
+  fromStatus:
+    conclusion.status,
+
+  toStatus:
+    to,
+});
+
 return updatedConclusion;
 }
 /* -------------------------------------------------------------------------- */
