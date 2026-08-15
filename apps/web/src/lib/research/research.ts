@@ -389,6 +389,29 @@ export function transitionResearchExperiment(
     updatedExperiment,
   );
 
+  createResearchProvenanceEvent({
+    investigationId:
+      experiment.investigationId,
+
+    entityType: "Experiment",
+
+    entityId:
+      experiment.id,
+
+    eventType:
+      "StatusChanged",
+
+    fromStatus:
+      experiment.status,
+
+    toStatus:
+      to,
+
+    reason:
+      reason?.trim() ||
+      undefined,
+  });
+
   return updatedExperiment;
 }
 const RESEARCH_CONCLUSION_TRANSITIONS: Record<
