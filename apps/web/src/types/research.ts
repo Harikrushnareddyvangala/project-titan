@@ -386,6 +386,13 @@ export interface ResearchProvenanceIntegrityResult {
   issues: ResearchProvenanceIntegrityIssue[];
 }
 
+export interface ResearchProvenanceIntegritySummary {
+  valid: boolean;
+  checkedEventCount: number;
+  issueCount: number;
+  issueCodes: string[];
+}
+
 export interface ResearchProvenanceEvent {
   id: string;
 

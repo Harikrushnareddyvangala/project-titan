@@ -17,6 +17,7 @@ import type {
   ResearchProvenanceEventType,
   ResearchProvenanceIntegrityIssue,
   ResearchProvenanceIntegrityResult,
+  ResearchProvenanceIntegritySummary,
 } from "@/types/research";
 
 import {
@@ -1867,6 +1868,35 @@ export function validateResearchProvenanceIntegrity():
     checkedEventCount:
       events.length,
     issues,
+  };
+}
+
+export function getResearchProvenanceIntegritySummary():
+  ResearchProvenanceIntegritySummary {
+  const result =
+    validateResearchProvenanceIntegrity();
+
+  const issueCodes =
+    Array.from(
+      new Set(
+        result.issues.map(
+          (issue) =>
+            issue.code,
+        ),
+      ),
+    );
+
+  return {
+    valid:
+      result.valid,
+
+    checkedEventCount:
+      result.checkedEventCount,
+
+    issueCount:
+      result.issues.length,
+
+    issueCodes,
   };
 }
 
