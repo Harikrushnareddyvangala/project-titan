@@ -1608,6 +1608,29 @@ export function getResearchProvenanceEventsChronological():
   );
 }
 
+export function getLatestResearchProvenanceEvent(
+  entityType: ResearchProvenanceEntityType,
+  entityId: string,
+): ResearchProvenanceEvent | null {
+  const events =
+    getResearchProvenanceEventsByEntity(
+      entityType,
+      entityId,
+    );
+
+  if (events.length === 0) {
+    return null;
+  }
+
+  return events.reduce(
+    (latest, event) =>
+      new Date(event.timestamp).getTime() >
+      new Date(latest.timestamp).getTime()
+        ? event
+        : latest,
+  );
+}
+
 export function getResearchProvenanceEventsByEventType(
   eventType: ResearchProvenanceEventType,
 ): ResearchProvenanceEvent[] {

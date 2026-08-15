@@ -35,4 +35,5 @@ export {
   getResearchProvenanceEventsByEventType,
   getResearchProvenanceEventsByInvestigationAndEntity,
   getResearchProvenanceEventsChronological,
+  getLatestResearchProvenanceEvent,
 } from "./research";
