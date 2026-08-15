@@ -349,3 +349,48 @@ export interface ResearchInvestigation {
   createdAt: string;
   updatedAt: string;
 }
+
+export type ResearchProvenanceEntityType =
+  | "Investigation"
+  | "Experiment"
+  | "Evidence"
+  | "EvidenceAssessment"
+  | "Finding"
+  | "FindingValidation"
+  | "Conclusion";
+
+export type ResearchProvenanceEventType =
+  | "Created"
+  | "Updated"
+  | "StatusChanged"
+  | "Linked"
+  | "Unlinked"
+  | "Validated"
+  | "Rejected"
+  | "RevisionRequested"
+  | "Accepted"
+  | "Superseded";
+
+export interface ResearchProvenanceEvent {
+  id: string;
+
+  investigationId: string;
+
+  entityType: ResearchProvenanceEntityType;
+
+  entityId: string;
+
+  eventType: ResearchProvenanceEventType;
+
+  fromStatus?: string;
+
+  toStatus?: string;
+
+  reason?: string;
+
+  actor?: string;
+
+  timestamp: string;
+
+  metadata?: Record<string, unknown>;
+}
