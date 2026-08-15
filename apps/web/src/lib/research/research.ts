@@ -14,6 +14,7 @@ import type {
   ResearchConclusionStatus,
   ResearchProvenanceEvent,
   ResearchProvenanceEntityType,
+  ResearchProvenanceEventType,
 } from "@/types/research";
 
 import {
@@ -1579,6 +1580,15 @@ export function getResearchProvenanceEventsByEntity(
     (event) =>
       event.entityType === entityType &&
       event.entityId === entityId,
+  );
+}
+
+export function getResearchProvenanceEventsByEventType(
+  eventType: ResearchProvenanceEventType,
+): ResearchProvenanceEvent[] {
+  return getResearchProvenanceEvents().filter(
+    (event) =>
+      event.eventType === eventType,
   );
 }
 
