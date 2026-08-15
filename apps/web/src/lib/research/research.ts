@@ -1014,6 +1014,58 @@ export function transitionResearchFindingValidation(
     historyEvent,
   );
 
+  const investigations =
+    getResearchInvestigations();
+
+  const finding =
+    getResearchFindings().find(
+      (item) =>
+        item.id ===
+        updatedValidation.findingId,
+    );
+
+  const investigation =
+    finding
+      ? investigations.find(
+          (item) =>
+            item.findingIds.includes(
+              finding.id,
+            ),
+        )
+      : undefined;
+
+  if (investigation) {
+    createResearchProvenanceEvent({
+      investigationId:
+        investigation.id,
+
+      entityType:
+        "FindingValidation",
+
+      entityId:
+        updatedValidation.id,
+
+      eventType:
+        to === "Validated"
+          ? "Validated"
+          : to === "Rejected"
+            ? "Rejected"
+            : to ===
+              "Needs Revision"
+              ? "RevisionRequested"
+              : "StatusChanged",
+
+      fromStatus:
+        validation.status,
+
+      toStatus:
+        to,
+
+      reason:
+        normalizedReason,
+    });
+  }
+
   return updatedValidation;
 }
 
