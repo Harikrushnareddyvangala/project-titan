@@ -1597,6 +1597,17 @@ export function getResearchProvenanceEventsByInvestigationAndEntity(
   );
 }
 
+export function getResearchProvenanceEventsChronological():
+  ResearchProvenanceEvent[] {
+  return [
+    ...getResearchProvenanceEvents(),
+  ].sort(
+    (a, b) =>
+      new Date(a.timestamp).getTime() -
+      new Date(b.timestamp).getTime(),
+  );
+}
+
 export function getResearchProvenanceEventsByEventType(
   eventType: ResearchProvenanceEventType,
 ): ResearchProvenanceEvent[] {
