@@ -371,6 +371,21 @@ export type ResearchProvenanceEventType =
   | "Accepted"
   | "Superseded";
 
+export interface ResearchProvenanceIntegrityIssue {
+  eventId: string;
+  investigationId: string;
+  entityType: ResearchProvenanceEntityType;
+  entityId: string;
+  code: string;
+  message: string;
+}
+
+export interface ResearchProvenanceIntegrityResult {
+  valid: boolean;
+  checkedEventCount: number;
+  issues: ResearchProvenanceIntegrityIssue[];
+}
+
 export interface ResearchProvenanceEvent {
   id: string;
 

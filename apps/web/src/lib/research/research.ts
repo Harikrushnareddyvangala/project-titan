@@ -15,6 +15,8 @@ import type {
   ResearchProvenanceEvent,
   ResearchProvenanceEntityType,
   ResearchProvenanceEventType,
+  ResearchProvenanceIntegrityIssue,
+  ResearchProvenanceIntegrityResult,
 } from "@/types/research";
 
 import {
@@ -572,44 +574,44 @@ export function transitionResearchInvestigationConclusion(
   }
 
   const updatedConclusion:
-  ResearchInvestigationConclusion = {
-  ...conclusion,
+    ResearchInvestigationConclusion = {
+    ...conclusion,
 
-  status: to,
+    status: to,
 
-  updatedAt:
-    new Date().toISOString(),
-};
+    updatedAt:
+      new Date().toISOString(),
+  };
 
-saveResearchInvestigationConclusion(
-  updatedConclusion,
-);
+  saveResearchInvestigationConclusion(
+    updatedConclusion,
+  );
 
-createResearchProvenanceEvent({
-  investigationId:
-    conclusion.investigationId,
+  createResearchProvenanceEvent({
+    investigationId:
+      conclusion.investigationId,
 
-  entityType:
-    "Conclusion",
+    entityType:
+      "Conclusion",
 
-  entityId:
-    conclusion.id,
+    entityId:
+      conclusion.id,
 
-  eventType:
-    to === "Accepted"
-      ? "Accepted"
-      : to === "Superseded"
-        ? "Superseded"
-        : "StatusChanged",
+    eventType:
+      to === "Accepted"
+        ? "Accepted"
+        : to === "Superseded"
+          ? "Superseded"
+          : "StatusChanged",
 
-  fromStatus:
-    conclusion.status,
+    fromStatus:
+      conclusion.status,
 
-  toStatus:
-    to,
-});
+    toStatus:
+      to,
+  });
 
-return updatedConclusion;
+  return updatedConclusion;
 }
 /* -------------------------------------------------------------------------- */
 /*                              Experiments                                   */
@@ -1053,11 +1055,11 @@ export function transitionResearchFindingValidation(
   const investigation =
     finding
       ? investigations.find(
-          (item) =>
-            item.findingIds.includes(
-              finding.id,
-            ),
-        )
+        (item) =>
+          item.findingIds.includes(
+            finding.id,
+          ),
+      )
       : undefined;
 
   if (investigation) {
@@ -1356,7 +1358,7 @@ export function attachResearchInvestigationConclusion(
 
   const investigation =
     investigations[
-      investigationIndex
+    investigationIndex
     ];
 
   if (
@@ -1410,7 +1412,7 @@ export function detachResearchInvestigationConclusion(
 
   const investigation =
     investigations[
-      investigationIndex
+    investigationIndex
     ];
 
   if (
@@ -1591,7 +1593,7 @@ export function getResearchProvenanceEventsByInvestigationAndEntity(
   return getResearchProvenanceEvents().filter(
     (event) =>
       event.investigationId ===
-        investigationId &&
+      investigationId &&
       event.entityType === entityType &&
       event.entityId === entityId,
   );
@@ -1637,7 +1639,7 @@ export function getLatestResearchProvenanceEvent(
   return events.reduce(
     (latest, event) =>
       new Date(event.timestamp).getTime() >
-      new Date(latest.timestamp).getTime()
+        new Date(latest.timestamp).getTime()
         ? event
         : latest,
   );
@@ -1650,6 +1652,222 @@ export function getResearchProvenanceEventsByEventType(
     (event) =>
       event.eventType === eventType,
   );
+}
+
+export function validateResearchProvenanceIntegrity():
+  ResearchProvenanceIntegrityResult {
+  const events =
+    getResearchProvenanceEvents();
+
+  const investigations =
+    getResearchInvestigations();
+
+  const experiments =
+    getResearchExperiments();
+
+  const findings =
+    getResearchFindings();
+
+  const validations =
+    getResearchFindingValidations();
+
+  const conclusions =
+    getResearchInvestigationConclusions();
+
+  const issues:
+    ResearchProvenanceIntegrityIssue[] = [];
+
+  const addIssue = (
+    event: ResearchProvenanceEvent,
+    code: string,
+    message: string,
+  ): void => {
+    issues.push({
+      eventId: event.id,
+      investigationId:
+        event.investigationId,
+      entityType:
+        event.entityType,
+      entityId:
+        event.entityId,
+      code,
+      message,
+    });
+  };
+
+  for (const event of events) {
+    const investigation =
+      investigations.find(
+        (item) =>
+          item.id ===
+          event.investigationId,
+      );
+
+    if (!investigation) {
+      addIssue(
+        event,
+        "INVESTIGATION_NOT_FOUND",
+        `Investigation ${event.investigationId} was not found.`,
+      );
+
+      continue;
+    }
+
+    const timestamp =
+      new Date(event.timestamp).getTime();
+
+    if (Number.isNaN(timestamp)) {
+      addIssue(
+        event,
+        "INVALID_TIMESTAMP",
+        `Provenance event ${event.id} has an invalid timestamp.`,
+      );
+    }
+
+    switch (event.entityType) {
+      case "Investigation": {
+        if (
+          event.entityId !==
+          investigation.id
+        ) {
+          addIssue(
+            event,
+            "ENTITY_INVESTIGATION_MISMATCH",
+            `Event entity ${event.entityId} does not match investigation ${investigation.id}.`,
+          );
+        }
+
+        break;
+      }
+
+      case "Experiment": {
+        const experiment =
+          experiments.find(
+            (item) =>
+              item.id ===
+              event.entityId,
+          );
+
+        if (!experiment) {
+          addIssue(
+            event,
+            "EXPERIMENT_NOT_FOUND",
+            `Experiment ${event.entityId} was not found.`,
+          );
+
+          break;
+        }
+
+        if (
+          experiment.investigationId !==
+          investigation.id
+        ) {
+          addIssue(
+            event,
+            "EXPERIMENT_INVESTIGATION_MISMATCH",
+            `Experiment ${event.entityId} does not belong to investigation ${investigation.id}.`,
+          );
+        }
+
+        break;
+      }
+
+      case "FindingValidation": {
+        const validation =
+          validations.find(
+            (item) =>
+              item.id ===
+              event.entityId,
+          );
+
+        if (!validation) {
+          addIssue(
+            event,
+            "VALIDATION_NOT_FOUND",
+            `Finding validation ${event.entityId} was not found.`,
+          );
+
+          break;
+        }
+
+        const finding =
+          findings.find(
+            (item) =>
+              item.id ===
+              validation.findingId,
+          );
+
+        if (!finding) {
+          addIssue(
+            event,
+            "VALIDATION_FINDING_NOT_FOUND",
+            `Finding ${validation.findingId} referenced by validation ${validation.id} was not found.`,
+          );
+
+          break;
+        }
+
+        if (
+          !investigation.findingIds.includes(
+            finding.id,
+          )
+        ) {
+          addIssue(
+            event,
+            "FINDING_INVESTIGATION_MISMATCH",
+            `Finding ${finding.id} does not belong to investigation ${investigation.id}.`,
+          );
+        }
+
+        break;
+      }
+
+      case "Conclusion": {
+        const conclusion =
+          conclusions.find(
+            (item) =>
+              item.id ===
+              event.entityId,
+          );
+
+        if (!conclusion) {
+          addIssue(
+            event,
+            "CONCLUSION_NOT_FOUND",
+            `Conclusion ${event.entityId} was not found.`,
+          );
+
+          break;
+        }
+
+        if (
+          conclusion.investigationId !==
+          investigation.id
+        ) {
+          addIssue(
+            event,
+            "CONCLUSION_INVESTIGATION_MISMATCH",
+            `Conclusion ${event.entityId} does not belong to investigation ${investigation.id}.`,
+          );
+        }
+
+        break;
+      }
+
+      case "Evidence":
+      case "EvidenceAssessment":
+      case "Finding":
+        break;
+    }
+  }
+
+  return {
+    valid:
+      issues.length === 0,
+    checkedEventCount:
+      events.length,
+    issues,
+  };
 }
 
 export function saveResearchProvenanceEvent(
