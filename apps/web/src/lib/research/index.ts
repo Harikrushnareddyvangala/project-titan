@@ -31,4 +31,5 @@ export {
   getResearchProvenanceEventsByInvestigation,
   saveResearchProvenanceEvent,
   createResearchProvenanceEvent,
+  getResearchProvenanceEventsByEntity,
 } from "./research";
