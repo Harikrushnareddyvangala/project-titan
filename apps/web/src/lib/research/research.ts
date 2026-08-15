@@ -13,6 +13,7 @@ import type {
   ResearchInvestigationConclusion,
   ResearchConclusionStatus,
   ResearchProvenanceEvent,
+  ResearchProvenanceTimelineItem,
   ResearchProvenanceEntityType,
   ResearchProvenanceEventType,
   ResearchProvenanceIntegrityIssue,
@@ -1608,6 +1609,58 @@ export function getResearchProvenanceEventsChronological():
     (a, b) =>
       new Date(a.timestamp).getTime() -
       new Date(b.timestamp).getTime(),
+  );
+}
+
+export function getResearchProvenanceTimeline():
+  ResearchProvenanceTimelineItem[] {
+  return getResearchProvenanceEventsChronological().map(
+    (event) => {
+      const statusDescription =
+        event.fromStatus &&
+        event.toStatus
+          ? `${event.fromStatus} → ${event.toStatus}`
+          : undefined;
+
+      return {
+        eventId: event.id,
+
+        investigationId:
+          event.investigationId,
+
+        entityType:
+          event.entityType,
+
+        entityId:
+          event.entityId,
+
+        eventType:
+          event.eventType,
+
+        title:
+          `${event.entityType} ${event.eventType}`,
+
+        description:
+          statusDescription ??
+          event.reason ??
+          `${event.entityType} ${event.eventType} event.`,
+
+        fromStatus:
+          event.fromStatus,
+
+        toStatus:
+          event.toStatus,
+
+        reason:
+          event.reason,
+
+        actor:
+          event.actor,
+
+        timestamp:
+          event.timestamp,
+      };
+    },
   );
 }
 

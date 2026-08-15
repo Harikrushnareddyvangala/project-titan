@@ -416,3 +416,29 @@ export interface ResearchProvenanceEvent {
 
   metadata?: Record<string, unknown>;
 }
+
+export interface ResearchProvenanceTimelineItem {
+  eventId: string;
+
+  investigationId: string;
+
+  entityType: ResearchProvenanceEntityType;
+
+  entityId: string;
+
+  eventType: ResearchProvenanceEventType;
+
+  title: string;
+
+  description: string;
+
+  fromStatus?: string;
+
+  toStatus?: string;
+
+  reason?: string;
+
+  actor?: string;
+
+  timestamp: string;
+}

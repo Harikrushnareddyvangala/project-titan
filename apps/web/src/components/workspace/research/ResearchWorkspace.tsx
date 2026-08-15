@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ArrowRight, FlaskConical, Layers3 } from "lucide-react";
 
 import { ResearchInvestigationPanel } from "./ResearchInvestigationPanel";
+import { ResearchProvenanceTimeline } from "./ResearchProvenanceTimeline";
 
 const researchModules = [
   {
@@ -70,6 +71,7 @@ export function ResearchWorkspace() {
           ))}
         </section>
           <ResearchInvestigationPanel />
+          <ResearchProvenanceTimeline />
         <WorkspaceFooter
           href="/workspace"
           label="Return to Workspace"

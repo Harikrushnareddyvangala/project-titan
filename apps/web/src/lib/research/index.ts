@@ -35,6 +35,7 @@ export {
   getResearchProvenanceEventsByEventType,
   getResearchProvenanceEventsByInvestigationAndEntity,
   getResearchProvenanceEventsChronological,
+  getResearchProvenanceTimeline,
   getLatestResearchProvenanceEvent,
   getResearchProvenanceEventsByInvestigationChronological,
   validateResearchProvenanceIntegrity,
