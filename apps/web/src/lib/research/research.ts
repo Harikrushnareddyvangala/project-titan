@@ -1608,6 +1608,18 @@ export function getResearchProvenanceEventsChronological():
   );
 }
 
+export function getResearchProvenanceEventsByInvestigationChronological(
+  investigationId: string,
+): ResearchProvenanceEvent[] {
+  return getResearchProvenanceEventsByInvestigation(
+    investigationId,
+  ).sort(
+    (a, b) =>
+      new Date(a.timestamp).getTime() -
+      new Date(b.timestamp).getTime(),
+  );
+}
+
 export function getLatestResearchProvenanceEvent(
   entityType: ResearchProvenanceEntityType,
   entityId: string,
