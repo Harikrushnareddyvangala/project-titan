@@ -11,6 +11,7 @@ import {
 
 import {
   getResearchProvenanceTimeline,
+  getResearchProvenanceTimelineByInvestigation,
   subscribeToResearch,
 } from "@/lib/research";
 
@@ -52,19 +53,25 @@ function formatTimestamp(
   ).toLocaleString();
 }
 
-let provenanceTimelineSnapshot:
-  ResearchProvenanceTimelineItem[] = [];
-
-let provenanceTimelineSnapshotRaw:
-  string | null = null;
-
 const EMPTY_PROVENANCE_TIMELINE:
   ResearchProvenanceTimelineItem[] = [];
 
-function getResearchProvenanceTimelineSnapshot():
-  ResearchProvenanceTimelineItem[] {
+interface ProvenanceTimelineSnapshotCache {
+  raw: string | null;
+  snapshot: ResearchProvenanceTimelineItem[];
+}
+
+const provenanceTimelineSnapshotCache =
+  new Map<
+    string,
+    ProvenanceTimelineSnapshotCache
+  >();
+
+function getResearchProvenanceTimelineSnapshot(
+  investigationId?: string,
+): ResearchProvenanceTimelineItem[] {
   if (typeof window === "undefined") {
-    return provenanceTimelineSnapshot;
+    return EMPTY_PROVENANCE_TIMELINE;
   }
 
   const raw =
@@ -72,28 +79,54 @@ function getResearchProvenanceTimelineSnapshot():
       "titan:research-provenance-events",
     );
 
+  const cacheKey =
+    investigationId ?? "all";
+
+  const cached =
+    provenanceTimelineSnapshotCache.get(
+      cacheKey,
+    );
+
   if (
-    raw ===
-    provenanceTimelineSnapshotRaw
+    cached &&
+    cached.raw === raw
   ) {
-    return provenanceTimelineSnapshot;
+    return cached.snapshot;
   }
 
-  provenanceTimelineSnapshotRaw =
-    raw;
+  const snapshot =
+    investigationId
+      ? getResearchProvenanceTimelineByInvestigation(
+          investigationId,
+        )
+      : getResearchProvenanceTimeline();
 
-  provenanceTimelineSnapshot =
-    getResearchProvenanceTimeline();
+  provenanceTimelineSnapshotCache.set(
+    cacheKey,
+    {
+      raw,
+      snapshot,
+    },
+  );
 
-  return provenanceTimelineSnapshot;
+  return snapshot;
 }
-export function ResearchProvenanceTimeline() {
+interface ResearchProvenanceTimelineProps {
+  investigationId?: string;
+}
+
+export function ResearchProvenanceTimeline({
+  investigationId,
+}: ResearchProvenanceTimelineProps) {
   const timeline =
-    useSyncExternalStore(
-      subscribeToResearch,
-      getResearchProvenanceTimelineSnapshot,
-      () => EMPTY_PROVENANCE_TIMELINE,
-    );
+  useSyncExternalStore(
+    subscribeToResearch,
+    () =>
+      getResearchProvenanceTimelineSnapshot(
+        investigationId,
+      ),
+    () => EMPTY_PROVENANCE_TIMELINE,
+  );
 
   return (
     <section className="mt-10 rounded-[34px] border border-white/10 bg-white/[0.04] p-8 backdrop-blur-3xl">

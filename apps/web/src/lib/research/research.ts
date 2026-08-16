@@ -1694,6 +1694,70 @@ export function getResearchProvenanceTimeline():
     },
   );
 }
+export function getResearchProvenanceTimelineByInvestigation(
+  investigationId: string,
+): ResearchProvenanceTimelineItem[] {
+  return getResearchProvenanceEventsByInvestigationChronological(
+    investigationId,
+  ).map((event) => {
+    const validation =
+      event.entityType === "FindingValidation"
+        ? getResearchFindingValidations().find(
+            (item) => item.id === event.entityId,
+          )
+        : undefined;
+
+    const finding = validation
+      ? getResearchFindings().find(
+          (item) => item.id === validation.findingId,
+        )
+      : undefined;
+
+    const statusDescription =
+      event.fromStatus && event.toStatus
+        ? `${event.fromStatus} → ${event.toStatus}`
+        : undefined;
+
+    return {
+      eventId: event.id,
+
+      investigationId: event.investigationId,
+
+      entityType: event.entityType,
+
+      entityId: event.entityId,
+
+      eventType: event.eventType,
+
+      findingId: finding?.id,
+
+      findingStatement: finding?.statement,
+
+      validationId: validation?.id,
+
+      validator: validation?.validator,
+
+      decision: validation?.decision,
+
+      title: `${event.entityType} ${event.eventType}`,
+
+      description:
+        statusDescription ??
+        event.reason ??
+        `${event.entityType} ${event.eventType} event.`,
+
+      fromStatus: event.fromStatus,
+
+      toStatus: event.toStatus,
+
+      reason: event.reason,
+
+      actor: event.actor,
+
+      timestamp: event.timestamp,
+    };
+  });
+}
 
 export function getResearchProvenanceEventsByInvestigationChronological(
   investigationId: string,
