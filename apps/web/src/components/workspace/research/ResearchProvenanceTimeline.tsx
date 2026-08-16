@@ -97,8 +97,8 @@ function getResearchProvenanceTimelineSnapshot(
   const snapshot =
     investigationId
       ? getResearchProvenanceTimelineByInvestigation(
-          investigationId,
-        )
+        investigationId,
+      )
       : getResearchProvenanceTimeline();
 
   provenanceTimelineSnapshotCache.set(
@@ -119,14 +119,14 @@ export function ResearchProvenanceTimeline({
   investigationId,
 }: ResearchProvenanceTimelineProps) {
   const timeline =
-  useSyncExternalStore(
-    subscribeToResearch,
-    () =>
-      getResearchProvenanceTimelineSnapshot(
-        investigationId,
-      ),
-    () => EMPTY_PROVENANCE_TIMELINE,
-  );
+    useSyncExternalStore(
+      subscribeToResearch,
+      () =>
+        getResearchProvenanceTimelineSnapshot(
+          investigationId,
+        ),
+      () => EMPTY_PROVENANCE_TIMELINE,
+    );
 
   return (
     <section className="mt-10 rounded-[34px] border border-white/10 bg-white/[0.04] p-8 backdrop-blur-3xl">
@@ -258,6 +258,15 @@ export function ResearchProvenanceTimeline({
                         {item.reason}
                       </p>
                     ) : null}
+                    <div className="mt-4 border-t border-white/10 pt-4">
+                      <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-zinc-600">
+                        Provenance Event ID
+                      </p>
+
+                      <p className="mt-1 break-all font-mono text-xs text-zinc-500">
+                        {item.eventId}
+                      </p>
+                    </div>
                   </div>
                 </article>
               );
