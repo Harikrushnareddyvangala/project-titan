@@ -20,7 +20,11 @@ import type {
   ResearchProvenanceTimelineItem,
 } from "@/types/research";
 
-import { useSyncExternalStore } from "react";
+import {
+  useMemo,
+  useSyncExternalStore,
+  useState,
+} from "react";
 function getEventIcon(
   eventType: ResearchProvenanceEventType,
 ) {
@@ -115,9 +119,20 @@ interface ResearchProvenanceTimelineProps {
   investigationId?: string;
 }
 
+type ProvenanceTimelineFilter =
+  | "All"
+  | "StatusChanged"
+  | "Validation"
+  | "Linked"
+  | "Other";
+
 export function ResearchProvenanceTimeline({
   investigationId,
 }: ResearchProvenanceTimelineProps) {
+  const [filter, setFilter] =
+    useState<ProvenanceTimelineFilter>(
+      "All",
+    );
   const timeline =
     useSyncExternalStore(
       subscribeToResearch,
@@ -127,6 +142,66 @@ export function ResearchProvenanceTimeline({
         ),
       () => EMPTY_PROVENANCE_TIMELINE,
     );
+  const filteredTimeline =
+    useMemo(() => {
+      switch (filter) {
+        case "StatusChanged":
+          return timeline.filter(
+            (item) =>
+              item.eventType ===
+              "StatusChanged",
+          );
+
+        case "Validation":
+          return timeline.filter(
+            (item) =>
+              item.entityType ===
+              "FindingValidation" ||
+              item.eventType ===
+              "Validated" ||
+              item.eventType ===
+              "Rejected" ||
+              item.eventType ===
+              "RevisionRequested" ||
+              item.eventType ===
+              "Accepted",
+          );
+
+        case "Linked":
+          return timeline.filter(
+            (item) =>
+              item.eventType ===
+              "Linked" ||
+              item.eventType ===
+              "Unlinked",
+          );
+
+        case "Other":
+          return timeline.filter(
+            (item) =>
+              item.eventType !==
+              "StatusChanged" &&
+              item.entityType !==
+              "FindingValidation" &&
+              item.eventType !==
+              "Validated" &&
+              item.eventType !==
+              "Rejected" &&
+              item.eventType !==
+              "RevisionRequested" &&
+              item.eventType !==
+              "Accepted" &&
+              item.eventType !==
+              "Linked" &&
+              item.eventType !==
+              "Unlinked",
+          );
+
+        case "All":
+        default:
+          return timeline;
+      }
+    }, [filter, timeline]);
 
   return (
     <section className="mt-10 rounded-[34px] border border-white/10 bg-white/[0.04] p-8 backdrop-blur-3xl">
@@ -156,15 +231,49 @@ export function ResearchProvenanceTimeline({
           </p>
 
           <p className="mt-1 text-2xl font-bold text-white">
-            {timeline.length}
+            {filteredTimeline.length}
           </p>
         </div>
       </div>
 
-      {timeline.length === 0 ? (
+      <div className="mt-6 flex flex-wrap gap-2">
+        {(
+          [
+            ["All", "All"],
+            ["StatusChanged", "Status Changes"],
+            ["Validation", "Validation"],
+            ["Linked", "Evidence / Links"],
+            ["Other", "Other"],
+          ] as const
+        ).map(([value, label]) => {
+          const active =
+            filter === value;
+
+          return (
+            <button
+              key={value}
+              type="button"
+              onClick={() =>
+                setFilter(value)
+              }
+              className={
+                active
+                  ? "rounded-full border border-cyan-400/40 bg-cyan-500/15 px-4 py-2 text-xs font-semibold text-cyan-300"
+                  : "rounded-full border border-white/10 bg-black/20 px-4 py-2 text-xs font-semibold text-zinc-400 transition hover:border-white/20 hover:text-zinc-200"
+              }
+            >
+              {label}
+            </button>
+          );
+        })}
+      </div>
+
+      {filteredTimeline.length === 0 ? (
         <div className="mt-8 rounded-2xl border border-dashed border-white/10 bg-black/20 p-8 text-center">
           <p className="text-zinc-400">
-            No provenance events recorded yet.
+            {timeline.length === 0
+              ? "No provenance events recorded yet."
+              : "No provenance events match this filter."}
           </p>
         </div>
       ) : (
@@ -172,7 +281,7 @@ export function ResearchProvenanceTimeline({
           <div className="absolute bottom-0 left-[17px] top-0 w-px bg-white/10" />
 
           <div className="space-y-8">
-            {timeline.map((item) => {
+            {filteredTimeline.map((item) => {
               const Icon =
                 getEventIcon(
                   item.eventType,
