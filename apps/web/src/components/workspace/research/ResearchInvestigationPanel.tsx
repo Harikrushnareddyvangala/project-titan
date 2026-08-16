@@ -19,6 +19,7 @@ import { ResearchEvidencePanel } from "./ResearchEvidencePanel";
 import { ResearchFindingPanel } from "./ResearchFindingPanel";
 import { ResearchExperimentPanel } from "./ResearchExperimentPanel";
 import { ResearchConclusionPanel } from "./ResearchConclusionPanel";
+import { ResearchProvenanceSummary } from "./ResearchProvenanceSummary";
 import { ResearchProvenanceTimeline } from "./ResearchProvenanceTimeline";
 
 const statuses =
@@ -357,6 +358,9 @@ function InvestigationCard({
         onInvestigationUpdated={
           onInvestigationUpdated
         }
+      />
+      <ResearchProvenanceSummary
+        investigationId={investigation.id}
       />
       <ResearchProvenanceTimeline
         investigationId={investigation.id}
