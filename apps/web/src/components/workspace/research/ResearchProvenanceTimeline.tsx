@@ -89,11 +89,11 @@ function getResearchProvenanceTimelineSnapshot():
 }
 export function ResearchProvenanceTimeline() {
   const timeline =
-  useSyncExternalStore(
-    subscribeToResearch,
-    getResearchProvenanceTimelineSnapshot,
-    () => EMPTY_PROVENANCE_TIMELINE,
-  );
+    useSyncExternalStore(
+      subscribeToResearch,
+      getResearchProvenanceTimelineSnapshot,
+      () => EMPTY_PROVENANCE_TIMELINE,
+    );
 
   return (
     <section className="mt-10 rounded-[34px] border border-white/10 bg-white/[0.04] p-8 backdrop-blur-3xl">
@@ -194,7 +194,32 @@ export function ResearchProvenanceTimeline() {
                         </span>
                       ) : null}
                     </div>
+                    {item.findingStatement ? (
+                      <div className="mt-4 rounded-xl border border-white/10 bg-white/[0.03] p-4">
+                        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">
+                          Finding
+                        </p>
 
+                        <p className="mt-2 text-sm leading-6 text-zinc-300">
+                          {item.findingStatement}
+                        </p>
+                      </div>
+                    ) : null}
+                    {item.validationId ? (
+                      <div className="mt-4 flex flex-wrap gap-2">
+                        {item.decision ? (
+                          <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs text-zinc-300">
+                            Decision: {item.decision}
+                          </span>
+                        ) : null}
+
+                        {item.validator ? (
+                          <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs text-zinc-400">
+                            Validator: {item.validator}
+                          </span>
+                        ) : null}
+                      </div>
+                    ) : null}
                     {item.reason ? (
                       <p className="mt-4 border-t border-white/10 pt-4 text-sm leading-6 text-zinc-500">
                         {item.reason}

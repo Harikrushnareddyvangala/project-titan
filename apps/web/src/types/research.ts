@@ -428,6 +428,16 @@ export interface ResearchProvenanceTimelineItem {
 
   eventType: ResearchProvenanceEventType;
 
+  findingId?: string;
+
+  findingStatement?: string;
+
+  validationId?: string;
+
+  validator?: string;
+
+  decision?: ResearchValidationDecision;
+
   title: string;
 
   description: string;

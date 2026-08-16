@@ -1616,6 +1616,22 @@ export function getResearchProvenanceTimeline():
   ResearchProvenanceTimelineItem[] {
   return getResearchProvenanceEventsChronological().map(
     (event) => {
+      const validation =
+        event.entityType === "FindingValidation"
+          ? getResearchFindingValidations().find(
+              (item) =>
+                item.id === event.entityId,
+            )
+          : undefined;
+
+      const finding =
+        validation
+          ? getResearchFindings().find(
+              (item) =>
+                item.id === validation.findingId,
+            )
+          : undefined;
+
       const statusDescription =
         event.fromStatus &&
         event.toStatus
@@ -1630,6 +1646,21 @@ export function getResearchProvenanceTimeline():
 
         entityType:
           event.entityType,
+
+        findingId:
+          finding?.id,
+
+        findingStatement:
+          finding?.statement,
+
+        validationId:
+          validation?.id,
+
+        validator:
+          validation?.validator,
+
+        decision:
+          validation?.decision,
 
         entityId:
           event.entityId,
