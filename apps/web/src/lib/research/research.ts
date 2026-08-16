@@ -19,6 +19,7 @@ import type {
   ResearchProvenanceIntegrityIssue,
   ResearchProvenanceIntegrityResult,
   ResearchProvenanceIntegritySummary,
+  ResearchProvenanceInvestigationSummary,
 } from "@/types/research";
 
 import {
@@ -1757,6 +1758,77 @@ export function getResearchProvenanceTimelineByInvestigation(
       timestamp: event.timestamp,
     };
   });
+}
+
+export function getResearchProvenanceInvestigationSummary(
+  investigationId: string,
+): ResearchProvenanceInvestigationSummary {
+  const events =
+    getResearchProvenanceEventsByInvestigationChronological(
+      investigationId,
+    );
+
+  const latest =
+    events.length > 0
+      ? events[events.length - 1]
+      : undefined;
+
+  const validationEventCount =
+    events.filter(
+      (event) =>
+        event.entityType ===
+          "FindingValidation" ||
+        event.eventType ===
+          "Validated" ||
+        event.eventType ===
+          "Rejected" ||
+        event.eventType ===
+          "RevisionRequested" ||
+        event.eventType ===
+          "Accepted",
+    ).length;
+
+  const statusChangeEventCount =
+    events.filter(
+      (event) =>
+        event.eventType ===
+        "StatusChanged",
+    ).length;
+
+  return {
+    investigationId,
+
+    eventCount:
+      events.length,
+
+    firstEventTimestamp:
+      events[0]?.timestamp,
+
+    latestEventTimestamp:
+      latest?.timestamp,
+
+    latestEventType:
+      latest?.eventType,
+
+    latestEntityType:
+      latest?.entityType,
+
+    latestEntityId:
+      latest?.entityId,
+
+    validationEventCount,
+
+    statusChangeEventCount,
+
+    valid:
+      validateResearchProvenanceIntegrity()
+        .issues
+        .filter(
+          (issue) =>
+            issue.investigationId ===
+            investigationId,
+        ).length === 0,
+  };
 }
 
 export function getResearchProvenanceEventsByInvestigationChronological(

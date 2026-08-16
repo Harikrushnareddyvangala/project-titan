@@ -41,4 +41,5 @@ export {
   getResearchProvenanceEventsByInvestigationChronological,
   validateResearchProvenanceIntegrity,
   getResearchProvenanceIntegritySummary,
+  getResearchProvenanceInvestigationSummary,
 } from "./research";

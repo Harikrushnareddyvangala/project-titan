@@ -452,3 +452,25 @@ export interface ResearchProvenanceTimelineItem {
 
   timestamp: string;
 }
+
+export interface ResearchProvenanceInvestigationSummary {
+  investigationId: string;
+
+  eventCount: number;
+
+  firstEventTimestamp?: string;
+
+  latestEventTimestamp?: string;
+
+  latestEventType?: ResearchProvenanceEventType;
+
+  latestEntityType?: ResearchProvenanceEntityType;
+
+  latestEntityId?: string;
+
+  validationEventCount: number;
+
+  statusChangeEventCount: number;
+
+  valid: boolean;
+}
