@@ -536,3 +536,33 @@ export interface ResearchLineage {
 
   issueCount: number;
 }
+
+export interface ResearchLineageIntegrityIssue {
+  investigationId: string;
+
+  code: string;
+
+  message: string;
+
+  nodeId?: string;
+
+  edgeId?: string;
+
+  sourceId?: string;
+
+  targetId?: string;
+}
+
+export interface ResearchLineageIntegrityResult {
+  investigationId: string;
+
+  valid: boolean;
+
+  checkedNodeCount: number;
+
+  checkedEdgeCount: number;
+
+  issueCount: number;
+
+  issues: ResearchLineageIntegrityIssue[];
+}

@@ -43,4 +43,6 @@ export {
   getResearchProvenanceIntegritySummary,
   getResearchProvenanceInvestigationSummary,
   getResearchLineage,
+  validateResearchLineage,
+  validateResearchLineageForInvestigation,
 } from "./research";

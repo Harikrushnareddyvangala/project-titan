@@ -25,6 +25,8 @@ import type {
   ResearchLineageEdgeType,
   ResearchLineageNode,
   ResearchLineageNodeType,
+  ResearchLineageIntegrityIssue,
+  ResearchLineageIntegrityResult,
 } from "@/types/research";
 
 import {
@@ -2341,6 +2343,333 @@ export function getLatestResearchProvenanceEvent(
         new Date(latest.timestamp).getTime()
         ? event
         : latest,
+  );
+}
+
+export function validateResearchLineage(
+  investigationId: string,
+): ResearchLineageIntegrityResult {
+  const lineage =
+    getResearchLineage(
+      investigationId,
+    );
+
+  const issues:
+    ResearchLineageIntegrityIssue[] = [];
+
+  const addIssue = (
+    issue: ResearchLineageIntegrityIssue,
+  ): void => {
+    issues.push(issue);
+  };
+
+  if (
+    lineage.nodes.length === 0
+  ) {
+    addIssue({
+      investigationId,
+      code: "INVESTIGATION_NOT_FOUND",
+      message:
+        `Investigation ${investigationId} has no lineage graph.`,
+    });
+
+    return {
+      investigationId,
+      valid: false,
+      checkedNodeCount: 0,
+      checkedEdgeCount: 0,
+      issueCount: issues.length,
+      issues,
+    };
+  }
+
+  const nodeById =
+    new Map(
+      lineage.nodes.map(
+        (node) => [
+          node.id,
+          node,
+        ],
+      ),
+    );
+
+  const edgeIds = new Set<string>();
+
+  const validEdgeTypes: Record<
+    ResearchLineageEdgeType,
+    Array<
+      [
+        ResearchLineageNodeType,
+        ResearchLineageNodeType,
+      ]
+    >
+  > = {
+    Contains: [
+      ["Investigation", "Experiment"],
+    ],
+
+    Produces: [
+      ["Experiment", "Evidence"],
+      ["Experiment", "Finding"],
+    ],
+
+    Supports: [
+      ["Evidence", "Finding"],
+    ],
+
+    Contradicts: [
+      ["Evidence", "Finding"],
+    ],
+
+    Validates: [
+      ["Finding", "FindingValidation"],
+    ],
+  };
+
+  for (const node of lineage.nodes) {
+    if (
+      node.investigationId !==
+      investigationId
+    ) {
+      addIssue({
+        investigationId,
+        code: "NODE_INVESTIGATION_MISMATCH",
+        message:
+          `Node ${node.id} belongs to investigation ${node.investigationId}, not ${investigationId}.`,
+        nodeId: node.id,
+      });
+    }
+
+    if (!node.valid) {
+      addIssue({
+        investigationId,
+        code: "INVALID_NODE",
+        message:
+          `Lineage node ${node.id} is marked invalid: ${
+            node.missingLinks.length > 0
+              ? node.missingLinks.join(" ")
+              : "the underlying research record is invalid."
+          }`,
+        nodeId: node.id,
+      });
+    }
+
+    if (
+      node.issueCount !==
+      0
+    ) {
+      addIssue({
+        investigationId,
+        code: "NODE_ISSUES_PRESENT",
+        message:
+          `Lineage node ${node.id} reports ${node.issueCount} issue(s).`,
+        nodeId: node.id,
+      });
+    }
+  }
+
+  for (const edge of lineage.edges) {
+    if (
+      edgeIds.has(edge.id)
+    ) {
+      addIssue({
+        investigationId,
+        code: "DUPLICATE_EDGE",
+        message:
+          `Lineage edge ${edge.id} appears more than once.`,
+        edgeId: edge.id,
+        sourceId: edge.sourceId,
+        targetId: edge.targetId,
+      });
+
+      continue;
+    }
+
+    edgeIds.add(edge.id);
+
+    const source =
+      nodeById.get(
+        edge.sourceId,
+      );
+
+    const target =
+      nodeById.get(
+        edge.targetId,
+      );
+
+    if (!source) {
+      addIssue({
+        investigationId,
+        code: "SOURCE_NODE_NOT_FOUND",
+        message:
+          `Lineage edge ${edge.id} references missing source node ${edge.sourceId}.`,
+        edgeId: edge.id,
+        sourceId: edge.sourceId,
+        targetId: edge.targetId,
+      });
+    }
+
+    if (!target) {
+      addIssue({
+        investigationId,
+        code: "TARGET_NODE_NOT_FOUND",
+        message:
+          `Lineage edge ${edge.id} references missing target node ${edge.targetId}.`,
+        edgeId: edge.id,
+        sourceId: edge.sourceId,
+        targetId: edge.targetId,
+      });
+    }
+
+    if (
+      !source ||
+      !target
+    ) {
+      continue;
+    }
+
+    if (
+      source.investigationId !==
+        investigationId ||
+      target.investigationId !==
+        investigationId
+    ) {
+      addIssue({
+        investigationId,
+        code: "CROSS_INVESTIGATION_EDGE",
+        message:
+          `Lineage edge ${edge.id} crosses investigation boundaries.`,
+        edgeId: edge.id,
+        sourceId: edge.sourceId,
+        targetId: edge.targetId,
+      });
+    }
+
+    const allowedPairs =
+      validEdgeTypes[
+        edge.type
+      ];
+
+    const validPair =
+      allowedPairs?.some(
+        ([sourceType, targetType]) =>
+          source.type ===
+            sourceType &&
+          target.type ===
+            targetType,
+      ) ?? false;
+
+    if (!validPair) {
+      addIssue({
+        investigationId,
+        code: "INVALID_EDGE_DIRECTION",
+        message:
+          `Edge ${edge.id} has invalid relationship ${edge.type}: ${source.type} → ${target.type}.`,
+        edgeId: edge.id,
+        sourceId: edge.sourceId,
+        targetId: edge.targetId,
+      });
+    }
+
+    if (
+      edge.sourceId ===
+      edge.targetId
+    ) {
+      addIssue({
+        investigationId,
+        code: "SELF_REFERENTIAL_EDGE",
+        message:
+          `Lineage edge ${edge.id} connects node ${edge.sourceId} to itself.`,
+        edgeId: edge.id,
+        sourceId: edge.sourceId,
+        targetId: edge.targetId,
+      });
+    }
+  }
+
+  const provenanceResult =
+    validateResearchProvenanceIntegrity();
+
+  const provenanceIssues =
+    provenanceResult.issues.filter(
+      (issue) =>
+        issue.investigationId ===
+        investigationId,
+    );
+
+  for (
+    const issue of provenanceIssues
+  ) {
+    addIssue({
+      investigationId,
+      code:
+        `PROVENANCE_${issue.code}`,
+      message:
+        `Underlying provenance issue ${issue.code}: ${issue.message}`,
+    });
+  }
+
+  const nodeIssueCounts =
+    new Map<
+      string,
+      number
+    >();
+
+  for (
+    const issue of issues
+  ) {
+    if (!issue.nodeId) {
+      continue;
+    }
+
+    nodeIssueCounts.set(
+      issue.nodeId,
+      (nodeIssueCounts.get(
+        issue.nodeId,
+      ) ?? 0) + 1,
+    );
+  }
+
+  for (
+    const node of lineage.nodes
+  ) {
+    const derivedIssueCount =
+      nodeIssueCounts.get(
+        node.id,
+      ) ?? 0;
+
+    if (
+      derivedIssueCount >
+      0
+    ) {
+      continue;
+    }
+  }
+
+  return {
+    investigationId,
+
+    valid:
+      issues.length === 0,
+
+    checkedNodeCount:
+      lineage.nodes.length,
+
+    checkedEdgeCount:
+      lineage.edges.length,
+
+    issueCount:
+      issues.length,
+
+    issues,
+  };
+}
+
+export function validateResearchLineageForInvestigation(
+  investigationId: string,
+): ResearchLineageIntegrityResult {
+  return validateResearchLineage(
+    investigationId,
   );
 }
 
