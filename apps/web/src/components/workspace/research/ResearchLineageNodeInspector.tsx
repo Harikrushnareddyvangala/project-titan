@@ -8,6 +8,8 @@ import {
   ShieldAlert,
 } from "lucide-react";
 
+import { useState } from "react";
+
 import type {
   ResearchLineageNode,
 } from "@/types/research";
@@ -50,6 +52,14 @@ export function ResearchLineageNodeInspector({
   node,
   onOpenArtifact,
 }: ResearchLineageNodeInspectorProps) {
+  const [openedArtifactKey, setOpenedArtifactKey] =
+    useState<string | null>(null);
+
+  const currentNodeKey =
+    node
+      ? `${node.type}:${node.id}`
+      : null;
+
   if (!node) {
     return (
       <section className="mt-6 rounded-3xl border border-dashed border-white/10 bg-black/20 p-6">
@@ -190,14 +200,28 @@ export function ResearchLineageNodeInspector({
         </div>
       ) : null}
       {onOpenArtifact ? (
-  <button
-    type="button"
-    onClick={() => onOpenArtifact(node)}
-    className="mt-5 inline-flex items-center rounded-xl border border-cyan-400/30 bg-cyan-500/10 px-4 py-2 text-sm font-semibold text-cyan-300 transition hover:border-cyan-400/50 hover:bg-cyan-500/15 hover:text-cyan-200"
-  >
-    Open artifact
-  </button>
-) : null}
+        <div className="mt-5">
+          <button
+            type="button"
+            onClick={() => {
+              onOpenArtifact(node);
+              setOpenedArtifactKey(
+                currentNodeKey,
+              );
+            }}
+            className="inline-flex items-center rounded-xl border border-cyan-400/30 bg-cyan-500/10 px-4 py-2 text-sm font-semibold text-cyan-300 transition hover:border-cyan-400/50 hover:bg-cyan-500/15 hover:text-cyan-200"
+          >
+            Open artifact
+          </button>
+
+          {openedArtifactKey ===
+          currentNodeKey ? (
+            <p className="mt-2 text-xs font-medium text-emerald-300">
+              ✓ Artifact opened from lineage
+            </p>
+          ) : null}
+        </div>
+      ) : null}
 
       <div className="mt-5 rounded-2xl border border-white/10 bg-black/30 p-4">
         <p className="text-xs uppercase tracking-[0.18em] text-zinc-500">
