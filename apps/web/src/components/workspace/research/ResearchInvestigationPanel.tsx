@@ -5,7 +5,7 @@ import {
   Plus,
   Search,
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import {
   useResearchInvestigations,
@@ -326,6 +326,29 @@ function InvestigationCard({
       ? artifactFocus
       : null;
 
+  useEffect(() => {
+    if (
+      activeArtifactFocus?.type !==
+      "Investigation"
+    ) {
+      return;
+    }
+
+    const element =
+      document.querySelector(
+        `[data-research-artifact-id="${activeArtifactFocus.id}"]`,
+      );
+
+    if (!element) {
+      return;
+    }
+
+    element.scrollIntoView({
+      behavior: "smooth",
+      block: "center",
+    });
+  }, [activeArtifactFocus]);
+
   const handleOpenLineageArtifact = (
     node: ResearchLineageNode,
   ) => {
@@ -435,7 +458,16 @@ function InvestigationCard({
     }
   };
   return (
-    <article className="rounded-3xl border border-white/10 bg-black/30 p-6">
+    <article
+      data-research-artifact-id={
+        investigation.id
+      }
+      className={`rounded-3xl border p-6 transition ${activeArtifactFocus?.type ===
+          "Investigation"
+          ? "border-cyan-400/60 bg-cyan-500/[0.08] ring-1 ring-cyan-400/30"
+          : "border-white/10 bg-black/30"
+        }`}
+    >
       <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
         <div>
           <h3 className="text-xl font-bold text-white">
