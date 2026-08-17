@@ -306,6 +306,16 @@ function InvestigationCard({
         node.id === selectedLineageNodeId,
     ) ?? null;
 
+  const handleLineageNodeSelect = (
+    nodeId: string | null,
+  ) => {
+    setSelectedLineageNodeId(nodeId);
+
+    if (nodeId !== selectedLineageNodeId) {
+      setArtifactFocus(null);
+    }
+  };
+
   const activeArtifactFocus =
     artifactFocus &&
       lineage.nodes.some(
@@ -543,7 +553,9 @@ function InvestigationCard({
       <ResearchLineageGraph
         investigationId={investigation.id}
         selectedNodeId={selectedLineageNodeId}
-        onNodeSelect={setSelectedLineageNodeId}
+        onNodeSelect={
+          handleLineageNodeSelect
+        }
       />
 
       <ResearchLineageNodeInspector
