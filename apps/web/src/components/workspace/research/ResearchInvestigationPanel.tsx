@@ -606,6 +606,9 @@ function InvestigationCard({
       />
       <ResearchLineageIntegrity
         investigationId={investigation.id}
+        onSelectNode={
+          handleLineageNodeSelect
+        }
       />
     </article>
   );

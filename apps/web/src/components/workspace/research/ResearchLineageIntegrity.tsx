@@ -5,6 +5,7 @@ import {
   CheckCircle2,
   ShieldAlert,
   Activity,
+  ArrowUpRight,
 } from "lucide-react";
 import { useSyncExternalStore } from "react";
 
@@ -20,6 +21,7 @@ import type {
 
 interface ResearchLineageIntegrityProps {
   investigationId: string;
+  onSelectNode?: (nodeId: string | null) => void;
 }
 
 const EMPTY_RESULT: ResearchLineageIntegrityResult = {
@@ -80,9 +82,21 @@ function getSnapshot(
 
 function IssueCard({
   issue,
+  onSelectNode,
 }: {
   issue: ResearchLineageIntegrityIssue;
+  onSelectNode?: (nodeId: string | null) => void;
 }) {
+  const targetNodeId =
+    issue.nodeId ??
+    (
+      issue.code === "SOURCE_NODE_NOT_FOUND"
+        ? issue.targetId
+        : issue.code === "TARGET_NODE_NOT_FOUND"
+          ? issue.sourceId
+          : issue.sourceId ?? issue.targetId
+    ) ??
+    null;
   return (
     <div className="rounded-2xl border border-amber-400/20 bg-amber-500/[0.05] p-4">
       <div className="flex items-start gap-3">
@@ -110,10 +124,21 @@ function IssueCard({
           ) : null}
 
           {issue.sourceId &&
-          issue.targetId ? (
+            issue.targetId ? (
             <p className="mt-1 break-all font-mono text-xs text-zinc-600">
               {issue.sourceId} → {issue.targetId}
             </p>
+          ) : null}
+
+          {targetNodeId && onSelectNode ? (
+            <button
+              type="button"
+              onClick={() => onSelectNode(targetNodeId)}
+              className="mt-4 inline-flex items-center rounded-xl border border-cyan-400/20 bg-cyan-500/10 px-3 py-2 text-xs font-semibold text-cyan-300 transition hover:border-cyan-400/40 hover:bg-cyan-500/15"
+            >
+              <ArrowUpRight className="mr-2 h-3.5 w-3.5" />
+              Inspect in lineage
+            </button>
           ) : null}
         </div>
       </div>
@@ -143,6 +168,7 @@ function Metric({
 
 export function ResearchLineageIntegrity({
   investigationId,
+  onSelectNode,
 }: ResearchLineageIntegrityProps) {
   const result =
     useSyncExternalStore(
@@ -230,6 +256,7 @@ export function ResearchLineageIntegrity({
               <IssueCard
                 key={`${issue.code}-${issue.nodeId ?? issue.edgeId ?? index}`}
                 issue={issue}
+                onSelectNode={onSelectNode}
               />
             ),
           )}
