@@ -7,7 +7,7 @@ import {
   Trash2,
   Unlink,
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import {
   canTransitionResearchExperiment,
@@ -32,6 +32,8 @@ interface ResearchExperimentPanelProps {
   onInvestigationUpdated?: (
     investigation: ResearchInvestigation,
   ) => void;
+
+  focusedArtifactId?: string | null;
 }
 
 const statuses: ResearchStatus[] = [
@@ -73,7 +75,27 @@ const nextStatusMap: Record<
 export function ResearchExperimentPanel({
   investigation,
   onInvestigationUpdated,
+  focusedArtifactId,
 }: ResearchExperimentPanelProps) {
+  useEffect(() => {
+    if (!focusedArtifactId) {
+      return;
+    }
+
+    const element =
+      document.querySelector(
+        `[data-research-artifact-id="${focusedArtifactId}"]`,
+      );
+
+    if (!element) {
+      return;
+    }
+
+    element.scrollIntoView({
+      behavior: "smooth",
+      block: "center",
+    });
+  }, [focusedArtifactId]);
   const [title, setTitle] =
     useState("");
 
@@ -141,33 +163,33 @@ export function ResearchExperimentPanel({
 
     const experiment:
       ResearchExperiment = {
-        id: `experiment-${Date.now()}`,
+      id: `experiment-${Date.now()}`,
 
-        investigationId:
-          investigation.id,
+      investigationId:
+        investigation.id,
 
-        title:
-          cleanTitle,
+      title:
+        cleanTitle,
 
-        objective:
-          cleanObjective,
+      objective:
+        cleanObjective,
 
-        status,
+      status,
 
-        description:
-          cleanDescription ||
-          undefined,
+      description:
+        cleanDescription ||
+        undefined,
 
-        evidenceIds: [],
+      evidenceIds: [],
 
-        findingIds: [],
+      findingIds: [],
 
-        lifecycle: [],
+      lifecycle: [],
 
-        createdAt: now,
+      createdAt: now,
 
-        updatedAt: now,
-      };
+      updatedAt: now,
+    };
 
     saveResearchExperiment(
       experiment,
@@ -180,15 +202,15 @@ export function ResearchExperimentPanel({
 
     const updatedInvestigation:
       ResearchInvestigation = {
-        ...investigation,
+      ...investigation,
 
-        experimentIds: [
-          ...investigation.experimentIds,
-          experiment.id,
-        ],
+      experimentIds: [
+        ...investigation.experimentIds,
+        experiment.id,
+      ],
 
-        updatedAt: now,
-      };
+      updatedAt: now,
+    };
 
     onInvestigationUpdated?.(
       updatedInvestigation,
@@ -215,16 +237,16 @@ export function ResearchExperimentPanel({
 
     const updatedInvestigation:
       ResearchInvestigation = {
-        ...investigation,
+      ...investigation,
 
-        experimentIds:
-          investigation.experimentIds.filter(
-            (id) =>
-              id !== experiment.id,
-          ),
+      experimentIds:
+        investigation.experimentIds.filter(
+          (id) =>
+            id !== experiment.id,
+        ),
 
-        updatedAt: now,
-      };
+      updatedAt: now,
+    };
 
     onInvestigationUpdated?.(
       updatedInvestigation,
@@ -237,11 +259,11 @@ export function ResearchExperimentPanel({
   ) {
     const updatedExperiment:
       ResearchExperiment = {
-        ...experiment,
-        ...patch,
-        updatedAt:
-          new Date().toISOString(),
-      };
+      ...experiment,
+      ...patch,
+      updatedAt:
+        new Date().toISOString(),
+    };
 
     saveResearchExperiment(
       updatedExperiment,
@@ -250,7 +272,7 @@ export function ResearchExperimentPanel({
     setExperiments((current) =>
       current.map((item) =>
         item.id ===
-        experiment.id
+          experiment.id
           ? updatedExperiment
           : item,
       ),
@@ -284,7 +306,7 @@ export function ResearchExperimentPanel({
     setExperiments((current) =>
       current.map((item) =>
         item.id ===
-        updatedExperiment.id
+          updatedExperiment.id
           ? updatedExperiment
           : item,
       ),
@@ -302,13 +324,13 @@ export function ResearchExperimentPanel({
 
     const evidenceIds = attached
       ? experiment.evidenceIds.filter(
-          (id) =>
-            id !== evidenceId,
-        )
+        (id) =>
+          id !== evidenceId,
+      )
       : [
-          ...experiment.evidenceIds,
-          evidenceId,
-        ];
+        ...experiment.evidenceIds,
+        evidenceId,
+      ];
 
     updateExperiment(
       experiment,
@@ -329,13 +351,13 @@ export function ResearchExperimentPanel({
 
     const findingIds = attached
       ? experiment.findingIds.filter(
-          (id) =>
-            id !== findingId,
-        )
+        (id) =>
+          id !== findingId,
+      )
       : [
-          ...experiment.findingIds,
-          findingId,
-        ];
+        ...experiment.findingIds,
+        findingId,
+      ];
 
     updateExperiment(
       experiment,
@@ -473,8 +495,13 @@ export function ResearchExperimentPanel({
               (experiment) => (
                 <ExperimentCard
                   key={experiment.id}
+
                   experiment={
                     experiment
+                  }
+                  focused={
+                    focusedArtifactId ===
+                    experiment.id
                   }
                   evidence={
                     investigationEvidence
@@ -513,6 +540,8 @@ export function ResearchExperimentPanel({
 interface ExperimentCardProps {
   experiment: ResearchExperiment;
 
+  focused?: boolean;
+
   evidence: ResearchEvidence[];
 
   findings: ResearchFinding[];
@@ -537,6 +566,7 @@ interface ExperimentCardProps {
 
 function ExperimentCard({
   experiment,
+  focused,
   evidence,
   findings,
   onEvidenceToggle,
@@ -546,11 +576,17 @@ function ExperimentCard({
 }: ExperimentCardProps) {
   const nextStatuses =
     nextStatusMap[
-      experiment.status
+    experiment.status
     ];
 
   return (
-    <article className="rounded-2xl border border-white/10 bg-white/[0.02] p-4">
+    <article
+      data-research-artifact-id={experiment.id}
+      className={`rounded-2xl border p-4 transition ${focused
+          ? "border-cyan-400/60 bg-cyan-500/[0.08] ring-1 ring-cyan-400/30"
+          : "border-white/10 bg-white/[0.02]"
+        }`}
+    >
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
@@ -592,90 +628,90 @@ function ExperimentCard({
 
               {nextStatuses.length >
                 0 && (
-                <select
-                  value=""
-                  onChange={(event) => {
-                    const next =
-                      event.target
-                        .value as ResearchStatus;
-
-                    if (next) {
-                      onTransition(
-                        experiment,
-                        next,
-                      );
-                    }
-                  }}
-                  className="rounded-xl border border-violet-400/20 bg-black/40 px-3 py-2 text-xs font-semibold text-violet-300 outline-none focus:border-violet-400/40"
-                >
-                  <option
+                  <select
                     value=""
-                    className="bg-zinc-950"
-                  >
-                    Advance lifecycle
-                  </option>
+                    onChange={(event) => {
+                      const next =
+                        event.target
+                          .value as ResearchStatus;
 
-                  {nextStatuses.map(
-                    (next) => (
-                      <option
-                        key={next}
-                        value={next}
-                        className="bg-zinc-950"
-                      >
-                        → {next}
-                      </option>
-                    ),
-                  )}
-                </select>
-              )}
+                      if (next) {
+                        onTransition(
+                          experiment,
+                          next,
+                        );
+                      }
+                    }}
+                    className="rounded-xl border border-violet-400/20 bg-black/40 px-3 py-2 text-xs font-semibold text-violet-300 outline-none focus:border-violet-400/40"
+                  >
+                    <option
+                      value=""
+                      className="bg-zinc-950"
+                    >
+                      Advance lifecycle
+                    </option>
+
+                    {nextStatuses.map(
+                      (next) => (
+                        <option
+                          key={next}
+                          value={next}
+                          className="bg-zinc-950"
+                        >
+                          → {next}
+                        </option>
+                      ),
+                    )}
+                  </select>
+                )}
 
               {nextStatuses.length ===
                 0 && (
-                <span className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-[10px] font-semibold text-zinc-600">
-                  Lifecycle complete
-                </span>
-              )}
+                  <span className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-[10px] font-semibold text-zinc-600">
+                    Lifecycle complete
+                  </span>
+                )}
             </div>
 
             {experiment.lifecycle.length >
               0 && (
-              <div className="mt-3 space-y-2">
-                {experiment.lifecycle.map(
-                  (event) => (
-                    <div
-                      key={event.id}
-                      className="rounded-xl border border-white/10 bg-black/20 px-3 py-2"
-                    >
-                      <div className="flex flex-wrap items-center gap-2">
-                        <span className="text-[10px] font-semibold text-zinc-500">
-                          {event.from}
-                        </span>
+                <div className="mt-3 space-y-2">
+                  {experiment.lifecycle.map(
+                    (event) => (
+                      <div
+                        key={event.id}
+                        className="rounded-xl border border-white/10 bg-black/20 px-3 py-2"
+                      >
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="text-[10px] font-semibold text-zinc-500">
+                            {event.from}
+                          </span>
 
-                        <span className="text-[10px] text-violet-400">
-                          →
-                        </span>
+                          <span className="text-[10px] text-violet-400">
+                            →
+                          </span>
 
-                        <span className="text-[10px] font-semibold text-violet-300">
-                          {event.to}
-                        </span>
+                          <span className="text-[10px] font-semibold text-violet-300">
+                            {event.to}
+                          </span>
 
-                        <span className="text-[10px] text-zinc-700">
-                          {new Date(
-                            event.timestamp,
-                          ).toLocaleString()}
-                        </span>
+                          <span className="text-[10px] text-zinc-700">
+                            {new Date(
+                              event.timestamp,
+                            ).toLocaleString()}
+                          </span>
+                        </div>
+
+                        {event.reason && (
+                          <p className="mt-1 text-[10px] text-zinc-600">
+                            {event.reason}
+                          </p>
+                        )}
                       </div>
-
-                      {event.reason && (
-                        <p className="mt-1 text-[10px] text-zinc-600">
-                          {event.reason}
-                        </p>
-                      )}
-                    </div>
-                  ),
-                )}
-              </div>
-            )}
+                    ),
+                  )}
+                </div>
+              )}
           </div>
 
           {/* -------------------------------------------------------------- */}
@@ -794,15 +830,15 @@ function ExperimentCard({
 
                             {finding.confidence !==
                               undefined && (
-                              <p className="mt-1 text-[10px] text-zinc-600">
-                                Confidence:{" "}
-                                {Math.round(
-                                  finding.confidence *
+                                <p className="mt-1 text-[10px] text-zinc-600">
+                                  Confidence:{" "}
+                                  {Math.round(
+                                    finding.confidence *
                                     100,
-                                )}
-                                %
-                              </p>
-                            )}
+                                  )}
+                                  %
+                                </p>
+                              )}
                           </div>
 
                           <button

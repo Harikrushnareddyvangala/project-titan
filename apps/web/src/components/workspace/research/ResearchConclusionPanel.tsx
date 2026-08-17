@@ -6,6 +6,7 @@ import {
     Trash2,
 } from "lucide-react";
 import {
+    useEffect,
     useMemo,
     useState,
 } from "react";
@@ -33,12 +34,34 @@ interface ResearchConclusionPanelProps {
     onInvestigationUpdated?: (
         investigation: ResearchInvestigation,
     ) => void;
+
+    focusedArtifactId?: string | null;
 }
 
 export function ResearchConclusionPanel({
     investigation,
     onInvestigationUpdated,
+    focusedArtifactId,
 }: ResearchConclusionPanelProps) {
+    useEffect(() => {
+        if (!focusedArtifactId) {
+            return;
+        }
+
+        const element = document.querySelector(
+            `[data-research-artifact-id="${focusedArtifactId}"]`,
+        );
+
+        if (!element) {
+            return;
+        }
+
+        element.scrollIntoView({
+            behavior: "smooth",
+            block: "center",
+        });
+    }, [focusedArtifactId]);
+
     const [statement, setStatement] =
         useState("");
 
@@ -355,6 +378,10 @@ export function ResearchConclusionPanel({
                                     conclusion={
                                         conclusion
                                     }
+                                    focused={
+                                        focusedArtifactId ===
+                                        conclusion.id
+                                    }
                                     onDelete={() =>
                                         removeConclusion(
                                             conclusion.id,
@@ -439,6 +466,8 @@ function FindingSelector({
 interface ConclusionCardProps {
     conclusion: ResearchInvestigationConclusion;
 
+    focused?: boolean;
+
     onDelete: () => void;
     onInvestigationUpdated: (
         conclusion: ResearchInvestigationConclusion,
@@ -447,6 +476,7 @@ interface ConclusionCardProps {
 
 function ConclusionCard({
     conclusion,
+    focused,
     onDelete,
     onInvestigationUpdated,
 }: ConclusionCardProps) {
@@ -472,7 +502,13 @@ function ConclusionCard({
         );
     }
     return (
-        <article className="rounded-2xl border border-white/10 bg-white/[0.02] p-4">
+        <article
+            data-research-artifact-id={conclusion.id}
+            className={`rounded-2xl border p-4 transition ${focused
+                    ? "border-cyan-400/60 bg-cyan-500/[0.08] ring-1 ring-cyan-400/30"
+                    : "border-white/10 bg-white/[0.02]"
+                }`}
+        >
             <div className="flex items-start justify-between gap-4">
                 <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">

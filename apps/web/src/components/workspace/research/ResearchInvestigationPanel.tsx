@@ -13,10 +13,16 @@ import {
 
 import type {
   ResearchInvestigation,
+  ResearchLineageNode,
 } from "@/types/research";
 
 import {
   getResearchLineage,
+  getResearchEvidence,
+  getResearchExperiments,
+  getResearchFindings,
+  getResearchFindingValidations,
+  getResearchInvestigationConclusions,
 } from "@/lib/research";
 
 import { ResearchEvidencePanel } from "./ResearchEvidencePanel";
@@ -28,6 +34,17 @@ import { ResearchProvenanceTimeline } from "./ResearchProvenanceTimeline";
 import { ResearchLineageIntegrity } from "./ResearchLineageIntegrity";
 import { ResearchLineageGraph } from "./ResearchLineageGraph";
 import { ResearchLineageNodeInspector } from "./ResearchLineageNodeInspector";
+
+type ResearchArtifactFocus = {
+  type:
+  | "Investigation"
+  | "Experiment"
+  | "Evidence"
+  | "Finding"
+  | "FindingValidation"
+  | "Conclusion";
+  id: string;
+};
 
 const statuses =
   [
@@ -277,6 +294,9 @@ function InvestigationCard({
   const [selectedLineageNodeId, setSelectedLineageNodeId] =
     useState<string | null>(null);
 
+  const [artifactFocus, setArtifactFocus] =
+    useState<ResearchArtifactFocus | null>(null);
+
   const lineage =
     getResearchLineage(investigation.id);
 
@@ -285,6 +305,104 @@ function InvestigationCard({
       (node) =>
         node.id === selectedLineageNodeId,
     ) ?? null;
+
+  const handleOpenLineageArtifact = (
+    node: ResearchLineageNode,
+  ) => {
+    switch (node.type) {
+      case "Investigation":
+        setArtifactFocus({
+          type: "Investigation",
+          id: node.id,
+        });
+        break;
+
+      case "Experiment": {
+        const experiment =
+          getResearchExperiments().find(
+            (item) => item.id === node.id,
+          );
+
+        if (!experiment) {
+          return;
+        }
+
+        setArtifactFocus({
+          type: "Experiment",
+          id: node.id,
+        });
+        break;
+      }
+
+      case "Evidence": {
+        const evidence =
+          getResearchEvidence().find(
+            (item) => item.id === node.id,
+          );
+
+        if (!evidence) {
+          return;
+        }
+
+        setArtifactFocus({
+          type: "Evidence",
+          id: node.id,
+        });
+        break;
+      }
+
+      case "Finding": {
+        const finding =
+          getResearchFindings().find(
+            (item) => item.id === node.id,
+          );
+
+        if (!finding) {
+          return;
+        }
+
+        setArtifactFocus({
+          type: "Finding",
+          id: node.id,
+        });
+        break;
+      }
+
+      case "FindingValidation": {
+        const validation =
+          getResearchFindingValidations().find(
+            (item) => item.id === node.id,
+          );
+
+        if (!validation) {
+          return;
+        }
+
+        setArtifactFocus({
+          type: "FindingValidation",
+          id: node.id,
+        });
+        break;
+      }
+
+      case "Conclusion": {
+        const conclusion =
+          getResearchInvestigationConclusions().find(
+            (item) => item.id === node.id,
+          );
+
+        if (!conclusion) {
+          return;
+        }
+
+        setArtifactFocus({
+          type: "Conclusion",
+          id: node.id,
+        });
+        break;
+      }
+    }
+  };
   return (
     <article className="rounded-3xl border border-white/10 bg-black/30 p-6">
       <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
@@ -358,23 +476,46 @@ function InvestigationCard({
         onInvestigationUpdated={
           onInvestigationUpdated
         }
+        focusedArtifactId={
+          artifactFocus?.type === "Experiment"
+            ? artifactFocus.id
+            : null
+        }
       />
+
       <ResearchEvidencePanel
         investigation={investigation}
         onInvestigationUpdated={
           onInvestigationUpdated
         }
+        focusedArtifactId={
+          artifactFocus?.type === "Evidence"
+            ? artifactFocus.id
+            : null
+        }
       />
+
       <ResearchFindingPanel
         investigation={investigation}
         onInvestigationUpdated={
           onInvestigationUpdated
         }
+        focusedArtifactId={
+          artifactFocus?.type === "Finding"
+            ? artifactFocus.id
+            : null
+        }
       />
+
       <ResearchConclusionPanel
         investigation={investigation}
         onInvestigationUpdated={
           onInvestigationUpdated
+        }
+        focusedArtifactId={
+          artifactFocus?.type === "Conclusion"
+            ? artifactFocus.id
+            : null
         }
       />
 
@@ -386,6 +527,9 @@ function InvestigationCard({
 
       <ResearchLineageNodeInspector
         node={selectedLineageNode}
+        onOpenArtifact={
+          handleOpenLineageArtifact
+        }
       />
 
       <ResearchProvenanceSummary

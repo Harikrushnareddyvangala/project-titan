@@ -6,6 +6,7 @@ import {
   Trash2,
 } from "lucide-react";
 import {
+  useEffect,
   useMemo,
   useState,
 } from "react";
@@ -34,15 +35,37 @@ const evidenceTypes: ResearchEvidenceType[] = [
 
 interface ResearchEvidencePanelProps {
   investigation: ResearchInvestigation;
+
   onInvestigationUpdated?: (
     investigation: ResearchInvestigation,
   ) => void;
+
+  focusedArtifactId?: string | null;
 }
 
 export function ResearchEvidencePanel({
   investigation,
   onInvestigationUpdated,
+  focusedArtifactId,
 }: ResearchEvidencePanelProps) {
+  useEffect(() => {
+    if (!focusedArtifactId) {
+      return;
+    }
+
+    const element = document.querySelector(
+      `[data-research-artifact-id="${focusedArtifactId}"]`,
+    );
+
+    if (!element) {
+      return;
+    }
+
+    element.scrollIntoView({
+      behavior: "smooth",
+      block: "center",
+    });
+  }, [focusedArtifactId]);
   const [title, setTitle] = useState("");
   const [description, setDescription] =
     useState("");
@@ -86,15 +109,15 @@ export function ResearchEvidencePanel({
     saveResearchEvidence(evidenceItem);
 
     const updatedInvestigation: ResearchInvestigation =
-      {
-        ...investigation,
-        evidenceIds: [
-          ...investigation.evidenceIds,
-          evidenceItem.id,
-        ],
-        updatedAt:
-          new Date().toISOString(),
-      };
+    {
+      ...investigation,
+      evidenceIds: [
+        ...investigation.evidenceIds,
+        evidenceItem.id,
+      ],
+      updatedAt:
+        new Date().toISOString(),
+    };
 
     onInvestigationUpdated?.(
       updatedInvestigation,
@@ -110,15 +133,15 @@ export function ResearchEvidencePanel({
     evidenceId: string,
   ) {
     const updatedInvestigation: ResearchInvestigation =
-      {
-        ...investigation,
-        evidenceIds:
-          investigation.evidenceIds.filter(
-            (id) => id !== evidenceId,
-          ),
-        updatedAt:
-          new Date().toISOString(),
-      };
+    {
+      ...investigation,
+      evidenceIds:
+        investigation.evidenceIds.filter(
+          (id) => id !== evidenceId,
+        ),
+      updatedAt:
+        new Date().toISOString(),
+    };
 
     onInvestigationUpdated?.(
       updatedInvestigation,
@@ -216,7 +239,11 @@ export function ResearchEvidencePanel({
           evidence.map((item) => (
             <article
               key={item.id}
-              className="rounded-2xl border border-white/10 bg-white/[0.02] p-4"
+              data-research-artifact-id={item.id}
+              className={`rounded-2xl border p-4 transition ${focusedArtifactId === item.id
+                  ? "border-cyan-400/60 bg-cyan-500/[0.08] ring-1 ring-cyan-400/30"
+                  : "border-white/10 bg-white/[0.02]"
+                }`}
             >
               <div className="flex items-start justify-between gap-4">
                 <div>

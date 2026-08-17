@@ -10,6 +10,7 @@ import {
   XCircle,
 } from "lucide-react";
 import {
+  useEffect,
   useMemo,
   useState,
 } from "react";
@@ -49,6 +50,8 @@ interface ResearchFindingPanelProps {
   onInvestigationUpdated?: (
     investigation: ResearchInvestigation,
   ) => void;
+
+  focusedArtifactId?: string | null;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -78,7 +81,27 @@ interface AssessmentDraft {
 export function ResearchFindingPanel({
   investigation,
   onInvestigationUpdated,
+  focusedArtifactId,
 }: ResearchFindingPanelProps) {
+  useEffect(() => {
+    if (!focusedArtifactId) {
+      return;
+    }
+
+    const element = document.querySelector(
+      `[data-research-artifact-id="${focusedArtifactId}"]`,
+    );
+
+    if (!element) {
+      return;
+    }
+
+    element.scrollIntoView({
+      behavior: "smooth",
+      block: "center",
+    });
+  }, [focusedArtifactId]);
+
   const [statement, setStatement] =
     useState("");
 
@@ -188,9 +211,9 @@ export function ResearchFindingPanel({
       current.map((item) =>
         item.evidenceId === evidenceId
           ? {
-              ...item,
-              ...patch,
-            }
+            ...item,
+            ...patch,
+          }
           : item,
       ),
     );
@@ -302,9 +325,9 @@ export function ResearchFindingPanel({
           alreadyAttached
             ? investigation.findingIds
             : [
-                ...investigation.findingIds,
-                finding.id,
-              ],
+              ...investigation.findingIds,
+              finding.id,
+            ],
 
         updatedAt: now,
       };
@@ -454,11 +477,10 @@ export function ResearchFindingPanel({
                     key={
                       evidence.id
                     }
-                    className={`rounded-2xl border p-4 transition ${
-                      selected
-                        ? "border-emerald-400/30 bg-emerald-500/[0.04]"
-                        : "border-white/10 bg-black/20"
-                    }`}
+                    className={`rounded-2xl border p-4 transition ${selected
+                      ? "border-emerald-400/30 bg-emerald-500/[0.04]"
+                      : "border-white/10 bg-black/20"
+                      }`}
                   >
                     <div className="flex items-start justify-between gap-4">
                       <div className="min-w-0">
@@ -590,6 +612,10 @@ export function ResearchFindingPanel({
                   finding={
                     finding
                   }
+                  focused={
+                    focusedArtifactId ===
+                    finding.id
+                  }
                   onDelete={() =>
                     removeFinding(
                       finding.id,
@@ -618,6 +644,8 @@ export function ResearchFindingPanel({
 interface FindingCardProps {
   finding: ResearchFinding;
 
+  focused?: boolean;
+
   onDelete: () => void;
 
   onChanged: () => void;
@@ -625,6 +653,7 @@ interface FindingCardProps {
 
 function FindingCard({
   finding,
+  focused,
   onDelete,
   onChanged,
 }: FindingCardProps) {
@@ -687,9 +716,9 @@ function FindingCard({
     latestValidation &&
     (
       latestValidation.status ===
-        "Pending" ||
+      "Pending" ||
       latestValidation.status ===
-        "In Review"
+      "In Review"
     );
 
   function requestValidation() {
@@ -769,14 +798,20 @@ function FindingCard({
 
   const confidenceLabel =
     finding.confidence ===
-    undefined
+      undefined
       ? "Not available"
       : `${Math.round(
-          finding.confidence * 100,
-        )}%`;
+        finding.confidence * 100,
+      )}%`;
 
   return (
-    <article className="rounded-2xl border border-white/10 bg-white/[0.02] p-5">
+    <article
+      data-research-artifact-id={finding.id}
+      className={`rounded-2xl border p-5 transition ${focused
+          ? "border-cyan-400/60 bg-cyan-500/[0.08] ring-1 ring-cyan-400/30"
+          : "border-white/10 bg-white/[0.02]"
+        }`}
+    >
       {/* ------------------------------------------------------------------ */}
       {/* Finding Header                                                     */}
       {/* ------------------------------------------------------------------ */}
@@ -862,11 +897,10 @@ function FindingCard({
         {/* -------------------------------------------------------------- */}
 
         <div
-          className={`mt-4 rounded-2xl border p-4 ${
-            eligibility.eligible
-              ? "border-emerald-400/20 bg-emerald-500/[0.04]"
-              : "border-amber-400/20 bg-amber-500/[0.04]"
-          }`}
+          className={`mt-4 rounded-2xl border p-4 ${eligibility.eligible
+            ? "border-emerald-400/20 bg-emerald-500/[0.04]"
+            : "border-amber-400/20 bg-amber-500/[0.04]"
+            }`}
         >
           <div className="flex items-center gap-2">
             {eligibility.eligible ? (
@@ -926,99 +960,99 @@ function FindingCard({
             <div className="space-y-3">
               {latestValidation.status ===
                 "Pending" && (
-                <button
-                  type="button"
-                  onClick={
-                    moveToReview
-                  }
-                  className="inline-flex items-center rounded-xl border border-violet-400/30 bg-violet-500/10 px-4 py-2.5 text-xs font-semibold text-violet-300 transition hover:bg-violet-500/20"
-                >
-                  <Clock3 className="mr-2 h-4 w-4" />
+                  <button
+                    type="button"
+                    onClick={
+                      moveToReview
+                    }
+                    className="inline-flex items-center rounded-xl border border-violet-400/30 bg-violet-500/10 px-4 py-2.5 text-xs font-semibold text-violet-300 transition hover:bg-violet-500/20"
+                  >
+                    <Clock3 className="mr-2 h-4 w-4" />
 
-                  Begin Review
-                </button>
-              )}
+                    Begin Review
+                  </button>
+                )}
 
               {latestValidation.status ===
                 "In Review" && (
-                <>
-                  <textarea
-                    value={
-                      reviewReason
-                    }
-                    onChange={(
-                      event,
-                    ) =>
-                      setReviewReason(
-                        event.target
-                          .value,
-                      )
-                    }
-                    rows={3}
-                    placeholder="Explain the validation decision..."
-                    className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm leading-6 text-white outline-none placeholder:text-zinc-700 focus:border-cyan-400/40"
-                  />
-
-                  <p className="text-[11px] text-zinc-600">
-                    A rationale is required
-                    for every terminal
-                    validation decision.
-                  </p>
-
-                  <div className="flex flex-wrap gap-2">
-                    <button
-                      type="button"
-                      disabled={
-                        !reviewReason.trim()
+                  <>
+                    <textarea
+                      value={
+                        reviewReason
                       }
-                      onClick={() =>
-                        completeReview(
-                          "Validated",
+                      onChange={(
+                        event,
+                      ) =>
+                        setReviewReason(
+                          event.target
+                            .value,
                         )
                       }
-                      className="inline-flex items-center rounded-xl border border-emerald-400/30 bg-emerald-500/10 px-3 py-2 text-xs font-semibold text-emerald-300 transition hover:bg-emerald-500/20 disabled:cursor-not-allowed disabled:opacity-40"
-                    >
-                      <CheckCircle2 className="mr-1.5 h-4 w-4" />
+                      rows={3}
+                      placeholder="Explain the validation decision..."
+                      className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm leading-6 text-white outline-none placeholder:text-zinc-700 focus:border-cyan-400/40"
+                    />
 
-                      Accept
-                    </button>
+                    <p className="text-[11px] text-zinc-600">
+                      A rationale is required
+                      for every terminal
+                      validation decision.
+                    </p>
 
-                    <button
-                      type="button"
-                      disabled={
-                        !reviewReason.trim()
-                      }
-                      onClick={() =>
-                        completeReview(
-                          "Rejected",
-                        )
-                      }
-                      className="inline-flex items-center rounded-xl border border-red-400/30 bg-red-500/10 px-3 py-2 text-xs font-semibold text-red-300 transition hover:bg-red-500/20 disabled:cursor-not-allowed disabled:opacity-40"
-                    >
-                      <XCircle className="mr-1.5 h-4 w-4" />
+                    <div className="flex flex-wrap gap-2">
+                      <button
+                        type="button"
+                        disabled={
+                          !reviewReason.trim()
+                        }
+                        onClick={() =>
+                          completeReview(
+                            "Validated",
+                          )
+                        }
+                        className="inline-flex items-center rounded-xl border border-emerald-400/30 bg-emerald-500/10 px-3 py-2 text-xs font-semibold text-emerald-300 transition hover:bg-emerald-500/20 disabled:cursor-not-allowed disabled:opacity-40"
+                      >
+                        <CheckCircle2 className="mr-1.5 h-4 w-4" />
 
-                      Reject
-                    </button>
+                        Accept
+                      </button>
 
-                    <button
-                      type="button"
-                      disabled={
-                        !reviewReason.trim()
-                      }
-                      onClick={() =>
-                        completeReview(
-                          "Needs Revision",
-                        )
-                      }
-                      className="inline-flex items-center rounded-xl border border-amber-400/30 bg-amber-500/10 px-3 py-2 text-xs font-semibold text-amber-300 transition hover:bg-amber-500/20 disabled:cursor-not-allowed disabled:opacity-40"
-                    >
-                      <Clock3 className="mr-1.5 h-4 w-4" />
+                      <button
+                        type="button"
+                        disabled={
+                          !reviewReason.trim()
+                        }
+                        onClick={() =>
+                          completeReview(
+                            "Rejected",
+                          )
+                        }
+                        className="inline-flex items-center rounded-xl border border-red-400/30 bg-red-500/10 px-3 py-2 text-xs font-semibold text-red-300 transition hover:bg-red-500/20 disabled:cursor-not-allowed disabled:opacity-40"
+                      >
+                        <XCircle className="mr-1.5 h-4 w-4" />
 
-                      Needs Revision
-                    </button>
-                  </div>
-                </>
-              )}
+                        Reject
+                      </button>
+
+                      <button
+                        type="button"
+                        disabled={
+                          !reviewReason.trim()
+                        }
+                        onClick={() =>
+                          completeReview(
+                            "Needs Revision",
+                          )
+                        }
+                        className="inline-flex items-center rounded-xl border border-amber-400/30 bg-amber-500/10 px-3 py-2 text-xs font-semibold text-amber-300 transition hover:bg-amber-500/20 disabled:cursor-not-allowed disabled:opacity-40"
+                      >
+                        <Clock3 className="mr-1.5 h-4 w-4" />
+
+                        Needs Revision
+                      </button>
+                    </div>
+                  </>
+                )}
             </div>
           ) : (
             <div className="space-y-3">
@@ -1050,39 +1084,39 @@ function FindingCard({
 
               {latestValidation.status ===
                 "Needs Revision" && (
-                <button
-                  type="button"
-                  disabled={
-                    !eligibility.eligible
-                  }
-                  onClick={
-                    requestValidation
-                  }
-                  className="inline-flex items-center rounded-xl border border-cyan-400/30 bg-cyan-500/10 px-4 py-2.5 text-xs font-semibold text-cyan-300 transition hover:bg-cyan-500/20 disabled:cursor-not-allowed disabled:opacity-40"
-                >
-                  <ShieldCheck className="mr-2 h-4 w-4" />
+                  <button
+                    type="button"
+                    disabled={
+                      !eligibility.eligible
+                    }
+                    onClick={
+                      requestValidation
+                    }
+                    className="inline-flex items-center rounded-xl border border-cyan-400/30 bg-cyan-500/10 px-4 py-2.5 text-xs font-semibold text-cyan-300 transition hover:bg-cyan-500/20 disabled:cursor-not-allowed disabled:opacity-40"
+                  >
+                    <ShieldCheck className="mr-2 h-4 w-4" />
 
-                  Start New Validation
-                </button>
-              )}
+                    Start New Validation
+                  </button>
+                )}
 
               {latestValidation.status ===
                 "Rejected" && (
-                <button
-                  type="button"
-                  disabled={
-                    !eligibility.eligible
-                  }
-                  onClick={
-                    requestValidation
-                  }
-                  className="inline-flex items-center rounded-xl border border-cyan-400/30 bg-cyan-500/10 px-4 py-2.5 text-xs font-semibold text-cyan-300 transition hover:bg-cyan-500/20 disabled:cursor-not-allowed disabled:opacity-40"
-                >
-                  <ShieldCheck className="mr-2 h-4 w-4" />
+                  <button
+                    type="button"
+                    disabled={
+                      !eligibility.eligible
+                    }
+                    onClick={
+                      requestValidation
+                    }
+                    className="inline-flex items-center rounded-xl border border-cyan-400/30 bg-cyan-500/10 px-4 py-2.5 text-xs font-semibold text-cyan-300 transition hover:bg-cyan-500/20 disabled:cursor-not-allowed disabled:opacity-40"
+                  >
+                    <ShieldCheck className="mr-2 h-4 w-4" />
 
-                  Re-submit for Validation
-                </button>
-              )}
+                    Re-submit for Validation
+                  </button>
+                )}
             </div>
           )}
         </div>
@@ -1211,7 +1245,7 @@ function ValidationHistory({
   history,
 }: {
   history:
-    ResearchFindingValidationHistoryEvent[];
+  ResearchFindingValidationHistoryEvent[];
 }) {
   return (
     <div className="mt-4 rounded-2xl border border-white/10 bg-black/20 p-4">
@@ -1242,11 +1276,10 @@ function ValidationHistory({
                 </span>
 
                 <span
-                  className={`text-xs font-semibold ${
-                    getHistoryTargetColor(
-                      event.to,
-                    )
-                  }`}
+                  className={`text-xs font-semibold ${getHistoryTargetColor(
+                    event.to,
+                  )
+                    }`}
                 >
                   {event.to}
                 </span>
@@ -1513,7 +1546,7 @@ function resolveLatestValidation(
         (item) =>
           item.id ===
           finding.validationIds[
-            index
+          index
           ],
       );
 

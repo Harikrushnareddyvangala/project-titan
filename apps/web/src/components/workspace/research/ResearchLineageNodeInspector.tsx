@@ -14,6 +14,9 @@ import type {
 
 interface ResearchLineageNodeInspectorProps {
   node: ResearchLineageNode | null;
+  onOpenArtifact?: (
+    node: ResearchLineageNode,
+  ) => void;
 }
 
 function getNodeTypeLabel(
@@ -45,6 +48,7 @@ function getNodeTypeLabel(
 
 export function ResearchLineageNodeInspector({
   node,
+  onOpenArtifact,
 }: ResearchLineageNodeInspectorProps) {
   if (!node) {
     return (
@@ -185,6 +189,15 @@ export function ResearchLineageNodeInspector({
           </div>
         </div>
       ) : null}
+      {onOpenArtifact ? (
+  <button
+    type="button"
+    onClick={() => onOpenArtifact(node)}
+    className="mt-5 inline-flex items-center rounded-xl border border-cyan-400/30 bg-cyan-500/10 px-4 py-2 text-sm font-semibold text-cyan-300 transition hover:border-cyan-400/50 hover:bg-cyan-500/15 hover:text-cyan-200"
+  >
+    Open artifact
+  </button>
+) : null}
 
       <div className="mt-5 rounded-2xl border border-white/10 bg-black/30 p-4">
         <p className="text-xs uppercase tracking-[0.18em] text-zinc-500">
