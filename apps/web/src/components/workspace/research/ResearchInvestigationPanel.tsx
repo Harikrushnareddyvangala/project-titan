@@ -21,6 +21,7 @@ import { ResearchExperimentPanel } from "./ResearchExperimentPanel";
 import { ResearchConclusionPanel } from "./ResearchConclusionPanel";
 import { ResearchProvenanceSummary } from "./ResearchProvenanceSummary";
 import { ResearchProvenanceTimeline } from "./ResearchProvenanceTimeline";
+import { ResearchLineageIntegrity } from "./ResearchLineageIntegrity";
 import { ResearchLineageGraph } from "./ResearchLineageGraph";
 
 const statuses =
@@ -369,6 +370,9 @@ function InvestigationCard({
       />
 
       <ResearchProvenanceTimeline
+        investigationId={investigation.id}
+      />
+      <ResearchLineageIntegrity
         investigationId={investigation.id}
       />
     </article>
