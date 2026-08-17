@@ -306,6 +306,16 @@ function InvestigationCard({
         node.id === selectedLineageNodeId,
     ) ?? null;
 
+  const activeArtifactFocus =
+    artifactFocus &&
+      lineage.nodes.some(
+        (node) =>
+          node.type === artifactFocus.type &&
+          node.id === artifactFocus.id,
+      )
+      ? artifactFocus
+      : null;
+
   const handleOpenLineageArtifact = (
     node: ResearchLineageNode,
   ) => {
@@ -477,8 +487,8 @@ function InvestigationCard({
           onInvestigationUpdated
         }
         focusedArtifactId={
-          artifactFocus?.type === "Experiment"
-            ? artifactFocus.id
+          activeArtifactFocus?.type === "Experiment"
+            ? activeArtifactFocus.id
             : null
         }
       />
@@ -489,8 +499,8 @@ function InvestigationCard({
           onInvestigationUpdated
         }
         focusedArtifactId={
-          artifactFocus?.type === "Evidence"
-            ? artifactFocus.id
+          activeArtifactFocus?.type === "Evidence"
+            ? activeArtifactFocus.id
             : null
         }
       />
@@ -501,8 +511,8 @@ function InvestigationCard({
           onInvestigationUpdated
         }
         focusedArtifactId={
-          artifactFocus?.type === "Finding"
-            ? artifactFocus.id
+          activeArtifactFocus?.type === "Finding"
+            ? activeArtifactFocus.id
             : null
         }
       />
@@ -513,8 +523,8 @@ function InvestigationCard({
           onInvestigationUpdated
         }
         focusedArtifactId={
-          artifactFocus?.type === "Conclusion"
-            ? artifactFocus.id
+          activeArtifactFocus?.type === "Conclusion"
+            ? activeArtifactFocus.id
             : null
         }
       />
