@@ -15,6 +15,10 @@ import type {
   ResearchInvestigation,
 } from "@/types/research";
 
+import {
+  getResearchLineage,
+} from "@/lib/research";
+
 import { ResearchEvidencePanel } from "./ResearchEvidencePanel";
 import { ResearchFindingPanel } from "./ResearchFindingPanel";
 import { ResearchExperimentPanel } from "./ResearchExperimentPanel";
@@ -23,6 +27,7 @@ import { ResearchProvenanceSummary } from "./ResearchProvenanceSummary";
 import { ResearchProvenanceTimeline } from "./ResearchProvenanceTimeline";
 import { ResearchLineageIntegrity } from "./ResearchLineageIntegrity";
 import { ResearchLineageGraph } from "./ResearchLineageGraph";
+import { ResearchLineageNodeInspector } from "./ResearchLineageNodeInspector";
 
 const statuses =
   [
@@ -271,6 +276,15 @@ function InvestigationCard({
 }: InvestigationCardProps) {
   const [selectedLineageNodeId, setSelectedLineageNodeId] =
     useState<string | null>(null);
+
+  const lineage =
+    getResearchLineage(investigation.id);
+
+  const selectedLineageNode =
+    lineage.nodes.find(
+      (node) =>
+        node.id === selectedLineageNodeId,
+    ) ?? null;
   return (
     <article className="rounded-3xl border border-white/10 bg-black/30 p-6">
       <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
@@ -363,14 +377,19 @@ function InvestigationCard({
           onInvestigationUpdated
         }
       />
-      <ResearchProvenanceSummary
-        investigationId={investigation.id}
-      />
 
       <ResearchLineageGraph
         investigationId={investigation.id}
         selectedNodeId={selectedLineageNodeId}
         onNodeSelect={setSelectedLineageNodeId}
+      />
+
+      <ResearchLineageNodeInspector
+        node={selectedLineageNode}
+      />
+
+      <ResearchProvenanceSummary
+        investigationId={investigation.id}
       />
 
       <ResearchProvenanceTimeline
