@@ -2415,10 +2415,12 @@ export function validateResearchLineage(
 
     Supports: [
       ["Evidence", "Finding"],
+      ["Finding", "Conclusion"],
     ],
 
     Contradicts: [
       ["Evidence", "Finding"],
+      ["Finding", "Conclusion"],
     ],
 
     Validates: [
