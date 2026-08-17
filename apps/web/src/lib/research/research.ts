@@ -1620,22 +1620,22 @@ export function getResearchProvenanceTimeline():
       const validation =
         event.entityType === "FindingValidation"
           ? getResearchFindingValidations().find(
-              (item) =>
-                item.id === event.entityId,
-            )
+            (item) =>
+              item.id === event.entityId,
+          )
           : undefined;
 
       const finding =
         validation
           ? getResearchFindings().find(
-              (item) =>
-                item.id === validation.findingId,
-            )
+            (item) =>
+              item.id === validation.findingId,
+          )
           : undefined;
 
       const statusDescription =
         event.fromStatus &&
-        event.toStatus
+          event.toStatus
           ? `${event.fromStatus} → ${event.toStatus}`
           : undefined;
 
@@ -1691,6 +1691,9 @@ export function getResearchProvenanceTimeline():
 
         timestamp:
           event.timestamp,
+
+        metadata:
+          event.metadata,
       };
     },
   );
@@ -1704,14 +1707,14 @@ export function getResearchProvenanceTimelineByInvestigation(
     const validation =
       event.entityType === "FindingValidation"
         ? getResearchFindingValidations().find(
-            (item) => item.id === event.entityId,
-          )
+          (item) => item.id === event.entityId,
+        )
         : undefined;
 
     const finding = validation
       ? getResearchFindings().find(
-          (item) => item.id === validation.findingId,
-        )
+        (item) => item.id === validation.findingId,
+      )
       : undefined;
 
     const statusDescription =
@@ -1756,6 +1759,9 @@ export function getResearchProvenanceTimelineByInvestigation(
       actor: event.actor,
 
       timestamp: event.timestamp,
+
+      metadata:
+        event.metadata,
     };
   });
 }
@@ -1777,15 +1783,15 @@ export function getResearchProvenanceInvestigationSummary(
     events.filter(
       (event) =>
         event.entityType ===
-          "FindingValidation" ||
+        "FindingValidation" ||
         event.eventType ===
-          "Validated" ||
+        "Validated" ||
         event.eventType ===
-          "Rejected" ||
+        "Rejected" ||
         event.eventType ===
-          "RevisionRequested" ||
+        "RevisionRequested" ||
         event.eventType ===
-          "Accepted",
+        "Accepted",
     ).length;
 
   const statusChangeEventCount =

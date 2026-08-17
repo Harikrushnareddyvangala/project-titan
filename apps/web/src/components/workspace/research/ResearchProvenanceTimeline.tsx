@@ -133,6 +133,9 @@ export function ResearchProvenanceTimeline({
     useState<ProvenanceTimelineFilter>(
       "All",
     );
+
+  const [expandedEventId, setExpandedEventId] =
+    useState<string | null>(null);
   const timeline =
     useSyncExternalStore(
       subscribeToResearch,
@@ -366,6 +369,131 @@ export function ResearchProvenanceTimeline({
                       <p className="mt-4 border-t border-white/10 pt-4 text-sm leading-6 text-zinc-500">
                         {item.reason}
                       </p>
+                    ) : null}
+
+                    <div className="mt-5 border-t border-white/10 pt-4">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setExpandedEventId(
+                            expandedEventId === item.eventId
+                              ? null
+                              : item.eventId,
+                          )
+                        }
+                        className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-300 transition hover:text-cyan-200"
+                      >
+                        {expandedEventId === item.eventId
+                          ? "Hide event details"
+                          : "View event details"}
+                      </button>
+                    </div>
+
+                    {expandedEventId === item.eventId ? (
+                      <div className="mt-4 rounded-2xl border border-white/10 bg-black/40 p-5">
+                        <div className="grid gap-4 md:grid-cols-2">
+                          <div>
+                            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-zinc-500">
+                              Event ID
+                            </p>
+
+                            <p className="mt-2 break-all font-mono text-xs text-zinc-300">
+                              {item.eventId}
+                            </p>
+                          </div>
+
+                          <div>
+                            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-zinc-500">
+                              Investigation ID
+                            </p>
+
+                            <p className="mt-2 break-all font-mono text-xs text-zinc-300">
+                              {item.investigationId}
+                            </p>
+                          </div>
+
+                          <div>
+                            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-zinc-500">
+                              Entity Type
+                            </p>
+
+                            <p className="mt-2 text-sm text-zinc-300">
+                              {item.entityType}
+                            </p>
+                          </div>
+
+                          <div>
+                            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-zinc-500">
+                              Entity ID
+                            </p>
+
+                            <p className="mt-2 break-all font-mono text-xs text-zinc-300">
+                              {item.entityId}
+                            </p>
+                          </div>
+
+                          <div>
+                            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-zinc-500">
+                              Event Type
+                            </p>
+
+                            <p className="mt-2 text-sm text-cyan-300">
+                              {item.eventType}
+                            </p>
+                          </div>
+
+                          <div>
+                            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-zinc-500">
+                              Timestamp
+                            </p>
+
+                            <p className="mt-2 text-sm text-zinc-300">
+                              {formatTimestamp(item.timestamp)}
+                            </p>
+                          </div>
+
+                          {item.actor ? (
+                            <div>
+                              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-zinc-500">
+                                Actor
+                              </p>
+
+                              <p className="mt-2 text-sm text-zinc-300">
+                                {item.actor}
+                              </p>
+                            </div>
+                          ) : null}
+
+                          {item.validationId ? (
+                            <div>
+                              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-zinc-500">
+                                Validation ID
+                              </p>
+
+                              <p className="mt-2 break-all font-mono text-xs text-zinc-300">
+                                {item.validationId}
+                              </p>
+                            </div>
+                          ) : null}
+                        </div>
+
+                        {item.metadata &&
+                        Object.keys(item.metadata).length > 0 ? (
+                          <div className="mt-5 border-t border-white/10 pt-5">
+                            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-zinc-500">
+                              Metadata
+                            </p>
+
+                            <pre className="mt-3 overflow-x-auto rounded-xl border border-white/10 bg-black/50 p-4 font-mono text-xs leading-6 text-zinc-300">
+                              {JSON.stringify(
+                                item.metadata,
+                                null,
+                                2,
+                              )}
+                            </pre>
+                          </div>
+                        ) : null}
+                      </div>
                     ) : null}
                     <div className="mt-4 border-t border-white/10 pt-4">
                       <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-zinc-600">

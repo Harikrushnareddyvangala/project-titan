@@ -451,6 +451,8 @@ export interface ResearchProvenanceTimelineItem {
   actor?: string;
 
   timestamp: string;
+
+  metadata?: Record<string, unknown>;
 }
 
 export interface ResearchProvenanceInvestigationSummary {
