@@ -269,6 +269,8 @@ function InvestigationCard({
   onStatusChange,
   onInvestigationUpdated,
 }: InvestigationCardProps) {
+  const [selectedLineageNodeId, setSelectedLineageNodeId] =
+    useState<string | null>(null);
   return (
     <article className="rounded-3xl border border-white/10 bg-black/30 p-6">
       <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
@@ -367,6 +369,8 @@ function InvestigationCard({
 
       <ResearchLineageGraph
         investigationId={investigation.id}
+        selectedNodeId={selectedLineageNodeId}
+        onNodeSelect={setSelectedLineageNodeId}
       />
 
       <ResearchProvenanceTimeline
