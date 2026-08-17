@@ -2589,6 +2589,48 @@ export function validateResearchLineage(
     }
   }
 
+    for (const edge of lineage.edges) {
+    if (
+      edge.type !== "Supports" &&
+      edge.type !== "Contradicts"
+    ) {
+      continue;
+    }
+
+    const target =
+      nodeById.get(
+        edge.targetId,
+      );
+
+    if (
+      target?.type !==
+      "Conclusion"
+    ) {
+      continue;
+    }
+
+    const source =
+      nodeById.get(
+        edge.sourceId,
+      );
+
+    if (
+      source?.type !==
+      "Finding"
+    ) {
+      addIssue({
+        investigationId,
+        code:
+          "CONCLUSION_FINDING_REFERENCE_INVALID",
+        message:
+          `Conclusion ${edge.targetId} references ${edge.sourceId}, which is not a Finding node.`,
+        edgeId: edge.id,
+        sourceId: edge.sourceId,
+        targetId: edge.targetId,
+      });
+    }
+  }
+
   const provenanceResult =
     validateResearchProvenanceIntegrity();
 
