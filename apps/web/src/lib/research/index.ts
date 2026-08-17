@@ -42,4 +42,5 @@ export {
   validateResearchProvenanceIntegrity,
   getResearchProvenanceIntegritySummary,
   getResearchProvenanceInvestigationSummary,
+  getResearchLineage,
 } from "./research";

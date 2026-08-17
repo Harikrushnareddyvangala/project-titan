@@ -476,3 +476,63 @@ export interface ResearchProvenanceInvestigationSummary {
 
   valid: boolean;
 }
+export type ResearchLineageNodeType =
+  | "Investigation"
+  | "Experiment"
+  | "Evidence"
+  | "Finding"
+  | "FindingValidation"
+  | "Conclusion";
+
+export type ResearchLineageEdgeType =
+  | "Contains"
+  | "Produces"
+  | "Supports"
+  | "Contradicts"
+  | "Validates";
+
+export interface ResearchLineageNode {
+  id: string;
+
+  type: ResearchLineageNodeType;
+
+  title: string;
+
+  description?: string;
+
+  status?: string;
+
+  investigationId: string;
+
+  provenanceEventCount: number;
+
+  valid: boolean;
+
+  issueCount: number;
+
+  missingLinks: string[];
+}
+
+export interface ResearchLineageEdge {
+  id: string;
+
+  sourceId: string;
+
+  targetId: string;
+
+  type: ResearchLineageEdgeType;
+
+  label: string;
+}
+
+export interface ResearchLineage {
+  investigationId: string;
+
+  nodes: ResearchLineageNode[];
+
+  edges: ResearchLineageEdge[];
+
+  valid: boolean;
+
+  issueCount: number;
+}
