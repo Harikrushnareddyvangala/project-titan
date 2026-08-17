@@ -388,10 +388,21 @@ function InvestigationCard({
           return;
         }
 
+        const finding =
+          getResearchFindings().find(
+            (item) =>
+              item.id === validation.findingId,
+          );
+
+        if (!finding) {
+          return;
+        }
+
         setArtifactFocus({
-          type: "FindingValidation",
-          id: node.id,
+          type: "Finding",
+          id: finding.id,
         });
+
         break;
       }
 
