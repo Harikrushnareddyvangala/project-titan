@@ -23,6 +23,8 @@ import type {
 
 interface ResearchLineageGraphProps {
   investigationId: string;
+  selectedNodeId?: string | null;
+  onNodeSelect?: (nodeId: string | null) => void;
 }
 
 const EMPTY_LINEAGE = {
@@ -255,6 +257,8 @@ function EdgeRow({
 
 export function ResearchLineageGraph({
   investigationId,
+  selectedNodeId,
+  onNodeSelect,
 }: ResearchLineageGraphProps) {
   const lineage =
     useSyncExternalStore(
@@ -263,13 +267,26 @@ export function ResearchLineageGraph({
       () => EMPTY_LINEAGE,
     );
 
-  const [selectedNodeId, setSelectedNodeId] =
+  const [internalSelectedNodeId, setInternalSelectedNodeId] =
     useState<string | null>(null);
+
+  const activeSelectedNodeId =
+    selectedNodeId !== undefined
+      ? selectedNodeId
+      : internalSelectedNodeId;
+
+  const selectNode = (nodeId: string | null) => {
+    if (selectedNodeId === undefined) {
+      setInternalSelectedNodeId(nodeId);
+    }
+
+    onNodeSelect?.(nodeId);
+  };
 
   const selectedNode =
     lineage.nodes.find(
       (node) =>
-        node.id === selectedNodeId,
+        node.id === activeSelectedNodeId,
     );
 
   const nodeGroups =
@@ -400,11 +417,11 @@ export function ResearchLineageGraph({
                         key={node.id}
                         node={node}
                         selected={
-                          selectedNodeId ===
+                          activeSelectedNodeId ===
                           node.id
                         }
                         onSelect={() =>
-                          setSelectedNodeId(
+                          selectNode(
                             node.id,
                           )
                         }
@@ -463,7 +480,7 @@ export function ResearchLineageGraph({
                 <button
                   type="button"
                   onClick={() =>
-                    setSelectedNodeId(null)
+                    selectNode(null)
                   }
                   className="text-xs text-zinc-500 transition hover:text-white"
                 >
