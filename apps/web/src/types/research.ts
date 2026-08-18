@@ -544,6 +544,12 @@ export type ResearchLineageIntegrityCategory =
   | "Scope"
   | "Reference"
   | "Provenance";
+
+export type ResearchLineageIntegrityPriority =
+  | "Critical"
+  | "High"
+  | "Medium"
+  | "Low";
   
 export interface ResearchLineageIntegrityIssue {
   investigationId: string;

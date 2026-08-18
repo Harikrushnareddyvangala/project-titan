@@ -28,6 +28,7 @@ import type {
   ResearchLineageIntegrityIssue,
   ResearchLineageIntegrityResult,
   ResearchLineageIntegrityCategory,
+  ResearchLineageIntegrityPriority,
 } from "@/types/research";
 
 import {
@@ -2394,6 +2395,45 @@ export function getResearchLineageIntegrityCategory(
   }
 
   return "Reference";
+}
+
+export function getResearchLineageIntegrityPriority(
+  code: string,
+): ResearchLineageIntegrityPriority {
+  if (
+    code === "INVESTIGATION_NOT_FOUND" ||
+    code === "CROSS_INVESTIGATION_EDGE"
+  ) {
+    return "Critical";
+  }
+
+  if (
+    code === "SOURCE_NODE_NOT_FOUND" ||
+    code === "TARGET_NODE_NOT_FOUND" ||
+    code === "INVALID_EDGE_DIRECTION" ||
+    code === "SELF_REFERENTIAL_EDGE" ||
+    code ===
+      "CONCLUSION_FINDING_REFERENCE_INVALID"
+  ) {
+    return "High";
+  }
+
+  if (
+    code === "NODE_INVESTIGATION_MISMATCH" ||
+    code === "INVALID_NODE" ||
+    code === "NODE_ISSUES_PRESENT" ||
+    code === "DUPLICATE_EDGE"
+  ) {
+    return "Medium";
+  }
+
+  if (
+    code.startsWith("PROVENANCE_")
+  ) {
+    return "Low";
+  }
+
+  return "Medium";
 }
 
 export function validateResearchLineage(

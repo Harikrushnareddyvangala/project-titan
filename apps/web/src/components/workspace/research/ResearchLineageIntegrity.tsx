@@ -16,6 +16,7 @@ import {
 
 import {
   getResearchLineageIntegrityCategory,
+  getResearchLineageIntegrityPriority,
   subscribeToResearch,
   validateResearchLineage,
 } from "@/lib/research";
@@ -23,6 +24,7 @@ import {
 import type {
   ResearchLineageIntegrityCategory,
   ResearchLineageIntegrityIssue,
+  ResearchLineageIntegrityPriority,
   ResearchLineageIntegrityResult,
 } from "@/types/research";
 
@@ -94,6 +96,11 @@ function IssueCard({
   issue: ResearchLineageIntegrityIssue;
   onSelectNode?: (nodeId: string | null) => void;
 }) {
+  const priority =
+    getResearchLineageIntegrityPriority(
+      issue.code,
+    );
+
   const targetNodeId =
     issue.nodeId ??
     (
@@ -117,9 +124,25 @@ function IssueCard({
 
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
-            <p className="text-xs font-bold uppercase tracking-[0.18em] text-amber-300">
-              {issue.code}
-            </p>
+            <div className="flex flex-wrap items-center gap-2">
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-amber-300">
+                {issue.code}
+              </p>
+
+              <span
+                className={
+                  priority === "Critical"
+                    ? "rounded-full border border-red-400/30 bg-red-500/10 px-2 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-red-300"
+                    : priority === "High"
+                      ? "rounded-full border border-orange-400/30 bg-orange-500/10 px-2 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-orange-300"
+                      : priority === "Medium"
+                        ? "rounded-full border border-amber-400/30 bg-amber-500/10 px-2 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-amber-300"
+                        : "rounded-full border border-zinc-400/20 bg-zinc-500/10 px-2 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-zinc-400"
+                }
+              >
+                {priority}
+              </span>
+            </div>
 
             <span className="rounded-full border border-white/10 bg-white/[0.03] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-zinc-500">
               {category}
