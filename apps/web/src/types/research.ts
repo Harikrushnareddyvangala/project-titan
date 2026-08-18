@@ -558,6 +558,12 @@ export interface ResearchLineageIntegrityPrioritySummary {
   low: number;
   highestPriority: ResearchLineageIntegrityPriority | null;
 }
+
+export type ResearchLineageIntegrityAssessment =
+  | "Healthy"
+  | "Attention"
+  | "Degraded"
+  | "Critical";
 export interface ResearchLineageIntegrityIssue {
   investigationId: string;
 

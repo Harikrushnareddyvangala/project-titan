@@ -15,6 +15,7 @@ import {
 } from "react";
 
 import {
+  getResearchLineageIntegrityAssessment,
   getResearchLineageIntegrityCategory,
   getResearchLineageIntegrityPriority,
   getResearchLineageIntegrityPrioritySummary,
@@ -240,6 +241,11 @@ export function ResearchLineageIntegrity({
       [result.issues],
     );
 
+  const assessment =
+    getResearchLineageIntegrityAssessment(
+      prioritySummary,
+    );
+
   const priorityCounts = {
     Critical: prioritySummary.critical,
     High: prioritySummary.high,
@@ -312,14 +318,14 @@ export function ResearchLineageIntegrity({
         .sort(
           (a, b) =>
             priorityRank[
-              getResearchLineageIntegrityPriority(
-                a.code,
-              )
+            getResearchLineageIntegrityPriority(
+              a.code,
+            )
             ] -
             priorityRank[
-              getResearchLineageIntegrityPriority(
-                b.code,
-              )
+            getResearchLineageIntegrityPriority(
+              b.code,
+            )
             ],
         );
     }, [
@@ -417,6 +423,17 @@ export function ResearchLineageIntegrity({
 
           <span className="text-sm font-bold text-white">
             {prioritySummary.highestPriority ?? "None"}
+          </span>
+        </div>
+      </div>
+      <div className="mt-4 rounded-2xl border border-white/10 bg-black/20 px-4 py-3">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <span className="text-xs font-semibold uppercase tracking-[0.18em] text-zinc-500">
+            Assessment
+          </span>
+
+          <span className="text-sm font-bold text-white">
+            {assessment}
           </span>
         </div>
       </div>

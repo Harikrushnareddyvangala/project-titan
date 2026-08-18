@@ -30,6 +30,7 @@ import type {
   ResearchLineageIntegrityCategory,
   ResearchLineageIntegrityPriority,
   ResearchLineageIntegrityPrioritySummary,
+  ResearchLineageIntegrityAssessment,
 } from "@/types/research";
 
 import {
@@ -2484,6 +2485,24 @@ export function getResearchLineageIntegrityPrioritySummary(
   }
 
   return summary;
+}
+
+export function getResearchLineageIntegrityAssessment(
+  summary: ResearchLineageIntegrityPrioritySummary,
+): ResearchLineageIntegrityAssessment {
+  if (summary.critical > 0) {
+    return "Critical";
+  }
+
+  if (summary.high > 0) {
+    return "Degraded";
+  }
+
+  if (summary.medium > 0) {
+    return "Attention";
+  }
+
+  return "Healthy";
 }
 
 export function validateResearchLineage(
