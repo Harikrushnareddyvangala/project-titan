@@ -16,6 +16,7 @@ import {
 
 import {
   getResearchLineageIntegrityAssessment,
+  getResearchLineageIntegrityAssessmentExplanation,
   getResearchLineageIntegrityCategory,
   getResearchLineageIntegrityPriority,
   getResearchLineageIntegrityPrioritySummary,
@@ -246,6 +247,11 @@ export function ResearchLineageIntegrity({
       prioritySummary,
     );
 
+  const assessmentExplanation =
+    getResearchLineageIntegrityAssessmentExplanation(
+      prioritySummary,
+    );
+
   const priorityCounts = {
     Critical: prioritySummary.critical,
     High: prioritySummary.high,
@@ -426,7 +432,7 @@ export function ResearchLineageIntegrity({
           </span>
         </div>
       </div>
-      <div className="mt-4 rounded-2xl border border-white/10 bg-black/20 px-4 py-3">
+      <div className="mt-4 rounded-2xl border border-white/10 bg-black/20 px-4 py-4">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <span className="text-xs font-semibold uppercase tracking-[0.18em] text-zinc-500">
             Assessment
@@ -435,6 +441,25 @@ export function ResearchLineageIntegrity({
           <span className="text-sm font-bold text-white">
             {assessment}
           </span>
+        </div>
+
+        <div className="mt-3">
+          <p className="text-sm font-semibold text-zinc-200">
+            {assessmentExplanation.title}
+          </p>
+
+          <p className="mt-2 text-sm leading-6 text-zinc-500">
+            {assessmentExplanation.description}
+          </p>
+
+          <div className="mt-3 rounded-xl border border-cyan-400/10 bg-cyan-500/[0.04] px-3 py-2">
+            <p className="text-xs leading-5 text-cyan-200/80">
+              <span className="font-semibold">
+                Recommended action:
+              </span>{" "}
+              {assessmentExplanation.recommendation}
+            </p>
+          </div>
         </div>
       </div>
       {result.issues.length > 0 ? (

@@ -564,6 +564,12 @@ export type ResearchLineageIntegrityAssessment =
   | "Attention"
   | "Degraded"
   | "Critical";
+export interface ResearchLineageIntegrityAssessmentExplanation {
+  assessment: ResearchLineageIntegrityAssessment;
+  title: string;
+  description: string;
+  recommendation: string;
+}
 export interface ResearchLineageIntegrityIssue {
   investigationId: string;
 

@@ -31,6 +31,7 @@ import type {
   ResearchLineageIntegrityPriority,
   ResearchLineageIntegrityPrioritySummary,
   ResearchLineageIntegrityAssessment,
+  ResearchLineageIntegrityAssessmentExplanation,
 } from "@/types/research";
 
 import {
@@ -2505,6 +2506,56 @@ export function getResearchLineageIntegrityAssessment(
   return "Healthy";
 }
 
+export function getResearchLineageIntegrityAssessmentExplanation(
+  summary: ResearchLineageIntegrityPrioritySummary,
+): ResearchLineageIntegrityAssessmentExplanation {
+  const assessment =
+    getResearchLineageIntegrityAssessment(
+      summary,
+    );
+
+  switch (assessment) {
+    case "Critical":
+      return {
+        assessment,
+        title: "Critical integrity risk",
+        description:
+          "Critical lineage integrity findings indicate that the investigation graph cannot currently be treated as trustworthy.",
+        recommendation:
+          "Resolve critical lineage integrity findings before relying on the investigation conclusion.",
+      };
+
+    case "Degraded":
+      return {
+        assessment,
+        title: "Degraded integrity",
+        description:
+          "High-priority lineage integrity findings require investigation before the lineage can be considered fully reliable.",
+        recommendation:
+          "Investigate and resolve high-priority lineage integrity findings.",
+      };
+
+    case "Attention":
+      return {
+        assessment,
+        title: "Integrity requires attention",
+        description:
+          "Medium-priority lineage integrity findings are present and may affect the reliability or completeness of the research graph.",
+        recommendation:
+          "Review the medium-priority findings and resolve them where appropriate.",
+      };
+
+    case "Healthy":
+      return {
+        assessment,
+        title: "Healthy lineage integrity",
+        description:
+          "No critical, high, or medium-priority lineage integrity findings are currently present.",
+        recommendation:
+          "Continue monitoring lineage integrity as the investigation evolves.",
+      };
+  }
+}
 export function validateResearchLineage(
   investigationId: string,
 ): ResearchLineageIntegrityResult {
