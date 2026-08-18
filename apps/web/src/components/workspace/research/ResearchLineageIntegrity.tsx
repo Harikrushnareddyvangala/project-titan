@@ -10,11 +10,13 @@ import {
 import { useSyncExternalStore } from "react";
 
 import {
+  getResearchLineageIntegrityCategory,
   subscribeToResearch,
   validateResearchLineage,
 } from "@/lib/research";
 
 import type {
+  ResearchLineageIntegrityCategory,
   ResearchLineageIntegrityIssue,
   ResearchLineageIntegrityResult,
 } from "@/types/research";
@@ -97,15 +99,27 @@ function IssueCard({
           : issue.sourceId ?? issue.targetId
     ) ??
     null;
+
+  const category:
+    ResearchLineageIntegrityCategory =
+    getResearchLineageIntegrityCategory(
+      issue.code,
+    );
   return (
     <div className="rounded-2xl border border-amber-400/20 bg-amber-500/[0.05] p-4">
       <div className="flex items-start gap-3">
         <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-300" />
 
         <div className="min-w-0">
-          <p className="text-xs font-bold uppercase tracking-[0.18em] text-amber-300">
-            {issue.code}
-          </p>
+          <div className="flex flex-wrap items-center gap-2">
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-amber-300">
+              {issue.code}
+            </p>
+
+            <span className="rounded-full border border-white/10 bg-white/[0.03] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-zinc-500">
+              {category}
+            </span>
+          </div>
 
           <p className="mt-2 text-sm leading-6 text-zinc-300">
             {issue.message}
@@ -216,11 +230,10 @@ export function ResearchLineageIntegrity({
 
           {result.valid
             ? "Lineage Valid"
-            : `${result.issueCount} Issue${
-                result.issueCount === 1
-                  ? ""
-                  : "s"
-              } Detected`}
+            : `${result.issueCount} Issue${result.issueCount === 1
+              ? ""
+              : "s"
+            } Detected`}
         </div>
       </div>
 
