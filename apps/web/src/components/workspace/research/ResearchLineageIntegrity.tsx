@@ -272,32 +272,56 @@ export function ResearchLineageIntegrity({
 
   const visibleIssues =
     useMemo(() => {
-      return result.issues.filter(
-        (issue) => {
-          const category =
-            getResearchLineageIntegrityCategory(
-              issue.code,
+      const priorityRank: Record<
+        ResearchLineageIntegrityPriority,
+        number
+      > = {
+        Critical: 0,
+        High: 1,
+        Medium: 2,
+        Low: 3,
+      };
+
+      return result.issues
+        .filter(
+          (issue) => {
+            const category =
+              getResearchLineageIntegrityCategory(
+                issue.code,
+              );
+
+            const priority =
+              getResearchLineageIntegrityPriority(
+                issue.code,
+              );
+
+            const categoryMatches =
+              activeCategory === "All" ||
+              category === activeCategory;
+
+            const priorityMatches =
+              activePriority === "All" ||
+              priority === activePriority;
+
+            return (
+              categoryMatches &&
+              priorityMatches
             );
-
-          const priority =
-            getResearchLineageIntegrityPriority(
-              issue.code,
-            );
-
-          const categoryMatches =
-            activeCategory === "All" ||
-            category === activeCategory;
-
-          const priorityMatches =
-            activePriority === "All" ||
-            priority === activePriority;
-
-          return (
-            categoryMatches &&
-            priorityMatches
-          );
-        },
-      );
+          },
+        )
+        .sort(
+          (a, b) =>
+            priorityRank[
+              getResearchLineageIntegrityPriority(
+                a.code,
+              )
+            ] -
+            priorityRank[
+              getResearchLineageIntegrityPriority(
+                b.code,
+              )
+            ],
+        );
     }, [
       activeCategory,
       activePriority,
