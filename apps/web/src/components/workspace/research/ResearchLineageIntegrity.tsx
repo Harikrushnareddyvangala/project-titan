@@ -7,7 +7,12 @@ import {
   Activity,
   ArrowUpRight,
 } from "lucide-react";
-import { useSyncExternalStore } from "react";
+
+import {
+  useMemo,
+  useState,
+  useSyncExternalStore,
+} from "react";
 
 import {
   getResearchLineageIntegrityCategory,
@@ -192,6 +197,50 @@ export function ResearchLineageIntegrity({
       ),
       () => EMPTY_RESULT,
     );
+  const [activeCategory, setActiveCategory] =
+    useState<ResearchLineageIntegrityCategory | "All">(
+      "All",
+    );
+
+  const categoryCounts =
+    useMemo(() => {
+      const counts =
+        new Map<
+          ResearchLineageIntegrityCategory,
+          number
+        >();
+
+      for (const issue of result.issues) {
+        const category =
+          getResearchLineageIntegrityCategory(
+            issue.code,
+          );
+
+        counts.set(
+          category,
+          (counts.get(category) ?? 0) + 1,
+        );
+      }
+
+      return counts;
+    }, [result.issues]);
+
+  const visibleIssues =
+    useMemo(() => {
+      if (activeCategory === "All") {
+        return result.issues;
+      }
+
+      return result.issues.filter(
+        (issue) =>
+          getResearchLineageIntegrityCategory(
+            issue.code,
+          ) === activeCategory,
+      );
+    }, [
+      activeCategory,
+      result.issues,
+    ]);
 
   return (
     <section className="mt-6 rounded-3xl border border-white/10 bg-white/[0.03] p-6">
@@ -255,7 +304,7 @@ export function ResearchLineageIntegrity({
       </div>
 
       {result.issues.length > 0 ? (
-        <div className="mt-6 space-y-3">
+        <div className="mt-6 space-y-4">
           <div className="flex items-center gap-2">
             <Activity className="h-4 w-4 text-amber-300" />
 
@@ -264,7 +313,67 @@ export function ResearchLineageIntegrity({
             </p>
           </div>
 
-          {result.issues.map(
+          <div className="flex flex-wrap gap-2">
+            {(
+              [
+                "All",
+                "Investigation",
+                "Node",
+                "Edge",
+                "Scope",
+                "Reference",
+                "Provenance",
+              ] as const
+            ).map((category) => {
+              const count =
+                category === "All"
+                  ? result.issues.length
+                  : categoryCounts.get(
+                    category,
+                  ) ?? 0;
+
+              if (
+                category !== "All" &&
+                count === 0
+              ) {
+                return null;
+              }
+
+              const active =
+                activeCategory === category;
+
+              return (
+                <button
+                  key={category}
+                  type="button"
+                  onClick={() =>
+                    setActiveCategory(
+                      category,
+                    )
+                  }
+                  className={
+                    active
+                      ? "rounded-full border border-cyan-400/40 bg-cyan-500/15 px-3 py-1.5 text-xs font-semibold text-cyan-300"
+                      : "rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-xs font-semibold text-zinc-500 transition hover:border-white/20 hover:text-zinc-300"
+                  }
+                >
+                  {category}
+                  <span className="ml-2 text-zinc-600">
+                    {count}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+          <div className="flex items-center gap-2">
+            <Activity className="h-4 w-4 text-amber-300" />
+
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">
+              Integrity Findings
+            </p>
+          </div>
+
+          {visibleIssues.map(
             (issue, index) => (
               <IssueCard
                 key={`${issue.code}-${issue.nodeId ?? issue.edgeId ?? index}`}
@@ -273,6 +382,14 @@ export function ResearchLineageIntegrity({
               />
             ),
           )}
+          {visibleIssues.length === 0 ? (
+            <div className="rounded-2xl border border-white/10 bg-black/20 p-5">
+              <p className="text-sm text-zinc-500">
+                No integrity findings exist in this
+                category.
+              </p>
+            </div>
+          ) : null}
         </div>
       ) : (
         <div className="mt-6 rounded-2xl border border-emerald-400/20 bg-emerald-500/[0.05] p-5">
