@@ -226,6 +226,11 @@ export function ResearchLineageIntegrity({
       "All",
     );
 
+  const [activePriority, setActivePriority] =
+    useState<ResearchLineageIntegrityPriority | "All">(
+      "All",
+    );
+
   const prioritySummary =
     useMemo(
       () =>
@@ -234,6 +239,13 @@ export function ResearchLineageIntegrity({
         ),
       [result.issues],
     );
+
+  const priorityCounts = {
+    Critical: prioritySummary.critical,
+    High: prioritySummary.high,
+    Medium: prioritySummary.medium,
+    Low: prioritySummary.low,
+  };
 
   const categoryCounts =
     useMemo(() => {
@@ -260,18 +272,35 @@ export function ResearchLineageIntegrity({
 
   const visibleIssues =
     useMemo(() => {
-      if (activeCategory === "All") {
-        return result.issues;
-      }
-
       return result.issues.filter(
-        (issue) =>
-          getResearchLineageIntegrityCategory(
-            issue.code,
-          ) === activeCategory,
+        (issue) => {
+          const category =
+            getResearchLineageIntegrityCategory(
+              issue.code,
+            );
+
+          const priority =
+            getResearchLineageIntegrityPriority(
+              issue.code,
+            );
+
+          const categoryMatches =
+            activeCategory === "All" ||
+            category === activeCategory;
+
+          const priorityMatches =
+            activePriority === "All" ||
+            priority === activePriority;
+
+          return (
+            categoryMatches &&
+            priorityMatches
+          );
+        },
       );
     }, [
       activeCategory,
+      activePriority,
       result.issues,
     ]);
 
@@ -429,6 +458,54 @@ export function ResearchLineageIntegrity({
               );
             })}
           </div>
+          <div className="flex flex-wrap gap-2">
+            {(
+              [
+                "All",
+                "Critical",
+                "High",
+                "Medium",
+                "Low",
+              ] as const
+            ).map((priority) => {
+              const count =
+                priority === "All"
+                  ? result.issues.length
+                  : priorityCounts[priority];
+
+              if (
+                priority !== "All" &&
+                count === 0
+              ) {
+                return null;
+              }
+
+              const active =
+                activePriority === priority;
+
+              return (
+                <button
+                  key={priority}
+                  type="button"
+                  onClick={() =>
+                    setActivePriority(
+                      priority,
+                    )
+                  }
+                  className={
+                    active
+                      ? "rounded-full border border-cyan-400/40 bg-cyan-500/15 px-3 py-1.5 text-xs font-semibold text-cyan-300"
+                      : "rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-xs font-semibold text-zinc-500 transition hover:border-white/20 hover:text-zinc-300"
+                  }
+                >
+                  {priority}
+                  <span className="ml-2 text-zinc-600">
+                    {count}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
           <div className="flex items-center gap-2">
             <Activity className="h-4 w-4 text-amber-300" />
 
@@ -449,8 +526,8 @@ export function ResearchLineageIntegrity({
           {visibleIssues.length === 0 ? (
             <div className="rounded-2xl border border-white/10 bg-black/20 p-5">
               <p className="text-sm text-zinc-500">
-                No integrity findings exist in this
-                category.
+                No integrity findings match the
+                selected filters.
               </p>
             </div>
           ) : null}
