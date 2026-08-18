@@ -537,6 +537,14 @@ export interface ResearchLineage {
   issueCount: number;
 }
 
+export type ResearchLineageIntegrityCategory =
+  | "Investigation"
+  | "Node"
+  | "Edge"
+  | "Scope"
+  | "Reference"
+  | "Provenance";
+  
 export interface ResearchLineageIntegrityIssue {
   investigationId: string;
 

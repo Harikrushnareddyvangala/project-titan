@@ -27,6 +27,7 @@ import type {
   ResearchLineageNodeType,
   ResearchLineageIntegrityIssue,
   ResearchLineageIntegrityResult,
+  ResearchLineageIntegrityCategory,
 } from "@/types/research";
 
 import {
@@ -2344,6 +2345,55 @@ export function getLatestResearchProvenanceEvent(
         ? event
         : latest,
   );
+}
+
+export function getResearchLineageIntegrityCategory(
+  code: string,
+): ResearchLineageIntegrityCategory {
+  if (
+    code === "INVESTIGATION_NOT_FOUND"
+  ) {
+    return "Investigation";
+  }
+
+  if (
+    code === "NODE_INVESTIGATION_MISMATCH" ||
+    code === "INVALID_NODE" ||
+    code === "NODE_ISSUES_PRESENT"
+  ) {
+    return "Node";
+  }
+
+  if (
+    code === "DUPLICATE_EDGE" ||
+    code === "SOURCE_NODE_NOT_FOUND" ||
+    code === "TARGET_NODE_NOT_FOUND" ||
+    code === "INVALID_EDGE_DIRECTION" ||
+    code === "SELF_REFERENTIAL_EDGE"
+  ) {
+    return "Edge";
+  }
+
+  if (
+    code === "CROSS_INVESTIGATION_EDGE"
+  ) {
+    return "Scope";
+  }
+
+  if (
+    code ===
+    "CONCLUSION_FINDING_REFERENCE_INVALID"
+  ) {
+    return "Reference";
+  }
+
+  if (
+    code.startsWith("PROVENANCE_")
+  ) {
+    return "Provenance";
+  }
+
+  return "Reference";
 }
 
 export function validateResearchLineage(
