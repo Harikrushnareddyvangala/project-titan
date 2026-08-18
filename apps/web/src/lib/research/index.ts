@@ -47,4 +47,5 @@ export {
   validateResearchLineageForInvestigation,
   getResearchLineageIntegrityCategory,
   getResearchLineageIntegrityPriority,
+  getResearchLineageIntegrityPrioritySummary,
 } from "./research";

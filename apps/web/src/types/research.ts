@@ -550,7 +550,14 @@ export type ResearchLineageIntegrityPriority =
   | "High"
   | "Medium"
   | "Low";
-  
+
+export interface ResearchLineageIntegrityPrioritySummary {
+  critical: number;
+  high: number;
+  medium: number;
+  low: number;
+  highestPriority: ResearchLineageIntegrityPriority | null;
+}
 export interface ResearchLineageIntegrityIssue {
   investigationId: string;
 

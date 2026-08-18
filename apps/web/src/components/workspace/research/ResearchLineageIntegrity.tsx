@@ -17,6 +17,7 @@ import {
 import {
   getResearchLineageIntegrityCategory,
   getResearchLineageIntegrityPriority,
+  getResearchLineageIntegrityPrioritySummary,
   subscribeToResearch,
   validateResearchLineage,
 } from "@/lib/research";
@@ -225,6 +226,15 @@ export function ResearchLineageIntegrity({
       "All",
     );
 
+  const prioritySummary =
+    useMemo(
+      () =>
+        getResearchLineageIntegrityPrioritySummary(
+          result.issues,
+        ),
+      [result.issues],
+    );
+
   const categoryCounts =
     useMemo(() => {
       const counts =
@@ -325,7 +335,38 @@ export function ResearchLineageIntegrity({
           value={result.issueCount}
         />
       </div>
+      <div className="mt-4 grid gap-3 sm:grid-cols-4">
+        <Metric
+          label="Critical"
+          value={prioritySummary.critical}
+        />
 
+        <Metric
+          label="High"
+          value={prioritySummary.high}
+        />
+
+        <Metric
+          label="Medium"
+          value={prioritySummary.medium}
+        />
+
+        <Metric
+          label="Low"
+          value={prioritySummary.low}
+        />
+      </div>
+      <div className="mt-4 rounded-2xl border border-white/10 bg-black/20 px-4 py-3">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <span className="text-xs font-semibold uppercase tracking-[0.18em] text-zinc-500">
+            Highest Priority
+          </span>
+
+          <span className="text-sm font-bold text-white">
+            {prioritySummary.highestPriority ?? "None"}
+          </span>
+        </div>
+      </div>
       {result.issues.length > 0 ? (
         <div className="mt-6 space-y-4">
           <div className="flex items-center gap-2">

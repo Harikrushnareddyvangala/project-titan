@@ -29,6 +29,7 @@ import type {
   ResearchLineageIntegrityResult,
   ResearchLineageIntegrityCategory,
   ResearchLineageIntegrityPriority,
+  ResearchLineageIntegrityPrioritySummary,
 } from "@/types/research";
 
 import {
@@ -2434,6 +2435,55 @@ export function getResearchLineageIntegrityPriority(
   }
 
   return "Medium";
+}
+
+export function getResearchLineageIntegrityPrioritySummary(
+  issues: ResearchLineageIntegrityIssue[],
+): ResearchLineageIntegrityPrioritySummary {
+  const summary: ResearchLineageIntegrityPrioritySummary = {
+    critical: 0,
+    high: 0,
+    medium: 0,
+    low: 0,
+    highestPriority: null,
+  };
+
+  for (const issue of issues) {
+    const priority =
+      getResearchLineageIntegrityPriority(
+        issue.code,
+      );
+
+    switch (priority) {
+      case "Critical":
+        summary.critical += 1;
+        break;
+
+      case "High":
+        summary.high += 1;
+        break;
+
+      case "Medium":
+        summary.medium += 1;
+        break;
+
+      case "Low":
+        summary.low += 1;
+        break;
+    }
+  }
+
+  if (summary.critical > 0) {
+    summary.highestPriority = "Critical";
+  } else if (summary.high > 0) {
+    summary.highestPriority = "High";
+  } else if (summary.medium > 0) {
+    summary.highestPriority = "Medium";
+  } else if (summary.low > 0) {
+    summary.highestPriority = "Low";
+  }
+
+  return summary;
 }
 
 export function validateResearchLineage(
