@@ -592,6 +592,20 @@ export interface ResearchLineageIntegrityIssueExplanation {
   recommendation: string;
 }
 
+export type ResearchLineageIntegrityAction =
+  | "Inspect"
+  | "RepairReference"
+  | "RepairScope"
+  | "RepairRelationship"
+  | "ReviewProvenance";
+
+export interface ResearchLineageIntegrityIssueAction {
+  action: ResearchLineageIntegrityAction;
+  label: string;
+  description: string;
+  requiresConfirmation: boolean;
+}
+
 export interface ResearchLineageIntegrityResult {
   investigationId: string;
 

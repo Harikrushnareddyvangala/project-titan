@@ -15,6 +15,7 @@ import {
 } from "react";
 
 import {
+  getResearchLineageIntegrityIssueAction,
   getResearchLineageIntegrityIssueExplanation,
   getResearchLineageIntegrityAssessment,
   getResearchLineageIntegrityAssessmentExplanation,
@@ -110,6 +111,11 @@ function IssueCard({
       issue.code,
     );
 
+  const action =
+    getResearchLineageIntegrityIssueAction(
+      issue.code,
+    );
+
   const targetNodeId =
     issue.nodeId ??
     (
@@ -177,6 +183,27 @@ function IssueCard({
               </span>{" "}
               {explanation.recommendation}
             </p>
+            <div className="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-white/10 bg-white/[0.02] px-3 py-2">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-zinc-500">
+                  Next action
+                </p>
+
+                <p className="mt-1 text-xs text-zinc-400">
+                  {action.description}
+                </p>
+              </div>
+
+              <button
+                type="button"
+                disabled
+                title="Remediation workflow will be connected in a later research-system increment."
+                className="inline-flex cursor-not-allowed items-center rounded-lg border border-cyan-400/20 bg-cyan-500/10 px-3 py-2 text-xs font-semibold text-cyan-300 opacity-70"
+              >
+                {action.label}
+                {action.requiresConfirmation ? " · Confirmation required" : ""}
+              </button>
+            </div>
           </div>
 
           {issue.nodeId ? (

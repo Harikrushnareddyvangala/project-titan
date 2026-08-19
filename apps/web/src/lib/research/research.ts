@@ -33,6 +33,7 @@ import type {
   ResearchLineageIntegrityAssessment,
   ResearchLineageIntegrityAssessmentExplanation,
   ResearchLineageIntegrityIssueExplanation,
+  ResearchLineageIntegrityIssueAction,
 } from "@/types/research";
 
 import {
@@ -2681,6 +2682,75 @@ export function getResearchLineageIntegrityIssueExplanation(
       };
   }
 }
+
+export function getResearchLineageIntegrityIssueAction(
+  code: string,
+): ResearchLineageIntegrityIssueAction {
+  switch (code) {
+    case "INVESTIGATION_NOT_FOUND":
+    case "SOURCE_NODE_NOT_FOUND":
+    case "TARGET_NODE_NOT_FOUND":
+    case "CONCLUSION_FINDING_REFERENCE_INVALID":
+      return {
+        action: "RepairReference",
+        label: "Repair reference",
+        description:
+          "Inspect and repair the unresolved research reference.",
+        requiresConfirmation: true,
+      };
+
+    case "NODE_INVESTIGATION_MISMATCH":
+    case "CROSS_INVESTIGATION_EDGE":
+      return {
+        action: "RepairScope",
+        label: "Repair scope",
+        description:
+          "Inspect the investigation ownership and correct the lineage scope.",
+        requiresConfirmation: true,
+      };
+
+    case "DUPLICATE_EDGE":
+    case "INVALID_EDGE_DIRECTION":
+    case "SELF_REFERENTIAL_EDGE":
+      return {
+        action: "RepairRelationship",
+        label: "Repair relationship",
+        description:
+          "Inspect the lineage relationship and correct the invalid edge.",
+        requiresConfirmation: true,
+      };
+
+    case "INVALID_NODE":
+    case "NODE_ISSUES_PRESENT":
+      return {
+        action: "Inspect",
+        label: "Inspect node",
+        description:
+          "Inspect the underlying research record before making a repair.",
+        requiresConfirmation: false,
+      };
+
+    default:
+      if (code.startsWith("PROVENANCE_")) {
+        return {
+          action: "ReviewProvenance",
+          label: "Review provenance",
+          description:
+            "Inspect the associated provenance record and its lineage history.",
+          requiresConfirmation: false,
+        };
+      }
+
+      return {
+        action: "Inspect",
+        label: "Inspect finding",
+        description:
+          "Inspect the associated lineage records before taking corrective action.",
+        requiresConfirmation: false,
+      };
+  }
+}
+
 export function validateResearchLineage(
   investigationId: string,
 ): ResearchLineageIntegrityResult {
