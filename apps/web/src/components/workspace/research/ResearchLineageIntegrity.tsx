@@ -113,7 +113,7 @@ function IssueCard({
 
   const action =
     getResearchLineageIntegrityIssueAction(
-      issue.code,
+      issue,
     );
 
   const targetNodeId =

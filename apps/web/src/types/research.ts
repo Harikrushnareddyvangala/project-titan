@@ -604,6 +604,14 @@ export interface ResearchLineageIntegrityIssueAction {
   label: string;
   description: string;
   requiresConfirmation: boolean;
+  target: ResearchLineageIntegrityActionTarget;
+}
+
+export interface ResearchLineageIntegrityActionTarget {
+  nodeId?: string;
+  edgeId?: string;
+  sourceId?: string;
+  targetId?: string;
 }
 
 export interface ResearchLineageIntegrityResult {

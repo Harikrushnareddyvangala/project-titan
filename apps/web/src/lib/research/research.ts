@@ -2684,8 +2684,16 @@ export function getResearchLineageIntegrityIssueExplanation(
 }
 
 export function getResearchLineageIntegrityIssueAction(
-  code: string,
+  issue: ResearchLineageIntegrityIssue,
 ): ResearchLineageIntegrityIssueAction {
+  const code = issue.code;
+
+  const target = {
+    nodeId: issue.nodeId,
+    edgeId: issue.edgeId,
+    sourceId: issue.sourceId,
+    targetId: issue.targetId,
+  };
   switch (code) {
     case "INVESTIGATION_NOT_FOUND":
     case "SOURCE_NODE_NOT_FOUND":
@@ -2697,6 +2705,7 @@ export function getResearchLineageIntegrityIssueAction(
         description:
           "Inspect and repair the unresolved research reference.",
         requiresConfirmation: true,
+        target,
       };
 
     case "NODE_INVESTIGATION_MISMATCH":
@@ -2707,6 +2716,7 @@ export function getResearchLineageIntegrityIssueAction(
         description:
           "Inspect the investigation ownership and correct the lineage scope.",
         requiresConfirmation: true,
+        target,
       };
 
     case "DUPLICATE_EDGE":
@@ -2718,6 +2728,7 @@ export function getResearchLineageIntegrityIssueAction(
         description:
           "Inspect the lineage relationship and correct the invalid edge.",
         requiresConfirmation: true,
+        target,
       };
 
     case "INVALID_NODE":
@@ -2728,6 +2739,7 @@ export function getResearchLineageIntegrityIssueAction(
         description:
           "Inspect the underlying research record before making a repair.",
         requiresConfirmation: false,
+        target,
       };
 
     default:
@@ -2738,6 +2750,7 @@ export function getResearchLineageIntegrityIssueAction(
           description:
             "Inspect the associated provenance record and its lineage history.",
           requiresConfirmation: false,
+          target,
         };
       }
 
@@ -2747,6 +2760,7 @@ export function getResearchLineageIntegrityIssueAction(
         description:
           "Inspect the associated lineage records before taking corrective action.",
         requiresConfirmation: false,
+        target,
       };
   }
 }
