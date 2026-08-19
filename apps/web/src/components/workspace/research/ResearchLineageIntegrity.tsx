@@ -196,12 +196,20 @@ function IssueCard({
 
               <button
                 type="button"
-                disabled
-                title="Remediation workflow will be connected in a later research-system increment."
-                className="inline-flex cursor-not-allowed items-center rounded-lg border border-cyan-400/20 bg-cyan-500/10 px-3 py-2 text-xs font-semibold text-cyan-300 opacity-70"
+                onClick={() => {
+                  if (targetNodeId && onSelectNode) {
+                    onSelectNode(targetNodeId);
+                  }
+                }}
+                disabled={!targetNodeId || !onSelectNode}
+                className="inline-flex items-center rounded-lg border border-cyan-400/20 bg-cyan-500/10 px-3 py-2 text-xs font-semibold text-cyan-300 transition hover:border-cyan-400/40 hover:bg-cyan-500/15 disabled:cursor-not-allowed disabled:opacity-40"
               >
-                {action.label}
-                {action.requiresConfirmation ? " · Confirmation required" : ""}
+                {targetNodeId
+                  ? action.label
+                  : "No target available"}
+                {targetNodeId && action.requiresConfirmation
+                  ? " · Confirmation required"
+                  : ""}
               </button>
             </div>
           </div>
