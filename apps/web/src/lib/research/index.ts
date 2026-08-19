@@ -50,4 +50,5 @@ export {
   getResearchLineageIntegrityPrioritySummary,
   getResearchLineageIntegrityAssessment,
   getResearchLineageIntegrityAssessmentExplanation,
+  getResearchLineageIntegrityIssueExplanation,
 } from "./research";

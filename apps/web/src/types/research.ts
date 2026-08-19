@@ -586,6 +586,12 @@ export interface ResearchLineageIntegrityIssue {
   targetId?: string;
 }
 
+export interface ResearchLineageIntegrityIssueExplanation {
+  title: string;
+  description: string;
+  recommendation: string;
+}
+
 export interface ResearchLineageIntegrityResult {
   investigationId: string;
 

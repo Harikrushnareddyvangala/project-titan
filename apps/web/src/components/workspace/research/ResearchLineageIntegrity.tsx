@@ -15,6 +15,7 @@ import {
 } from "react";
 
 import {
+  getResearchLineageIntegrityIssueExplanation,
   getResearchLineageIntegrityAssessment,
   getResearchLineageIntegrityAssessmentExplanation,
   getResearchLineageIntegrityCategory,
@@ -104,6 +105,11 @@ function IssueCard({
       issue.code,
     );
 
+  const explanation =
+    getResearchLineageIntegrityIssueExplanation(
+      issue.code,
+    );
+
   const targetNodeId =
     issue.nodeId ??
     (
@@ -155,6 +161,23 @@ function IssueCard({
           <p className="mt-2 text-sm leading-6 text-zinc-300">
             {issue.message}
           </p>
+
+          <div className="mt-3 rounded-xl border border-white/10 bg-black/20 px-3 py-3">
+            <p className="text-sm font-semibold text-zinc-200">
+              {explanation.title}
+            </p>
+
+            <p className="mt-2 text-xs leading-5 text-zinc-500">
+              {explanation.description}
+            </p>
+
+            <p className="mt-2 text-xs leading-5 text-cyan-200/80">
+              <span className="font-semibold">
+                Recommended action:
+              </span>{" "}
+              {explanation.recommendation}
+            </p>
+          </div>
 
           {issue.nodeId ? (
             <p className="mt-2 break-all font-mono text-xs text-zinc-600">
