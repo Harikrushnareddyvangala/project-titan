@@ -15,10 +15,12 @@ import {
 } from "react";
 
 import {
+  getResearchLineage,
   getResearchLineageIntegrityIssueAction,
   getResearchLineageIntegrityIssueExplanation,
   getResearchLineageIntegrityAssessment,
   getResearchLineageIntegrityAssessmentExplanation,
+  getResearchLineageIntegrityInspectionNodeId,
   getResearchLineageIntegrityCategory,
   getResearchLineageIntegrityPriority,
   getResearchLineageIntegrityPrioritySummary,
@@ -27,6 +29,7 @@ import {
 } from "@/lib/research";
 
 import type {
+  ResearchLineage,
   ResearchLineageIntegrityCategory,
   ResearchLineageIntegrityIssue,
   ResearchLineageIntegrityPriority,
@@ -96,9 +99,11 @@ function getSnapshot(
 
 function IssueCard({
   issue,
+  lineage,
   onSelectNode,
 }: {
   issue: ResearchLineageIntegrityIssue;
+  lineage: ResearchLineage;
   onSelectNode?: (nodeId: string | null) => void;
 }) {
   const priority =
@@ -116,16 +121,11 @@ function IssueCard({
       issue,
     );
 
-  const targetNodeId =
-    issue.nodeId ??
-    (
-      issue.code === "SOURCE_NODE_NOT_FOUND"
-        ? issue.targetId
-        : issue.code === "TARGET_NODE_NOT_FOUND"
-          ? issue.sourceId
-          : issue.sourceId ?? issue.targetId
-    ) ??
-    null;
+  const inspectionNodeId =
+    getResearchLineageIntegrityInspectionNodeId(
+      issue,
+      lineage,
+    );
 
   const category:
     ResearchLineageIntegrityCategory =
@@ -197,17 +197,17 @@ function IssueCard({
               <button
                 type="button"
                 onClick={() => {
-                  if (targetNodeId && onSelectNode) {
-                    onSelectNode(targetNodeId);
+                  if (inspectionNodeId && onSelectNode) {
+                    onSelectNode(inspectionNodeId);
                   }
                 }}
-                disabled={!targetNodeId || !onSelectNode}
+                disabled={!inspectionNodeId || !onSelectNode}
                 className="inline-flex items-center rounded-lg border border-cyan-400/20 bg-cyan-500/10 px-3 py-2 text-xs font-semibold text-cyan-300 transition hover:border-cyan-400/40 hover:bg-cyan-500/15 disabled:cursor-not-allowed disabled:opacity-40"
               >
-                {targetNodeId
+                {inspectionNodeId
                   ? action.label
                   : "No target available"}
-                {targetNodeId && action.requiresConfirmation
+                {inspectionNodeId && action.requiresConfirmation
                   ? " · Confirmation required"
                   : ""}
               </button>
@@ -233,10 +233,10 @@ function IssueCard({
             </p>
           ) : null}
 
-          {targetNodeId && onSelectNode ? (
+          {inspectionNodeId && onSelectNode ? (
             <button
               type="button"
-              onClick={() => onSelectNode(targetNodeId)}
+              onClick={() => onSelectNode(inspectionNodeId)}
               className="mt-4 inline-flex items-center rounded-xl border border-cyan-400/20 bg-cyan-500/10 px-3 py-2 text-xs font-semibold text-cyan-300 transition hover:border-cyan-400/40 hover:bg-cyan-500/15"
             >
               <ArrowUpRight className="mr-2 h-3.5 w-3.5" />
@@ -281,6 +281,11 @@ export function ResearchLineageIntegrity({
       ),
       () => EMPTY_RESULT,
     );
+
+  const lineage = getResearchLineage(
+    investigationId,
+  );
+
   const [activeCategory, setActiveCategory] =
     useState<ResearchLineageIntegrityCategory | "All">(
       "All",
@@ -643,6 +648,7 @@ export function ResearchLineageIntegrity({
               <IssueCard
                 key={`${issue.code}-${issue.nodeId ?? issue.edgeId ?? index}`}
                 issue={issue}
+                lineage={lineage}
                 onSelectNode={onSelectNode}
               />
             ),

@@ -2765,6 +2765,75 @@ export function getResearchLineageIntegrityIssueAction(
   }
 }
 
+export function getResearchLineageIntegrityInspectionNodeId(
+  issue: ResearchLineageIntegrityIssue,
+  lineage: ResearchLineage,
+): string | null {
+  if (issue.nodeId) {
+    return (
+      lineage.nodes.some(
+        (node) => node.id === issue.nodeId,
+      )
+        ? issue.nodeId
+        : null
+    );
+  }
+
+  if (issue.sourceId) {
+    const sourceExists =
+      lineage.nodes.some(
+        (node) => node.id === issue.sourceId,
+      );
+
+    if (sourceExists) {
+      return issue.sourceId;
+    }
+  }
+
+  if (issue.targetId) {
+    const targetExists =
+      lineage.nodes.some(
+        (node) => node.id === issue.targetId,
+      );
+
+    if (targetExists) {
+      return issue.targetId;
+    }
+  }
+
+  if (issue.edgeId) {
+    const edge =
+      lineage.edges.find(
+        (candidate) =>
+          candidate.id === issue.edgeId,
+      );
+
+    if (edge) {
+      const sourceExists =
+        lineage.nodes.some(
+          (node) =>
+            node.id === edge.sourceId,
+        );
+
+      if (sourceExists) {
+        return edge.sourceId;
+      }
+
+      const targetExists =
+        lineage.nodes.some(
+          (node) =>
+            node.id === edge.targetId,
+        );
+
+      if (targetExists) {
+        return edge.targetId;
+      }
+    }
+  }
+
+  return null;
+}
+
 export function validateResearchLineage(
   investigationId: string,
 ): ResearchLineageIntegrityResult {
