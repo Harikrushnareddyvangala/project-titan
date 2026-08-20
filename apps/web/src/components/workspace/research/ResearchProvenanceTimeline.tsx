@@ -21,6 +21,7 @@ import type {
 } from "@/types/research";
 
 import {
+  useEffect,
   useMemo,
   useSyncExternalStore,
   useState,
@@ -117,6 +118,7 @@ function getResearchProvenanceTimelineSnapshot(
 }
 interface ResearchProvenanceTimelineProps {
   investigationId?: string;
+  focusedEventId?: string | null;
 }
 
 type ProvenanceTimelineFilter =
@@ -128,6 +130,7 @@ type ProvenanceTimelineFilter =
 
 export function ResearchProvenanceTimeline({
   investigationId,
+  focusedEventId,
 }: ResearchProvenanceTimelineProps) {
   const [filter, setFilter] =
     useState<ProvenanceTimelineFilter>(
@@ -136,6 +139,25 @@ export function ResearchProvenanceTimeline({
 
   const [expandedEventId, setExpandedEventId] =
     useState<string | null>(null);
+  useEffect(() => {
+    if (!focusedEventId) {
+      return;
+    }
+
+    const element =
+      document.querySelector(
+        `[data-research-provenance-event-id="${focusedEventId}"]`,
+      );
+
+    if (!element) {
+      return;
+    }
+
+    element.scrollIntoView({
+      behavior: "smooth",
+      block: "center",
+    });
+  }, [focusedEventId]);
   const timeline =
     useSyncExternalStore(
       subscribeToResearch,
@@ -293,7 +315,12 @@ export function ResearchProvenanceTimeline({
               return (
                 <article
                   key={item.eventId}
-                  className="relative pl-12"
+                  data-research-provenance-event-id={item.eventId}
+                  className={
+                    item.eventId === focusedEventId
+                      ? "relative rounded-2xl bg-cyan-500/[0.05] pl-12 ring-1 ring-cyan-400/30"
+                      : "relative pl-12"
+                  }
                 >
                   <div className="absolute left-0 top-0 flex h-9 w-9 items-center justify-center rounded-full border border-cyan-400/30 bg-zinc-950">
                     <Icon className="h-4 w-4 text-cyan-300" />
@@ -478,7 +505,7 @@ export function ResearchProvenanceTimeline({
                         </div>
 
                         {item.metadata &&
-                        Object.keys(item.metadata).length > 0 ? (
+                          Object.keys(item.metadata).length > 0 ? (
                           <div className="mt-5 border-t border-white/10 pt-5">
                             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-zinc-500">
                               Metadata

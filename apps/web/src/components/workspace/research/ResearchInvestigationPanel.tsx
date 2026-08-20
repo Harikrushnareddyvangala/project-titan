@@ -305,6 +305,9 @@ function InvestigationCard({
   const [selectedLineageNodeId, setSelectedLineageNodeId] =
     useState<string | null>(null);
 
+  const [provenanceInspectionEventId, setProvenanceInspectionEventId] =
+  useState<string | null>(null);
+
   const [lineageInspectionContext, setLineageInspectionContext] =
     useState<ResearchLineageInspectionContext | null>(null);
 
@@ -325,6 +328,7 @@ function InvestigationCard({
   ) => {
     setSelectedLineageNodeId(nodeId);
     setLineageInspectionContext(null);
+    setProvenanceInspectionEventId(null);
 
     if (nodeId !== selectedLineageNodeId) {
       setArtifactFocus(null);
@@ -343,6 +347,7 @@ function InvestigationCard({
       }
         : null,
     );
+    setProvenanceInspectionEventId(null);
 
     if (nodeId !== selectedLineageNodeId) {
       setArtifactFocus(null);
@@ -639,6 +644,7 @@ function InvestigationCard({
 
       <ResearchProvenanceTimeline
         investigationId={investigation.id}
+        focusedEventId={provenanceInspectionEventId}
       />
       <ResearchLineageIntegrity
         investigationId={investigation.id}

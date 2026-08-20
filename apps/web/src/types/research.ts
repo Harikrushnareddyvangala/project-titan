@@ -584,6 +584,8 @@ export interface ResearchLineageIntegrityIssue {
   sourceId?: string;
 
   targetId?: string;
+
+  provenanceEventId?: string;
 }
 
 export interface ResearchLineageIntegrityIssueExplanation {

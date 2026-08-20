@@ -3144,6 +3144,8 @@ export function validateResearchLineage(
         `PROVENANCE_${issue.code}`,
       message:
         `Underlying provenance issue ${issue.code}: ${issue.message}`,
+      provenanceEventId:
+        issue.eventId,
     });
   }
 
