@@ -17,7 +17,16 @@ import type {
 interface ResearchLineageNodeInspectorProps {
   node: ResearchLineageNode | null;
 
-  inspectionContext?: string | null;
+  inspectionContext?: {
+  source: "Integrity";
+  action:
+    | "Inspect"
+    | "RepairReference"
+    | "RepairScope"
+    | "RepairRelationship"
+    | "ReviewProvenance";
+  label: string;
+} | null;
 
   onOpenArtifact?: (
     node: ResearchLineageNode,
@@ -109,7 +118,7 @@ export function ResearchLineageNodeInspector({
               <ShieldAlert className="mr-2 h-3.5 w-3.5 text-amber-300" />
 
               <span className="text-xs font-semibold text-amber-200">
-                {inspectionContext}
+                {inspectionContext.label}
               </span>
             </div>
           ) : null}

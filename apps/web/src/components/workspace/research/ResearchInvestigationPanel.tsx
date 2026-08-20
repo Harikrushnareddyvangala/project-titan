@@ -46,6 +46,17 @@ type ResearchArtifactFocus = {
   id: string;
 };
 
+type ResearchLineageInspectionContext = {
+  source: "Integrity";
+  action:
+  | "Inspect"
+  | "RepairReference"
+  | "RepairScope"
+  | "RepairRelationship"
+  | "ReviewProvenance";
+  label: string;
+};
+
 const statuses =
   [
     "Draft",
@@ -295,7 +306,7 @@ function InvestigationCard({
     useState<string | null>(null);
 
   const [lineageInspectionContext, setLineageInspectionContext] =
-    useState<string | null>(null);
+    useState<ResearchLineageInspectionContext | null>(null);
 
   const [artifactFocus, setArtifactFocus] =
     useState<ResearchArtifactFocus | null>(null);
@@ -325,7 +336,12 @@ function InvestigationCard({
   ) => {
     setSelectedLineageNodeId(nodeId);
     setLineageInspectionContext(
-      nodeId ? "Integrity finding" : null,
+      nodeId ? {
+        source: "Integrity",
+        action: "Inspect",
+        label: "Integrity finding",
+      }
+        : null,
     );
 
     if (nodeId !== selectedLineageNodeId) {
