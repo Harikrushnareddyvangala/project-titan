@@ -167,9 +167,26 @@ export function ResearchProvenanceTimeline({
         ),
       () => EMPTY_PROVENANCE_TIMELINE,
     );
+
+  const focusedEventExists = useMemo(
+    () =>
+      focusedEventId
+        ? timeline.some(
+          (item) =>
+            item.eventId === focusedEventId,
+        )
+        : false,
+    [focusedEventId, timeline],
+  );
+
+  const effectiveFilter =
+    focusedEventId && focusedEventExists
+      ? "All"
+      : filter;
+
   const filteredTimeline =
     useMemo(() => {
-      switch (filter) {
+      switch (effectiveFilter) {
         case "StatusChanged":
           return timeline.filter(
             (item) =>
@@ -226,7 +243,7 @@ export function ResearchProvenanceTimeline({
         default:
           return timeline;
       }
-    }, [filter, timeline]);
+    }, [effectiveFilter, timeline]);
 
   return (
     <section className="mt-10 rounded-[34px] border border-white/10 bg-white/[0.04] p-8 backdrop-blur-3xl">
@@ -293,6 +310,13 @@ export function ResearchProvenanceTimeline({
         })}
       </div>
 
+      {focusedEventId &&
+        focusedEventExists &&
+        filter !== "All" ? (
+        <div className="mt-4 rounded-xl border border-cyan-400/20 bg-cyan-500/[0.05] px-3 py-2 text-xs text-cyan-200">
+          Showing all provenance events to reveal the selected integrity finding.
+        </div>
+      ) : null}
       {filteredTimeline.length === 0 ? (
         <div className="mt-8 rounded-2xl border border-dashed border-white/10 bg-black/20 p-8 text-center">
           <p className="text-zinc-400">
