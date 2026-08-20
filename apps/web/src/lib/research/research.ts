@@ -2705,6 +2705,7 @@ export function getResearchLineageIntegrityIssueAction(
         description:
           "Inspect and repair the unresolved research reference.",
         requiresConfirmation: true,
+        readiness: "Planned",
         target,
       };
 
@@ -2716,6 +2717,7 @@ export function getResearchLineageIntegrityIssueAction(
         description:
           "Inspect the investigation ownership and correct the lineage scope.",
         requiresConfirmation: true,
+        readiness: "Planned",
         target,
       };
 
@@ -2728,6 +2730,7 @@ export function getResearchLineageIntegrityIssueAction(
         description:
           "Inspect the lineage relationship and correct the invalid edge.",
         requiresConfirmation: true,
+        readiness: "Planned",
         target,
       };
 
@@ -2739,6 +2742,7 @@ export function getResearchLineageIntegrityIssueAction(
         description:
           "Inspect the underlying research record before making a repair.",
         requiresConfirmation: false,
+        readiness: "Ready",
         target,
       };
 
@@ -2750,6 +2754,7 @@ export function getResearchLineageIntegrityIssueAction(
           description:
             "Inspect the associated provenance record and its lineage history.",
           requiresConfirmation: false,
+          readiness: "Ready",
           target,
         };
       }
@@ -2760,6 +2765,7 @@ export function getResearchLineageIntegrityIssueAction(
         description:
           "Inspect the associated lineage records before taking corrective action.",
         requiresConfirmation: false,
+        readiness: "Ready",
         target,
       };
   }

@@ -599,11 +599,16 @@ export type ResearchLineageIntegrityAction =
   | "RepairRelationship"
   | "ReviewProvenance";
 
+export type ResearchLineageIntegrityActionReadiness =
+  | "Ready"
+  | "Planned";
+
 export interface ResearchLineageIntegrityIssueAction {
   action: ResearchLineageIntegrityAction;
   label: string;
   description: string;
   requiresConfirmation: boolean;
+  readiness: ResearchLineageIntegrityActionReadiness;
   target: ResearchLineageIntegrityActionTarget;
 }
 

@@ -192,6 +192,18 @@ function IssueCard({
                 <p className="mt-1 text-xs text-zinc-400">
                   {action.description}
                 </p>
+
+                <p
+                  className={
+                    action.readiness === "Ready"
+                      ? "mt-1 text-[10px] font-bold uppercase tracking-[0.14em] text-emerald-300"
+                      : "mt-1 text-[10px] font-bold uppercase tracking-[0.14em] text-amber-300"
+                  }
+                >
+                  {action.readiness === "Ready"
+                    ? "Ready"
+                    : "Planned remediation"}
+                </p>
               </div>
 
               <button
