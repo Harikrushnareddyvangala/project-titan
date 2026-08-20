@@ -317,6 +317,12 @@ export function ResearchProvenanceTimeline({
           Showing all provenance events to reveal the selected integrity finding.
         </div>
       ) : null}
+      {focusedEventId &&
+        focusedEventExists ? (
+        <div className="mt-4 rounded-xl border border-amber-400/20 bg-amber-500/[0.05] px-3 py-2 text-xs text-amber-200">
+          This provenance event was selected from a lineage integrity finding.
+        </div>
+      ) : null}
       {filteredTimeline.length === 0 ? (
         <div className="mt-8 rounded-2xl border border-dashed border-white/10 bg-black/20 p-8 text-center">
           <p className="text-zinc-400">
