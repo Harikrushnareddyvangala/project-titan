@@ -36,6 +36,7 @@ import type {
   ResearchLineageIntegrityIssueAction,
   ResearchLineageIntegrityRemediationRequest,
   ResearchLineageIntegrityRemediationPlan,
+  ResearchLineageIntegrityRemediationResult,
   ResearchLineageIntegrityRemediationPreview,
 } from "@/types/research";
 
@@ -2833,6 +2834,51 @@ export function createResearchLineageIntegrityRemediationPlan(
 
     description:
       `Proposed ${request.action} remediation for ${request.issueCode}.`,
+  };
+}
+
+export function executeResearchLineageIntegrityRemediation(
+  plan: ResearchLineageIntegrityRemediationPlan,
+): ResearchLineageIntegrityRemediationResult {
+  if (!plan.confirmed) {
+    return {
+      investigationId: plan.investigationId,
+      action: plan.action,
+      issueCode: plan.issueCode,
+      status: "Rejected",
+      executed: false,
+      message:
+        "Remediation execution requires explicit confirmation.",
+      plan,
+    };
+  }
+
+  if (
+    plan.action !== "RepairReference" &&
+    plan.action !== "RepairScope" &&
+    plan.action !== "RepairRelationship"
+  ) {
+    return {
+      investigationId: plan.investigationId,
+      action: plan.action,
+      issueCode: plan.issueCode,
+      status: "Rejected",
+      executed: false,
+      message:
+        `Remediation action ${plan.action} is not executable.`,
+      plan,
+    };
+  }
+
+  return {
+    investigationId: plan.investigationId,
+    action: plan.action,
+    issueCode: plan.issueCode,
+    status: "Planned",
+    executed: false,
+    message:
+      `Remediation action ${plan.action} has passed the execution boundary but no data mutation has been implemented yet.`,
+    plan,
   };
 }
 
