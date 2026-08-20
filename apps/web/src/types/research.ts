@@ -636,6 +636,15 @@ export interface ResearchLineageIntegrityRemediationRequest {
   confirmed: boolean;
 }
 
+export interface ResearchLineageIntegrityRemediationPreview {
+  title: string;
+  description: string;
+  action: ResearchLineageIntegrityAction;
+  issueCode: string;
+  target: ResearchLineageIntegrityActionTarget;
+  requiresConfirmation: boolean;
+}
+
 export interface ResearchLineageIntegrityResult {
   investigationId: string;
 

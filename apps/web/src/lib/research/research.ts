@@ -35,6 +35,7 @@ import type {
   ResearchLineageIntegrityIssueExplanation,
   ResearchLineageIntegrityIssueAction,
   ResearchLineageIntegrityRemediationRequest,
+  ResearchLineageIntegrityRemediationPreview,
 } from "@/types/research";
 
 import {
@@ -2795,6 +2796,31 @@ export function createResearchLineageIntegrityRemediationRequest(
     issueCode: issue.code,
     target: action.target,
     confirmed,
+  };
+}
+
+export function getResearchLineageIntegrityRemediationPreview(
+  issue: ResearchLineageIntegrityIssue,
+): ResearchLineageIntegrityRemediationPreview | null {
+  const action =
+    getResearchLineageIntegrityIssueAction(issue);
+
+  if (
+    action.action === "Inspect" ||
+    action.action === "ReviewProvenance"
+  ) {
+    return null;
+  }
+
+  return {
+    title: `Proposed ${action.label.toLowerCase()}`,
+    description:
+      `This action would address ${issue.code} using the proposed ${action.action} remediation. No research data will be changed until confirmation is explicitly provided.`,
+    action: action.action,
+    issueCode: issue.code,
+    target: action.target,
+    requiresConfirmation:
+      action.requiresConfirmation,
   };
 }
 

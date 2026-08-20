@@ -24,6 +24,7 @@ import {
   getResearchLineageIntegrityCategory,
   getResearchLineageIntegrityPriority,
   getResearchLineageIntegrityPrioritySummary,
+  getResearchLineageIntegrityRemediationPreview,
   subscribeToResearch,
   validateResearchLineage,
 } from "@/lib/research";
@@ -128,6 +129,14 @@ function IssueCard({
       issue,
     );
 
+  const [showRemediationPreview, setShowRemediationPreview] =
+    useState(false);
+
+  const remediationPreview =
+    getResearchLineageIntegrityRemediationPreview(
+      issue,
+    );
+
   const inspectionNodeId =
     getResearchLineageIntegrityInspectionNodeId(
       issue,
@@ -227,6 +236,14 @@ function IssueCard({
                     return;
                   }
 
+                  if (
+                    action.requiresConfirmation &&
+                    remediationPreview
+                  ) {
+                    setShowRemediationPreview(true);
+                    return;
+                  }
+
                   if (inspectionNodeId && onSelectNode) {
                     onSelectNode(inspectionNodeId);
                   }
@@ -255,6 +272,57 @@ function IssueCard({
               </button>
             </div>
           </div>
+
+          {showRemediationPreview &&
+            remediationPreview ? (
+            <div className="mt-3 rounded-xl border border-amber-400/20 bg-amber-500/[0.05] p-4">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-[0.14em] text-amber-300">
+                    Remediation preview
+                  </p>
+
+                  <p className="mt-2 text-sm font-semibold text-zinc-200">
+                    {remediationPreview.title}
+                  </p>
+
+                  <p className="mt-2 text-xs leading-5 text-zinc-400">
+                    {remediationPreview.description}
+                  </p>
+
+                  <div className="mt-3 grid gap-2 text-xs text-zinc-500">
+                    <p>
+                      <span className="font-semibold text-zinc-400">
+                        Action:
+                      </span>{" "}
+                      {remediationPreview.action}
+                    </p>
+
+                    <p>
+                      <span className="font-semibold text-zinc-400">
+                        Issue:
+                      </span>{" "}
+                      {remediationPreview.issueCode}
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    setShowRemediationPreview(false)
+                  }
+                  className="rounded-lg border border-white/10 px-2 py-1 text-xs text-zinc-500 transition hover:text-zinc-200"
+                >
+                  Close
+                </button>
+              </div>
+
+              <div className="mt-4 rounded-lg border border-amber-400/10 bg-black/20 px-3 py-2 text-xs text-amber-200">
+                Confirmation is required before any remediation can be executed.
+              </div>
+            </div>
+          ) : null}
 
           {issue.nodeId ? (
             <p className="mt-2 break-all font-mono text-xs text-zinc-600">
