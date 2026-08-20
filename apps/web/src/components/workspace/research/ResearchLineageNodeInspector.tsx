@@ -16,6 +16,9 @@ import type {
 
 interface ResearchLineageNodeInspectorProps {
   node: ResearchLineageNode | null;
+
+  inspectionContext?: string | null;
+
   onOpenArtifact?: (
     node: ResearchLineageNode,
   ) => void;
@@ -50,6 +53,7 @@ function getNodeTypeLabel(
 
 export function ResearchLineageNodeInspector({
   node,
+  inspectionContext,
   onOpenArtifact,
 }: ResearchLineageNodeInspectorProps) {
   const [openedArtifactKey, setOpenedArtifactKey] =
@@ -100,6 +104,15 @@ export function ResearchLineageNodeInspector({
           <p className="mt-2 text-sm text-zinc-500">
             {getNodeTypeLabel(node.type)}
           </p>
+          {inspectionContext ? (
+            <div className="mt-3 inline-flex items-center rounded-full border border-amber-400/20 bg-amber-500/[0.06] px-3 py-1.5">
+              <ShieldAlert className="mr-2 h-3.5 w-3.5 text-amber-300" />
+
+              <span className="text-xs font-semibold text-amber-200">
+                {inspectionContext}
+              </span>
+            </div>
+          ) : null}
         </div>
 
         <div
@@ -215,7 +228,7 @@ export function ResearchLineageNodeInspector({
           </button>
 
           {openedArtifactKey ===
-          currentNodeKey ? (
+            currentNodeKey ? (
             <p className="mt-2 text-xs font-medium text-emerald-300">
               ✓ Artifact opened from lineage
             </p>

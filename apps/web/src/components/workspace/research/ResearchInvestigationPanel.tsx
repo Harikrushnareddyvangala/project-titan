@@ -294,6 +294,9 @@ function InvestigationCard({
   const [selectedLineageNodeId, setSelectedLineageNodeId] =
     useState<string | null>(null);
 
+  const [lineageInspectionContext, setLineageInspectionContext] =
+    useState<string | null>(null);
+
   const [artifactFocus, setArtifactFocus] =
     useState<ResearchArtifactFocus | null>(null);
 
@@ -310,6 +313,20 @@ function InvestigationCard({
     nodeId: string | null,
   ) => {
     setSelectedLineageNodeId(nodeId);
+    setLineageInspectionContext(null);
+
+    if (nodeId !== selectedLineageNodeId) {
+      setArtifactFocus(null);
+    }
+  };
+
+  const handleIntegrityNodeSelect = (
+    nodeId: string | null,
+  ) => {
+    setSelectedLineageNodeId(nodeId);
+    setLineageInspectionContext(
+      nodeId ? "Integrity finding" : null,
+    );
 
     if (nodeId !== selectedLineageNodeId) {
       setArtifactFocus(null);
@@ -463,9 +480,9 @@ function InvestigationCard({
         investigation.id
       }
       className={`rounded-3xl border p-6 transition ${activeArtifactFocus?.type ===
-          "Investigation"
-          ? "border-cyan-400/60 bg-cyan-500/[0.08] ring-1 ring-cyan-400/30"
-          : "border-white/10 bg-black/30"
+        "Investigation"
+        ? "border-cyan-400/60 bg-cyan-500/[0.08] ring-1 ring-cyan-400/30"
+        : "border-white/10 bg-black/30"
         }`}
     >
       <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
@@ -592,6 +609,9 @@ function InvestigationCard({
 
       <ResearchLineageNodeInspector
         node={selectedLineageNode}
+        inspectionContext={
+          lineageInspectionContext
+        }
         onOpenArtifact={
           handleOpenLineageArtifact
         }
@@ -607,7 +627,7 @@ function InvestigationCard({
       <ResearchLineageIntegrity
         investigationId={investigation.id}
         onSelectNode={
-          handleLineageNodeSelect
+          handleIntegrityNodeSelect
         }
       />
     </article>
