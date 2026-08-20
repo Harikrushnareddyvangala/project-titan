@@ -636,6 +636,51 @@ export interface ResearchLineageIntegrityRemediationRequest {
   confirmed: boolean;
 }
 
+export type ResearchLineageIntegrityRemediationExecutionStatus =
+  | "Planned"
+  | "Validated"
+  | "Executed"
+  | "Rejected"
+  | "Failed";
+
+export interface ResearchLineageIntegrityRemediationPlan {
+  investigationId: string;
+
+  action: Exclude<
+    ResearchLineageIntegrityAction,
+    "Inspect" | "ReviewProvenance"
+  >;
+
+  issueCode: string;
+
+  target: ResearchLineageIntegrityActionTarget;
+
+  confirmed: boolean;
+
+  status: "Planned" | "Validated";
+
+  description: string;
+}
+
+export interface ResearchLineageIntegrityRemediationResult {
+  investigationId: string;
+
+  action: Exclude<
+    ResearchLineageIntegrityAction,
+    "Inspect" | "ReviewProvenance"
+  >;
+
+  issueCode: string;
+
+  status: ResearchLineageIntegrityRemediationExecutionStatus;
+
+  executed: boolean;
+
+  message: string;
+
+  plan: ResearchLineageIntegrityRemediationPlan;
+}
+
 export interface ResearchLineageIntegrityRemediationPreview {
   title: string;
   description: string;

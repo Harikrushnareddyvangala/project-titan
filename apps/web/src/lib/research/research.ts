@@ -35,6 +35,7 @@ import type {
   ResearchLineageIntegrityIssueExplanation,
   ResearchLineageIntegrityIssueAction,
   ResearchLineageIntegrityRemediationRequest,
+  ResearchLineageIntegrityRemediationPlan,
   ResearchLineageIntegrityRemediationPreview,
 } from "@/types/research";
 
@@ -2790,12 +2791,48 @@ export function createResearchLineageIntegrityRemediationRequest(
     return null;
   }
 
+  if (
+    action.requiresConfirmation &&
+    !confirmed
+  ) {
+    return null;
+  }
+
   return {
     investigationId,
     action: action.action,
     issueCode: issue.code,
     target: action.target,
     confirmed,
+  };
+}
+
+export function createResearchLineageIntegrityRemediationPlan(
+  request: ResearchLineageIntegrityRemediationRequest,
+): ResearchLineageIntegrityRemediationPlan {
+  return {
+    investigationId:
+      request.investigationId,
+
+    action:
+      request.action,
+
+    issueCode:
+      request.issueCode,
+
+    target:
+      request.target,
+
+    confirmed:
+      request.confirmed,
+
+    status:
+      request.confirmed
+        ? "Validated"
+        : "Planned",
+
+    description:
+      `Proposed ${request.action} remediation for ${request.issueCode}.`,
   };
 }
 
