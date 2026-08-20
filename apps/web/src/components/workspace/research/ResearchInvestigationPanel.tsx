@@ -14,6 +14,7 @@ import {
 import type {
   ResearchInvestigation,
   ResearchLineageNode,
+  ResearchLineageIntegrityRemediationRequest,
 } from "@/types/research";
 
 import {
@@ -309,6 +310,14 @@ function InvestigationCard({
     provenanceInspectionEventId,
     setProvenanceInspectionEventId,
   ] = useState<string | null>(null);
+
+  const [
+  remediationRequest,
+  setRemediationRequest,
+] =
+  useState<ResearchLineageIntegrityRemediationRequest | null>(
+    null,
+  );
 
   const [lineageInspectionContext, setLineageInspectionContext] =
     useState<ResearchLineageInspectionContext | null>(null);
@@ -656,7 +665,26 @@ function InvestigationCard({
         onSelectProvenanceEvent={
           setProvenanceInspectionEventId
         }
+        onRemediationRequest={
+          setRemediationRequest
+        }
       />
+      {remediationRequest ? (
+        <div className="mt-4 rounded-2xl border border-amber-400/20 bg-amber-500/[0.05] p-4">
+          <p className="text-xs font-bold uppercase tracking-[0.14em] text-amber-300">
+            Remediation request created
+          </p>
+
+          <p className="mt-2 text-xs text-zinc-400">
+            {remediationRequest.action} ·{" "}
+            {remediationRequest.issueCode}
+          </p>
+
+          <p className="mt-2 text-xs text-zinc-500">
+            The request is confirmed but has not been executed.
+          </p>
+        </div>
+      ) : null}
     </article>
   );
 }

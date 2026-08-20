@@ -25,6 +25,7 @@ import {
   getResearchLineageIntegrityPriority,
   getResearchLineageIntegrityPrioritySummary,
   getResearchLineageIntegrityRemediationPreview,
+  createResearchLineageIntegrityRemediationRequest,
   subscribeToResearch,
   validateResearchLineage,
 } from "@/lib/research";
@@ -35,6 +36,7 @@ import type {
   ResearchLineageIntegrityIssue,
   ResearchLineageIntegrityPriority,
   ResearchLineageIntegrityResult,
+  ResearchLineageIntegrityRemediationRequest,
 } from "@/types/research";
 
 interface ResearchLineageIntegrityProps {
@@ -42,6 +44,9 @@ interface ResearchLineageIntegrityProps {
   onSelectNode?: (nodeId: string | null) => void;
   onSelectProvenanceEvent?: (
     eventId: string | null,
+  ) => void;
+  onRemediationRequest?: (
+    request: ResearchLineageIntegrityRemediationRequest,
   ) => void;
 }
 
@@ -106,12 +111,18 @@ function IssueCard({
   lineage,
   onSelectNode,
   onSelectProvenanceEvent,
+  investigationId,
+  onRemediationRequest,
 }: {
   issue: ResearchLineageIntegrityIssue;
   lineage: ResearchLineage;
   onSelectNode?: (nodeId: string | null) => void;
   onSelectProvenanceEvent?: (
     eventId: string | null,
+  ) => void;
+  investigationId: string;
+  onRemediationRequest?: (
+    request: ResearchLineageIntegrityRemediationRequest,
   ) => void;
 }) {
   const priority =
@@ -251,9 +262,9 @@ function IssueCard({
                 disabled={
                   action.action === "ReviewProvenance"
                     ? !issue.provenanceEventId ||
-                      !onSelectProvenanceEvent
+                    !onSelectProvenanceEvent
                     : !inspectionNodeId ||
-                      !onSelectNode
+                    !onSelectNode
                 }
                 className="inline-flex items-center rounded-lg border border-cyan-400/20 bg-cyan-500/10 px-3 py-2 text-xs font-semibold text-cyan-300 transition hover:border-cyan-400/40 hover:bg-cyan-500/15 disabled:cursor-not-allowed disabled:opacity-40"
               >
@@ -318,8 +329,44 @@ function IssueCard({
                 </button>
               </div>
 
-              <div className="mt-4 rounded-lg border border-amber-400/10 bg-black/20 px-3 py-2 text-xs text-amber-200">
-                Confirmation is required before any remediation can be executed.
+              <div className="mt-4 rounded-lg border border-amber-400/10 bg-black/20 px-3 py-3">
+                <p className="text-xs text-amber-200">
+                  Confirmation is required before any remediation can be executed.
+                </p>
+
+                <div className="mt-3 flex flex-wrap justify-end gap-2">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setShowRemediationPreview(false)
+                    }
+                    className="rounded-lg border border-white/10 px-3 py-2 text-xs font-semibold text-zinc-400 transition hover:border-white/20 hover:text-zinc-200"
+                  >
+                    Cancel
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const request =
+                        createResearchLineageIntegrityRemediationRequest(
+                          investigationId,
+                          issue,
+                          true,
+                        );
+
+                      if (!request) {
+                        return;
+                      }
+
+                      onRemediationRequest?.(request);
+                    }}
+                    disabled={!onRemediationRequest}
+                    className="rounded-lg border border-amber-400/30 bg-amber-500/10 px-3 py-2 text-xs font-semibold text-amber-200 transition hover:border-amber-400/50 hover:bg-amber-500/15 disabled:cursor-not-allowed disabled:opacity-40"
+                  >
+                    Confirm remediation
+                  </button>
+                </div>
               </div>
             </div>
           ) : null}
@@ -373,6 +420,7 @@ export function ResearchLineageIntegrity({
   investigationId,
   onSelectNode,
   onSelectProvenanceEvent,
+  onRemediationRequest,
 }: ResearchLineageIntegrityProps) {
   const result =
     useSyncExternalStore(
@@ -750,9 +798,13 @@ export function ResearchLineageIntegrity({
                 key={`${issue.code}-${issue.nodeId ?? issue.edgeId ?? issue.provenanceEventId ?? index}`}
                 issue={issue}
                 lineage={lineage}
+                investigationId={investigationId}
                 onSelectNode={onSelectNode}
                 onSelectProvenanceEvent={
                   onSelectProvenanceEvent
+                }
+                onRemediationRequest={
+                  onRemediationRequest
                 }
               />
             ),
