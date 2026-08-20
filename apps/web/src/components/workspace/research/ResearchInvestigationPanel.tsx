@@ -305,8 +305,10 @@ function InvestigationCard({
   const [selectedLineageNodeId, setSelectedLineageNodeId] =
     useState<string | null>(null);
 
-  const [provenanceInspectionEventId, setProvenanceInspectionEventId] =
-  useState<string | null>(null);
+  const [
+    provenanceInspectionEventId,
+    setProvenanceInspectionEventId,
+  ] = useState<string | null>(null);
 
   const [lineageInspectionContext, setLineageInspectionContext] =
     useState<ResearchLineageInspectionContext | null>(null);
@@ -650,6 +652,9 @@ function InvestigationCard({
         investigationId={investigation.id}
         onSelectNode={
           handleIntegrityNodeSelect
+        }
+        onSelectProvenanceEvent={
+          setProvenanceInspectionEventId
         }
       />
     </article>

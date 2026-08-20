@@ -39,6 +39,9 @@ import type {
 interface ResearchLineageIntegrityProps {
   investigationId: string;
   onSelectNode?: (nodeId: string | null) => void;
+  onSelectProvenanceEvent?: (
+    eventId: string | null,
+  ) => void;
 }
 
 const EMPTY_RESULT: ResearchLineageIntegrityResult = {
@@ -101,10 +104,14 @@ function IssueCard({
   issue,
   lineage,
   onSelectNode,
+  onSelectProvenanceEvent,
 }: {
   issue: ResearchLineageIntegrityIssue;
   lineage: ResearchLineage;
   onSelectNode?: (nodeId: string | null) => void;
+  onSelectProvenanceEvent?: (
+    eventId: string | null,
+  ) => void;
 }) {
   const priority =
     getResearchLineageIntegrityPriority(
@@ -209,19 +216,40 @@ function IssueCard({
               <button
                 type="button"
                 onClick={() => {
+                  if (
+                    action.action === "ReviewProvenance" &&
+                    issue.provenanceEventId &&
+                    onSelectProvenanceEvent
+                  ) {
+                    onSelectProvenanceEvent(
+                      issue.provenanceEventId,
+                    );
+                    return;
+                  }
+
                   if (inspectionNodeId && onSelectNode) {
                     onSelectNode(inspectionNodeId);
                   }
                 }}
-                disabled={!inspectionNodeId || !onSelectNode}
+                disabled={
+                  action.action === "ReviewProvenance"
+                    ? !issue.provenanceEventId ||
+                      !onSelectProvenanceEvent
+                    : !inspectionNodeId ||
+                      !onSelectNode
+                }
                 className="inline-flex items-center rounded-lg border border-cyan-400/20 bg-cyan-500/10 px-3 py-2 text-xs font-semibold text-cyan-300 transition hover:border-cyan-400/40 hover:bg-cyan-500/15 disabled:cursor-not-allowed disabled:opacity-40"
               >
-                {inspectionNodeId
-                  ? action.action === "Inspect"
+                {action.action === "ReviewProvenance"
+                  ? issue.provenanceEventId
                     ? action.label
-                    : "Inspect in lineage"
-                  : "No target available"}
-                {inspectionNodeId && action.requiresConfirmation
+                    : "No provenance event available"
+                  : inspectionNodeId
+                    ? action.action === "Inspect"
+                      ? action.label
+                      : "Inspect in lineage"
+                    : "No target available"}
+                {action.requiresConfirmation
                   ? " · Confirmation required"
                   : ""}
               </button>
@@ -276,6 +304,7 @@ function Metric({
 export function ResearchLineageIntegrity({
   investigationId,
   onSelectNode,
+  onSelectProvenanceEvent,
 }: ResearchLineageIntegrityProps) {
   const result =
     useSyncExternalStore(
@@ -650,10 +679,13 @@ export function ResearchLineageIntegrity({
           {visibleIssues.map(
             (issue, index) => (
               <IssueCard
-                key={`${issue.code}-${issue.nodeId ?? issue.edgeId ?? index}`}
+                key={`${issue.code}-${issue.nodeId ?? issue.edgeId ?? issue.provenanceEventId ?? index}`}
                 issue={issue}
                 lineage={lineage}
                 onSelectNode={onSelectNode}
+                onSelectProvenanceEvent={
+                  onSelectProvenanceEvent
+                }
               />
             ),
           )}
