@@ -205,7 +205,9 @@ function IssueCard({
                 className="inline-flex items-center rounded-lg border border-cyan-400/20 bg-cyan-500/10 px-3 py-2 text-xs font-semibold text-cyan-300 transition hover:border-cyan-400/40 hover:bg-cyan-500/15 disabled:cursor-not-allowed disabled:opacity-40"
               >
                 {inspectionNodeId
-                  ? action.label
+                  ? action.action === "Inspect"
+                    ? action.label
+                    : "Inspect in lineage"
                   : "No target available"}
                 {inspectionNodeId && action.requiresConfirmation
                   ? " · Confirmation required"
@@ -233,16 +235,6 @@ function IssueCard({
             </p>
           ) : null}
 
-          {inspectionNodeId && onSelectNode ? (
-            <button
-              type="button"
-              onClick={() => onSelectNode(inspectionNodeId)}
-              className="mt-4 inline-flex items-center rounded-xl border border-cyan-400/20 bg-cyan-500/10 px-3 py-2 text-xs font-semibold text-cyan-300 transition hover:border-cyan-400/40 hover:bg-cyan-500/15"
-            >
-              <ArrowUpRight className="mr-2 h-3.5 w-3.5" />
-              Inspect in lineage
-            </button>
-          ) : null}
         </div>
       </div>
     </div>
