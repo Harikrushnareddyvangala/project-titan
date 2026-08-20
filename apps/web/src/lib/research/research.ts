@@ -34,6 +34,7 @@ import type {
   ResearchLineageIntegrityAssessmentExplanation,
   ResearchLineageIntegrityIssueExplanation,
   ResearchLineageIntegrityIssueAction,
+  ResearchLineageIntegrityRemediationRequest,
 } from "@/types/research";
 
 import {
@@ -2769,6 +2770,32 @@ export function getResearchLineageIntegrityIssueAction(
         target,
       };
   }
+}
+
+export function createResearchLineageIntegrityRemediationRequest(
+  investigationId: string,
+  issue: ResearchLineageIntegrityIssue,
+  confirmed: boolean,
+): ResearchLineageIntegrityRemediationRequest | null {
+  const action =
+    getResearchLineageIntegrityIssueAction(
+      issue,
+    );
+
+  if (
+    action.action === "Inspect" ||
+    action.action === "ReviewProvenance"
+  ) {
+    return null;
+  }
+
+  return {
+    investigationId,
+    action: action.action,
+    issueCode: issue.code,
+    target: action.target,
+    confirmed,
+  };
 }
 
 export function getResearchLineageIntegrityInspectionNodeId(
