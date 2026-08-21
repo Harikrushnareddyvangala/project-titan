@@ -3048,13 +3048,12 @@ export function executeResearchLineageIntegrityRemediation(
     };
   }
 
-  const targetValidation =
-    validateResearchLineageIntegrityRemediationTarget(
-      plan.investigationId,
-      plan.target,
+  const preflight =
+    preflightResearchLineageIntegrityRemediation(
+      plan,
     );
 
-  if (!targetValidation.valid) {
+  if (!preflight.ready) {
     return {
       investigationId: plan.investigationId,
       action: plan.action,
@@ -3062,7 +3061,7 @@ export function executeResearchLineageIntegrityRemediation(
       status: "Rejected",
       executed: false,
       message:
-        targetValidation.reason,
+        preflight.reason,
       plan,
     };
   }
