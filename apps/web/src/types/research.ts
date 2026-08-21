@@ -646,6 +646,28 @@ export interface ResearchLineageIntegrityRemediationTargetValidation {
   target: ResearchLineageIntegrityActionTarget;
 }
 
+export interface ResearchLineageIntegrityRemediationExecutionPreflight {
+  investigationId: string;
+
+  action: Exclude<
+    ResearchLineageIntegrityAction,
+    "Inspect" | "ReviewProvenance"
+  >;
+
+  issueCode: string;
+
+  policy: ResearchLineageIntegrityRemediationExecutionPolicy;
+
+  targetValidation:
+    ResearchLineageIntegrityRemediationTargetValidation;
+
+  confirmed: boolean;
+
+  ready: boolean;
+
+  reason: string;
+}
+
 export interface ResearchLineageIntegrityRemediationRequest {
   investigationId: string;
 

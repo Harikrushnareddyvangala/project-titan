@@ -41,6 +41,7 @@ import type {
   ResearchLineageIntegrityRemediationPreview,
   ResearchLineageIntegrityRemediationExecutionPolicy,
   ResearchLineageIntegrityRemediationTargetValidation,
+  ResearchLineageIntegrityRemediationExecutionPreflight,
 } from "@/types/research";
 
 import {
@@ -2956,6 +2957,61 @@ export function validateResearchLineageIntegrityRemediationTarget(
       "The remediation target is valid for the investigation.",
     investigationId,
     target,
+  };
+}
+
+export function preflightResearchLineageIntegrityRemediation(
+  plan: ResearchLineageIntegrityRemediationPlan,
+): ResearchLineageIntegrityRemediationExecutionPreflight {
+  const policy =
+    getResearchLineageIntegrityRemediationExecutionPolicy(
+      plan.action,
+    );
+
+  const targetValidation =
+    validateResearchLineageIntegrityRemediationTarget(
+      plan.investigationId,
+      plan.target,
+    );
+
+  if (!plan.confirmed) {
+    return {
+      investigationId: plan.investigationId,
+      action: plan.action,
+      issueCode: plan.issueCode,
+      policy,
+      targetValidation,
+      confirmed: false,
+      ready: false,
+      reason:
+        "Remediation execution requires explicit confirmation.",
+    };
+  }
+
+  if (!targetValidation.valid) {
+    return {
+      investigationId: plan.investigationId,
+      action: plan.action,
+      issueCode: plan.issueCode,
+      policy,
+      targetValidation,
+      confirmed: true,
+      ready: false,
+      reason:
+        targetValidation.reason,
+    };
+  }
+
+  return {
+    investigationId: plan.investigationId,
+    action: plan.action,
+    issueCode: plan.issueCode,
+    policy,
+    targetValidation,
+    confirmed: true,
+    ready: true,
+    reason:
+      "Remediation passed confirmation, execution-policy, and target-validation checks.",
   };
 }
 
