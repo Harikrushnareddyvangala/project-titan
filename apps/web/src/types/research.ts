@@ -636,6 +636,16 @@ export interface ResearchLineageIntegrityRemediationExecutionPolicy {
   requiresTargetValidation: true;
 }
 
+export interface ResearchLineageIntegrityRemediationTargetValidation {
+  valid: boolean;
+
+  reason: string;
+
+  investigationId: string;
+
+  target: ResearchLineageIntegrityActionTarget;
+}
+
 export interface ResearchLineageIntegrityRemediationRequest {
   investigationId: string;
 

@@ -34,11 +34,13 @@ import type {
   ResearchLineageIntegrityAssessmentExplanation,
   ResearchLineageIntegrityIssueExplanation,
   ResearchLineageIntegrityIssueAction,
+  ResearchLineageIntegrityActionTarget,
   ResearchLineageIntegrityRemediationRequest,
   ResearchLineageIntegrityRemediationPlan,
   ResearchLineageIntegrityRemediationResult,
   ResearchLineageIntegrityRemediationPreview,
   ResearchLineageIntegrityRemediationExecutionPolicy,
+  ResearchLineageIntegrityRemediationTargetValidation,
 } from "@/types/research";
 
 import {
@@ -2850,6 +2852,113 @@ export function getResearchLineageIntegrityRemediationExecutionPolicy(
   };
 }
 
+export function validateResearchLineageIntegrityRemediationTarget(
+  investigationId: string,
+  target: ResearchLineageIntegrityActionTarget,
+): ResearchLineageIntegrityRemediationTargetValidation {
+  const lineage =
+    getResearchLineage(
+      investigationId,
+    );
+
+  if (lineage.investigationId !== investigationId) {
+    return {
+      valid: false,
+      reason:
+        "The remediation target does not belong to the requested investigation.",
+      investigationId,
+      target,
+    };
+  }
+
+  if (
+    target.nodeId &&
+    !lineage.nodes.some(
+      (node) =>
+        node.id === target.nodeId,
+    )
+  ) {
+    return {
+      valid: false,
+      reason:
+        "The requested remediation node could not be found in the investigation lineage.",
+      investigationId,
+      target,
+    };
+  }
+
+  if (
+    target.edgeId &&
+    !lineage.edges.some(
+      (edge) =>
+        edge.id === target.edgeId,
+    )
+  ) {
+    return {
+      valid: false,
+      reason:
+        "The requested remediation edge could not be found in the investigation lineage.",
+      investigationId,
+      target,
+    };
+  }
+
+  if (
+    target.sourceId &&
+    !lineage.nodes.some(
+      (node) =>
+        node.id === target.sourceId,
+    )
+  ) {
+    return {
+      valid: false,
+      reason:
+        "The requested remediation source node could not be found in the investigation lineage.",
+      investigationId,
+      target,
+    };
+  }
+
+  if (
+    target.targetId &&
+    !lineage.nodes.some(
+      (node) =>
+        node.id === target.targetId,
+    )
+  ) {
+    return {
+      valid: false,
+      reason:
+        "The requested remediation target node could not be found in the investigation lineage.",
+      investigationId,
+      target,
+    };
+  }
+
+  if (
+    !target.nodeId &&
+    !target.edgeId &&
+    !target.sourceId &&
+    !target.targetId
+  ) {
+    return {
+      valid: false,
+      reason:
+        "No remediation target was provided.",
+      investigationId,
+      target,
+    };
+  }
+
+  return {
+    valid: true,
+    reason:
+      "The remediation target is valid for the investigation.",
+    investigationId,
+    target,
+  };
+}
+
 export function executeResearchLineageIntegrityRemediation(
   plan: ResearchLineageIntegrityRemediationPlan,
 ): ResearchLineageIntegrityRemediationResult {
@@ -2879,6 +2988,25 @@ export function executeResearchLineageIntegrityRemediation(
       executed: false,
       message:
         `Remediation action ${plan.action} is not executable.`,
+      plan,
+    };
+  }
+
+  const targetValidation =
+    validateResearchLineageIntegrityRemediationTarget(
+      plan.investigationId,
+      plan.target,
+    );
+
+  if (!targetValidation.valid) {
+    return {
+      investigationId: plan.investigationId,
+      action: plan.action,
+      issueCode: plan.issueCode,
+      status: "Rejected",
+      executed: false,
+      message:
+        targetValidation.reason,
       plan,
     };
   }

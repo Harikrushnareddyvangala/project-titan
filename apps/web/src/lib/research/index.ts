@@ -56,5 +56,6 @@ export {
   getResearchLineageIntegrityRemediationPreview,
   createResearchLineageIntegrityRemediationRequest,
   getResearchLineageIntegrityRemediationExecutionPolicy,
+  validateResearchLineageIntegrityRemediationTarget,
   executeResearchLineageIntegrityRemediation,
 } from "./research";
