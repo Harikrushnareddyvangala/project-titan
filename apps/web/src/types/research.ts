@@ -621,6 +621,21 @@ export interface ResearchLineageIntegrityActionTarget {
   targetId?: string;
 }
 
+export interface ResearchLineageIntegrityRemediationExecutionPolicy {
+  action: Exclude<
+    ResearchLineageIntegrityAction,
+    "Inspect" | "ReviewProvenance"
+  >;
+
+  requiresConfirmation: true;
+
+  mutatesResearchData: true;
+
+  createsProvenanceEvent: true;
+
+  requiresTargetValidation: true;
+}
+
 export interface ResearchLineageIntegrityRemediationRequest {
   investigationId: string;
 

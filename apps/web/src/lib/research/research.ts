@@ -38,6 +38,7 @@ import type {
   ResearchLineageIntegrityRemediationPlan,
   ResearchLineageIntegrityRemediationResult,
   ResearchLineageIntegrityRemediationPreview,
+  ResearchLineageIntegrityRemediationExecutionPolicy,
 } from "@/types/research";
 
 import {
@@ -2834,6 +2835,18 @@ export function createResearchLineageIntegrityRemediationPlan(
 
     description:
       `Proposed ${request.action} remediation for ${request.issueCode}.`,
+  };
+}
+
+export function getResearchLineageIntegrityRemediationExecutionPolicy(
+  action: ResearchLineageIntegrityRemediationRequest["action"],
+): ResearchLineageIntegrityRemediationExecutionPolicy {
+  return {
+    action,
+    requiresConfirmation: true,
+    mutatesResearchData: true,
+    createsProvenanceEvent: true,
+    requiresTargetValidation: true,
   };
 }
 
