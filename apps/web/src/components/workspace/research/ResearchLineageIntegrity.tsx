@@ -26,6 +26,8 @@ import {
   getResearchLineageIntegrityPrioritySummary,
   getResearchLineageIntegrityRemediationPreview,
   createResearchLineageIntegrityRemediationRequest,
+  createResearchLineageIntegrityRemediationPlan,
+  preflightResearchLineageIntegrityRemediation,
   subscribeToResearch,
   validateResearchLineage,
 } from "@/lib/research";
@@ -142,6 +144,13 @@ function IssueCard({
 
   const [showRemediationPreview, setShowRemediationPreview] =
     useState(false);
+
+  const [remediationPreflight, setRemediationPreflight] =
+    useState<
+      ReturnType<
+        typeof preflightResearchLineageIntegrityRemediation
+      > | null
+    >(null);
 
   const remediationPreview =
     getResearchLineageIntegrityRemediationPreview(

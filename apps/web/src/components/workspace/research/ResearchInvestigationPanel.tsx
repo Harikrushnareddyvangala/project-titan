@@ -24,6 +24,8 @@ import {
   getResearchFindings,
   getResearchFindingValidations,
   getResearchInvestigationConclusions,
+  createResearchLineageIntegrityRemediationPlan,
+  preflightResearchLineageIntegrityRemediation,
 } from "@/lib/research";
 
 import { ResearchEvidencePanel } from "./ResearchEvidencePanel";
@@ -318,6 +320,21 @@ function InvestigationCard({
   useState<ResearchLineageIntegrityRemediationRequest | null>(
     null,
   );
+
+  const remediationPreflight = useMemo(() => {
+    if (!remediationRequest) {
+      return null;
+    }
+
+    const plan =
+      createResearchLineageIntegrityRemediationPlan(
+        remediationRequest,
+      );
+
+    return preflightResearchLineageIntegrityRemediation(
+      plan,
+    );
+  }, [remediationRequest]);
 
   const [lineageInspectionContext, setLineageInspectionContext] =
     useState<ResearchLineageInspectionContext | null>(null);
@@ -669,20 +686,106 @@ function InvestigationCard({
           setRemediationRequest
         }
       />
-      {remediationRequest ? (
+      {remediationPreflight ? (
         <div className="mt-4 rounded-2xl border border-amber-400/20 bg-amber-500/[0.05] p-4">
-          <p className="text-xs font-bold uppercase tracking-[0.14em] text-amber-300">
-            Remediation request created
-          </p>
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.14em] text-amber-300">
+                Remediation preflight
+              </p>
 
-          <p className="mt-2 text-xs text-zinc-400">
-            {remediationRequest.action} ·{" "}
-            {remediationRequest.issueCode}
-          </p>
+              <p className="mt-2 text-xs text-zinc-400">
+                {remediationPreflight.action} ·{" "}
+                {remediationPreflight.issueCode}
+              </p>
+            </div>
 
-          <p className="mt-2 text-xs text-zinc-500">
-            The request is confirmed but has not been executed.
-          </p>
+            <span
+              className={
+                remediationPreflight.ready
+                  ? "rounded-full border border-emerald-400/30 bg-emerald-400/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-emerald-300"
+                  : "rounded-full border border-red-400/30 bg-red-400/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-red-300"
+              }
+            >
+              {remediationPreflight.ready
+                ? "Ready"
+                : "Not ready"}
+            </span>
+          </div>
+
+          <div className="mt-4">
+            <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-zinc-500">
+              Execution policy
+            </p>
+
+            <div className="mt-2 space-y-1.5 text-xs text-zinc-400">
+              <p>
+                ✓ Confirmation required
+              </p>
+
+              <p>
+                ✓ Research data mutation
+              </p>
+
+              <p>
+                ✓ Provenance event
+              </p>
+
+              <p>
+                ✓ Target validation
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-4">
+            <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-zinc-500">
+              Target validation
+            </p>
+
+            <div className="mt-2">
+              <p
+                className={
+                  remediationPreflight.targetValidation.valid
+                    ? "text-xs font-semibold text-emerald-300"
+                    : "text-xs font-semibold text-red-300"
+                }
+              >
+                {remediationPreflight.targetValidation.valid
+                  ? "✓ Valid"
+                  : "✕ Invalid"}
+              </p>
+
+              <p className="mt-1 text-xs leading-5 text-zinc-500">
+                {remediationPreflight.targetValidation.reason}
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-4 border-t border-white/5 pt-4">
+            <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-zinc-500">
+              Execution readiness
+            </p>
+
+            <p
+              className={
+                remediationPreflight.ready
+                  ? "mt-2 text-xs font-bold uppercase tracking-[0.12em] text-emerald-300"
+                  : "mt-2 text-xs font-bold uppercase tracking-[0.12em] text-red-300"
+              }
+            >
+              {remediationPreflight.ready
+                ? "● Ready for execution"
+                : "● Not ready for execution"}
+            </p>
+
+            <p className="mt-2 text-xs leading-5 text-zinc-500">
+              {remediationPreflight.reason}
+            </p>
+
+            <p className="mt-2 text-xs leading-5 text-zinc-500">
+              No research data has been modified.
+            </p>
+          </div>
         </div>
       ) : null}
     </article>

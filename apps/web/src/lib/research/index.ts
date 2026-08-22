@@ -55,6 +55,7 @@ export {
   getResearchLineageIntegrityInspectionNodeId,
   getResearchLineageIntegrityRemediationPreview,
   createResearchLineageIntegrityRemediationRequest,
+  createResearchLineageIntegrityRemediationPlan,
   getResearchLineageIntegrityRemediationExecutionPolicy,
   validateResearchLineageIntegrityRemediationTarget,
   preflightResearchLineageIntegrityRemediation,
