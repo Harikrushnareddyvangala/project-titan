@@ -742,6 +742,8 @@ export interface ResearchLineageIntegrityRemediationMutationContract {
   target:
     ResearchLineageIntegrityResolvedRemediationTarget;
 
+  replacementEntityId: string;
+
   deterministic: true;
 
   requiresConfirmation: true;
@@ -783,6 +785,8 @@ export interface ResearchLineageIntegrityRemediationRepairDecisionResult {
 
   resolvedTarget:
     ResearchLineageIntegrityResolvedRemediationTarget;
+
+  replacementEntityId?: string;
 
   repairDescription: string;
 
