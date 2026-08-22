@@ -42,6 +42,7 @@ import type {
   ResearchLineageIntegrityRemediationExecutionPolicy,
   ResearchLineageIntegrityRemediationTargetValidation,
   ResearchLineageIntegrityRemediationExecutionPreflight,
+  ResearchLineageIntegrityResolvedRemediationTarget,
 } from "@/types/research";
 
 import {
@@ -2960,6 +2961,253 @@ export function validateResearchLineageIntegrityRemediationTarget(
   };
 }
 
+export function resolveResearchLineageIntegrityRemediationTarget(
+  investigationId: string,
+  target: ResearchLineageIntegrityActionTarget,
+): ResearchLineageIntegrityResolvedRemediationTarget {
+  const lineage =
+    getResearchLineage(
+      investigationId,
+    );
+
+  if (
+    lineage.investigationId !==
+    investigationId
+  ) {
+    return {
+      investigationId,
+      kind: "Relationship",
+      resolvable: false,
+      reason:
+        "The remediation target does not belong to the requested investigation.",
+    };
+  }
+
+  /*
+   * Relationship targets are derived from canonical
+   * source/target records. Resolve them first because
+   * an edge is more specific than an individual node.
+   */
+  if (target.edgeId) {
+    const edge =
+      lineage.edges.find(
+        (candidate) =>
+          candidate.id ===
+          target.edgeId,
+      );
+
+    if (!edge) {
+      return {
+        investigationId,
+        kind: "Relationship",
+        resolvable: false,
+        reason:
+          "The requested remediation relationship could not be found in the investigation lineage.",
+      };
+    }
+
+    const source =
+      lineage.nodes.find(
+        (node) =>
+          node.id ===
+          edge.sourceId,
+      );
+
+    const targetNode =
+      lineage.nodes.find(
+        (node) =>
+          node.id ===
+          edge.targetId,
+      );
+
+    if (!source || !targetNode) {
+      return {
+        investigationId,
+        kind: "Relationship",
+        sourceId:
+          edge.sourceId,
+        targetId:
+          edge.targetId,
+        relationshipType:
+          edge.type,
+        resolvable: false,
+        reason:
+          "The remediation relationship cannot be resolved because one or both endpoint nodes are missing.",
+      };
+    }
+
+    return {
+      investigationId,
+      kind: "Relationship",
+      sourceId:
+        edge.sourceId,
+      targetId:
+        edge.targetId,
+      relationshipType:
+        edge.type,
+      resolvable: true,
+      reason:
+        "The remediation relationship was resolved from the investigation lineage.",
+    };
+  }
+
+  /*
+   * Resolve an explicit node target.
+   */
+  const nodeId =
+    target.nodeId ??
+    target.sourceId ??
+    target.targetId;
+
+  if (!nodeId) {
+    return {
+      investigationId,
+      kind: "Relationship",
+      resolvable: false,
+      reason:
+        "No resolvable remediation target was provided.",
+    };
+  }
+
+  const node =
+    lineage.nodes.find(
+      (candidate) =>
+        candidate.id ===
+        nodeId,
+    );
+
+  if (!node) {
+    return {
+      investigationId,
+      kind: "Relationship",
+      entityId: nodeId,
+      resolvable: false,
+      reason:
+        "The requested remediation node could not be resolved in the investigation lineage.",
+    };
+  }
+
+  switch (node.type) {
+    case "Investigation": {
+      const exists =
+        getResearchInvestigations().some(
+          (item) =>
+            item.id === node.id,
+        );
+
+      return {
+        investigationId,
+        kind: "Investigation",
+        entityId: node.id,
+        resolvable: exists,
+        reason: exists
+          ? "The investigation remediation target resolves to a canonical investigation record."
+          : "The investigation lineage node exists, but its canonical investigation record could not be resolved.",
+      };
+    }
+
+    case "Experiment": {
+      const exists =
+        getResearchExperiments().some(
+          (item) =>
+            item.id === node.id,
+        );
+
+      return {
+        investigationId,
+        kind: "Experiment",
+        entityId: node.id,
+        resolvable: exists,
+        reason: exists
+          ? "The experiment remediation target resolves to a canonical experiment record."
+          : "The experiment lineage node exists, but its canonical experiment record could not be resolved.",
+      };
+    }
+
+    case "Evidence": {
+      const exists =
+        getResearchEvidence().some(
+          (item) =>
+            item.id === node.id,
+        );
+
+      return {
+        investigationId,
+        kind: "Evidence",
+        entityId: node.id,
+        resolvable: exists,
+        reason: exists
+          ? "The evidence remediation target resolves to a canonical evidence record."
+          : "The evidence lineage node exists, but its canonical evidence record could not be resolved.",
+      };
+    }
+
+    case "Finding": {
+      const exists =
+        getResearchFindings().some(
+          (item) =>
+            item.id === node.id,
+        );
+
+      return {
+        investigationId,
+        kind: "Finding",
+        entityId: node.id,
+        resolvable: exists,
+        reason: exists
+          ? "The finding remediation target resolves to a canonical finding record."
+          : "The finding lineage node exists, but its canonical finding record could not be resolved.",
+      };
+    }
+
+    case "FindingValidation": {
+      const exists =
+        getResearchFindingValidations().some(
+          (item) =>
+            item.id === node.id,
+        );
+
+      return {
+        investigationId,
+        kind: "FindingValidation",
+        entityId: node.id,
+        resolvable: exists,
+        reason: exists
+          ? "The finding-validation remediation target resolves to a canonical validation record."
+          : "The finding-validation lineage node exists, but its canonical validation record could not be resolved.",
+      };
+    }
+
+    case "Conclusion": {
+      const exists =
+        getResearchInvestigationConclusions().some(
+          (item) =>
+            item.id === node.id,
+        );
+
+      return {
+        investigationId,
+        kind: "Conclusion",
+        entityId: node.id,
+        resolvable: exists,
+        reason: exists
+          ? "The conclusion remediation target resolves to a canonical conclusion record."
+          : "The conclusion lineage node exists, but its canonical conclusion record could not be resolved.",
+      };
+    }
+
+    default: {
+      return {
+        investigationId,
+        kind: "Relationship",
+        entityId: node.id,
+        resolvable: false,
+        reason:
+          "The remediation target uses an unsupported lineage node type.",
+      };
+    }
+  }
+}
 export function preflightResearchLineageIntegrityRemediation(
   plan: ResearchLineageIntegrityRemediationPlan,
 ): ResearchLineageIntegrityRemediationExecutionPreflight {

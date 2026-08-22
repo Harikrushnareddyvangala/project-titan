@@ -621,6 +621,33 @@ export interface ResearchLineageIntegrityActionTarget {
   targetId?: string;
 }
 
+export type ResearchLineageIntegrityRemediationTargetKind =
+  | "Investigation"
+  | "Experiment"
+  | "Evidence"
+  | "Finding"
+  | "FindingValidation"
+  | "Conclusion"
+  | "Relationship";
+
+export interface ResearchLineageIntegrityResolvedRemediationTarget {
+  investigationId: string;
+
+  kind: ResearchLineageIntegrityRemediationTargetKind;
+
+  entityId?: string;
+
+  sourceId?: string;
+
+  targetId?: string;
+
+  relationshipType?: ResearchLineageEdgeType;
+
+  resolvable: boolean;
+
+  reason: string;
+}
+
 export interface ResearchLineageIntegrityRemediationExecutionPolicy {
   action: Exclude<
     ResearchLineageIntegrityAction,
