@@ -43,6 +43,7 @@ import type {
   ResearchLineageIntegrityRemediationTargetValidation,
   ResearchLineageIntegrityRemediationExecutionPreflight,
   ResearchLineageIntegrityRemediationRepairDecisionResult,
+  ResearchLineageIntegrityRemediationRepairExecutionResult,
   ResearchLineageIntegrityResolvedRemediationTarget,
   ResearchLineageIntegrityRemediationMutationContract,
   ResearchLineageIntegrityRemediationMutationResult,
@@ -2826,6 +2827,62 @@ export function createResearchLineageIntegrityRemediationMutationContract(
 
     description:
       "Apply only the deterministic reference replacement defined by the repair decision.",
+  };
+}
+
+export function executeResearchLineageIntegrityRemediationRepair(
+  decision: ResearchLineageIntegrityRemediationRepairDecisionResult,
+): ResearchLineageIntegrityRemediationRepairExecutionResult {
+  if (decision.decision !== "Repairable") {
+    return {
+      investigationId: decision.investigationId,
+      action: decision.action,
+      issueCode: decision.issueCode,
+      executed: false,
+      mutationType: null,
+      message:
+        "Repair execution rejected because the repair decision is not deterministic.",
+    };
+  }
+
+  const mutationContract =
+    createResearchLineageIntegrityRemediationMutationContract(
+      decision,
+    );
+
+  if (!mutationContract) {
+    return {
+      investigationId: decision.investigationId,
+      action: decision.action,
+      issueCode: decision.issueCode,
+      executed: false,
+      mutationType: null,
+      message:
+        "Repair execution rejected because no valid mutation contract exists.",
+    };
+  }
+
+  if (!mutationContract.deterministic) {
+    return {
+      investigationId: decision.investigationId,
+      action: decision.action,
+      issueCode: decision.issueCode,
+      executed: false,
+      mutationType: null,
+      message:
+        "Repair execution rejected because the mutation is not deterministic.",
+    };
+  }
+
+  return {
+    investigationId: decision.investigationId,
+    action: decision.action,
+    issueCode: decision.issueCode,
+    executed: false,
+    mutationType:
+      mutationContract.mutationType,
+    message:
+      "Repair execution is structurally valid, but no concrete research-data mutation is implemented for this mutation type.",
   };
 }
 

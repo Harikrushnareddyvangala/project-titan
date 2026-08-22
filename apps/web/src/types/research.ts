@@ -765,6 +765,27 @@ export interface ResearchLineageIntegrityRemediationRepairDecisionResult {
   reason: string;
 }
 
+export interface ResearchLineageIntegrityRemediationRepairExecutionResult {
+  investigationId: string;
+
+  action: Exclude<
+    ResearchLineageIntegrityAction,
+    "Inspect" | "ReviewProvenance"
+  >;
+
+  issueCode: string;
+
+  executed: boolean;
+
+  mutationType:
+    | "ReferenceReplacement"
+    | null;
+
+  message: string;
+
+  provenanceEventId?: string;
+}
+
 export interface ResearchLineageIntegrityRemediationRequest {
   investigationId: string;
 
