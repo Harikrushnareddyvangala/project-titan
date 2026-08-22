@@ -2812,9 +2812,14 @@ export function decideResearchLineageIntegrityRemediationRepair(
     };
   }
 
+  const replacementDiscovery =
+    discoverResearchLineageIntegrityRemediationReplacement(
+      plan,
+    );
+
   if (
-    plan.issueCode ===
-    "CONCLUSION_FINDING_REFERENCE_INVALID"
+    replacementDiscovery.status ===
+    "NotFound"
   ) {
     return {
       investigationId:
@@ -2827,9 +2832,57 @@ export function decideResearchLineageIntegrityRemediationRepair(
         "NotRepairable",
       resolvedTarget,
       repairDescription:
-        "No conclusion finding reference will be changed automatically.",
+        "No deterministic replacement was discovered.",
       reason:
-        "The invalid finding reference identifies no canonical replacement finding, so automatic mutation would invent research lineage.",
+        replacementDiscovery.reason,
+    };
+  }
+
+  if (
+    replacementDiscovery.status ===
+    "Ambiguous"
+  ) {
+    return {
+      investigationId:
+        plan.investigationId,
+      action:
+        plan.action,
+      issueCode:
+        plan.issueCode,
+      decision:
+        "NotRepairable",
+      resolvedTarget,
+      repairDescription:
+        "Multiple possible replacements were discovered, so no automatic repair will be selected.",
+      reason:
+        replacementDiscovery.reason,
+    };
+  }
+
+  const candidate =
+    replacementDiscovery.selectedCandidate;
+
+  if (
+    !candidate ||
+    replacementDiscovery.candidates.length !==
+      1 ||
+    candidate.investigationId !==
+      plan.investigationId
+  ) {
+    return {
+      investigationId:
+        plan.investigationId,
+      action:
+        plan.action,
+      issueCode:
+        plan.issueCode,
+      decision:
+        "NotRepairable",
+      resolvedTarget,
+      repairDescription:
+        "The discovered replacement does not satisfy the deterministic repair contract.",
+      reason:
+        "A repair candidate must be uniquely selected and belong to the same investigation.",
     };
   }
 
@@ -2841,12 +2894,12 @@ export function decideResearchLineageIntegrityRemediationRepair(
     issueCode:
       plan.issueCode,
     decision:
-      "NotRepairable",
+      "Repairable",
     resolvedTarget,
     repairDescription:
-      "No deterministic repair mutation has been defined for this reference issue.",
+      `A deterministic replacement candidate ${candidate.id} was uniquely discovered for this remediation.`,
     reason:
-      "The remediation target resolves successfully, but the system has no deterministic mutation rule for this issue.",
+      "The remediation target resolves successfully and replacement discovery produced exactly one candidate within the investigation.",
   };
 }
 
