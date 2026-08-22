@@ -43,6 +43,7 @@ import type {
   ResearchLineageIntegrityRemediationTargetValidation,
   ResearchLineageIntegrityRemediationExecutionPreflight,
   ResearchLineageIntegrityRemediationRepairDecisionResult,
+  ResearchLineageIntegrityRemediationReplacementDiscoveryResult,
   ResearchLineageIntegrityRemediationRepairExecutionResult,
   ResearchLineageIntegrityResolvedRemediationTarget,
   ResearchLineageIntegrityRemediationMutationContract,
@@ -2695,6 +2696,72 @@ export function getResearchLineageIntegrityIssueExplanation(
           "Inspect the associated lineage records and resolve the underlying reference or relationship.",
       };
   }
+}
+
+export function discoverResearchLineageIntegrityRemediationReplacement(
+  plan: ResearchLineageIntegrityRemediationPlan,
+): ResearchLineageIntegrityRemediationReplacementDiscoveryResult {
+  const investigation =
+    getResearchInvestigations().find(
+      (item) =>
+        item.id === plan.investigationId,
+    );
+
+  if (!investigation) {
+    return {
+      investigationId:
+        plan.investigationId,
+      issueCode:
+        plan.issueCode,
+      status:
+        "NotFound",
+      candidates: [],
+      selectedCandidate:
+        null,
+      reason:
+        "The investigation does not exist, so no canonical replacement can be discovered.",
+    };
+  }
+
+  if (
+    plan.issueCode !==
+    "CONCLUSION_FINDING_REFERENCE_INVALID"
+  ) {
+    return {
+      investigationId:
+        plan.investigationId,
+      issueCode:
+        plan.issueCode,
+      status:
+        "NotFound",
+      candidates: [],
+      selectedCandidate:
+        null,
+      reason:
+        "No canonical replacement-discovery rule is defined for this issue.",
+    };
+  }
+
+  /*
+   * A missing conclusion finding reference does not provide enough
+   * information to infer a replacement finding.
+   *
+   * Do not search globally and do not select a candidate based only
+   * on title similarity, creation order, or proximity.
+   */
+  return {
+    investigationId:
+      plan.investigationId,
+    issueCode:
+      plan.issueCode,
+    status:
+      "NotFound",
+    candidates: [],
+    selectedCandidate:
+      null,
+    reason:
+      "The invalid finding reference does not identify a canonical replacement finding within the investigation.",
+  };
 }
 
 export function decideResearchLineageIntegrityRemediationRepair(

@@ -699,6 +699,30 @@ export type ResearchLineageIntegrityRemediationRepairDecision =
   | "Repairable"
   | "NotRepairable";
 
+export type ResearchLineageIntegrityRemediationReplacementDiscoveryStatus =
+  | "Resolved"
+  | "NotFound"
+  | "Ambiguous";
+
+export interface ResearchLineageIntegrityRemediationReplacementCandidate {
+  id: string;
+  title: string;
+  investigationId: string;
+  reason: string;
+}
+
+export interface ResearchLineageIntegrityRemediationReplacementDiscoveryResult {
+  investigationId: string;
+  issueCode: string;
+  status:
+    ResearchLineageIntegrityRemediationReplacementDiscoveryStatus;
+  candidates:
+    ResearchLineageIntegrityRemediationReplacementCandidate[];
+  selectedCandidate:
+    ResearchLineageIntegrityRemediationReplacementCandidate | null;
+  reason: string;
+}
+
 export type ResearchLineageIntegrityRemediationMutationType =
   | "ReferenceReplacement";
 

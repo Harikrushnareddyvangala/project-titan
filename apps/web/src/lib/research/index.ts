@@ -62,6 +62,7 @@ export {
   preflightResearchLineageIntegrityRemediation,
   executeResearchLineageIntegrityRemediation,
   decideResearchLineageIntegrityRemediationRepair,
+  discoverResearchLineageIntegrityRemediationReplacement,
   executeResearchLineageIntegrityRemediationRepair,
   createResearchLineageIntegrityRemediationMutationContract,
 } from "./research";
