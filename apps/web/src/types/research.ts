@@ -695,6 +695,31 @@ export interface ResearchLineageIntegrityRemediationExecutionPreflight {
   reason: string;
 }
 
+export type ResearchLineageIntegrityRemediationRepairDecision =
+  | "Repairable"
+  | "NotRepairable";
+
+export interface ResearchLineageIntegrityRemediationRepairDecisionResult {
+  investigationId: string;
+
+  action: Exclude<
+    ResearchLineageIntegrityAction,
+    "Inspect" | "ReviewProvenance"
+  >;
+
+  issueCode: string;
+
+  decision:
+    ResearchLineageIntegrityRemediationRepairDecision;
+
+  resolvedTarget:
+    ResearchLineageIntegrityResolvedRemediationTarget;
+
+  repairDescription: string;
+
+  reason: string;
+}
+
 export interface ResearchLineageIntegrityRemediationRequest {
   investigationId: string;
 

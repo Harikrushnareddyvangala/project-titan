@@ -42,6 +42,7 @@ import type {
   ResearchLineageIntegrityRemediationExecutionPolicy,
   ResearchLineageIntegrityRemediationTargetValidation,
   ResearchLineageIntegrityRemediationExecutionPreflight,
+  ResearchLineageIntegrityRemediationRepairDecisionResult,
   ResearchLineageIntegrityResolvedRemediationTarget,
 } from "@/types/research";
 
@@ -2690,6 +2691,92 @@ export function getResearchLineageIntegrityIssueExplanation(
           "Inspect the associated lineage records and resolve the underlying reference or relationship.",
       };
   }
+}
+
+export function decideResearchLineageIntegrityRemediationRepair(
+  plan: ResearchLineageIntegrityRemediationPlan,
+): ResearchLineageIntegrityRemediationRepairDecisionResult {
+  const resolvedTarget =
+    resolveResearchLineageIntegrityRemediationTarget(
+      plan.investigationId,
+      plan.target,
+    );
+
+  if (!resolvedTarget.resolvable) {
+    return {
+      investigationId:
+        plan.investigationId,
+      action:
+        plan.action,
+      issueCode:
+        plan.issueCode,
+      decision:
+        "NotRepairable",
+      resolvedTarget,
+      repairDescription:
+        "No deterministic repair will be performed.",
+      reason:
+        resolvedTarget.reason,
+    };
+  }
+
+  if (
+    plan.action !==
+    "RepairReference"
+  ) {
+    return {
+      investigationId:
+        plan.investigationId,
+      action:
+        plan.action,
+      issueCode:
+        plan.issueCode,
+      decision:
+        "NotRepairable",
+      resolvedTarget,
+      repairDescription:
+        "The current repair decision contract only permits deterministic reference repairs.",
+      reason:
+        `Remediation action ${plan.action} does not have a deterministic reference-repair mutation defined.`,
+    };
+  }
+
+  if (
+    plan.issueCode ===
+    "CONCLUSION_FINDING_REFERENCE_INVALID"
+  ) {
+    return {
+      investigationId:
+        plan.investigationId,
+      action:
+        plan.action,
+      issueCode:
+        plan.issueCode,
+      decision:
+        "NotRepairable",
+      resolvedTarget,
+      repairDescription:
+        "No conclusion finding reference will be changed automatically.",
+      reason:
+        "The invalid finding reference identifies no canonical replacement finding, so automatic mutation would invent research lineage.",
+    };
+  }
+
+  return {
+    investigationId:
+      plan.investigationId,
+    action:
+      plan.action,
+    issueCode:
+      plan.issueCode,
+    decision:
+      "NotRepairable",
+    resolvedTarget,
+    repairDescription:
+      "No deterministic repair mutation has been defined for this reference issue.",
+    reason:
+      "The remediation target resolves successfully, but the system has no deterministic mutation rule for this issue.",
+  };
 }
 
 export function getResearchLineageIntegrityIssueAction(
