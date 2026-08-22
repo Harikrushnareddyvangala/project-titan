@@ -699,6 +699,51 @@ export type ResearchLineageIntegrityRemediationRepairDecision =
   | "Repairable"
   | "NotRepairable";
 
+export type ResearchLineageIntegrityRemediationMutationType =
+  | "ReferenceReplacement";
+
+export interface ResearchLineageIntegrityRemediationMutationContract {
+  mutationType:
+    ResearchLineageIntegrityRemediationMutationType;
+
+  investigationId: string;
+
+  action: Exclude<
+    ResearchLineageIntegrityAction,
+    "Inspect" | "ReviewProvenance"
+  >;
+
+  issueCode: string;
+
+  target:
+    ResearchLineageIntegrityResolvedRemediationTarget;
+
+  deterministic: true;
+
+  requiresConfirmation: true;
+
+  createsProvenanceEvent: true;
+
+  description: string;
+}
+
+export interface ResearchLineageIntegrityRemediationMutationResult {
+  mutationType:
+    ResearchLineageIntegrityRemediationMutationType;
+
+  investigationId: string;
+
+  issueCode: string;
+
+  applied: boolean;
+
+  changedEntityId?: string;
+
+  message: string;
+
+  provenanceEventId?: string;
+}
+
 export interface ResearchLineageIntegrityRemediationRepairDecisionResult {
   investigationId: string;
 

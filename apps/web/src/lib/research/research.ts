@@ -44,7 +44,10 @@ import type {
   ResearchLineageIntegrityRemediationExecutionPreflight,
   ResearchLineageIntegrityRemediationRepairDecisionResult,
   ResearchLineageIntegrityResolvedRemediationTarget,
+  ResearchLineageIntegrityRemediationMutationContract,
+  ResearchLineageIntegrityRemediationMutationResult,
 } from "@/types/research";
+
 
 import {
   evaluateFindingValidationEligibility,
@@ -2776,6 +2779,53 @@ export function decideResearchLineageIntegrityRemediationRepair(
       "No deterministic repair mutation has been defined for this reference issue.",
     reason:
       "The remediation target resolves successfully, but the system has no deterministic mutation rule for this issue.",
+  };
+}
+
+export function createResearchLineageIntegrityRemediationMutationContract(
+  decision: ResearchLineageIntegrityRemediationRepairDecisionResult,
+): ResearchLineageIntegrityRemediationMutationContract | null {
+  if (
+    decision.decision !==
+    "Repairable"
+  ) {
+    return null;
+  }
+
+  if (
+    decision.action !==
+    "RepairReference"
+  ) {
+    return null;
+  }
+
+  return {
+    mutationType:
+      "ReferenceReplacement",
+
+    investigationId:
+      decision.investigationId,
+
+    action:
+      decision.action,
+
+    issueCode:
+      decision.issueCode,
+
+    target:
+      decision.resolvedTarget,
+
+    deterministic:
+      true,
+
+    requiresConfirmation:
+      true,
+
+    createsProvenanceEvent:
+      true,
+
+    description:
+      "Apply only the deterministic reference replacement defined by the repair decision.",
   };
 }
 
