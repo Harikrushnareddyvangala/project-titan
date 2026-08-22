@@ -822,6 +822,8 @@ export interface ResearchLineageIntegrityRemediationRequest {
 
   target: ResearchLineageIntegrityActionTarget;
 
+  replacementEntityId?: string;
+
   confirmed: boolean;
 }
 
@@ -843,6 +845,8 @@ export interface ResearchLineageIntegrityRemediationPlan {
   issueCode: string;
 
   target: ResearchLineageIntegrityActionTarget;
+
+  replacementEntityId?: string;
 
   confirmed: boolean;
 

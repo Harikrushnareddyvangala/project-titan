@@ -44,6 +44,7 @@ import type {
   ResearchLineageIntegrityRemediationExecutionPreflight,
   ResearchLineageIntegrityRemediationRepairDecisionResult,
   ResearchLineageIntegrityRemediationReplacementDiscoveryResult,
+  ResearchLineageIntegrityRemediationReplacementCandidate,
   ResearchLineageIntegrityRemediationRepairExecutionResult,
   ResearchLineageIntegrityResolvedRemediationTarget,
   ResearchLineageIntegrityRemediationMutationContract,
@@ -2704,7 +2705,8 @@ export function discoverResearchLineageIntegrityRemediationReplacement(
   const investigation =
     getResearchInvestigations().find(
       (item) =>
-        item.id === plan.investigationId,
+        item.id ===
+        plan.investigationId,
     );
 
   if (!investigation) {
@@ -2742,25 +2744,78 @@ export function discoverResearchLineageIntegrityRemediationReplacement(
     };
   }
 
-  /*
-   * A missing conclusion finding reference does not provide enough
-   * information to infer a replacement finding.
-   *
-   * Do not search globally and do not select a candidate based only
-   * on title similarity, creation order, or proximity.
-   */
+  if (!plan.replacementEntityId) {
+    return {
+      investigationId:
+        plan.investigationId,
+      issueCode:
+        plan.issueCode,
+      status:
+        "NotFound",
+      candidates: [],
+      selectedCandidate:
+        null,
+      reason:
+        "No explicit replacement entity was provided for deterministic replacement discovery.",
+    };
+  }
+
+  const finding =
+    getResearchFindings().find(
+      (item) =>
+        item.id ===
+          plan.replacementEntityId &&
+        investigation.findingIds.includes(
+          item.id,
+        ),
+    );
+
+  if (!finding) {
+    return {
+      investigationId:
+        plan.investigationId,
+      issueCode:
+        plan.issueCode,
+      status:
+        "NotFound",
+      candidates: [],
+      selectedCandidate:
+        null,
+      reason:
+        `The explicit replacement finding ${plan.replacementEntityId} could not be resolved within the investigation.`,
+    };
+  }
+
+  const candidate:
+    ResearchLineageIntegrityRemediationReplacementCandidate =
+    {
+      id:
+        finding.id,
+
+      title:
+        finding.statement,
+
+      investigationId:
+        plan.investigationId,
+
+      reason:
+        "The replacement finding was explicitly identified and resolved by exact ID within the investigation.",
+    };
+
   return {
     investigationId:
       plan.investigationId,
     issueCode:
       plan.issueCode,
     status:
-      "NotFound",
-    candidates: [],
+      "Resolved",
+    candidates: [
+      candidate,
+    ],
     selectedCandidate:
-      null,
+      candidate,
     reason:
-      "The invalid finding reference does not identify a canonical replacement finding within the investigation.",
+      "The explicit replacement finding resolved uniquely within the investigation.",
   };
 }
 
@@ -3142,6 +3197,9 @@ export function createResearchLineageIntegrityRemediationPlan(
 
     target:
       request.target,
+
+    replacementEntityId:
+      request.replacementEntityId,
 
     confirmed:
       request.confirmed,
