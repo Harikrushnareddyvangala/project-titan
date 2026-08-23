@@ -3632,6 +3632,7 @@ export function getResearchLineageIntegrityRemediationExecutionPolicy(
 export function validateResearchLineageIntegrityRemediationTarget(
   investigationId: string,
   target: ResearchLineageIntegrityActionTarget,
+  action?: ResearchLineageIntegrityRemediationPlan["action"],
 ): ResearchLineageIntegrityRemediationTargetValidation {
   const lineage =
     getResearchLineage(
@@ -3680,20 +3681,40 @@ export function validateResearchLineageIntegrityRemediationTarget(
     };
   }
 
-  if (
+    if (
     target.sourceId &&
     !lineage.nodes.some(
       (node) =>
         node.id === target.sourceId,
     )
   ) {
-    return {
-      valid: false,
-      reason:
-        "The requested remediation source node could not be found in the investigation lineage.",
-      investigationId,
-      target,
-    };
+    if (
+      action !== "RepairReference"
+    ) {
+      return {
+        valid: false,
+        reason:
+          "The requested remediation source node could not be found in the investigation lineage.",
+        investigationId,
+        target,
+      };
+    }
+
+    if (
+      !target.targetId ||
+      !lineage.nodes.some(
+        (node) =>
+          node.id === target.targetId,
+      )
+    ) {
+      return {
+        valid: false,
+        reason:
+          "The broken reference source is missing and its owning target could not be resolved.",
+        investigationId,
+        target,
+      };
+    }
   }
 
   if (
@@ -3739,6 +3760,7 @@ export function validateResearchLineageIntegrityRemediationTarget(
 export function resolveResearchLineageIntegrityRemediationTarget(
   investigationId: string,
   target: ResearchLineageIntegrityActionTarget,
+  action?: ResearchLineageIntegrityRemediationPlan["action"],
 ): ResearchLineageIntegrityResolvedRemediationTarget {
   const lineage =
     getResearchLineage(
@@ -3755,6 +3777,52 @@ export function resolveResearchLineageIntegrityRemediationTarget(
       resolvable: false,
       reason:
         "The remediation target does not belong to the requested investigation.",
+    };
+  }
+
+    /*
+   * RepairReference is special: the source node may be
+   * intentionally missing because that missing reference
+   * is exactly what the remediation will replace.
+   *
+   * Resolve the owning target node instead.
+   */
+  if (
+    action === "RepairReference" &&
+    target.targetId
+  ) {
+    const targetNode =
+      lineage.nodes.find(
+        (node) =>
+          node.id === target.targetId,
+      );
+
+    if (!targetNode) {
+      return {
+        investigationId,
+        kind: "Relationship",
+        entityId:
+          target.targetId,
+        resolvable: false,
+        reason:
+          "The owning remediation target could not be resolved in the investigation lineage.",
+      };
+    }
+
+    return {
+      investigationId,
+      kind: targetNode.type,
+      entityId:
+        targetNode.id,
+      sourceId:
+        target.sourceId,
+      targetId:
+        target.targetId,
+      relationshipType:
+        "Supports",
+      resolvable: true,
+      reason:
+        "The owning target for the broken reference was resolved; the missing source is eligible for deterministic reference replacement.",
     };
   }
 
@@ -3995,6 +4063,7 @@ export function preflightResearchLineageIntegrityRemediation(
     validateResearchLineageIntegrityRemediationTarget(
       plan.investigationId,
       plan.target,
+      plan.action,
     );
 
   if (!plan.confirmed) {
@@ -4093,6 +4162,7 @@ export function executeResearchLineageIntegrityRemediation(
     resolveResearchLineageIntegrityRemediationTarget(
       plan.investigationId,
       plan.target,
+      plan.action,
     );
 
   if (!resolvedTarget.resolvable) {
