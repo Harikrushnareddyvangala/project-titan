@@ -2826,6 +2826,7 @@ export function decideResearchLineageIntegrityRemediationRepair(
     resolveResearchLineageIntegrityRemediationTarget(
       plan.investigationId,
       plan.target,
+      plan.action,
     );
 
   if (!resolvedTarget.resolvable) {

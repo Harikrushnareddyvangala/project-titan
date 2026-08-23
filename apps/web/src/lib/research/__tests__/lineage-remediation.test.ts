@@ -7,6 +7,7 @@ import {
   getResearchLineageIntegrityIssueAction,
   getResearchFindings,
   validateResearchLineage,
+  createResearchLineageIntegrityRemediationRequest,
 } from "@/lib/research";
 
 describe("research lineage remediation", () => {
@@ -358,6 +359,141 @@ describe("research lineage remediation", () => {
           ),
       ),
     ).toBe(true);
+  });
+
+  it("does not auto-repair an invalid relationship", () => {
+    const now = new Date().toISOString();
+
+    const investigations = [
+      {
+        id: "investigation-test-004",
+        title: "Relationship safety test",
+        objective: "Test invalid lineage relationship handling",
+        question: "Can an invalid relationship be prevented from automatic repair?",
+        status: "Draft",
+        experimentIds: ["experiment-test-004"],
+        evidenceIds: ["evidence-test-004"],
+        findingIds: ["finding-test-004"],
+        artifactIds: [],
+        conclusionIds: ["conclusion-test-004"],
+        createdAt: now,
+        updatedAt: now,
+      },
+    ];
+
+    const experiments = [
+      {
+        id: "experiment-test-004",
+        investigationId: "investigation-test-004",
+        title: "Relationship experiment",
+        hypothesis: "Test invalid relationship",
+        status: "Completed",
+        evidenceIds: ["evidence-test-004"],
+        findingIds: [],
+        createdAt: now,
+        updatedAt: now,
+      },
+    ];
+
+    const evidence = [
+      {
+        id: "evidence-test-004",
+        investigationId: "investigation-test-004",
+        title: "Test evidence",
+        description: "Evidence for relationship safety test",
+        experimentId: "experiment-test-004",
+        createdAt: now,
+        updatedAt: now,
+      },
+    ];
+
+    const findings = [
+      {
+        id: "finding-test-004",
+        statement: "Test finding",
+        evidenceAssessments: [],
+        confidence: 0.9,
+        validationIds: [],
+        investigationId: "investigation-test-004",
+        createdAt: now,
+        updatedAt: now,
+      },
+    ];
+
+    const conclusions = [
+      {
+        id: "conclusion-test-004",
+        investigationId: "investigation-test-004",
+        statement: "Test conclusion",
+        status: "Accepted",
+        supportingFindingIds: ["evidence-test-004"],
+        contradictingFindingIds: [],
+        createdAt: now,
+        updatedAt: now,
+      },
+    ];
+
+    localStorage.setItem(
+      "titan:research-investigations",
+      JSON.stringify(investigations),
+    );
+
+    localStorage.setItem(
+      "titan:research-experiments",
+      JSON.stringify(experiments),
+    );
+
+    localStorage.setItem(
+      "titan:research-evidence",
+      JSON.stringify(evidence),
+    );
+
+    localStorage.setItem(
+      "titan:research-findings",
+      JSON.stringify(findings),
+    );
+
+    localStorage.setItem(
+      "titan:research-investigation-conclusions",
+      JSON.stringify(conclusions),
+    );
+
+    const validation =
+      validateResearchLineage("investigation-test-004");
+
+    expect(validation.valid).toBe(false);
+
+    const issue =
+      validation.issues.find(
+        (candidate) =>
+          candidate.code ===
+          "INVALID_EDGE_DIRECTION",
+      );
+
+    expect(issue).toBeDefined();
+
+    if (!issue) {
+      return;
+    }
+
+    const action =
+      getResearchLineageIntegrityIssueAction(issue);
+
+    expect(action.action).toBe("RepairRelationship");
+    expect(action.requiresConfirmation).toBe(true);
+    expect(action.readiness).toBe("Planned");
+    expect(action.target.edgeId).toBe(issue.edgeId);
+    expect(action.target.sourceId).toBe(issue.sourceId);
+    expect(action.target.targetId).toBe(issue.targetId);
+
+    const request =
+      createResearchLineageIntegrityRemediationRequest(
+        "investigation-test-004",
+        issue,
+        false,
+      );
+
+    expect(request).toBeNull();
   });
 
 });
