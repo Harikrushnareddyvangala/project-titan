@@ -4089,14 +4089,111 @@ export function executeResearchLineageIntegrityRemediation(
     };
   }
 
+  const resolvedTarget =
+    resolveResearchLineageIntegrityRemediationTarget(
+      plan.investigationId,
+      plan.target,
+    );
+
+  if (!resolvedTarget.resolvable) {
+    return {
+      investigationId:
+        plan.investigationId,
+
+      action:
+        plan.action,
+
+      issueCode:
+        plan.issueCode,
+
+      status:
+        "Rejected",
+
+      executed:
+        false,
+
+      message:
+        `Execution target could not be resolved: ${resolvedTarget.reason}`,
+
+      plan,
+    };
+  }
+
+  const repairDecision:
+    ResearchLineageIntegrityRemediationRepairDecisionResult =
+    plan.replacementEntityId
+      ? {
+        investigationId:
+          plan.investigationId,
+
+        action:
+          plan.action,
+
+        issueCode:
+          plan.issueCode,
+
+        decision:
+          "Repairable",
+
+        resolvedTarget,
+
+        replacementEntityId:
+          plan.replacementEntityId,
+
+        repairDescription:
+          plan.description,
+
+        reason:
+          "The remediation plan passed execution preflight and contains an explicit deterministic replacement entity.",
+      }
+      : {
+        investigationId:
+          plan.investigationId,
+
+        action:
+          plan.action,
+
+        issueCode:
+          plan.issueCode,
+
+        decision:
+          "NotRepairable",
+
+        resolvedTarget,
+
+        repairDescription:
+          "No deterministic replacement entity is available in the remediation plan.",
+
+        reason:
+          "Reference repair execution requires an explicit replacement entity.",
+      };
+
+  const repairResult =
+    executeResearchLineageIntegrityRemediationRepair(
+      repairDecision,
+    );
+
   return {
-    investigationId: plan.investigationId,
-    action: plan.action,
-    issueCode: plan.issueCode,
-    status: "Planned",
-    executed: false,
+    investigationId:
+      plan.investigationId,
+
+    action:
+      plan.action,
+
+    issueCode:
+      plan.issueCode,
+
+    status:
+      repairResult.executed
+        ? "Executed"
+        : "Rejected",
+
+    executed:
+      repairResult.executed,
+
     message:
-      `Remediation action ${plan.action} has passed the execution boundary but no data mutation has been implemented yet.`,
+      repairResult.message,
+
     plan,
   };
 }
