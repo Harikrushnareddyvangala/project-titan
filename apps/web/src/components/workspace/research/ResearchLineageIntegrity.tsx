@@ -28,6 +28,8 @@ import {
   createResearchLineageIntegrityRemediationRequest,
   createResearchLineageIntegrityRemediationPlan,
   preflightResearchLineageIntegrityRemediation,
+  getResearchFindings,
+  getResearchInvestigations,
   subscribeToResearch,
   validateResearchLineage,
 } from "@/lib/research";
@@ -145,6 +147,9 @@ function IssueCard({
   const [showRemediationPreview, setShowRemediationPreview] =
     useState(false);
 
+  const [replacementEntityId, setReplacementEntityId] =
+  useState<string>("");
+
   const [remediationPreflight, setRemediationPreflight] =
     useState<
       ReturnType<
@@ -156,6 +161,25 @@ function IssueCard({
     getResearchLineageIntegrityRemediationPreview(
       issue,
     );
+
+  const investigation =
+  getResearchInvestigations().find(
+    (item) =>
+      item.id === investigationId,
+  );
+
+  const replacementFindings =
+  issue.code ===
+    "CONCLUSION_FINDING_REFERENCE_INVALID" &&
+  investigation
+    ? getResearchFindings().filter(
+        (finding) =>
+          investigation.findingIds.includes(
+            finding.id,
+          )&&
+          finding.id !== issue.sourceId,
+      )
+    : [];
 
   const inspectionNodeId =
     getResearchLineageIntegrityInspectionNodeId(
@@ -338,6 +362,57 @@ function IssueCard({
                 </button>
               </div>
 
+                {issue.code ===
+                  "CONCLUSION_FINDING_REFERENCE_INVALID" ? (
+                  <div className="mb-4 rounded-lg border border-cyan-400/10 bg-cyan-500/[0.04] px-3 py-3">
+                    <label
+                      htmlFor={`replacement-finding-${issue.targetId ?? issue.nodeId ?? "unknown"}`}
+                      className="text-xs font-semibold uppercase tracking-[0.14em] text-cyan-300"
+                    >
+                      Replacement finding
+                    </label>
+
+                    <p className="mt-1 text-xs leading-5 text-zinc-500">
+                      Select the exact finding that should replace the
+                      invalid conclusion reference. Only findings belonging
+                      to this investigation are available.
+                    </p>
+
+                    <select
+                      id={`replacement-finding-${issue.targetId ?? issue.nodeId ?? "unknown"}`}
+                      value={replacementEntityId}
+                      onChange={(event) =>
+                        setReplacementEntityId(
+                          event.target.value,
+                        )
+                      }
+                      className="mt-3 w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-xs text-zinc-200 outline-none transition focus:border-cyan-400/40"
+                    >
+                      <option value="">
+                        Select a replacement finding
+                      </option>
+
+                      {replacementFindings.map(
+                        (finding) => (
+                          <option
+                            key={finding.id}
+                            value={finding.id}
+                          >
+                            {finding.statement}
+                          </option>
+                        ),
+                      )}
+                    </select>
+
+                    {replacementFindings.length === 0 ? (
+                      <p className="mt-2 text-xs text-amber-300">
+                        No findings belonging to this investigation are
+                        available as deterministic replacements.
+                      </p>
+                    ) : null}
+                  </div>
+                ) : null}
+
               <div className="mt-4 rounded-lg border border-amber-400/10 bg-black/20 px-3 py-3">
                 <p className="text-xs text-amber-200">
                   Confirmation is required before any remediation can be executed.
@@ -362,6 +437,8 @@ function IssueCard({
                           investigationId,
                           issue,
                           true,
+                          replacementEntityId ||
+                            undefined,
                         );
 
                       if (!request) {
@@ -370,7 +447,14 @@ function IssueCard({
 
                       onRemediationRequest?.(request);
                     }}
-                    disabled={!onRemediationRequest}
+                      disabled={
+                        !onRemediationRequest ||
+                        (
+                          issue.code ===
+                          "CONCLUSION_FINDING_REFERENCE_INVALID" &&
+                          !replacementEntityId
+                        )
+                      }
                     className="rounded-lg border border-amber-400/30 bg-amber-500/10 px-3 py-2 text-xs font-semibold text-amber-200 transition hover:border-amber-400/50 hover:bg-amber-500/15 disabled:cursor-not-allowed disabled:opacity-40"
                   >
                     Confirm remediation

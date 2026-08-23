@@ -3554,6 +3554,7 @@ export function createResearchLineageIntegrityRemediationRequest(
   investigationId: string,
   issue: ResearchLineageIntegrityIssue,
   confirmed: boolean,
+  replacementEntityId?: string,
 ): ResearchLineageIntegrityRemediationRequest | null {
   const action =
     getResearchLineageIntegrityIssueAction(
@@ -3579,6 +3580,7 @@ export function createResearchLineageIntegrityRemediationRequest(
     action: action.action,
     issueCode: issue.code,
     target: action.target,
+    replacementEntityId,
     confirmed,
   };
 }
