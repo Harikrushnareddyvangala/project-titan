@@ -307,6 +307,76 @@ describe("research lineage remediation", () => {
         confirmed: true,
       });
 
+    const decision =
+      decideResearchLineageIntegrityRemediationRepair(
+        plan,
+      );
+
+    expect(decision.decision).toBe(
+      "Repairable",
+    );
+
+    expect(decision.action).toBe(
+      "RepairReference",
+    );
+
+    expect(
+      decision.replacementEntityId,
+    ).toBe(
+      "finding-valid-003",
+    );
+
+    expect(
+      decision.resolvedTarget.resolvable,
+    ).toBe(true);
+
+    const mutationContract =
+      createResearchLineageIntegrityRemediationMutationContract(
+        decision,
+      );
+
+    expect(mutationContract).not.toBeNull();
+
+    if (!mutationContract) {
+      return;
+    }
+
+    expect(
+      mutationContract.mutationType,
+    ).toBe(
+      "ReferenceReplacement",
+    );
+
+    expect(
+      mutationContract.investigationId,
+    ).toBe(
+      "investigation-test-003",
+    );
+
+    expect(
+      mutationContract.issueCode,
+    ).toBe(
+      "CONCLUSION_FINDING_REFERENCE_INVALID",
+    );
+
+    expect(
+      mutationContract.replacementEntityId,
+    ).toBe(
+      "finding-valid-003",
+    );
+
+    expect(
+      mutationContract.deterministic,
+    ).toBe(true);
+
+    expect(
+      mutationContract.requiresConfirmation,
+    ).toBe(true);
+
+    expect(
+      mutationContract.createsProvenanceEvent,
+    ).toBe(true);
+
     const result =
       executeResearchLineageIntegrityRemediation(
         plan,
