@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it } from "vitest";
 
 import {
+  createResearchLineageIntegrityRemediationMutationContract,
   createResearchLineageIntegrityRemediationPlan,
   createResearchLineageIntegrityRemediationRequest,
   decideResearchLineageIntegrityRemediationRepair,
@@ -647,6 +648,13 @@ describe("research lineage remediation", () => {
     expect(decision.decision).toBe(
       "NotRepairable",
     );
+
+    const mutationContract =
+      createResearchLineageIntegrityRemediationMutationContract(
+        decision,
+      );
+
+expect(mutationContract).toBeNull();
 
     expect(
       decision.resolvedTarget.resolvable,
