@@ -2,12 +2,13 @@ import { beforeEach, describe, expect, it } from "vitest";
 
 import {
   createResearchLineageIntegrityRemediationPlan,
+  createResearchLineageIntegrityRemediationRequest,
+  decideResearchLineageIntegrityRemediationRepair,
   executeResearchLineageIntegrityRemediation,
   getResearchInvestigationConclusions,
   getResearchLineageIntegrityIssueAction,
   getResearchFindings,
   validateResearchLineage,
-  createResearchLineageIntegrityRemediationRequest,
 } from "@/lib/research";
 
 describe("research lineage remediation", () => {
@@ -369,7 +370,8 @@ describe("research lineage remediation", () => {
         id: "investigation-test-004",
         title: "Relationship safety test",
         objective: "Test invalid lineage relationship handling",
-        question: "Can an invalid relationship be prevented from automatic repair?",
+        question:
+          "Can an invalid relationship be prevented from automatic repair?",
         status: "Draft",
         experimentIds: ["experiment-test-004"],
         evidenceIds: ["evidence-test-004"],
@@ -600,7 +602,8 @@ describe("research lineage remediation", () => {
     const issue =
       validation.issues.find(
         (candidate) =>
-          candidate.code === "INVALID_EDGE_DIRECTION",
+          candidate.code ===
+          "INVALID_EDGE_DIRECTION",
       );
 
     expect(issue).toBeDefined();
@@ -632,6 +635,35 @@ describe("research lineage remediation", () => {
         request,
       );
 
+    const decision =
+      decideResearchLineageIntegrityRemediationRepair(
+        plan,
+      );
+
+    expect(decision.action).toBe(
+      "RepairRelationship",
+    );
+
+    expect(decision.decision).toBe(
+      "NotRepairable",
+    );
+
+    expect(
+      decision.resolvedTarget.resolvable,
+    ).toBe(true);
+
+    expect(
+      decision.repairDescription,
+    ).toContain(
+      "only permits deterministic reference repairs",
+    );
+
+    expect(
+      decision.reason,
+    ).toContain(
+      "RepairRelationship",
+    );
+
     const result =
       executeResearchLineageIntegrityRemediation(
         plan,
@@ -643,5 +675,4 @@ describe("research lineage remediation", () => {
       "not deterministic",
     );
   });
-
 });
