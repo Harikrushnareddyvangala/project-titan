@@ -496,4 +496,152 @@ describe("research lineage remediation", () => {
     expect(request).toBeNull();
   });
 
+  it("rejects confirmed relationship remediation without a mutation contract", () => {
+    const now = new Date().toISOString();
+
+    const investigations = [
+      {
+        id: "investigation-test-005",
+        title: "Confirmed relationship safety test",
+        objective: "Test confirmed relationship remediation execution",
+        question:
+          "Can confirmed relationship repair be rejected without a mutation contract?",
+        status: "Draft",
+        experimentIds: ["experiment-test-005"],
+        evidenceIds: ["evidence-test-005"],
+        findingIds: ["finding-test-005"],
+        artifactIds: [],
+        conclusionIds: ["conclusion-test-005"],
+        createdAt: now,
+        updatedAt: now,
+      },
+    ];
+
+    const experiments = [
+      {
+        id: "experiment-test-005",
+        investigationId: "investigation-test-005",
+        title: "Relationship execution experiment",
+        hypothesis: "Test confirmed relationship remediation",
+        status: "Completed",
+        evidenceIds: ["evidence-test-005"],
+        findingIds: [],
+        createdAt: now,
+        updatedAt: now,
+      },
+    ];
+
+    const evidence = [
+      {
+        id: "evidence-test-005",
+        investigationId: "investigation-test-005",
+        title: "Test evidence",
+        description: "Evidence for relationship execution safety test",
+        experimentId: "experiment-test-005",
+        createdAt: now,
+        updatedAt: now,
+      },
+    ];
+
+    const findings = [
+      {
+        id: "finding-test-005",
+        statement: "Test finding",
+        evidenceAssessments: [],
+        confidence: 0.9,
+        validationIds: [],
+        investigationId: "investigation-test-005",
+        createdAt: now,
+        updatedAt: now,
+      },
+    ];
+
+    const conclusions = [
+      {
+        id: "conclusion-test-005",
+        investigationId: "investigation-test-005",
+        statement: "Test conclusion",
+        status: "Accepted",
+        supportingFindingIds: ["evidence-test-005"],
+        contradictingFindingIds: [],
+        createdAt: now,
+        updatedAt: now,
+      },
+    ];
+
+    localStorage.setItem(
+      "titan:research-investigations",
+      JSON.stringify(investigations),
+    );
+
+    localStorage.setItem(
+      "titan:research-experiments",
+      JSON.stringify(experiments),
+    );
+
+    localStorage.setItem(
+      "titan:research-evidence",
+      JSON.stringify(evidence),
+    );
+
+    localStorage.setItem(
+      "titan:research-findings",
+      JSON.stringify(findings),
+    );
+
+    localStorage.setItem(
+      "titan:research-investigation-conclusions",
+      JSON.stringify(conclusions),
+    );
+
+    const validation =
+      validateResearchLineage("investigation-test-005");
+
+    const issue =
+      validation.issues.find(
+        (candidate) =>
+          candidate.code === "INVALID_EDGE_DIRECTION",
+      );
+
+    expect(issue).toBeDefined();
+
+    if (!issue) {
+      return;
+    }
+
+    const action =
+      getResearchLineageIntegrityIssueAction(issue);
+
+    expect(action.action).toBe("RepairRelationship");
+
+    const request =
+      createResearchLineageIntegrityRemediationRequest(
+        "investigation-test-005",
+        issue,
+        true,
+      );
+
+    expect(request).not.toBeNull();
+
+    if (!request) {
+      return;
+    }
+
+    const plan =
+      createResearchLineageIntegrityRemediationPlan(
+        request,
+      );
+
+    const result =
+      executeResearchLineageIntegrityRemediation(
+        plan,
+      );
+
+    expect(result.executed).toBe(false);
+    expect(result.status).toBe("Rejected");
+    expect(result.message).toContain(
+      "not deterministic",
+    );
+  });
+
 });
