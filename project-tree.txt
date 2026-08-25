@@ -1,5 +1,4 @@
 .
-├── .DS_Store
 ├── .editorconfig
 ├── .github
 │   └── workflows
@@ -7,14 +6,11 @@
 ├── .prettierrc
 ├── .vscode
 ├── apps
-│   ├── .DS_Store
 │   ├── admin
 │   ├── api
 │   ├── docs
 │   ├── PROJECT_TITAN_PROGRESS.md
 │   └── web
-│       ├── .DS_Store
-│       ├── .env.local
 │       ├── .gitignore
 │       ├── assets
 │       ├── components
@@ -26,12 +22,11 @@
 │       ├── next-env.d.ts
 │       ├── next.config.ts
 │       ├── package.json
-│       ├── pnpm-lock.yaml
-│       ├── pnpm-workspace.yaml
 │       ├── postcss.config.mjs
 │       ├── providers
 │       ├── public
-│       │   ├── .DS_Store
+│       │   ├── branding
+│       │   │   └── harikrushnareddy-signature-transparent.png
 │       │   ├── file.svg
 │       │   ├── globe.svg
 │       │   ├── next.svg
@@ -48,9 +43,7 @@
 │       ├── README.md
 │       ├── services
 │       ├── src
-│       │   ├── .DS_Store
 │       │   ├── app
-│       │   │   ├── .DS_Store
 │       │   │   ├── api
 │       │   │   │   └── github
 │       │   │   │       └── [...repo]
@@ -69,6 +62,8 @@
 │       │   │   └── workspace
 │       │   │       ├── [module]
 │       │   │       │   └── page.tsx
+│       │   │       ├── artifact-lifecycle-test
+│       │   │       │   └── page.tsx
 │       │   │       ├── comparison
 │       │   │       │   └── page.tsx
 │       │   │       ├── developer
@@ -85,7 +80,9 @@
 │       │   │       │   └── page.tsx
 │       │   │       ├── repository
 │       │   │       │   └── page.tsx
-│       │   │       └── research
+│       │   │       ├── research
+│       │   │       │   └── page.tsx
+│       │   │       └── trust-test
 │       │   │           └── page.tsx
 │       │   ├── assets
 │       │   │   ├── animations
@@ -96,7 +93,6 @@
 │       │   ├── blog
 │       │   ├── common
 │       │   ├── components
-│       │   │   ├── .DS_Store
 │       │   │   ├── architecture
 │       │   │   │   ├── ArchitectureFlow.tsx
 │       │   │   │   ├── ArchitectureOverview.tsx
@@ -150,10 +146,79 @@
 │       │   │   │   ├── TeamCompatibilityDashboard.tsx
 │       │   │   │   └── TechnologyDistribution.tsx
 │       │   │   ├── intelligence
+│       │   │   │   ├── actions
+│       │   │   │   │   ├── index.ts
+│       │   │   │   │   └── IntelligenceActionBar.tsx
+│       │   │   │   ├── artifacts
+│       │   │   │   │   ├── index.ts
+│       │   │   │   │   ├── IntelligenceArtifactExportButtons.tsx
+│       │   │   │   │   ├── IntelligenceArtifactHistory.tsx
+│       │   │   │   │   ├── IntelligenceArtifactIntegrity.tsx
+│       │   │   │   │   ├── IntelligenceArtifactLineage.tsx
+│       │   │   │   │   ├── IntelligenceArtifactSigningPanel.tsx
+│       │   │   │   │   ├── IntelligenceArtifactStatusBadge.tsx
+│       │   │   │   │   ├── IntelligenceArtifactTrust.tsx
+│       │   │   │   │   └── IntelligenceTrustKeyManager.tsx
 │       │   │   │   ├── ConfidenceMetric.tsx
+│       │   │   │   ├── development
+│       │   │   │   │   ├── DevelopmentIntelligence.tsx
+│       │   │   │   │   ├── DevelopmentMetricCard.tsx
+│       │   │   │   │   └── index.ts
+│       │   │   │   ├── engineering
+│       │   │   │   │   ├── EngineeringIntelligence.tsx
+│       │   │   │   │   ├── EngineeringMetricCard.tsx
+│       │   │   │   │   └── index.ts
+│       │   │   │   ├── enterprise
+│       │   │   │   │   ├── EnterpriseIntelligence.tsx
+│       │   │   │   │   ├── EnterpriseMetricCard.tsx
+│       │   │   │   │   └── index.ts
+│       │   │   │   ├── executive
+│       │   │   │   │   ├── ExecutiveIntelligence.tsx
+│       │   │   │   │   ├── ExecutiveScoreCard.tsx
+│       │   │   │   │   ├── ExecutiveSummary.tsx
+│       │   │   │   │   └── index.ts
 │       │   │   │   ├── ExecutiveSummary.tsx
 │       │   │   │   ├── index.ts
-│       │   │   │   └── RecommendationCard.tsx
+│       │   │   │   ├── navigation
+│       │   │   │   │   ├── index.ts
+│       │   │   │   │   ├── IntelligenceNavigation.tsx
+│       │   │   │   │   └── IntelligenceNavigationItem.tsx
+│       │   │   │   ├── overview
+│       │   │   │   │   ├── index.ts
+│       │   │   │   │   ├── IntelligenceOverview.tsx
+│       │   │   │   │   └── IntelligenceOverviewCard.tsx
+│       │   │   │   ├── RecommendationCard.tsx
+│       │   │   │   ├── recommendations
+│       │   │   │   │   ├── AIRecommendations.tsx
+│       │   │   │   │   ├── index.ts
+│       │   │   │   │   └── RecommendationCard.tsx
+│       │   │   │   ├── recruiter
+│       │   │   │   │   ├── index.ts
+│       │   │   │   │   ├── RecruiterIntelligence.tsx
+│       │   │   │   │   └── RecruiterMetricCard.tsx
+│       │   │   │   ├── reports
+│       │   │   │   │   ├── index.ts
+│       │   │   │   │   └── IntelligenceReport.tsx
+│       │   │   │   ├── RepositoryIntelligence.tsx
+│       │   │   │   ├── search
+│       │   │   │   │   ├── index.ts
+│       │   │   │   │   └── IntelligenceSearch.tsx
+│       │   │   │   ├── shared
+│       │   │   │   │   ├── getAvailableIntelligenceSections.ts
+│       │   │   │   │   ├── index.ts
+│       │   │   │   │   ├── IntelligenceEmptyState.tsx
+│       │   │   │   │   ├── IntelligenceLoading.tsx
+│       │   │   │   │   └── IntelligenceSection.tsx
+│       │   │   │   ├── snapshots
+│       │   │   │   │   ├── index.ts
+│       │   │   │   │   ├── IntelligenceSnapshotCard.tsx
+│       │   │   │   │   ├── IntelligenceSnapshotHistory.tsx
+│       │   │   │   │   ├── IntelligenceSnapshotViewer.tsx
+│       │   │   │   │   └── SharedSnapshotView.tsx
+│       │   │   │   └── technology
+│       │   │   │       ├── index.ts
+│       │   │   │       ├── TechnologyIntelligence.tsx
+│       │   │   │       └── TechnologyMetricCard.tsx
 │       │   │   ├── layout
 │       │   │   │   ├── Container
 │       │   │   │   │   ├── Container.tsx
@@ -174,9 +239,15 @@
 │       │   │   │   │   ├── types.ts
 │       │   │   │   │   ├── use-navbar-scroll.ts
 │       │   │   │   │   └── UserActions.tsx
+│       │   │   │   ├── Platform
 │       │   │   │   └── ThemeToggle
+│       │   │   ├── pages
+│       │   │   │   └── HomePage
+│       │   │   │       ├── HomePage.tsx
+│       │   │   │       └── index.ts
+│       │   │   ├── providers
+│       │   │   │   └── PlatformProvider.tsx
 │       │   │   ├── sections
-│       │   │   │   ├── .DS_Store
 │       │   │   │   ├── About
 │       │   │   │   │   ├── About.tsx
 │       │   │   │   │   ├── AboutAchievements.tsx
@@ -352,10 +423,10 @@
 │       │   │   │       ├── ProjectsHeader.tsx
 │       │   │   │       ├── ProjectSort.tsx
 │       │   │   │       ├── ProjectTechStack.tsx
+│       │   │   │       ├── selectors.ts
 │       │   │   │       ├── types.ts
 │       │   │   │       └── useProjectFilters.ts
 │       │   │   ├── ui
-│       │   │   │   ├── .DS_Store
 │       │   │   │   ├── Badge
 │       │   │   │   ├── badge.tsx
 │       │   │   │   ├── badges
@@ -416,7 +487,6 @@
 │       │   │   │   ├── TrendIndicator.tsx
 │       │   │   │   └── TrendMetricCard.tsx
 │       │   │   └── workspace
-│       │   │       ├── .DS_Store
 │       │   │       ├── comparison
 │       │   │       │   ├── ArchitectureIntelligenceDashboard.tsx
 │       │   │       │   ├── CategoryLaggardsCard.tsx
@@ -455,10 +525,21 @@
 │       │   │       ├── repository
 │       │   │       │   ├── page.tsx
 │       │   │       │   ├── PortfolioWorkspace.tsx
+│       │   │       │   ├── RecentRepositoriesCard.tsx
 │       │   │       │   ├── RepositoryWorkspace.tsx
 │       │   │       │   ├── RepositoryWorkspaceHeader.tsx
 │       │   │       │   └── RepositoryWorkspaceLayout.tsx
 │       │   │       ├── research
+│       │   │       │   ├── ResearchConclusionPanel.tsx
+│       │   │       │   ├── ResearchEvidencePanel.tsx
+│       │   │       │   ├── ResearchExperimentPanel.tsx
+│       │   │       │   ├── ResearchFindingPanel.tsx
+│       │   │       │   ├── ResearchInvestigationPanel.tsx
+│       │   │       │   ├── ResearchLineageGraph.tsx
+│       │   │       │   ├── ResearchLineageIntegrity.tsx
+│       │   │       │   ├── ResearchLineageNodeInspector.tsx
+│       │   │       │   ├── ResearchProvenanceSummary.tsx
+│       │   │       │   ├── ResearchProvenanceTimeline.tsx
 │       │   │       │   └── ResearchWorkspace.tsx
 │       │   │       ├── shared
 │       │   │       │   ├── RepositoryAnalysisContainer.tsx
@@ -469,6 +550,8 @@
 │       │   │       ├── WorkspaceNavigation.tsx
 │       │   │       ├── WorkspaceShell.tsx
 │       │   │       └── WorkspaceSidebar.tsx
+│       │   ├── config
+│       │   │   └── identity.ts
 │       │   ├── constants
 │       │   │   ├── navigation.ts
 │       │   │   ├── risk.ts
@@ -478,14 +561,11 @@
 │       │   ├── contact
 │       │   ├── dashboard
 │       │   ├── features
-│       │   │   ├── .DS_Store
 │       │   │   ├── CTA
 │       │   │   ├── FeaturedProjects
 │       │   │   ├── Hero
 │       │   │   ├── home
-│       │   │   │   ├── .DS_Store
 │       │   │   │   ├── components
-│       │   │   │   │   ├── .DS_Store
 │       │   │   │   │   └── Hero
 │       │   │   │   │       ├── Hero.tsx
 │       │   │   │   │       ├── HeroActions.tsx
@@ -510,13 +590,18 @@
 │       │   ├── hooks
 │       │   │   ├── useGithubPortfolio.ts
 │       │   │   ├── useGithubRepository.ts
+│       │   │   ├── useIntelligenceShare.ts
+│       │   │   ├── useIntelligenceSnapshot.ts
+│       │   │   ├── useLastRepository.ts
 │       │   │   ├── useMousePosition.ts
+│       │   │   ├── useRecentRepositories.ts
 │       │   │   ├── useRepositoryAnalytics.ts
+│       │   │   ├── useResearchInvestigations.ts
+│       │   │   ├── useSharedSnapshot.ts
 │       │   │   ├── useTypingEffect.ts
 │       │   │   └── useWorkspaceRepository.ts
 │       │   ├── layout
 │       │   ├── lib
-│       │   │   ├── .DS_Store
 │       │   │   ├── animations
 │       │   │   │   ├── fade.ts
 │       │   │   │   ├── index.ts
@@ -525,10 +610,10 @@
 │       │   │   │   └── stagger.ts
 │       │   │   ├── animations.ts
 │       │   │   ├── constants
+│       │   │   │   ├── github.ts
 │       │   │   │   ├── navigation.ts
 │       │   │   │   └── workspaceNavigation.ts
 │       │   │   ├── github
-│       │   │   │   ├── .DS_Store
 │       │   │   │   ├── aiRecommendationEngine.ts
 │       │   │   │   ├── analyticsEngine.ts
 │       │   │   │   ├── architectureIntelligenceEngine.ts
@@ -586,19 +671,44 @@
 │       │   │   │   ├── repositoryTrendIntelligenceEngine.ts
 │       │   │   │   ├── scoringEngine.ts
 │       │   │   │   ├── securityEngine.ts
+│       │   │   │   ├── storage.ts
 │       │   │   │   ├── teamCompatibilityEngine.ts
-│       │   │   │   └── technologyEngine.ts
+│       │   │   │   ├── technologyEngine.ts
+│       │   │   │   └── validation.ts
 │       │   │   ├── github.ts
 │       │   │   ├── hooks
 │       │   │   ├── intelligence
+│       │   │   │   ├── artifact.ts
+│       │   │   │   ├── artifactExport.ts
+│       │   │   │   ├── artifactIntegrity.ts
+│       │   │   │   ├── artifactLifecycleTest.ts
+│       │   │   │   ├── artifactProvenance.ts
+│       │   │   │   ├── artifactRegistry.ts
+│       │   │   │   ├── artifactService.ts
+│       │   │   │   ├── artifactSigning.ts
+│       │   │   │   ├── artifactSigningWorkflow.ts
+│       │   │   │   ├── artifactTrustEnforcement.ts
+│       │   │   │   ├── artifactTrustPolicy.ts
+│       │   │   │   ├── artifactTrustService.ts
 │       │   │   │   ├── confidence.ts
 │       │   │   │   ├── executive.ts
+│       │   │   │   ├── export.ts
 │       │   │   │   ├── health.ts
 │       │   │   │   ├── index.ts
+│       │   │   │   ├── keyManagementService.ts
+│       │   │   │   ├── keyManager.ts
 │       │   │   │   ├── risk.ts
 │       │   │   │   ├── score.ts
+│       │   │   │   ├── sections.ts
+│       │   │   │   ├── share.ts
+│       │   │   │   ├── snapshot.ts
 │       │   │   │   ├── summary.ts
-│       │   │   │   └── trend.ts
+│       │   │   │   ├── trend.ts
+│       │   │   │   ├── trust.ts
+│       │   │   │   ├── trustRuntimeTest.ts
+│       │   │   │   ├── trustService.ts
+│       │   │   │   ├── trustStore.ts
+│       │   │   │   └── types.ts
 │       │   │   ├── platform
 │       │   │   │   ├── architecture
 │       │   │   │   │   └── architectureCenter.ts
@@ -606,14 +716,32 @@
 │       │   │   │   │   ├── diagnosticRegistry.ts
 │       │   │   │   │   ├── index.ts
 │       │   │   │   │   └── platformDiagnosticsService.ts
+│       │   │   │   ├── initializePlatform.ts
 │       │   │   │   ├── metadata
-│       │   │   │   │   └── moduleCatalog.ts
+│       │   │   │   │   ├── architecture.ts
+│       │   │   │   │   ├── dashboard.ts
+│       │   │   │   │   ├── github.ts
+│       │   │   │   │   ├── moduleCatalog.ts
+│       │   │   │   │   ├── portfolio.ts
+│       │   │   │   │   ├── projects.ts
+│       │   │   │   │   ├── research.ts
+│       │   │   │   │   └── workspace.ts
 │       │   │   │   ├── performance
 │       │   │   │   │   ├── index.ts
 │       │   │   │   │   ├── performanceMonitor.ts
 │       │   │   │   │   └── performanceTypes.ts
 │       │   │   │   └── registry
-│       │   │   │       └── moduleRegistry.ts
+│       │   │   │       ├── index.ts
+│       │   │   │       ├── moduleRegistry.ts
+│       │   │   │       ├── moduleTypes.ts
+│       │   │   │       ├── registerModule.ts
+│       │   │   │       └── registryHelpers.ts
+│       │   │   ├── research
+│       │   │   │   ├── __tests__
+│       │   │   │   │   └── lineage-remediation.test.ts
+│       │   │   │   ├── evidenceAssessment.ts
+│       │   │   │   ├── index.ts
+│       │   │   │   └── research.ts
 │       │   │   ├── types
 │       │   │   └── utils
 │       │   │       ├── cn.ts
@@ -653,6 +781,7 @@
 │       │   │   ├── platformMetadata.ts
 │       │   │   ├── project.ts
 │       │   │   ├── quality.ts
+│       │   │   ├── research.ts
 │       │   │   ├── risk.ts
 │       │   │   └── skill.ts
 │       │   ├── ui
@@ -665,7 +794,8 @@
 │       ├── tsconfig.json
 │       ├── tsconfig.tsbuildinfo
 │       ├── types
-│       └── utils
+│       ├── utils
+│       └── vitest.config.mts
 ├── datasets
 ├── docs
 │   ├── architecture
@@ -695,6 +825,7 @@
 ├── pnpm-workspace.yaml
 ├── project-tree.txt
 ├── README.md
+├── ROADMAP.md
 ├── scripts
 ├── services
 │   ├── ai
@@ -706,4 +837,4 @@
 ├── tsconfig.base.json
 └── turbo.json
 
-167 directories, 540 files
+192 directories, 646 files
