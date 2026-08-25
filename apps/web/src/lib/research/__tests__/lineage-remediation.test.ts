@@ -754,6 +754,133 @@ expect(mutationContract).toBeNull();
     );
   });
 
+    it("rejects reference execution when the invalid source is absent from the target", () => {
+    const now = new Date().toISOString();
+
+    const investigations = [
+      {
+        id: "investigation-test-006",
+        title: "Mutation execution guard test",
+        objective: "Test stale reference execution protection",
+        question:
+          "Can execution reject a mutation when the source reference is absent?",
+        status: "Draft",
+        experimentIds: [],
+        evidenceIds: [],
+        findingIds: ["finding-valid-006"],
+        artifactIds: [],
+        conclusionIds: ["conclusion-test-006"],
+        createdAt: now,
+        updatedAt: now,
+      },
+    ];
+
+    const findings = [
+      {
+        id: "finding-valid-006",
+        statement: "Valid replacement finding",
+        evidenceAssessments: [],
+        confidence: 0.95,
+        validationIds: [],
+        investigationId: "investigation-test-006",
+        createdAt: now,
+        updatedAt: now,
+      },
+    ];
+
+    const conclusions = [
+      {
+        id: "conclusion-test-006",
+        investigationId: "investigation-test-006",
+        statement: "Test conclusion",
+        status: "Accepted",
+        supportingFindingIds: [],
+        contradictingFindingIds: [],
+        createdAt: now,
+        updatedAt: now,
+      },
+    ];
+
+    localStorage.setItem(
+      "titan:research-investigations",
+      JSON.stringify(investigations),
+    );
+
+    localStorage.setItem(
+      "titan:research-findings",
+      JSON.stringify(findings),
+    );
+
+    localStorage.setItem(
+      "titan:research-investigation-conclusions",
+      JSON.stringify(conclusions),
+    );
+
+    const validation =
+      validateResearchLineage(
+        "investigation-test-006",
+      );
+
+    expect(validation.valid).toBe(true);
+
+    const plan =
+      createResearchLineageIntegrityRemediationPlan({
+        investigationId:
+          "investigation-test-006",
+        action: "RepairReference",
+        issueCode:
+          "CONCLUSION_FINDING_REFERENCE_INVALID",
+        target: {
+          targetId:
+            "conclusion-test-006",
+          sourceId:
+            "finding-invalid-006",
+        },
+        replacementEntityId:
+          "finding-valid-006",
+        confirmed: true,
+      });
+
+      const conclusionsBefore =
+        getResearchInvestigationConclusions();
+
+      expect(
+        conclusionsBefore.find(
+          (conclusion) =>
+            conclusion.id === "conclusion-test-006",
+        )?.supportingFindingIds,
+      ).toEqual([]);
+
+      expect(
+        conclusionsBefore.find(
+          (conclusion) =>
+            conclusion.id === "conclusion-test-006",
+        )?.contradictingFindingIds,
+      ).toEqual([]);
+
+    const result =
+      executeResearchLineageIntegrityRemediation(
+        plan,
+      );
+
+    expect(result.executed).toBe(false);
+    expect(result.status).toBe("Rejected");
+    expect(result.message).toContain(
+      "not present on the target conclusion",
+    );
+
+    const conclusionsAfter =
+      getResearchInvestigationConclusions();
+
+    expect(
+      conclusionsAfter[0].supportingFindingIds,
+    ).toEqual([]);
+
+    expect(
+      conclusionsAfter[0].contradictingFindingIds,
+    ).toEqual([]);
+  });
+
   it("creates a deterministic mutation contract for a repairable reference", () => {
   const now = new Date().toISOString();
 
