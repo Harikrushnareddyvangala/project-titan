@@ -793,6 +793,19 @@ export interface ResearchLineageIntegrityRemediationRepairDecisionResult {
   reason: string;
 }
 
+export interface ResearchLineageIntegrityRemediationPostcondition {
+  validated: boolean;
+
+  valid: boolean;
+
+  issueCount: number;
+
+  issues: ResearchLineageIntegrityIssue[];
+
+  checkedNodeCount: number;
+
+  checkedEdgeCount: number;
+}
 export interface ResearchLineageIntegrityRemediationRepairExecutionResult {
   investigationId: string;
 
@@ -812,6 +825,8 @@ export interface ResearchLineageIntegrityRemediationRepairExecutionResult {
   message: string;
 
   provenanceEventId?: string;
+
+  postcondition?: ResearchLineageIntegrityRemediationPostcondition;
 }
 
 export interface ResearchLineageIntegrityRemediationRequest {
@@ -876,6 +891,8 @@ export interface ResearchLineageIntegrityRemediationResult {
   message: string;
 
   provenanceEventId?: string;
+
+  postcondition?: ResearchLineageIntegrityRemediationPostcondition;
 
   plan: ResearchLineageIntegrityRemediationPlan;
 }

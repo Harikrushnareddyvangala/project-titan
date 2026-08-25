@@ -1373,6 +1373,122 @@ describe("research lineage remediation", () => {
     );
   });
 
+  it("preserves unrelated finding polarity during reference remediation", () => {
+    const now = new Date().toISOString();
+
+    const investigations = [
+      {
+        id: "investigation-test-011",
+        title: "Mixed polarity remediation test",
+        objective: "Test selective reference replacement",
+        question:
+          "Does reference remediation preserve unrelated finding polarity?",
+        status: "Draft",
+        experimentIds: [],
+        evidenceIds: [],
+        findingIds: [
+          "finding-valid-011",
+          "finding-contradicting-011",
+        ],
+        artifactIds: [],
+        conclusionIds: ["conclusion-test-011"],
+        createdAt: now,
+        updatedAt: now,
+      },
+    ];
+
+    const findings = [
+      {
+        id: "finding-valid-011",
+        statement: "Valid replacement finding",
+        evidenceAssessments: [],
+        confidence: 0.95,
+        validationIds: [],
+        investigationId: "investigation-test-011",
+        createdAt: now,
+        updatedAt: now,
+      },
+      {
+        id: "finding-contradicting-011",
+        statement: "Independent contradicting finding",
+        evidenceAssessments: [],
+        confidence: 0.85,
+        validationIds: [],
+        investigationId: "investigation-test-011",
+        createdAt: now,
+        updatedAt: now,
+      },
+    ];
+
+    const conclusions = [
+      {
+        id: "conclusion-test-011",
+        investigationId: "investigation-test-011",
+        statement: "Mixed polarity conclusion",
+        status: "Accepted",
+        supportingFindingIds: ["finding-invalid-011"],
+        contradictingFindingIds: ["finding-contradicting-011"],
+        createdAt: now,
+        updatedAt: now,
+      },
+    ];
+
+    localStorage.setItem(
+      "titan:research-investigations",
+      JSON.stringify(investigations),
+    );
+
+    localStorage.setItem(
+      "titan:research-findings",
+      JSON.stringify(findings),
+    );
+
+    localStorage.setItem(
+      "titan:research-investigation-conclusions",
+      JSON.stringify(conclusions),
+    );
+
+    const plan =
+      createResearchLineageIntegrityRemediationPlan({
+        investigationId: "investigation-test-011",
+        action: "RepairReference",
+        issueCode: "CONCLUSION_FINDING_REFERENCE_INVALID",
+        target: {
+          targetId: "conclusion-test-011",
+          sourceId: "finding-invalid-011",
+        },
+        replacementEntityId: "finding-valid-011",
+        confirmed: true,
+      });
+
+    const result =
+      executeResearchLineageIntegrityRemediation(plan);
+
+    expect(result.executed).toBe(true);
+    expect(result.status).toBe("Executed");
+
+    const updatedConclusion =
+      getResearchInvestigationConclusions().find(
+        (conclusion) =>
+          conclusion.id === "conclusion-test-011",
+      );
+
+    expect(updatedConclusion?.supportingFindingIds).toEqual([
+      "finding-valid-011",
+    ]);
+
+    expect(updatedConclusion?.contradictingFindingIds).toEqual([
+      "finding-contradicting-011",
+    ]);
+
+    const validation =
+      validateResearchLineage(
+        "investigation-test-011",
+      );
+
+    expect(validation.valid).toBe(true);
+  });
+
   it("reports successful remediation only when the repaired lineage validates", () => {
     const now = new Date().toISOString();
 
@@ -1750,5 +1866,123 @@ describe("research lineage remediation", () => {
           item.eventId === result.provenanceEventId,
       ),
     ).toBe(true);
+  });
+
+    it("returns a validated postcondition after successful remediation", () => {
+    const now = new Date().toISOString();
+
+    const investigations = [
+      {
+        id: "investigation-test-012",
+        title: "Remediation postcondition test",
+        objective: "Test remediation postcondition reporting",
+        question:
+          "Does successful remediation return a validated lineage postcondition?",
+        status: "Draft",
+        experimentIds: [],
+        evidenceIds: [],
+        findingIds: ["finding-valid-012"],
+        artifactIds: [],
+        conclusionIds: ["conclusion-test-012"],
+        createdAt: now,
+        updatedAt: now,
+      },
+    ];
+
+    const findings = [
+      {
+        id: "finding-valid-012",
+        statement: "Valid replacement finding",
+        evidenceAssessments: [],
+        confidence: 0.95,
+        validationIds: [],
+        investigationId: "investigation-test-012",
+        createdAt: now,
+        updatedAt: now,
+      },
+    ];
+
+    const conclusions = [
+      {
+        id: "conclusion-test-012",
+        investigationId: "investigation-test-012",
+        statement: "Test conclusion",
+        status: "Accepted",
+        supportingFindingIds: ["finding-invalid-012"],
+        contradictingFindingIds: [],
+        createdAt: now,
+        updatedAt: now,
+      },
+    ];
+
+    localStorage.setItem(
+      "titan:research-investigations",
+      JSON.stringify(investigations),
+    );
+
+    localStorage.setItem(
+      "titan:research-findings",
+      JSON.stringify(findings),
+    );
+
+    localStorage.setItem(
+      "titan:research-investigation-conclusions",
+      JSON.stringify(conclusions),
+    );
+
+    const initialValidation =
+      validateResearchLineage(
+        "investigation-test-012",
+      );
+
+    expect(initialValidation.valid).toBe(false);
+
+    const plan =
+      createResearchLineageIntegrityRemediationPlan({
+        investigationId:
+          "investigation-test-012",
+        action: "RepairReference",
+        issueCode:
+          "CONCLUSION_FINDING_REFERENCE_INVALID",
+        target: {
+          targetId:
+            "conclusion-test-012",
+          sourceId:
+            "finding-invalid-012",
+        },
+        replacementEntityId:
+          "finding-valid-012",
+        confirmed: true,
+      });
+
+    const result =
+      executeResearchLineageIntegrityRemediation(
+        plan,
+      );
+
+    expect(result.executed).toBe(true);
+    expect(result.status).toBe("Executed");
+
+    expect(result.postcondition).toBeDefined();
+
+    expect(result.postcondition).toEqual(
+      expect.objectContaining({
+        validated: true,
+        valid: true,
+        issueCount: 0,
+      }),
+    );
+
+    expect(
+      result.postcondition?.checkedNodeCount,
+    ).toBeGreaterThan(0);
+
+    expect(
+      result.postcondition?.checkedEdgeCount,
+    ).toBeGreaterThan(0);
+
+    expect(
+      result.postcondition?.issues,
+    ).toEqual([]);
   });
 });

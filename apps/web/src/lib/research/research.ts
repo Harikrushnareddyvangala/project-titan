@@ -46,6 +46,7 @@ import type {
   ResearchLineageIntegrityRemediationReplacementDiscoveryResult,
   ResearchLineageIntegrityRemediationReplacementCandidate,
   ResearchLineageIntegrityRemediationRepairExecutionResult,
+  ResearchLineageIntegrityRemediationPostcondition,
   ResearchLineageIntegrityResolvedRemediationTarget,
   ResearchLineageIntegrityRemediationMutationContract,
   ResearchLineageIntegrityRemediationMutationResult,
@@ -2346,7 +2347,18 @@ export function executeResearchLineageIntegrityRemediationRepair(
     reason: `Deterministic remediation replaced invalid finding reference ${sourceId} with ${replacementFindingId}.`,
   });
 
-  const validation = validateResearchLineage(decision.investigationId);
+  const validation = validateResearchLineage(
+    decision.investigationId,
+  );
+
+  const postcondition: ResearchLineageIntegrityRemediationPostcondition = {
+    validated: true,
+    valid: validation.valid,
+    issueCount: validation.issueCount,
+    issues: validation.issues,
+    checkedNodeCount: validation.checkedNodeCount,
+    checkedEdgeCount: validation.checkedEdgeCount,
+  };
 
   if (
     validation.issues.some(
@@ -2367,6 +2379,8 @@ export function executeResearchLineageIntegrityRemediationRepair(
 
       provenanceEventId: provenanceEvent.id,
 
+      postcondition,
+
       message:
         "The reference mutation was persisted, but lineage validation still reports an invalid conclusion finding reference.",
     };
@@ -2384,6 +2398,8 @@ export function executeResearchLineageIntegrityRemediationRepair(
     mutationType: mutationContract.mutationType,
 
     provenanceEventId: provenanceEvent.id,
+
+    postcondition,
 
     message: `Deterministic reference repair completed: ${sourceId} was replaced with ${replacementFindingId} on conclusion ${conclusion.id}.`,
   };
@@ -2967,6 +2983,8 @@ export function executeResearchLineageIntegrityRemediation(
     message: repairResult.message,
 
     provenanceEventId: repairResult.provenanceEventId,
+
+    postcondition: repairResult.postcondition,
 
     plan,
   };
