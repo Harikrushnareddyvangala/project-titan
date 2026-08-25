@@ -9,6 +9,8 @@ import {
   getResearchInvestigationConclusions,
   getResearchLineageIntegrityIssueAction,
   getResearchFindings,
+  getResearchProvenanceEvents,
+  validateResearchProvenanceIntegrity,
   getResearchProvenanceEventsByEntity,
   validateResearchLineage,
 } from "@/lib/research";
@@ -1490,4 +1492,151 @@ describe("research lineage remediation", () => {
       updatedConclusion?.supportingFindingIds,
     ).toEqual(["finding-valid-009"]);
   });
+
+  it("returns a provenance event that passes provenance integrity validation", () => {
+  const now = new Date().toISOString();
+
+  const investigations = [
+    {
+      id: "investigation-test-010",
+      title: "Provenance integrity remediation test",
+      objective: "Test remediation provenance integrity",
+      question:
+        "Does successful remediation create provenance that remains internally valid?",
+      status: "Draft",
+      experimentIds: [],
+      evidenceIds: [],
+      findingIds: ["finding-valid-010"],
+      artifactIds: [],
+      conclusionIds: ["conclusion-test-010"],
+      createdAt: now,
+      updatedAt: now,
+    },
+  ];
+
+  const findings = [
+    {
+      id: "finding-valid-010",
+      statement: "Valid replacement finding",
+      evidenceAssessments: [],
+      confidence: 0.95,
+      validationIds: [],
+      investigationId: "investigation-test-010",
+      createdAt: now,
+      updatedAt: now,
+    },
+  ];
+
+  const conclusions = [
+    {
+      id: "conclusion-test-010",
+      investigationId: "investigation-test-010",
+      statement: "Test conclusion",
+      status: "Accepted",
+      supportingFindingIds: ["finding-invalid-010"],
+      contradictingFindingIds: [],
+      createdAt: now,
+      updatedAt: now,
+    },
+  ];
+
+  localStorage.setItem(
+    "titan:research-investigations",
+    JSON.stringify(investigations),
+  );
+
+  localStorage.setItem(
+    "titan:research-findings",
+    JSON.stringify(findings),
+  );
+
+  localStorage.setItem(
+    "titan:research-investigation-conclusions",
+    JSON.stringify(conclusions),
+  );
+
+  const plan =
+    createResearchLineageIntegrityRemediationPlan({
+      investigationId:
+        "investigation-test-010",
+      action: "RepairReference",
+      issueCode:
+        "CONCLUSION_FINDING_REFERENCE_INVALID",
+      target: {
+        targetId:
+          "conclusion-test-010",
+        sourceId:
+          "finding-invalid-010",
+      },
+      replacementEntityId:
+        "finding-valid-010",
+      confirmed: true,
+    });
+
+  const result =
+    executeResearchLineageIntegrityRemediation(
+      plan,
+    );
+
+  expect(result.executed).toBe(true);
+  expect(result.status).toBe("Executed");
+  expect(result.provenanceEventId).toBeDefined();
+
+  if (!result.provenanceEventId) {
+    return;
+  }
+
+  const provenanceEvents =
+    getResearchProvenanceEvents();
+
+  const provenanceEvent =
+    provenanceEvents.find(
+      (event) =>
+        event.id ===
+        result.provenanceEventId,
+    );
+
+  expect(provenanceEvent).toBeDefined();
+
+  if (!provenanceEvent) {
+    return;
+  }
+
+  expect(provenanceEvent.investigationId).toBe(
+    "investigation-test-010",
+  );
+
+  expect(provenanceEvent.entityType).toBe(
+    "Conclusion",
+  );
+
+  expect(provenanceEvent.entityId).toBe(
+    "conclusion-test-010",
+  );
+
+  expect(provenanceEvent.eventType).toBe(
+    "Updated",
+  );
+
+  expect(provenanceEvent.reason).toContain(
+    "finding-invalid-010",
+  );
+
+  expect(provenanceEvent.reason).toContain(
+    "finding-valid-010",
+  );
+
+  const provenanceValidation =
+    validateResearchProvenanceIntegrity();
+
+  expect(provenanceValidation.valid).toBe(true);
+
+  expect(
+    provenanceValidation.issues.filter(
+      (issue) =>
+        issue.eventId ===
+        result.provenanceEventId,
+    ),
+  ).toEqual([]);
+});
 });
