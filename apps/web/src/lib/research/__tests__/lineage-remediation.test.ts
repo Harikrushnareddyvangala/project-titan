@@ -9,6 +9,7 @@ import {
   getResearchInvestigationConclusions,
   getResearchLineageIntegrityIssueAction,
   getResearchFindings,
+  getResearchProvenanceEventsByEntity,
   validateResearchLineage,
 } from "@/lib/research";
 
@@ -385,6 +386,25 @@ describe("research lineage remediation", () => {
     expect(result.executed).toBe(true);
     expect(result.status).toBe("Executed");
 
+    const conclusionProvenance =
+      getResearchProvenanceEventsByEntity(
+        "Conclusion",
+        "conclusion-test-003",
+      );
+
+    expect(
+      conclusionProvenance.some(
+        (event) =>
+          event.eventType === "Updated" &&
+          event.reason?.includes(
+            "finding-invalid-003",
+          ) &&
+          event.reason?.includes(
+            "finding-valid-003",
+          ),
+      ),
+    ).toBe(true);
+
     const updatedConclusions =
       getResearchInvestigationConclusions();
 
@@ -421,7 +441,7 @@ describe("research lineage remediation", () => {
         }) =>
           event.entityType === "Conclusion" &&
           event.entityId ===
-            "conclusion-test-003" &&
+          "conclusion-test-003" &&
           event.eventType === "Updated" &&
           event.reason?.includes(
             "finding-invalid-003",
@@ -724,7 +744,7 @@ describe("research lineage remediation", () => {
         decision,
       );
 
-expect(mutationContract).toBeNull();
+    expect(mutationContract).toBeNull();
 
     expect(
       decision.resolvedTarget.resolvable,
@@ -754,7 +774,7 @@ expect(mutationContract).toBeNull();
     );
   });
 
-    it("rejects reference execution when the invalid source is absent from the target", () => {
+  it("rejects reference execution when the invalid source is absent from the target", () => {
     const now = new Date().toISOString();
 
     const investigations = [
@@ -841,22 +861,22 @@ expect(mutationContract).toBeNull();
         confirmed: true,
       });
 
-      const conclusionsBefore =
-        getResearchInvestigationConclusions();
+    const conclusionsBefore =
+      getResearchInvestigationConclusions();
 
-      expect(
-        conclusionsBefore.find(
-          (conclusion) =>
-            conclusion.id === "conclusion-test-006",
-        )?.supportingFindingIds,
-      ).toEqual([]);
+    expect(
+      conclusionsBefore.find(
+        (conclusion) =>
+          conclusion.id === "conclusion-test-006",
+      )?.supportingFindingIds,
+    ).toEqual([]);
 
-      expect(
-        conclusionsBefore.find(
-          (conclusion) =>
-            conclusion.id === "conclusion-test-006",
-        )?.contradictingFindingIds,
-      ).toEqual([]);
+    expect(
+      conclusionsBefore.find(
+        (conclusion) =>
+          conclusion.id === "conclusion-test-006",
+      )?.contradictingFindingIds,
+    ).toEqual([]);
 
     const result =
       executeResearchLineageIntegrityRemediation(
@@ -881,89 +901,223 @@ expect(mutationContract).toBeNull();
     ).toEqual([]);
   });
 
+  it("preserves contradicting relationship polarity during reference remediation", () => {
+    const now = new Date().toISOString();
+
+    const investigations = [
+      {
+        id: "investigation-test-007",
+        title: "Relationship polarity test",
+        objective: "Test contradicting reference remediation",
+        question:
+          "Does remediation preserve the original relationship polarity?",
+        status: "Draft",
+        experimentIds: [],
+        evidenceIds: [],
+        findingIds: ["finding-valid-007"],
+        artifactIds: [],
+        conclusionIds: ["conclusion-test-007"],
+        createdAt: now,
+        updatedAt: now,
+      },
+    ];
+
+    const findings = [
+      {
+        id: "finding-valid-007",
+        statement: "Valid replacement finding",
+        evidenceAssessments: [],
+        confidence: 0.95,
+        validationIds: [],
+        investigationId: "investigation-test-007",
+        createdAt: now,
+        updatedAt: now,
+      },
+    ];
+
+    const conclusions = [
+      {
+        id: "conclusion-test-007",
+        investigationId: "investigation-test-007",
+        statement: "Test conclusion",
+        status: "Accepted",
+        supportingFindingIds: [],
+        contradictingFindingIds: ["finding-invalid-007"],
+        createdAt: now,
+        updatedAt: now,
+      },
+    ];
+
+    localStorage.setItem(
+      "titan:research-investigations",
+      JSON.stringify(investigations),
+    );
+
+    localStorage.setItem(
+      "titan:research-findings",
+      JSON.stringify(findings),
+    );
+
+    localStorage.setItem(
+      "titan:research-investigation-conclusions",
+      JSON.stringify(conclusions),
+    );
+
+    const plan =
+      createResearchLineageIntegrityRemediationPlan({
+        investigationId:
+          "investigation-test-007",
+        action: "RepairReference",
+        issueCode:
+          "CONCLUSION_FINDING_REFERENCE_INVALID",
+        target: {
+          targetId:
+            "conclusion-test-007",
+          sourceId:
+            "finding-invalid-007",
+        },
+        replacementEntityId:
+          "finding-valid-007",
+        confirmed: true,
+      });
+
+    const result =
+      executeResearchLineageIntegrityRemediation(
+        plan,
+      );
+
+    expect(result.executed).toBe(true);
+    expect(result.status).toBe("Executed");
+
+    const conclusionsAfter =
+      getResearchInvestigationConclusions();
+
+    const updatedConclusion =
+      conclusionsAfter.find(
+        (conclusion) =>
+          conclusion.id ===
+          "conclusion-test-007",
+      );
+
+    expect(updatedConclusion).toBeDefined();
+
+    if (!updatedConclusion) {
+      return;
+    }
+
+    expect(
+      updatedConclusion.supportingFindingIds,
+    ).toEqual([]);
+
+    expect(
+      updatedConclusion.contradictingFindingIds,
+    ).toEqual([
+      "finding-valid-007",
+    ]);
+
+    expect(
+      updatedConclusion.contradictingFindingIds,
+    ).not.toContain(
+      "finding-invalid-007",
+    );
+
+    expect(
+      updatedConclusion.supportingFindingIds,
+    ).not.toContain(
+      "finding-valid-007",
+    );
+
+    const validation =
+      validateResearchLineage(
+        "investigation-test-007",
+      );
+
+    expect(validation.valid).toBe(true);
+  });
+
   it("creates a deterministic mutation contract for a repairable reference", () => {
-  const now = new Date().toISOString();
+    const now = new Date().toISOString();
 
-  const investigations = [
-    {
-      id: "investigation-test-005",
-      title: "Mutation contract test",
-      objective: "Test deterministic mutation contract creation",
-      question: "Can a repairable reference produce a deterministic contract?",
-      status: "Draft",
-      experimentIds: [],
-      evidenceIds: [],
-      findingIds: ["finding-valid-005"],
-      artifactIds: [],
-      conclusionIds: ["conclusion-test-005"],
-      createdAt: now,
-      updatedAt: now,
-    },
-  ];
+    const investigations = [
+      {
+        id: "investigation-test-005",
+        title: "Mutation contract test",
+        objective: "Test deterministic mutation contract creation",
+        question: "Can a repairable reference produce a deterministic contract?",
+        status: "Draft",
+        experimentIds: [],
+        evidenceIds: [],
+        findingIds: ["finding-valid-005"],
+        artifactIds: [],
+        conclusionIds: ["conclusion-test-005"],
+        createdAt: now,
+        updatedAt: now,
+      },
+    ];
 
-  const findings = [
-    {
-      id: "finding-valid-005",
-      statement: "Valid replacement finding",
-      evidenceAssessments: [],
-      confidence: 0.95,
-      validationIds: [],
-      investigationId: "investigation-test-005",
-      createdAt: now,
-      updatedAt: now,
-    },
-  ];
+    const findings = [
+      {
+        id: "finding-valid-005",
+        statement: "Valid replacement finding",
+        evidenceAssessments: [],
+        confidence: 0.95,
+        validationIds: [],
+        investigationId: "investigation-test-005",
+        createdAt: now,
+        updatedAt: now,
+      },
+    ];
 
-  const conclusions = [
-    {
-      id: "conclusion-test-005",
-      investigationId: "investigation-test-005",
-      statement: "Test conclusion",
-      status: "Accepted",
-      supportingFindingIds: ["finding-invalid-005"],
-      contradictingFindingIds: [],
-      createdAt: now,
-      updatedAt: now,
-    },
-  ];
+    const conclusions = [
+      {
+        id: "conclusion-test-005",
+        investigationId: "investigation-test-005",
+        statement: "Test conclusion",
+        status: "Accepted",
+        supportingFindingIds: ["finding-invalid-005"],
+        contradictingFindingIds: [],
+        createdAt: now,
+        updatedAt: now,
+      },
+    ];
 
-  localStorage.setItem(
-    "titan:research-investigations",
-    JSON.stringify(investigations),
-  );
-
-  localStorage.setItem(
-    "titan:research-findings",
-    JSON.stringify(findings),
-  );
-
-  localStorage.setItem(
-    "titan:research-investigation-conclusions",
-    JSON.stringify(conclusions),
-  );
-
-  const validation =
-    validateResearchLineage(
-      "investigation-test-005",
+    localStorage.setItem(
+      "titan:research-investigations",
+      JSON.stringify(investigations),
     );
 
-  const issue =
-    validation.issues.find(
-      (candidate) =>
-        candidate.code ===
-        "CONCLUSION_FINDING_REFERENCE_INVALID",
+    localStorage.setItem(
+      "titan:research-findings",
+      JSON.stringify(findings),
     );
 
-  expect(issue).toBeDefined();
+    localStorage.setItem(
+      "titan:research-investigation-conclusions",
+      JSON.stringify(conclusions),
+    );
 
-  if (!issue) {
-    return;
-  }
+    const validation =
+      validateResearchLineage(
+        "investigation-test-005",
+      );
 
-  const action =
-    getResearchLineageIntegrityIssueAction(issue);
+    const issue =
+      validation.issues.find(
+        (candidate) =>
+          candidate.code ===
+          "CONCLUSION_FINDING_REFERENCE_INVALID",
+      );
 
-  expect(action.action).toBe("RepairReference");
+    expect(issue).toBeDefined();
+
+    if (!issue) {
+      return;
+    }
+
+    const action =
+      getResearchLineageIntegrityIssueAction(issue);
+
+    expect(action.action).toBe("RepairReference");
 
     if (action.action !== "RepairReference") {
       throw new Error(
@@ -971,86 +1125,247 @@ expect(mutationContract).toBeNull();
       );
     }
 
-  const plan =
-    createResearchLineageIntegrityRemediationPlan({
-      investigationId:
-        "investigation-test-005",
-      action: action.action,
-      issueCode: issue.code,
-      target: action.target,
-      replacementEntityId:
-        "finding-valid-005",
-      confirmed: true,
-    });
+    const plan =
+      createResearchLineageIntegrityRemediationPlan({
+        investigationId:
+          "investigation-test-005",
+        action: action.action,
+        issueCode: issue.code,
+        target: action.target,
+        replacementEntityId:
+          "finding-valid-005",
+        confirmed: true,
+      });
 
-  const decision =
-    decideResearchLineageIntegrityRemediationRepair(
-      plan,
+    const decision =
+      decideResearchLineageIntegrityRemediationRepair(
+        plan,
+      );
+
+    expect(decision.decision).toBe(
+      "Repairable",
     );
 
-  expect(decision.decision).toBe(
-    "Repairable",
-  );
+    expect(
+      decision.replacementEntityId,
+    ).toBe("finding-valid-005");
 
-  expect(
-    decision.replacementEntityId,
-  ).toBe("finding-valid-005");
+    const mutationContract =
+      createResearchLineageIntegrityRemediationMutationContract(
+        decision,
+      );
 
-  const mutationContract =
-    createResearchLineageIntegrityRemediationMutationContract(
-      decision,
+    expect(mutationContract).not.toBeNull();
+
+    if (!mutationContract) {
+      return;
+    }
+
+    expect(
+      mutationContract.mutationType,
+    ).toBe("ReferenceReplacement");
+
+    expect(
+      mutationContract.investigationId,
+    ).toBe("investigation-test-005");
+
+    expect(
+      mutationContract.action,
+    ).toBe("RepairReference");
+
+    expect(
+      mutationContract.issueCode,
+    ).toBe(
+      "CONCLUSION_FINDING_REFERENCE_INVALID",
     );
 
-  expect(mutationContract).not.toBeNull();
+    expect(
+      mutationContract.target.entityId,
+    ).toBe("conclusion-test-005");
 
-  if (!mutationContract) {
-    return;
-  }
+    expect(
+      mutationContract.target.sourceId,
+    ).toBe("finding-invalid-005");
 
-  expect(
-    mutationContract.mutationType,
-  ).toBe("ReferenceReplacement");
+    expect(
+      mutationContract.target.targetId,
+    ).toBe("conclusion-test-005");
 
-  expect(
-    mutationContract.investigationId,
-  ).toBe("investigation-test-005");
+    expect(
+      mutationContract.replacementEntityId,
+    ).toBe("finding-valid-005");
 
-  expect(
-    mutationContract.action,
-  ).toBe("RepairReference");
+    expect(
+      mutationContract.deterministic,
+    ).toBe(true);
 
-  expect(
-    mutationContract.issueCode,
-  ).toBe(
-    "CONCLUSION_FINDING_REFERENCE_INVALID",
-  );
+    expect(
+      mutationContract.requiresConfirmation,
+    ).toBe(true);
 
-  expect(
-    mutationContract.target.entityId,
-  ).toBe("conclusion-test-005");
+    expect(
+      mutationContract.createsProvenanceEvent,
+    ).toBe(true);
+  });
 
-  expect(
-    mutationContract.target.sourceId,
-  ).toBe("finding-invalid-005");
+  it("returns the exact provenance event created by successful reference remediation", () => {
+    const now = new Date().toISOString();
 
-  expect(
-    mutationContract.target.targetId,
-  ).toBe("conclusion-test-005");
+    const investigations = [
+      {
+        id: "investigation-test-008",
+        title: "Provenance execution result test",
+        objective: "Test provenance result binding",
+        question:
+          "Does successful remediation return its exact provenance event?",
+        status: "Draft",
+        experimentIds: [],
+        evidenceIds: [],
+        findingIds: ["finding-valid-008"],
+        artifactIds: [],
+        conclusionIds: ["conclusion-test-008"],
+        createdAt: now,
+        updatedAt: now,
+      },
+    ];
 
-  expect(
-    mutationContract.replacementEntityId,
-  ).toBe("finding-valid-005");
+    const findings = [
+      {
+        id: "finding-valid-008",
+        statement: "Valid replacement finding",
+        evidenceAssessments: [],
+        confidence: 0.95,
+        validationIds: [],
+        investigationId: "investigation-test-008",
+        createdAt: now,
+        updatedAt: now,
+      },
+    ];
 
-  expect(
-    mutationContract.deterministic,
-  ).toBe(true);
+    const conclusions = [
+      {
+        id: "conclusion-test-008",
+        investigationId: "investigation-test-008",
+        statement: "Test conclusion",
+        status: "Accepted",
+        supportingFindingIds: ["finding-invalid-008"],
+        contradictingFindingIds: [],
+        createdAt: now,
+        updatedAt: now,
+      },
+    ];
 
-  expect(
-    mutationContract.requiresConfirmation,
-  ).toBe(true);
+    localStorage.setItem(
+      "titan:research-investigations",
+      JSON.stringify(investigations),
+    );
 
-  expect(
-    mutationContract.createsProvenanceEvent,
-  ).toBe(true);
-});
+    localStorage.setItem(
+      "titan:research-findings",
+      JSON.stringify(findings),
+    );
+
+    localStorage.setItem(
+      "titan:research-investigation-conclusions",
+      JSON.stringify(conclusions),
+    );
+
+    const plan =
+      createResearchLineageIntegrityRemediationPlan({
+        investigationId:
+          "investigation-test-008",
+        action: "RepairReference",
+        issueCode:
+          "CONCLUSION_FINDING_REFERENCE_INVALID",
+        target: {
+          targetId:
+            "conclusion-test-008",
+          sourceId:
+            "finding-invalid-008",
+        },
+        replacementEntityId:
+          "finding-valid-008",
+        confirmed: true,
+      });
+
+    const result =
+      executeResearchLineageIntegrityRemediation(
+        plan,
+      );
+
+    expect(result.executed).toBe(true);
+    expect(result.status).toBe("Executed");
+
+    const provenanceEvents =
+      getResearchProvenanceEventsByEntity(
+        "Conclusion",
+        "conclusion-test-008",
+      );
+
+    const provenanceEvent =
+      provenanceEvents.find(
+        (event) =>
+          event.eventType === "Updated" &&
+          event.reason?.includes(
+            "finding-invalid-008",
+          ) &&
+          event.reason?.includes(
+            "finding-valid-008",
+          ),
+      );
+
+    expect(provenanceEvent).toBeDefined();
+
+    if (!provenanceEvent) {
+      return;
+    }
+
+    expect(provenanceEvent.entityType).toBe(
+      "Conclusion",
+    );
+
+    expect(provenanceEvent.entityId).toBe(
+      "conclusion-test-008",
+    );
+
+    expect(provenanceEvent.eventType).toBe(
+      "Updated",
+    );
+
+    expect(provenanceEvent.investigationId).toBe(
+      "investigation-test-008",
+    );
+
+    expect(provenanceEvent.reason).toContain(
+      "finding-invalid-008",
+    );
+
+    expect(provenanceEvent.reason).toContain(
+      "finding-valid-008",
+    );
+
+    expect(provenanceEvent.entityType).toBe(
+      "Conclusion",
+    );
+
+    expect(provenanceEvent.entityId).toBe(
+      "conclusion-test-008",
+    );
+
+    expect(provenanceEvent.eventType).toBe(
+      "Updated",
+    );
+
+    expect(provenanceEvent.investigationId).toBe(
+      "investigation-test-008",
+    );
+
+    expect(provenanceEvent.reason).toContain(
+      "finding-invalid-008",
+    );
+
+    expect(provenanceEvent.reason).toContain(
+      "finding-valid-008",
+    );
+  });
 });
