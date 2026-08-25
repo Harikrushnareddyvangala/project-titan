@@ -1368,4 +1368,126 @@ describe("research lineage remediation", () => {
       "finding-valid-008",
     );
   });
+
+  it("reports successful remediation only when the repaired lineage validates", () => {
+    const now = new Date().toISOString();
+
+    const investigations = [
+      {
+        id: "investigation-test-009",
+        title: "Post-mutation validation test",
+        objective: "Test execution validation boundary",
+        question:
+          "Does successful reference remediation leave the lineage valid?",
+        status: "Draft",
+        experimentIds: [],
+        evidenceIds: [],
+        findingIds: ["finding-valid-009"],
+        artifactIds: [],
+        conclusionIds: ["conclusion-test-009"],
+        createdAt: now,
+        updatedAt: now,
+      },
+    ];
+
+    const findings = [
+      {
+        id: "finding-valid-009",
+        statement: "Valid replacement finding",
+        evidenceAssessments: [],
+        confidence: 0.95,
+        validationIds: [],
+        investigationId: "investigation-test-009",
+        createdAt: now,
+        updatedAt: now,
+      },
+    ];
+
+    const conclusions = [
+      {
+        id: "conclusion-test-009",
+        investigationId: "investigation-test-009",
+        statement: "Test conclusion",
+        status: "Accepted",
+        supportingFindingIds: ["finding-invalid-009"],
+        contradictingFindingIds: [],
+        createdAt: now,
+        updatedAt: now,
+      },
+    ];
+
+    localStorage.setItem(
+      "titan:research-investigations",
+      JSON.stringify(investigations),
+    );
+
+    localStorage.setItem(
+      "titan:research-findings",
+      JSON.stringify(findings),
+    );
+
+    localStorage.setItem(
+      "titan:research-investigation-conclusions",
+      JSON.stringify(conclusions),
+    );
+
+    const initialValidation =
+      validateResearchLineage(
+        "investigation-test-009",
+      );
+
+    expect(initialValidation.valid).toBe(false);
+
+    const plan =
+      createResearchLineageIntegrityRemediationPlan({
+        investigationId:
+          "investigation-test-009",
+        action: "RepairReference",
+        issueCode:
+          "CONCLUSION_FINDING_REFERENCE_INVALID",
+        target: {
+          targetId:
+            "conclusion-test-009",
+          sourceId:
+            "finding-invalid-009",
+        },
+        replacementEntityId:
+          "finding-valid-009",
+        confirmed: true,
+      });
+
+    const result =
+      executeResearchLineageIntegrityRemediation(
+        plan,
+      );
+
+    expect(result.executed).toBe(true);
+    expect(result.status).toBe("Executed");
+
+    const finalValidation =
+      validateResearchLineage(
+        "investigation-test-009",
+      );
+
+    expect(finalValidation.valid).toBe(true);
+
+    expect(
+      finalValidation.issues.some(
+        (issue) =>
+          issue.code ===
+          "CONCLUSION_FINDING_REFERENCE_INVALID",
+      ),
+    ).toBe(false);
+
+    const updatedConclusion =
+      getResearchInvestigationConclusions().find(
+        (conclusion) =>
+          conclusion.id ===
+          "conclusion-test-009",
+      );
+
+    expect(
+      updatedConclusion?.supportingFindingIds,
+    ).toEqual(["finding-valid-009"]);
+  });
 });
