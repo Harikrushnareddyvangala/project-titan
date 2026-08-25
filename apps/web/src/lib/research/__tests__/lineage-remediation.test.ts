@@ -753,4 +753,177 @@ expect(mutationContract).toBeNull();
       "not deterministic",
     );
   });
+
+  it("creates a deterministic mutation contract for a repairable reference", () => {
+  const now = new Date().toISOString();
+
+  const investigations = [
+    {
+      id: "investigation-test-005",
+      title: "Mutation contract test",
+      objective: "Test deterministic mutation contract creation",
+      question: "Can a repairable reference produce a deterministic contract?",
+      status: "Draft",
+      experimentIds: [],
+      evidenceIds: [],
+      findingIds: ["finding-valid-005"],
+      artifactIds: [],
+      conclusionIds: ["conclusion-test-005"],
+      createdAt: now,
+      updatedAt: now,
+    },
+  ];
+
+  const findings = [
+    {
+      id: "finding-valid-005",
+      statement: "Valid replacement finding",
+      evidenceAssessments: [],
+      confidence: 0.95,
+      validationIds: [],
+      investigationId: "investigation-test-005",
+      createdAt: now,
+      updatedAt: now,
+    },
+  ];
+
+  const conclusions = [
+    {
+      id: "conclusion-test-005",
+      investigationId: "investigation-test-005",
+      statement: "Test conclusion",
+      status: "Accepted",
+      supportingFindingIds: ["finding-invalid-005"],
+      contradictingFindingIds: [],
+      createdAt: now,
+      updatedAt: now,
+    },
+  ];
+
+  localStorage.setItem(
+    "titan:research-investigations",
+    JSON.stringify(investigations),
+  );
+
+  localStorage.setItem(
+    "titan:research-findings",
+    JSON.stringify(findings),
+  );
+
+  localStorage.setItem(
+    "titan:research-investigation-conclusions",
+    JSON.stringify(conclusions),
+  );
+
+  const validation =
+    validateResearchLineage(
+      "investigation-test-005",
+    );
+
+  const issue =
+    validation.issues.find(
+      (candidate) =>
+        candidate.code ===
+        "CONCLUSION_FINDING_REFERENCE_INVALID",
+    );
+
+  expect(issue).toBeDefined();
+
+  if (!issue) {
+    return;
+  }
+
+  const action =
+    getResearchLineageIntegrityIssueAction(issue);
+
+  expect(action.action).toBe("RepairReference");
+
+    if (action.action !== "RepairReference") {
+      throw new Error(
+        `Expected RepairReference action, received ${action.action}`,
+      );
+    }
+
+  const plan =
+    createResearchLineageIntegrityRemediationPlan({
+      investigationId:
+        "investigation-test-005",
+      action: action.action,
+      issueCode: issue.code,
+      target: action.target,
+      replacementEntityId:
+        "finding-valid-005",
+      confirmed: true,
+    });
+
+  const decision =
+    decideResearchLineageIntegrityRemediationRepair(
+      plan,
+    );
+
+  expect(decision.decision).toBe(
+    "Repairable",
+  );
+
+  expect(
+    decision.replacementEntityId,
+  ).toBe("finding-valid-005");
+
+  const mutationContract =
+    createResearchLineageIntegrityRemediationMutationContract(
+      decision,
+    );
+
+  expect(mutationContract).not.toBeNull();
+
+  if (!mutationContract) {
+    return;
+  }
+
+  expect(
+    mutationContract.mutationType,
+  ).toBe("ReferenceReplacement");
+
+  expect(
+    mutationContract.investigationId,
+  ).toBe("investigation-test-005");
+
+  expect(
+    mutationContract.action,
+  ).toBe("RepairReference");
+
+  expect(
+    mutationContract.issueCode,
+  ).toBe(
+    "CONCLUSION_FINDING_REFERENCE_INVALID",
+  );
+
+  expect(
+    mutationContract.target.entityId,
+  ).toBe("conclusion-test-005");
+
+  expect(
+    mutationContract.target.sourceId,
+  ).toBe("finding-invalid-005");
+
+  expect(
+    mutationContract.target.targetId,
+  ).toBe("conclusion-test-005");
+
+  expect(
+    mutationContract.replacementEntityId,
+  ).toBe("finding-valid-005");
+
+  expect(
+    mutationContract.deterministic,
+  ).toBe(true);
+
+  expect(
+    mutationContract.requiresConfirmation,
+  ).toBe(true);
+
+  expect(
+    mutationContract.createsProvenanceEvent,
+  ).toBe(true);
+});
 });
