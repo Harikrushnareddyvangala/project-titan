@@ -12,6 +12,8 @@ import {
   getResearchProvenanceEvents,
   validateResearchProvenanceIntegrity,
   getResearchProvenanceEventsByEntity,
+  getResearchProvenanceEventsByInvestigation,
+  getResearchProvenanceTimelineByInvestigation,
   validateResearchLineage,
 } from "@/lib/research";
 
@@ -1639,4 +1641,114 @@ describe("research lineage remediation", () => {
     ),
   ).toEqual([]);
 });
+
+  it("makes successful remediation provenance discoverable through the investigation timeline", () => {
+    const now = new Date().toISOString();
+
+    const investigations = [
+      {
+        id: "investigation-test-010",
+        title: "Remediation timeline discoverability test",
+        objective: "Test remediation provenance discoverability",
+        question:
+          "Is successful remediation provenance visible in the investigation timeline?",
+        status: "Draft",
+        experimentIds: [],
+        evidenceIds: [],
+        findingIds: ["finding-valid-010"],
+        artifactIds: [],
+        conclusionIds: ["conclusion-test-010"],
+        createdAt: now,
+        updatedAt: now,
+      },
+    ];
+
+    const findings = [
+      {
+        id: "finding-valid-010",
+        statement: "Valid replacement finding",
+        evidenceAssessments: [],
+        confidence: 0.95,
+        validationIds: [],
+        investigationId: "investigation-test-010",
+        createdAt: now,
+        updatedAt: now,
+      },
+    ];
+
+    const conclusions = [
+      {
+        id: "conclusion-test-010",
+        investigationId: "investigation-test-010",
+        statement: "Timeline discoverability conclusion",
+        status: "Accepted",
+        supportingFindingIds: ["finding-invalid-010"],
+        contradictingFindingIds: [],
+        createdAt: now,
+        updatedAt: now,
+      },
+    ];
+
+    localStorage.setItem(
+      "titan:research-investigations",
+      JSON.stringify(investigations),
+    );
+
+    localStorage.setItem(
+      "titan:research-findings",
+      JSON.stringify(findings),
+    );
+
+    localStorage.setItem(
+      "titan:research-investigation-conclusions",
+      JSON.stringify(conclusions),
+    );
+
+    const plan = createResearchLineageIntegrityRemediationPlan({
+      investigationId: "investigation-test-010",
+      action: "RepairReference",
+      issueCode: "CONCLUSION_FINDING_REFERENCE_INVALID",
+      target: {
+        targetId: "conclusion-test-010",
+        sourceId: "finding-invalid-010",
+      },
+      replacementEntityId: "finding-valid-010",
+      confirmed: true,
+    });
+
+    const result =
+      executeResearchLineageIntegrityRemediation(plan);
+
+    expect(result.executed).toBe(true);
+    expect(result.status).toBe("Executed");
+    expect(result.provenanceEventId).toBeDefined();
+
+    if (!result.provenanceEventId) {
+      return;
+    }
+
+    const investigationEvents =
+      getResearchProvenanceEventsByInvestigation(
+        "investigation-test-010",
+      );
+
+    const event = investigationEvents.find(
+      (candidate) =>
+        candidate.id === result.provenanceEventId,
+    );
+
+    expect(event).toBeDefined();
+
+    const timeline =
+      getResearchProvenanceTimelineByInvestigation(
+        "investigation-test-010",
+      );
+
+    expect(
+      timeline.some(
+        (item) =>
+          item.eventId === result.provenanceEventId,
+      ),
+    ).toBe(true);
+  });
 });
