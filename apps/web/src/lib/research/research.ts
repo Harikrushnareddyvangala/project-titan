@@ -2966,6 +2966,8 @@ export function executeResearchLineageIntegrityRemediation(
 
     message: repairResult.message,
 
+    provenanceEventId: repairResult.provenanceEventId,
+
     plan,
   };
 }

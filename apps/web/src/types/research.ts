@@ -875,6 +875,8 @@ export interface ResearchLineageIntegrityRemediationResult {
 
   message: string;
 
+  provenanceEventId?: string;
+
   plan: ResearchLineageIntegrityRemediationPlan;
 }
 
