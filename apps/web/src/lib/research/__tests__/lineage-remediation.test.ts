@@ -1245,10 +1245,141 @@ describe("research lineage remediation", () => {
     expect(
       mutationContract.createsProvenanceEvent,
     ).toBe(true);
+    });
+
+  it("promotes a uniquely discovered replacement to a repairable decision", () => {
+    const now = new Date().toISOString();
+
+    const investigations = [
+      {
+        id: "investigation-test-012",
+        title: "Replacement decision integration test",
+        objective: "Test discovery-to-decision integration",
+        question:
+          "Does a uniquely discovered replacement become repairable?",
+        status: "Draft",
+        experimentIds: [],
+        evidenceIds: [],
+        findingIds: ["finding-valid-012"],
+        artifactIds: [],
+        conclusionIds: ["conclusion-test-012"],
+        createdAt: now,
+        updatedAt: now,
+      },
+    ];
+
+    const findings = [
+      {
+        id: "finding-valid-012",
+        statement: "Uniquely discovered replacement finding",
+        evidenceAssessments: [],
+        confidence: 0.95,
+        validationIds: [],
+        createdAt: now,
+        updatedAt: now,
+      },
+    ];
+
+    const conclusions = [
+      {
+        id: "conclusion-test-012",
+        investigationId: "investigation-test-012",
+        statement: "Test conclusion",
+        status: "Accepted",
+        supportingFindingIds: ["finding-invalid-012"],
+        contradictingFindingIds: [],
+        createdAt: now,
+        updatedAt: now,
+      },
+    ];
+
+    localStorage.setItem(
+      "titan:research-investigations",
+      JSON.stringify(investigations),
+    );
+
+    localStorage.setItem(
+      "titan:research-findings",
+      JSON.stringify(findings),
+    );
+
+    localStorage.setItem(
+      "titan:research-investigation-conclusions",
+      JSON.stringify(conclusions),
+    );
+
+    const validation =
+      validateResearchLineage(
+        "investigation-test-012",
+      );
+
+    const issue =
+      validation.issues.find(
+        (candidate) =>
+          candidate.code ===
+          "CONCLUSION_FINDING_REFERENCE_INVALID",
+      );
+
+    expect(issue).toBeDefined();
+
+    if (!issue) {
+      return;
+    }
+
+    const action =
+      getResearchLineageIntegrityIssueAction(issue);
+
+    expect(action.action).toBe("RepairReference");
+
+    const plan =
+      createResearchLineageIntegrityRemediationPlan({
+        investigationId:
+          "investigation-test-012",
+        action: "RepairReference",
+        issueCode: issue.code,
+        target: action.target,
+        confirmed: true,
+      });
+
+    const discovery =
+      discoverResearchLineageIntegrityRemediationReplacement(
+        plan,
+      );
+
+    expect(discovery.status).toBe("Resolved");
+
+    expect(discovery.candidates).toHaveLength(1);
+
+    expect(discovery.selectedCandidate).toEqual(
+      expect.objectContaining({
+        id: "finding-valid-012",
+        title:
+          "Uniquely discovered replacement finding",
+        investigationId:
+          "investigation-test-012",
+      }),
+    );
+
+    const decision =
+      decideResearchLineageIntegrityRemediationRepair(
+        plan,
+      );
+
+    expect(decision.decision).toBe("Repairable");
+
+    expect(
+      decision.replacementEntityId,
+    ).toBe("finding-valid-012");
+
+    expect(
+      decision.repairDescription,
+    ).toContain(
+      "finding-valid-012",
+    );
   });
 
   it("returns the exact provenance event created by successful reference remediation", () => {
-    const now = new Date().toISOString();
+        const now = new Date().toISOString();
 
     const investigations = [
       {
