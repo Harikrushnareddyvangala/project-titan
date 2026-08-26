@@ -4,6 +4,7 @@ import {
   createResearchLineageIntegrityRemediationMutationContract,
   createResearchLineageIntegrityRemediationPlan,
   createResearchLineageIntegrityRemediationRequest,
+  discoverResearchLineageIntegrityRemediationReplacement,
   decideResearchLineageIntegrityRemediationRepair,
   executeResearchLineageIntegrityRemediation,
   getResearchInvestigationConclusions,
@@ -2019,4 +2020,246 @@ describe("research lineage remediation", () => {
       result.postcondition?.issues,
     ).toEqual([]);
   });
+
+  it("returns not found when deterministic replacement discovery has no explicit replacement", () => {
+    const now = new Date().toISOString();
+
+    localStorage.setItem(
+      "titan:research-investigations",
+      JSON.stringify([
+        {
+          id: "investigation-discovery-001",
+          title: "Replacement discovery test",
+          objective: "Test missing replacement input",
+          question: "Can discovery reject an unspecified replacement?",
+          status: "Draft",
+          experimentIds: [],
+          evidenceIds: [],
+          findingIds: ["finding-discovery-001"],
+          artifactIds: [],
+          conclusionIds: [],
+          createdAt: now,
+          updatedAt: now,
+        },
+      ]),
+    );
+
+    localStorage.setItem(
+      "titan:research-findings",
+      JSON.stringify([
+        {
+          id: "finding-discovery-001",
+          statement: "Existing finding",
+          evidenceAssessments: [],
+          confidence: 0.9,
+          validationIds: [],
+          createdAt: now,
+          updatedAt: now,
+        },
+      ]),
+    );
+
+    const result =
+      discoverResearchLineageIntegrityRemediationReplacement({
+        investigationId: "investigation-discovery-001",
+        action: "RepairReference",
+        issueCode: "CONCLUSION_FINDING_REFERENCE_INVALID",
+        target: {
+          nodeId: "conclusion-discovery-001",
+          edgeId: undefined,
+          sourceId: "finding-invalid-discovery-001",
+          targetId: "conclusion-discovery-001",
+        },
+        confirmed: true,
+        status: "Validated",
+        description: "Test replacement discovery",
+      });
+
+    expect(result.status).toBe("NotFound");
+    expect(result.candidates).toEqual([]);
+    expect(result.selectedCandidate).toBeNull();
+    expect(result.reason).toContain(
+      "No explicit replacement entity was provided",
+    );
+  });
+
+  it("returns not found when the explicit replacement finding does not exist", () => {
+    const now = new Date().toISOString();
+
+    localStorage.setItem(
+      "titan:research-investigations",
+      JSON.stringify([
+        {
+          id: "investigation-discovery-002",
+          title: "Replacement discovery test",
+          objective: "Test missing replacement finding",
+          question: "Can discovery reject an unknown replacement?",
+          status: "Draft",
+          experimentIds: [],
+          evidenceIds: [],
+          findingIds: [],
+          artifactIds: [],
+          conclusionIds: [],
+          createdAt: now,
+          updatedAt: now,
+        },
+      ]),
+    );
+
+    const result =
+      discoverResearchLineageIntegrityRemediationReplacement({
+        investigationId: "investigation-discovery-002",
+        action: "RepairReference",
+        issueCode: "CONCLUSION_FINDING_REFERENCE_INVALID",
+        target: {
+          nodeId: "conclusion-discovery-002",
+          edgeId: undefined,
+          sourceId: "finding-invalid-discovery-002",
+          targetId: "conclusion-discovery-002",
+        },
+        replacementEntityId: "finding-missing-discovery-002",
+        confirmed: true,
+        status: "Validated",
+        description: "Test replacement discovery",
+      });
+
+    expect(result.status).toBe("NotFound");
+    expect(result.candidates).toEqual([]);
+    expect(result.selectedCandidate).toBeNull();
+    expect(result.reason).toContain(
+      "could not be resolved within the investigation",
+    );
+  });
+
+  it("rejects an explicit replacement finding outside the investigation scope", () => {
+    const now = new Date().toISOString();
+
+    localStorage.setItem(
+      "titan:research-investigations",
+      JSON.stringify([
+        {
+          id: "investigation-discovery-003",
+          title: "Replacement scope test",
+          objective: "Test replacement investigation ownership",
+          question: "Can an out-of-scope replacement be rejected?",
+          status: "Draft",
+          experimentIds: [],
+          evidenceIds: [],
+          findingIds: [],
+          artifactIds: [],
+          conclusionIds: [],
+          createdAt: now,
+          updatedAt: now,
+        },
+      ]),
+    );
+
+    localStorage.setItem(
+      "titan:research-findings",
+      JSON.stringify([
+        {
+          id: "finding-outside-discovery-003",
+          statement: "Finding belongs outside this investigation",
+          evidenceAssessments: [],
+          confidence: 0.8,
+          validationIds: [],
+          createdAt: now,
+          updatedAt: now,
+        },
+      ]),
+    );
+
+    const result =
+      discoverResearchLineageIntegrityRemediationReplacement({
+        investigationId: "investigation-discovery-003",
+        action: "RepairReference",
+        issueCode: "CONCLUSION_FINDING_REFERENCE_INVALID",
+        target: {
+          nodeId: "conclusion-discovery-003",
+          edgeId: undefined,
+          sourceId: "finding-invalid-discovery-003",
+          targetId: "conclusion-discovery-003",
+        },
+        replacementEntityId: "finding-outside-discovery-003",
+        confirmed: true,
+        status: "Validated",
+        description: "Test replacement discovery",
+      });
+
+    expect(result.status).toBe("NotFound");
+    expect(result.candidates).toEqual([]);
+    expect(result.selectedCandidate).toBeNull();
+    expect(result.reason).toContain(
+      "could not be resolved within the investigation",
+    );
+  });
+
+  it("resolves exactly one explicit replacement finding within the investigation", () => {
+    const now = new Date().toISOString();
+
+    localStorage.setItem(
+      "titan:research-investigations",
+      JSON.stringify([
+        {
+          id: "investigation-discovery-004",
+          title: "Deterministic replacement test",
+          objective: "Test successful replacement discovery",
+          question: "Can an exact replacement be uniquely resolved?",
+          status: "Draft",
+          experimentIds: [],
+          evidenceIds: [],
+          findingIds: ["finding-discovery-004"],
+          artifactIds: [],
+          conclusionIds: [],
+          createdAt: now,
+          updatedAt: now,
+        },
+      ]),
+    );
+
+    localStorage.setItem(
+      "titan:research-findings",
+      JSON.stringify([
+        {
+          id: "finding-discovery-004",
+          statement: "Deterministic replacement finding",
+          evidenceAssessments: [],
+          confidence: 0.95,
+          validationIds: [],
+          createdAt: now,
+          updatedAt: now,
+        },
+      ]),
+    );
+
+    const result =
+      discoverResearchLineageIntegrityRemediationReplacement({
+        investigationId: "investigation-discovery-004",
+        action: "RepairReference",
+        issueCode: "CONCLUSION_FINDING_REFERENCE_INVALID",
+        target: {
+          nodeId: "conclusion-discovery-004",
+          edgeId: undefined,
+          sourceId: "finding-invalid-discovery-004",
+          targetId: "conclusion-discovery-004",
+        },
+        replacementEntityId: "finding-discovery-004",
+        confirmed: true,
+        status: "Validated",
+        description: "Test replacement discovery",
+      });
+
+    expect(result.status).toBe("Resolved");
+    expect(result.candidates).toHaveLength(1);
+    expect(result.selectedCandidate).not.toBeNull();
+
+    expect(result.selectedCandidate).toEqual(
+      expect.objectContaining({
+        id: "finding-discovery-004",
+        title: "Deterministic replacement finding",
+        investigationId: "investigation-discovery-004",
+      }),
+    );
+  });
+
 });
