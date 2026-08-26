@@ -390,6 +390,47 @@ describe("research lineage remediation", () => {
     expect(result.executed).toBe(true);
     expect(result.status).toBe("Executed");
 
+    const updatedConclusions =
+      getResearchInvestigationConclusions();
+
+    expect(updatedConclusions).toHaveLength(1);
+
+    expect(updatedConclusions[0].id).toBe(
+      "conclusion-test-003",
+    );
+
+    expect(updatedConclusions[0].investigationId).toBe(
+      "investigation-test-003",
+    );
+
+    expect(updatedConclusions[0].statement).toBe(
+      "Test conclusion",
+    );
+
+    expect(updatedConclusions[0].status).toBe(
+      "Accepted",
+    );
+
+    expect(updatedConclusions[0].contradictingFindingIds).toEqual(
+      [],
+    );
+
+    expect(updatedConclusions[0].supportingFindingIds).toEqual(
+      ["finding-valid-003"],
+    );
+
+    expect(updatedConclusions[0].createdAt).toBe(
+      now,
+    );
+
+    expect(updatedConclusions[0].updatedAt).toBeDefined();
+
+    expect(
+      Number.isNaN(
+        Date.parse(updatedConclusions[0].updatedAt),
+      ),
+    ).toBe(false);
+
     const conclusionProvenance =
       getResearchProvenanceEventsByEntity(
         "Conclusion",
@@ -408,13 +449,6 @@ describe("research lineage remediation", () => {
           ),
       ),
     ).toBe(true);
-
-    const updatedConclusions =
-      getResearchInvestigationConclusions();
-
-    expect(
-      updatedConclusions[0].supportingFindingIds,
-    ).toEqual(["finding-valid-003"]);
 
     const finalValidation =
       validateResearchLineage(
