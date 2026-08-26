@@ -2499,4 +2499,135 @@ describe("research lineage remediation", () => {
     );
   });
 
+  it("executes a deterministic discovered replacement through the top-level remediation flow", () => {
+    const now = new Date().toISOString();
+
+    localStorage.setItem(
+      "titan:research-investigations",
+      JSON.stringify([
+        {
+          id: "investigation-discovery-execution-001",
+          title: "Discovered replacement execution test",
+          objective: "Test end-to-end deterministic replacement execution",
+          question:
+            "Can a uniquely discovered replacement be executed without an explicit replacement ID?",
+          status: "Draft",
+          experimentIds: [],
+          evidenceIds: [],
+          findingIds: ["finding-discovered-execution-001"],
+          artifactIds: [],
+          conclusionIds: ["conclusion-discovered-execution-001"],
+          createdAt: now,
+          updatedAt: now,
+        },
+      ]),
+    );
+
+    localStorage.setItem(
+      "titan:research-findings",
+      JSON.stringify([
+        {
+          id: "finding-discovered-execution-001",
+          statement: "Valid discovered replacement finding",
+          evidenceAssessments: [],
+          confidence: 0.95,
+          validationIds: [],
+          investigationId: "investigation-discovery-execution-001",
+          createdAt: now,
+          updatedAt: now,
+        },
+      ]),
+    );
+
+    localStorage.setItem(
+      "titan:research-investigation-conclusions",
+      JSON.stringify([
+        {
+          id: "conclusion-discovered-execution-001",
+          investigationId: "investigation-discovery-execution-001",
+          statement: "Conclusion requiring deterministic remediation",
+          status: "Accepted",
+          supportingFindingIds: [
+            "finding-invalid-discovered-execution-001",
+          ],
+          contradictingFindingIds: [],
+          createdAt: now,
+          updatedAt: now,
+        },
+      ]),
+    );
+
+    const initialValidation = validateResearchLineage(
+      "investigation-discovery-execution-001",
+    );
+
+    expect(initialValidation.valid).toBe(false);
+
+    const issue = initialValidation.issues.find(
+      (candidate) =>
+        candidate.code === "CONCLUSION_FINDING_REFERENCE_INVALID",
+    );
+
+    expect(issue).toBeDefined();
+
+    if (!issue) {
+      return;
+    }
+
+    const action = getResearchLineageIntegrityIssueAction(issue);
+
+    expect(action.action).toBe("RepairReference");
+
+    if (action.action !== "RepairReference") {
+      throw new Error(
+        `Expected RepairReference action, received ${action.action}`,
+      );
+    }
+
+    const plan = createResearchLineageIntegrityRemediationPlan({
+      investigationId: "investigation-discovery-execution-001",
+      action: action.action,
+      issueCode: issue.code,
+      target: action.target,
+      confirmed: true,
+    });
+
+    expect(plan.replacementEntityId).toBeUndefined();
+
+    const result = executeResearchLineageIntegrityRemediation(plan);
+
+    expect(result.executed).toBe(true);
+    expect(result.status).toBe("Executed");
+
+    const updatedConclusion =
+      getResearchInvestigationConclusions().find(
+        (conclusion) =>
+          conclusion.id === "conclusion-discovered-execution-001",
+      );
+
+    expect(updatedConclusion?.supportingFindingIds).toEqual([
+      "finding-discovered-execution-001",
+    ]);
+
+    expect(
+      updatedConclusion?.supportingFindingIds,
+    ).not.toContain("finding-invalid-discovered-execution-001");
+
+    expect(result.provenanceEventId).toBeDefined();
+
+    expect(result.postcondition).toEqual(
+      expect.objectContaining({
+        validated: true,
+        valid: true,
+        issueCount: 0,
+      }),
+    );
+
+    const finalValidation = validateResearchLineage(
+      "investigation-discovery-execution-001",
+    );
+
+    expect(finalValidation.valid).toBe(true);
+  });
+
 });
