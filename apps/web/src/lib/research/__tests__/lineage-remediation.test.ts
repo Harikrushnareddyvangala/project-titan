@@ -2021,7 +2021,7 @@ describe("research lineage remediation", () => {
     ).toEqual([]);
   });
 
-  it("returns not found when deterministic replacement discovery has no explicit replacement", () => {
+  it("resolves a unique replacement when no explicit replacement is provided", () => {
     const now = new Date().toISOString();
 
     localStorage.setItem(
@@ -2075,11 +2075,20 @@ describe("research lineage remediation", () => {
         description: "Test replacement discovery",
       });
 
-    expect(result.status).toBe("NotFound");
-    expect(result.candidates).toEqual([]);
-    expect(result.selectedCandidate).toBeNull();
+    expect(result.status).toBe("Resolved");
+
+    expect(result.candidates).toHaveLength(1);
+
+    expect(result.selectedCandidate).toEqual(
+      expect.objectContaining({
+        id: "finding-discovery-001",
+        title: "Existing finding",
+        investigationId: "investigation-discovery-001",
+      }),
+    );
+
     expect(result.reason).toContain(
-      "No explicit replacement entity was provided",
+      "Exactly one candidate replacement finding",
     );
   });
 
@@ -2259,6 +2268,103 @@ describe("research lineage remediation", () => {
         title: "Deterministic replacement finding",
         investigationId: "investigation-discovery-004",
       }),
+    );
+  });
+
+  it("returns ambiguous when multiple replacement findings are discovered", () => {
+    const now = new Date().toISOString();
+
+    localStorage.setItem(
+      "titan:research-investigations",
+      JSON.stringify([
+        {
+          id: "investigation-discovery-005",
+          title: "Ambiguous replacement discovery test",
+          objective: "Test ambiguous replacement discovery",
+          question:
+            "Can multiple possible replacement findings prevent deterministic selection?",
+          status: "Draft",
+          experimentIds: [],
+          evidenceIds: [],
+          findingIds: [
+            "finding-discovery-005-a",
+            "finding-discovery-005-b",
+          ],
+          artifactIds: [],
+          conclusionIds: [],
+          createdAt: now,
+          updatedAt: now,
+        },
+      ]),
+    );
+
+    localStorage.setItem(
+      "titan:research-findings",
+      JSON.stringify([
+        {
+          id: "finding-discovery-005-a",
+          statement: "First possible replacement finding",
+          evidenceAssessments: [],
+          confidence: 0.9,
+          validationIds: [],
+          createdAt: now,
+          updatedAt: now,
+        },
+        {
+          id: "finding-discovery-005-b",
+          statement: "Second possible replacement finding",
+          evidenceAssessments: [],
+          confidence: 0.85,
+          validationIds: [],
+          createdAt: now,
+          updatedAt: now,
+        },
+      ]),
+    );
+
+    const result =
+      discoverResearchLineageIntegrityRemediationReplacement({
+        investigationId: "investigation-discovery-005",
+        action: "RepairReference",
+        issueCode: "CONCLUSION_FINDING_REFERENCE_INVALID",
+        target: {
+          nodeId: "conclusion-discovery-005",
+          edgeId: undefined,
+          sourceId: "finding-invalid-discovery-005",
+          targetId: "conclusion-discovery-005",
+        },
+        confirmed: true,
+        status: "Validated",
+        description: "Test ambiguous replacement discovery",
+      });
+
+    expect(result.status).toBe("Ambiguous");
+
+    expect(result.candidates).toHaveLength(2);
+
+    expect(result.selectedCandidate).toBeNull();
+
+    expect(result.candidates).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: "finding-discovery-005-a",
+          title: "First possible replacement finding",
+          investigationId: "investigation-discovery-005",
+        }),
+        expect.objectContaining({
+          id: "finding-discovery-005-b",
+          title: "Second possible replacement finding",
+          investigationId: "investigation-discovery-005",
+        }),
+      ]),
+    );
+
+    expect(result.reason).toContain(
+      "Multiple candidate replacement findings",
+    );
+
+    expect(result.reason).toContain(
+      "no deterministic replacement can be selected",
     );
   });
 

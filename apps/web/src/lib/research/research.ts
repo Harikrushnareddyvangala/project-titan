@@ -1911,14 +1911,54 @@ export function discoverResearchLineageIntegrityRemediationReplacement(
   }
 
   if (!plan.replacementEntityId) {
+    const candidates = getResearchFindings()
+      .filter((finding) =>
+        investigation.findingIds.includes(finding.id),
+      )
+      .map(
+        (
+          finding,
+        ): ResearchLineageIntegrityRemediationReplacementCandidate => ({
+          id: finding.id,
+          title: finding.statement,
+          investigationId: plan.investigationId,
+          reason:
+            "The finding belongs to the investigation and is eligible for replacement discovery.",
+        }),
+      );
+
+    if (candidates.length === 0) {
+      return {
+        investigationId: plan.investigationId,
+        issueCode: plan.issueCode,
+        status: "NotFound",
+        candidates: [],
+        selectedCandidate: null,
+        reason:
+          "No candidate replacement finding could be discovered within the investigation.",
+      };
+    }
+
+    if (candidates.length > 1) {
+      return {
+        investigationId: plan.investigationId,
+        issueCode: plan.issueCode,
+        status: "Ambiguous",
+        candidates,
+        selectedCandidate: null,
+        reason:
+          "Multiple candidate replacement findings were discovered within the investigation, so no deterministic replacement can be selected.",
+      };
+    }
+
     return {
       investigationId: plan.investigationId,
       issueCode: plan.issueCode,
-      status: "NotFound",
-      candidates: [],
-      selectedCandidate: null,
+      status: "Resolved",
+      candidates,
+      selectedCandidate: candidates[0],
       reason:
-        "No explicit replacement entity was provided for deterministic replacement discovery.",
+        "Exactly one candidate replacement finding was discovered within the investigation.",
     };
   }
 
