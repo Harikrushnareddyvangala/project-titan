@@ -2553,6 +2553,51 @@ export function createResearchLineageIntegrityRemediationRequest(
   };
 }
 
+function getResearchLineageRemediationEntityUpdatedAt(
+  target: ResearchLineageIntegrityResolvedRemediationTarget,
+): string | undefined {
+  if (!target.resolvable || !target.entityId) {
+    return undefined;
+  }
+
+  switch (target.kind) {
+    case "Investigation":
+      return getResearchInvestigations().find(
+        (item) => item.id === target.entityId,
+      )?.updatedAt;
+
+    case "Experiment":
+      return getResearchExperiments().find(
+        (item) => item.id === target.entityId,
+      )?.updatedAt;
+
+    case "Finding":
+      return getResearchFindings().find(
+        (item) => item.id === target.entityId,
+      )?.updatedAt;
+
+    case "FindingValidation":
+      return getResearchFindingValidations().find(
+        (item) => item.id === target.entityId,
+      )?.updatedAt;
+
+    case "Conclusion":
+      return getResearchInvestigationConclusions().find(
+        (item) => item.id === target.entityId,
+      )?.updatedAt;
+
+    case "Evidence":
+      /*
+       * ResearchEvidence currently has no updatedAt field.
+       *
+       * Until ResearchEvidence gains an updatedAt timestamp,
+       * concurrency protection cannot be based on an entity
+       * update timestamp for evidence targets.
+       */
+      return undefined;
+  }
+}
+
 export function createResearchLineageIntegrityRemediationPlan(
   request: ResearchLineageIntegrityRemediationRequest,
 ): ResearchLineageIntegrityRemediationPlan {
@@ -2563,63 +2608,8 @@ export function createResearchLineageIntegrityRemediationPlan(
       request.action,
     );
 
-  let targetUpdatedAt: string | undefined;
-
-  if (
-    resolvedTarget.resolvable &&
-    resolvedTarget.entityId
-  ) {
-    switch (resolvedTarget.kind) {
-      case "Investigation":
-        targetUpdatedAt =
-          getResearchInvestigations().find(
-            (item) =>
-              item.id === resolvedTarget.entityId,
-          )?.updatedAt;
-        break;
-
-      case "Experiment":
-        targetUpdatedAt =
-          getResearchExperiments().find(
-            (item) =>
-              item.id === resolvedTarget.entityId,
-          )?.updatedAt;
-        break;
-
-      case "Finding":
-        targetUpdatedAt =
-          getResearchFindings().find(
-            (item) =>
-              item.id === resolvedTarget.entityId,
-          )?.updatedAt;
-        break;
-
-      case "FindingValidation":
-        targetUpdatedAt =
-          getResearchFindingValidations().find(
-            (item) =>
-              item.id === resolvedTarget.entityId,
-          )?.updatedAt;
-        break;
-
-      case "Conclusion":
-        targetUpdatedAt =
-          getResearchInvestigationConclusions().find(
-            (item) =>
-              item.id === resolvedTarget.entityId,
-          )?.updatedAt;
-        break;
-
-      case "Evidence":
-        /*
-         * ResearchEvidence currently has no updatedAt field,
-         * so no optimistic-concurrency timestamp can be
-         * captured for Evidence targets.
-         */
-        targetUpdatedAt = undefined;
-        break;
-    }
-  }
+  const targetUpdatedAt =
+  getResearchLineageRemediationEntityUpdatedAt(resolvedTarget);
 
   let replacementUpdatedAt: string | undefined;
 
@@ -3086,45 +3076,11 @@ export function executeResearchLineageIntegrityRemediation(
     };
   }
 
-  if (plan.targetUpdatedAt && resolvedTarget.entityId) {
-    let currentTargetUpdatedAt: string | undefined;
-
-    switch (resolvedTarget.kind) {
-      case "Investigation":
-        currentTargetUpdatedAt = getResearchInvestigations().find(
-          (item) => item.id === resolvedTarget.entityId,
-        )?.updatedAt;
-        break;
-
-      case "Experiment":
-        currentTargetUpdatedAt = getResearchExperiments().find(
-          (item) => item.id === resolvedTarget.entityId,
-        )?.updatedAt;
-        break;
-
-      case "Finding":
-        currentTargetUpdatedAt = getResearchFindings().find(
-          (item) => item.id === resolvedTarget.entityId,
-        )?.updatedAt;
-        break;
-
-      case "FindingValidation":
-        currentTargetUpdatedAt = getResearchFindingValidations().find(
-          (item) => item.id === resolvedTarget.entityId,
-        )?.updatedAt;
-        break;
-
-      case "Conclusion":
-        currentTargetUpdatedAt = getResearchInvestigationConclusions().find(
-          (item) => item.id === resolvedTarget.entityId,
-        )?.updatedAt;
-        break;
-
-      case "Evidence":
-        // ResearchEvidence currently has no updatedAt field.
-        currentTargetUpdatedAt = undefined;
-        break;
-    }
+  if (plan.targetUpdatedAt) {
+    const currentTargetUpdatedAt =
+      getResearchLineageRemediationEntityUpdatedAt(
+        resolvedTarget,
+      );
 
     if (currentTargetUpdatedAt !== plan.targetUpdatedAt) {
       return {

@@ -1725,6 +1725,164 @@ describe("research lineage remediation", () => {
     );
   });
 
+  it("rejects execution when the replacement disappears after plan creation", () => {
+    const now = new Date().toISOString();
+
+    const investigations = [
+      {
+        id: "investigation-replacement-disappearance-001",
+        title: "Replacement disappearance test",
+        objective: "Test replacement deletion concurrency protection",
+        question:
+          "Does remediation reject execution when its replacement disappears?",
+        status: "Draft",
+        experimentIds: [],
+        evidenceIds: [],
+        findingIds: [
+          "finding-valid-replacement-disappearance-001",
+        ],
+        artifactIds: [],
+        conclusionIds: [
+          "conclusion-replacement-disappearance-001",
+        ],
+        createdAt: now,
+        updatedAt: now,
+      },
+    ];
+
+    const replacementFinding = {
+      id: "finding-valid-replacement-disappearance-001",
+      statement: "Valid replacement finding",
+      evidenceAssessments: [],
+      confidence: 0.95,
+      validationIds: [],
+      investigationId:
+        "investigation-replacement-disappearance-001",
+      createdAt: now,
+      updatedAt: now,
+    };
+
+    const conclusions = [
+      {
+        id: "conclusion-replacement-disappearance-001",
+        investigationId:
+          "investigation-replacement-disappearance-001",
+        statement: "Test conclusion",
+        status: "Accepted",
+        supportingFindingIds: [
+          "finding-invalid-replacement-disappearance-001",
+        ],
+        contradictingFindingIds: [],
+        createdAt: now,
+        updatedAt: now,
+      },
+    ];
+
+    localStorage.setItem(
+      "titan:research-investigations",
+      JSON.stringify(investigations),
+    );
+
+    localStorage.setItem(
+      "titan:research-findings",
+      JSON.stringify([
+        replacementFinding,
+      ]),
+    );
+
+    localStorage.setItem(
+      "titan:research-investigation-conclusions",
+      JSON.stringify(conclusions),
+    );
+
+    const validation = validateResearchLineage(
+      "investigation-replacement-disappearance-001",
+    );
+
+    const issue = validation.issues.find(
+      (candidate) =>
+        candidate.code ===
+        "CONCLUSION_FINDING_REFERENCE_INVALID",
+    );
+
+    expect(issue).toBeDefined();
+
+    if (!issue) {
+      return;
+    }
+
+    const action =
+      getResearchLineageIntegrityIssueAction(issue);
+
+    expect(action.action).toBe("RepairReference");
+
+    if (action.action !== "RepairReference") {
+      throw new Error(
+        `Expected RepairReference action, received ${action.action}`,
+      );
+    }
+
+    const plan =
+      createResearchLineageIntegrityRemediationPlan({
+        investigationId:
+          "investigation-replacement-disappearance-001",
+        action: action.action,
+        issueCode: issue.code,
+        target: action.target,
+        replacementEntityId:
+          "finding-valid-replacement-disappearance-001",
+        confirmed: true,
+      });
+
+    expect(plan.replacementUpdatedAt).toBe(now);
+
+    /*
+     * Simulate the replacement entity being deleted
+     * after the plan was created.
+     */
+    localStorage.setItem(
+      "titan:research-findings",
+      JSON.stringify([]),
+    );
+
+    const result =
+      executeResearchLineageIntegrityRemediation(plan);
+
+    expect(result.status).toBe("Rejected");
+
+    expect(result.executed).toBe(false);
+
+    expect(result.message).toContain(
+      "replacement changed after the remediation plan was created",
+    );
+
+    /*
+     * The target must remain untouched because the
+     * concurrency check rejected execution before mutation.
+     */
+    const conclusionsAfter =
+      getResearchInvestigationConclusions();
+
+    const conclusionAfter =
+      conclusionsAfter.find(
+        (item) =>
+          item.id ===
+          "conclusion-replacement-disappearance-001",
+      );
+
+    expect(
+      conclusionAfter?.supportingFindingIds,
+    ).toContain(
+      "finding-invalid-replacement-disappearance-001",
+    );
+
+    expect(
+      conclusionAfter?.supportingFindingIds,
+    ).not.toContain(
+      "finding-valid-replacement-disappearance-001",
+    );
+  });
+
   it("promotes a uniquely discovered replacement to a repairable decision", () => {
     const now = new Date().toISOString();
 
