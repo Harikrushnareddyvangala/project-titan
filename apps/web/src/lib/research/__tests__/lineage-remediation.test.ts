@@ -7,6 +7,8 @@ import {
   discoverResearchLineageIntegrityRemediationReplacement,
   decideResearchLineageIntegrityRemediationRepair,
   executeResearchLineageIntegrityRemediation,
+  getResearchInvestigations,
+  saveResearchInvestigation,
   getResearchInvestigationConclusions,
   getResearchLineageIntegrityIssueAction,
   getResearchFindings,
@@ -1882,6 +1884,161 @@ describe("research lineage remediation", () => {
       "finding-valid-replacement-disappearance-001",
     );
   });
+
+  it("rejects execution when the replacement leaves the investigation after plan creation", () => {
+    const now = new Date().toISOString();
+
+    const investigationId =
+      "investigation-replacement-leaves-001";
+
+    const replacementFindingId =
+      "finding-valid-replacement-leaves-001";
+
+    const conclusionId =
+      "conclusion-replacement-leaves-001";
+
+    const investigations = [
+      {
+        id: investigationId,
+        title: "Replacement leaves investigation test",
+        objective:
+          "Test replacement investigation-scope concurrency protection",
+        question:
+          "Does remediation reject a replacement that leaves the investigation after plan creation?",
+        status: "Draft",
+        experimentIds: [],
+        evidenceIds: [],
+        findingIds: [replacementFindingId],
+        artifactIds: [],
+        conclusionIds: [conclusionId],
+        createdAt: now,
+        updatedAt: now,
+      },
+    ];
+
+    const findings = [
+      {
+        id: replacementFindingId,
+        statement: "Valid replacement finding",
+        evidenceAssessments: [],
+        confidence: 0.95,
+        validationIds: [],
+        investigationId,
+        createdAt: now,
+        updatedAt: now,
+      },
+    ];
+
+    const conclusions = [
+      {
+        id: conclusionId,
+        investigationId,
+        statement: "Test conclusion",
+        status: "Accepted",
+        supportingFindingIds: [
+          "finding-invalid-replacement-leaves-001",
+        ],
+        contradictingFindingIds: [],
+        createdAt: now,
+        updatedAt: now,
+      },
+    ];
+
+    localStorage.setItem(
+      "titan:research-investigations",
+      JSON.stringify(investigations),
+    );
+
+    localStorage.setItem(
+      "titan:research-findings",
+      JSON.stringify(findings),
+    );
+
+    localStorage.setItem(
+      "titan:research-investigation-conclusions",
+      JSON.stringify(conclusions),
+    );
+
+    const validation =
+      validateResearchLineage(investigationId);
+
+    const issue = validation.issues.find(
+      (candidate) =>
+        candidate.code ===
+        "CONCLUSION_FINDING_REFERENCE_INVALID",
+    );
+
+    expect(issue).toBeDefined();
+
+    if (!issue) {
+      return;
+    }
+
+    const action =
+      getResearchLineageIntegrityIssueAction(issue);
+
+    expect(action.action).toBe("RepairReference");
+
+    if (action.action !== "RepairReference") {
+      throw new Error(
+        `Expected RepairReference action, received ${action.action}`,
+      );
+    }
+
+    const plan =
+      createResearchLineageIntegrityRemediationPlan({
+        investigationId,
+        action: action.action,
+        issueCode: issue.code,
+        target: {
+          nodeId: issue.nodeId,
+          edgeId: issue.edgeId,
+          sourceId: issue.sourceId,
+          targetId: issue.targetId,
+        },
+        replacementEntityId: replacementFindingId,
+        confirmed: true,
+      });
+
+    expect(plan.replacementUpdatedAt).toBe(now);
+
+    const investigation =
+      getResearchInvestigations().find(
+        (item) => item.id === investigationId,
+      );
+
+    expect(investigation).toBeDefined();
+
+    if (!investigation) {
+      return;
+    }
+
+    /*
+     * Simulate the replacement leaving the investigation.
+     *
+     * The finding itself still exists, but the investigation
+     * no longer owns it. Therefore the replacement is no
+     * longer a valid remediation target.
+     */
+    saveResearchInvestigation({
+      ...investigation,
+      findingIds: investigation.findingIds.filter(
+        (findingId) =>
+          findingId !== replacementFindingId,
+      ),
+    });
+
+    const result =
+      executeResearchLineageIntegrityRemediation(plan);
+
+    expect(result.executed).toBe(false);
+    expect(result.status).toBe("Rejected");
+
+    expect(result.message).toContain(
+      "replacement changed after the remediation plan was created",
+    );
+  },
+  );
 
   it("promotes a uniquely discovered replacement to a repairable decision", () => {
     const now = new Date().toISOString();

@@ -2598,6 +2598,32 @@ function getResearchLineageRemediationEntityUpdatedAt(
   }
 }
 
+export function getResearchLineageRemediationReplacement(
+  investigationId: string,
+  replacementEntityId: string | undefined,
+): ResearchFinding | undefined {
+  if (!replacementEntityId) {
+    return undefined;
+  }
+
+  const investigation = getResearchInvestigations().find(
+    (item) => item.id === investigationId,
+  );
+
+  if (!investigation) {
+    return undefined;
+  }
+
+  if (!investigation.findingIds.includes(replacementEntityId)) {
+    return undefined;
+  }
+
+  return getResearchFindings().find(
+    (finding) =>
+      finding.id === replacementEntityId,
+  );
+}
+
 export function createResearchLineageIntegrityRemediationPlan(
   request: ResearchLineageIntegrityRemediationRequest,
 ): ResearchLineageIntegrityRemediationPlan {
@@ -2609,39 +2635,32 @@ export function createResearchLineageIntegrityRemediationPlan(
     );
 
   const targetUpdatedAt =
-  getResearchLineageRemediationEntityUpdatedAt(resolvedTarget);
+    getResearchLineageRemediationEntityUpdatedAt(resolvedTarget);
 
   let replacementUpdatedAt: string | undefined;
 
   if (request.replacementEntityId) {
-    replacementUpdatedAt = getResearchFindings().find(
-      (item) => item.id === request.replacementEntityId,
-    )?.updatedAt;
+    replacementUpdatedAt =
+      getResearchLineageRemediationReplacement(
+        request.investigationId,
+        request.replacementEntityId,
+      )?.updatedAt;
   }
 
   return {
     investigationId: request.investigationId,
-
     action: request.action,
-
     issueCode: request.issueCode,
-
     target: request.target,
-
     replacementEntityId:
       request.replacementEntityId,
-
     confirmed: request.confirmed,
-
     status: request.confirmed
       ? "Validated"
       : "Planned",
-
     description:
       `Proposed ${request.action} remediation for ${request.issueCode}.`,
-
     targetUpdatedAt,
-
     replacementUpdatedAt,
   };
 }
@@ -3097,14 +3116,17 @@ export function executeResearchLineageIntegrityRemediation(
   }
 
   if (
-    plan.replacementUpdatedAt &&
+    plan.replacementUpdatedAt !== undefined &&
     plan.replacementEntityId
   ) {
+    const currentReplacement =
+      getResearchLineageRemediationReplacement(
+        plan.investigationId,
+        plan.replacementEntityId,
+      );
+
     const currentReplacementUpdatedAt =
-      getResearchFindings().find(
-        (finding) =>
-          finding.id === plan.replacementEntityId,
-      )?.updatedAt;
+      currentReplacement?.updatedAt;
 
     if (
       currentReplacementUpdatedAt !==
