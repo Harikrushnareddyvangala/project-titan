@@ -872,6 +872,15 @@ export interface ResearchLineageIntegrityRemediationPlan {
   status: "Planned" | "Validated";
 
   description: string;
+
+  /**
+   * Optimistic-concurrency snapshot captured when the
+   * remediation plan was created.
+   *
+   * Execution must reject the plan if the owning target
+   * has changed since this snapshot was captured.
+   */
+  targetUpdatedAt?: string;
 }
 
 export interface ResearchLineageIntegrityRemediationResult {

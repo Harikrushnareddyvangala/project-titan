@@ -2556,6 +2556,71 @@ export function createResearchLineageIntegrityRemediationRequest(
 export function createResearchLineageIntegrityRemediationPlan(
   request: ResearchLineageIntegrityRemediationRequest,
 ): ResearchLineageIntegrityRemediationPlan {
+  const resolvedTarget =
+    resolveResearchLineageIntegrityRemediationTarget(
+      request.investigationId,
+      request.target,
+      request.action,
+    );
+
+  let targetUpdatedAt: string | undefined;
+
+  if (
+    resolvedTarget.resolvable &&
+    resolvedTarget.entityId
+  ) {
+    switch (resolvedTarget.kind) {
+      case "Investigation":
+        targetUpdatedAt =
+          getResearchInvestigations().find(
+            (item) =>
+              item.id === resolvedTarget.entityId,
+          )?.updatedAt;
+        break;
+
+      case "Experiment":
+        targetUpdatedAt =
+          getResearchExperiments().find(
+            (item) =>
+              item.id === resolvedTarget.entityId,
+          )?.updatedAt;
+        break;
+
+      case "Finding":
+        targetUpdatedAt =
+          getResearchFindings().find(
+            (item) =>
+              item.id === resolvedTarget.entityId,
+          )?.updatedAt;
+        break;
+
+      case "FindingValidation":
+        targetUpdatedAt =
+          getResearchFindingValidations().find(
+            (item) =>
+              item.id === resolvedTarget.entityId,
+          )?.updatedAt;
+        break;
+
+      case "Conclusion":
+        targetUpdatedAt =
+          getResearchInvestigationConclusions().find(
+            (item) =>
+              item.id === resolvedTarget.entityId,
+          )?.updatedAt;
+        break;
+
+      case "Evidence":
+        /*
+         * ResearchEvidence currently has no updatedAt field,
+         * so no optimistic-concurrency timestamp can be
+         * captured for Evidence targets.
+         */
+        targetUpdatedAt = undefined;
+        break;
+    }
+  }
+
   return {
     investigationId: request.investigationId,
 
@@ -2565,13 +2630,19 @@ export function createResearchLineageIntegrityRemediationPlan(
 
     target: request.target,
 
-    replacementEntityId: request.replacementEntityId,
+    replacementEntityId:
+      request.replacementEntityId,
 
     confirmed: request.confirmed,
 
-    status: request.confirmed ? "Validated" : "Planned",
+    status: request.confirmed
+      ? "Validated"
+      : "Planned",
 
-    description: `Proposed ${request.action} remediation for ${request.issueCode}.`,
+    description:
+      `Proposed ${request.action} remediation for ${request.issueCode}.`,
+
+    targetUpdatedAt,
   };
 }
 
@@ -3003,6 +3074,60 @@ export function executeResearchLineageIntegrityRemediation(
 
       plan,
     };
+  }
+
+  if (plan.targetUpdatedAt && resolvedTarget.entityId) {
+    let currentTargetUpdatedAt: string | undefined;
+
+    switch (resolvedTarget.kind) {
+      case "Investigation":
+        currentTargetUpdatedAt = getResearchInvestigations().find(
+          (item) => item.id === resolvedTarget.entityId,
+        )?.updatedAt;
+        break;
+
+      case "Experiment":
+        currentTargetUpdatedAt = getResearchExperiments().find(
+          (item) => item.id === resolvedTarget.entityId,
+        )?.updatedAt;
+        break;
+
+      case "Finding":
+        currentTargetUpdatedAt = getResearchFindings().find(
+          (item) => item.id === resolvedTarget.entityId,
+        )?.updatedAt;
+        break;
+
+      case "FindingValidation":
+        currentTargetUpdatedAt = getResearchFindingValidations().find(
+          (item) => item.id === resolvedTarget.entityId,
+        )?.updatedAt;
+        break;
+
+      case "Conclusion":
+        currentTargetUpdatedAt = getResearchInvestigationConclusions().find(
+          (item) => item.id === resolvedTarget.entityId,
+        )?.updatedAt;
+        break;
+
+      case "Evidence":
+        // ResearchEvidence currently has no updatedAt field.
+        currentTargetUpdatedAt = undefined;
+        break;
+    }
+
+    if (currentTargetUpdatedAt !== plan.targetUpdatedAt) {
+      return {
+        investigationId: plan.investigationId,
+        action: plan.action,
+        issueCode: plan.issueCode,
+        status: "Rejected",
+        executed: false,
+        message:
+          "Remediation execution rejected because the target changed after the remediation plan was created.",
+        plan,
+      };
+    }
   }
 
   const repairDecision = decideResearchLineageIntegrityRemediationRepair(plan);

@@ -16,6 +16,7 @@ import {
   getResearchProvenanceEventsByInvestigation,
   getResearchProvenanceTimelineByInvestigation,
   validateResearchLineage,
+  resolveResearchLineageIntegrityRemediationTarget,
 } from "@/lib/research";
 
 describe("research lineage remediation", () => {
@@ -1246,6 +1247,211 @@ describe("research lineage remediation", () => {
       mutationContract.createsProvenanceEvent,
     ).toBe(true);
     });
+
+  it("captures the target updatedAt snapshot when creating a remediation plan", () => {
+    const now = new Date().toISOString();
+
+    const investigations = [
+      {
+        id: "investigation-snapshot-001",
+        title: "Remediation snapshot test",
+        objective: "Test target snapshot capture",
+        question: "Does remediation planning capture target state?",
+        status: "Draft",
+        experimentIds: [],
+        evidenceIds: [],
+        findingIds: ["finding-snapshot-001"],
+        artifactIds: [],
+        conclusionIds: ["conclusion-snapshot-001"],
+        createdAt: now,
+        updatedAt: now,
+      },
+    ];
+
+    const findings = [
+      {
+        id: "finding-snapshot-001",
+        statement: "Valid finding",
+        evidenceAssessments: [],
+        confidence: 0.9,
+        validationIds: [],
+        investigationId: "investigation-snapshot-001",
+        createdAt: now,
+        updatedAt: now,
+      },
+    ];
+
+    const conclusions = [
+      {
+        id: "conclusion-snapshot-001",
+        investigationId: "investigation-snapshot-001",
+        statement: "Test conclusion",
+        status: "Accepted",
+        supportingFindingIds: ["finding-invalid-snapshot-001"],
+        contradictingFindingIds: [],
+        createdAt: now,
+        updatedAt: now,
+      },
+    ];
+
+    localStorage.setItem(
+      "titan:research-investigations",
+      JSON.stringify(investigations),
+    );
+
+    localStorage.setItem(
+      "titan:research-findings",
+      JSON.stringify(findings),
+    );
+
+    localStorage.setItem(
+      "titan:research-investigation-conclusions",
+      JSON.stringify(conclusions),
+    );
+
+    const resolvedTarget =
+      resolveResearchLineageIntegrityRemediationTarget(
+        "investigation-snapshot-001",
+        {
+          nodeId: "conclusion-snapshot-001",
+          edgeId: undefined,
+          sourceId: "finding-invalid-snapshot-001",
+          targetId: "conclusion-snapshot-001",
+        },
+        "RepairReference",
+      );
+
+    const plan =
+      createResearchLineageIntegrityRemediationPlan({
+        investigationId: "investigation-snapshot-001",
+        action: "RepairReference",
+        issueCode:
+          "CONCLUSION_FINDING_REFERENCE_INVALID",
+        target: {
+          nodeId: "conclusion-snapshot-001",
+          edgeId: undefined,
+          sourceId: "finding-invalid-snapshot-001",
+          targetId: "conclusion-snapshot-001",
+        },
+        replacementEntityId: "finding-snapshot-001",
+        confirmed: true,
+      });
+
+    expect(plan.targetUpdatedAt).toBe(now);
+  });
+
+  it("rejects execution when the remediation target changed after plan creation", () => {
+    const originalUpdatedAt = "2026-08-27T04:00:00.000Z";
+    const changedUpdatedAt = "2026-08-27T04:05:00.000Z";
+
+    const investigations = [
+      {
+        id: "investigation-stale-plan-001",
+        title: "Stale remediation plan test",
+        objective: "Test optimistic concurrency protection",
+        question: "Does remediation reject a stale plan?",
+        status: "Draft",
+        experimentIds: [],
+        evidenceIds: [],
+        findingIds: ["finding-stale-plan-001"],
+        artifactIds: [],
+        conclusionIds: ["conclusion-stale-plan-001"],
+        createdAt: originalUpdatedAt,
+        updatedAt: originalUpdatedAt,
+      },
+    ];
+
+    const findings = [
+      {
+        id: "finding-stale-plan-001",
+        statement: "Replacement finding",
+        evidenceAssessments: [],
+        confidence: 0.95,
+        validationIds: [],
+        investigationId: "investigation-stale-plan-001",
+        createdAt: originalUpdatedAt,
+        updatedAt: originalUpdatedAt,
+      },
+    ];
+
+    const conclusions = [
+      {
+        id: "conclusion-stale-plan-001",
+        investigationId: "investigation-stale-plan-001",
+        statement: "Conclusion whose state changes after planning",
+        status: "Accepted",
+        supportingFindingIds: ["finding-invalid-stale-plan-001"],
+        contradictingFindingIds: [],
+        createdAt: originalUpdatedAt,
+        updatedAt: originalUpdatedAt,
+      },
+    ];
+
+    localStorage.setItem(
+      "titan:research-investigations",
+      JSON.stringify(investigations),
+    );
+
+    localStorage.setItem(
+      "titan:research-findings",
+      JSON.stringify(findings),
+    );
+
+    localStorage.setItem(
+      "titan:research-investigation-conclusions",
+      JSON.stringify(conclusions),
+    );
+
+    const plan = createResearchLineageIntegrityRemediationPlan({
+      investigationId: "investigation-stale-plan-001",
+      action: "RepairReference",
+      issueCode: "CONCLUSION_FINDING_REFERENCE_INVALID",
+      target: {
+        nodeId: "conclusion-stale-plan-001",
+        edgeId: undefined,
+        sourceId: "finding-invalid-stale-plan-001",
+        targetId: "conclusion-stale-plan-001",
+      },
+      replacementEntityId: "finding-stale-plan-001",
+      confirmed: true,
+    });
+
+    expect(plan.targetUpdatedAt).toBe(originalUpdatedAt);
+
+    const changedConclusions = [
+      {
+        ...conclusions[0],
+        updatedAt: changedUpdatedAt,
+      },
+    ];
+
+    localStorage.setItem(
+      "titan:research-investigation-conclusions",
+      JSON.stringify(changedConclusions),
+    );
+
+    const result = executeResearchLineageIntegrityRemediation(plan);
+
+    expect(result.status).toBe("Rejected");
+    expect(result.executed).toBe(false);
+
+    expect(result.message).toContain(
+      "target changed after the remediation plan was created",
+    );
+
+    const persistedConclusions =
+      getResearchInvestigationConclusions();
+
+    expect(persistedConclusions[0]).toEqual(
+      expect.objectContaining({
+        id: "conclusion-stale-plan-001",
+        updatedAt: changedUpdatedAt,
+        supportingFindingIds: [
+          "finding-invalid-stale-plan-001",
+        ],
+      }),
+    );
+  });
 
   it("promotes a uniquely discovered replacement to a repairable decision", () => {
     const now = new Date().toISOString();
