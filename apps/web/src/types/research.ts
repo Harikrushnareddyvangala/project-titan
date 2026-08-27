@@ -881,6 +881,14 @@ export interface ResearchLineageIntegrityRemediationPlan {
    * has changed since this snapshot was captured.
    */
   targetUpdatedAt?: string;
+  /**
+   * Optimistic-concurrency snapshot captured for the
+   * replacement entity when the remediation plan was created.
+   *
+   * Execution must reject the plan if the replacement
+   * entity has changed since this snapshot was captured.
+   */
+  replacementUpdatedAt?: string;
 }
 
 export interface ResearchLineageIntegrityRemediationResult {

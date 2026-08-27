@@ -2621,6 +2621,14 @@ export function createResearchLineageIntegrityRemediationPlan(
     }
   }
 
+  let replacementUpdatedAt: string | undefined;
+
+  if (request.replacementEntityId) {
+    replacementUpdatedAt = getResearchFindings().find(
+      (item) => item.id === request.replacementEntityId,
+    )?.updatedAt;
+  }
+
   return {
     investigationId: request.investigationId,
 
@@ -2643,6 +2651,8 @@ export function createResearchLineageIntegrityRemediationPlan(
       `Proposed ${request.action} remediation for ${request.issueCode}.`,
 
     targetUpdatedAt,
+
+    replacementUpdatedAt,
   };
 }
 
@@ -3125,6 +3135,33 @@ export function executeResearchLineageIntegrityRemediation(
         executed: false,
         message:
           "Remediation execution rejected because the target changed after the remediation plan was created.",
+        plan,
+      };
+    }
+  }
+
+  if (
+    plan.replacementUpdatedAt &&
+    plan.replacementEntityId
+  ) {
+    const currentReplacementUpdatedAt =
+      getResearchFindings().find(
+        (finding) =>
+          finding.id === plan.replacementEntityId,
+      )?.updatedAt;
+
+    if (
+      currentReplacementUpdatedAt !==
+      plan.replacementUpdatedAt
+    ) {
+      return {
+        investigationId: plan.investigationId,
+        action: plan.action,
+        issueCode: plan.issueCode,
+        status: "Rejected",
+        executed: false,
+        message:
+          "Remediation execution rejected because the replacement changed after the remediation plan was created.",
         plan,
       };
     }

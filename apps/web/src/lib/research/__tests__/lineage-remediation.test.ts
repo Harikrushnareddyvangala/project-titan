@@ -1340,6 +1340,110 @@ describe("research lineage remediation", () => {
     expect(plan.targetUpdatedAt).toBe(now);
   });
 
+  it("captures the replacement updatedAt snapshot when creating a remediation plan", () => {
+    const now = new Date().toISOString();
+
+    const investigations = [
+      {
+        id: "investigation-replacement-snapshot-001",
+        title: "Replacement snapshot test",
+        objective: "Test replacement concurrency snapshot",
+        question: "Does a remediation plan capture the replacement finding timestamp?",
+        status: "Draft",
+        experimentIds: [],
+        evidenceIds: [],
+        findingIds: [
+          "finding-valid-replacement-snapshot-001",
+        ],
+        artifactIds: [],
+        conclusionIds: ["conclusion-replacement-snapshot-001"],
+        createdAt: now,
+        updatedAt: now,
+      },
+    ];
+
+    const findings = [
+      {
+        id: "finding-valid-replacement-snapshot-001",
+        statement: "Valid replacement finding",
+        evidenceAssessments: [],
+        confidence: 0.95,
+        validationIds: [],
+        investigationId: "investigation-replacement-snapshot-001",
+        createdAt: now,
+        updatedAt: now,
+      },
+    ];
+
+    const conclusions = [
+      {
+        id: "conclusion-replacement-snapshot-001",
+        investigationId: "investigation-replacement-snapshot-001",
+        statement: "Test conclusion",
+        status: "Accepted",
+        supportingFindingIds: [
+          "finding-invalid-replacement-snapshot-001",
+        ],
+        contradictingFindingIds: [],
+        createdAt: now,
+        updatedAt: now,
+      },
+    ];
+
+    localStorage.setItem(
+      "titan:research-investigations",
+      JSON.stringify(investigations),
+    );
+
+    localStorage.setItem(
+      "titan:research-findings",
+      JSON.stringify(findings),
+    );
+
+    localStorage.setItem(
+      "titan:research-investigation-conclusions",
+      JSON.stringify(conclusions),
+    );
+
+    const validation = validateResearchLineage(
+      "investigation-replacement-snapshot-001",
+    );
+
+    const issue = validation.issues.find(
+      (candidate) =>
+        candidate.code === "CONCLUSION_FINDING_REFERENCE_INVALID",
+    );
+
+    expect(issue).toBeDefined();
+
+    if (!issue) {
+      return;
+    }
+
+    const action = getResearchLineageIntegrityIssueAction(issue);
+
+    expect(action.action).toBe("RepairReference");
+
+    if (action.action !== "RepairReference") {
+      throw new Error(
+        `Expected RepairReference action, received ${action.action}`,
+      );
+    }
+
+    const plan = createResearchLineageIntegrityRemediationPlan({
+      investigationId:
+        "investigation-replacement-snapshot-001",
+      action: action.action,
+      issueCode: issue.code,
+      target: action.target,
+      replacementEntityId:
+        "finding-valid-replacement-snapshot-001",
+      confirmed: true,
+    });
+
+    expect(plan.replacementUpdatedAt).toBe(now);
+  });
+
   it("rejects execution when the remediation target changed after plan creation", () => {
     const originalUpdatedAt = "2026-08-27T04:00:00.000Z";
     const changedUpdatedAt = "2026-08-27T04:05:00.000Z";
@@ -1450,6 +1554,174 @@ describe("research lineage remediation", () => {
           "finding-invalid-stale-plan-001",
         ],
       }),
+    );
+  });
+
+  it("rejects execution when the replacement changed after plan creation", () => {
+    const now = new Date().toISOString();
+
+    const investigations = [
+      {
+        id: "investigation-replacement-concurrency-001",
+        title: "Replacement concurrency test",
+        objective: "Test replacement optimistic concurrency protection",
+        question:
+          "Does remediation reject execution when the replacement changes after plan creation?",
+        status: "Draft",
+        experimentIds: [],
+        evidenceIds: [],
+        findingIds: [
+          "finding-valid-replacement-concurrency-001",
+        ],
+        artifactIds: [],
+        conclusionIds: [
+          "conclusion-replacement-concurrency-001",
+        ],
+        createdAt: now,
+        updatedAt: now,
+      },
+    ];
+
+    const replacementFinding = {
+      id: "finding-valid-replacement-concurrency-001",
+      statement: "Valid replacement finding",
+      evidenceAssessments: [],
+      confidence: 0.95,
+      validationIds: [],
+      investigationId:
+        "investigation-replacement-concurrency-001",
+      createdAt: now,
+      updatedAt: now,
+    };
+
+    const conclusions = [
+      {
+        id: "conclusion-replacement-concurrency-001",
+        investigationId:
+          "investigation-replacement-concurrency-001",
+        statement: "Test conclusion",
+        status: "Accepted",
+        supportingFindingIds: [
+          "finding-invalid-replacement-concurrency-001",
+        ],
+        contradictingFindingIds: [],
+        createdAt: now,
+        updatedAt: now,
+      },
+    ];
+
+    localStorage.setItem(
+      "titan:research-investigations",
+      JSON.stringify(investigations),
+    );
+
+    localStorage.setItem(
+      "titan:research-findings",
+      JSON.stringify([
+        replacementFinding,
+      ]),
+    );
+
+    localStorage.setItem(
+      "titan:research-investigation-conclusions",
+      JSON.stringify(conclusions),
+    );
+
+    const validation = validateResearchLineage(
+      "investigation-replacement-concurrency-001",
+    );
+
+    const issue = validation.issues.find(
+      (candidate) =>
+        candidate.code ===
+        "CONCLUSION_FINDING_REFERENCE_INVALID",
+    );
+
+    expect(issue).toBeDefined();
+
+    if (!issue) {
+      return;
+    }
+
+    const action =
+      getResearchLineageIntegrityIssueAction(issue);
+
+    expect(action.action).toBe("RepairReference");
+
+    if (action.action !== "RepairReference") {
+      throw new Error(
+        `Expected RepairReference action, received ${action.action}`,
+      );
+    }
+
+    const plan =
+      createResearchLineageIntegrityRemediationPlan({
+        investigationId:
+          "investigation-replacement-concurrency-001",
+        action: action.action,
+        issueCode: issue.code,
+        target: action.target,
+        replacementEntityId:
+          "finding-valid-replacement-concurrency-001",
+        confirmed: true,
+      });
+
+    expect(plan.targetUpdatedAt).toBe(now);
+
+    expect(plan.replacementUpdatedAt).toBe(now);
+
+    /*
+     * Simulate another process changing the replacement
+     * finding after the remediation plan was created.
+     */
+    const replacementChangedAt =
+      new Date(Date.now() + 1000).toISOString();
+
+    localStorage.setItem(
+      "titan:research-findings",
+      JSON.stringify([
+        {
+          ...replacementFinding,
+          updatedAt: replacementChangedAt,
+        },
+      ]),
+    );
+
+    const result =
+      executeResearchLineageIntegrityRemediation(plan);
+
+    expect(result.status).toBe("Rejected");
+
+    expect(result.executed).toBe(false);
+
+    expect(result.message).toContain(
+      "replacement changed after the remediation plan was created",
+    );
+
+    /*
+     * The original broken reference must remain untouched
+     * because execution was rejected before mutation.
+     */
+    const conclusionsAfter =
+      getResearchInvestigationConclusions();
+
+    const conclusionAfter =
+      conclusionsAfter.find(
+        (item) =>
+          item.id ===
+          "conclusion-replacement-concurrency-001",
+      );
+
+    expect(
+      conclusionAfter?.supportingFindingIds,
+    ).toContain(
+      "finding-invalid-replacement-concurrency-001",
+    );
+
+    expect(
+      conclusionAfter?.supportingFindingIds,
+    ).not.toContain(
+      "finding-valid-replacement-concurrency-001",
     );
   });
 
