@@ -5,7 +5,6 @@ import {
   CheckCircle2,
   ShieldAlert,
   Activity,
-  ArrowUpRight,
 } from "lucide-react";
 
 import {
@@ -26,8 +25,6 @@ import {
   getResearchLineageIntegrityPrioritySummary,
   getResearchLineageIntegrityRemediationPreview,
   createResearchLineageIntegrityRemediationRequest,
-  createResearchLineageIntegrityRemediationPlan,
-  preflightResearchLineageIntegrityRemediation,
   getResearchFindings,
   getResearchInvestigations,
   subscribeToResearch,
@@ -149,13 +146,6 @@ function IssueCard({
 
   const [replacementEntityId, setReplacementEntityId] =
   useState<string>("");
-
-  const [remediationPreflight, setRemediationPreflight] =
-    useState<
-      ReturnType<
-        typeof preflightResearchLineageIntegrityRemediation
-      > | null
-    >(null);
 
   const remediationPreview =
     getResearchLineageIntegrityRemediationPreview(
