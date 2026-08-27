@@ -2630,4 +2630,160 @@ describe("research lineage remediation", () => {
     expect(finalValidation.valid).toBe(true);
   });
 
+  it("does not execute when replacement discovery is ambiguous", () => {
+    const now = new Date().toISOString();
+
+    localStorage.setItem(
+      "titan:research-investigations",
+      JSON.stringify([
+        {
+          id: "investigation-ambiguous-execution-001",
+          title: "Ambiguous replacement execution test",
+          objective: "Test the safety boundary for ambiguous discovery",
+          question:
+            "Does ambiguous replacement discovery prevent automatic execution?",
+          status: "Draft",
+          experimentIds: [],
+          evidenceIds: [],
+          findingIds: [
+            "finding-ambiguous-execution-001",
+            "finding-ambiguous-execution-002",
+          ],
+          artifactIds: [],
+          conclusionIds: [
+            "conclusion-ambiguous-execution-001",
+          ],
+          createdAt: now,
+          updatedAt: now,
+        },
+      ]),
+    );
+
+    localStorage.setItem(
+      "titan:research-findings",
+      JSON.stringify([
+        {
+          id: "finding-ambiguous-execution-001",
+          statement: "First possible replacement finding",
+          evidenceAssessments: [],
+          confidence: 0.91,
+          validationIds: [],
+          investigationId: "investigation-ambiguous-execution-001",
+          createdAt: now,
+          updatedAt: now,
+        },
+        {
+          id: "finding-ambiguous-execution-002",
+          statement: "Second possible replacement finding",
+          evidenceAssessments: [],
+          confidence: 0.92,
+          validationIds: [],
+          investigationId: "investigation-ambiguous-execution-001",
+          createdAt: now,
+          updatedAt: now,
+        },
+      ]),
+    );
+
+    localStorage.setItem(
+      "titan:research-investigation-conclusions",
+      JSON.stringify([
+        {
+          id: "conclusion-ambiguous-execution-001",
+          investigationId: "investigation-ambiguous-execution-001",
+          statement: "Conclusion requiring replacement",
+          status: "Accepted",
+          supportingFindingIds: [
+            "finding-invalid-ambiguous-execution-001",
+          ],
+          contradictingFindingIds: [],
+          createdAt: now,
+          updatedAt: now,
+        },
+      ]),
+    );
+
+    const initialValidation = validateResearchLineage(
+      "investigation-ambiguous-execution-001",
+    );
+
+    expect(initialValidation.valid).toBe(false);
+
+    const issue = initialValidation.issues.find(
+      (candidate) =>
+        candidate.code === "CONCLUSION_FINDING_REFERENCE_INVALID",
+    );
+
+    expect(issue).toBeDefined();
+
+    if (!issue) {
+      return;
+    }
+
+    const action = getResearchLineageIntegrityIssueAction(issue);
+
+    expect(action.action).toBe("RepairReference");
+
+    if (action.action !== "RepairReference") {
+      throw new Error(
+        `Expected RepairReference action, received ${action.action}`,
+      );
+    }
+
+    const plan = createResearchLineageIntegrityRemediationPlan({
+      investigationId: "investigation-ambiguous-execution-001",
+      action: action.action,
+      issueCode: issue.code,
+      target: action.target,
+      confirmed: true,
+    });
+
+    expect(plan.replacementEntityId).toBeUndefined();
+
+    const result = executeResearchLineageIntegrityRemediation(plan);
+
+    expect(result.executed).toBe(false);
+    expect(result.status).toBe("Rejected");
+
+    expect(result.message).toContain(
+      "not deterministic",
+    );
+
+    const conclusions =
+      getResearchInvestigationConclusions();
+
+    const conclusion = conclusions.find(
+      (candidate) =>
+        candidate.id ===
+        "conclusion-ambiguous-execution-001",
+    );
+
+    expect(
+      conclusion?.supportingFindingIds,
+    ).toEqual([
+      "finding-invalid-ambiguous-execution-001",
+    ]);
+
+    const provenanceEvents =
+      getResearchProvenanceEventsByInvestigation(
+        "investigation-ambiguous-execution-001",
+      );
+
+    expect(provenanceEvents).toEqual([]);
+
+    const finalValidation = validateResearchLineage(
+      "investigation-ambiguous-execution-001",
+    );
+
+    expect(finalValidation.valid).toBe(false);
+
+    expect(
+      finalValidation.issues.some(
+        (candidate) =>
+          candidate.code ===
+          "CONCLUSION_FINDING_REFERENCE_INVALID",
+      ),
+    ).toBe(true);
+  });
+
 });
