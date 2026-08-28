@@ -9,6 +9,7 @@ export {
   getResearchFindings,
   saveResearchFinding,
   subscribeToResearch,
+  getResearchPersistenceSnapshot,
   canTransitionResearchExperiment,
   transitionResearchExperiment,
   getResearchFindingValidations,

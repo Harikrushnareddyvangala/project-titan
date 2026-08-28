@@ -12,6 +12,7 @@ import { useSyncExternalStore, useState, } from "react";
 
 import {
   getResearchLineage,
+  getResearchPersistenceSnapshot,
   subscribeToResearch,
 } from "@/lib/research";
 
@@ -50,29 +51,7 @@ function getSnapshot(
     return EMPTY_LINEAGE;
   }
 
-  const raw = [
-    localStorage.getItem(
-      "titan:research-investigations",
-    ),
-    localStorage.getItem(
-      "titan:research-experiments",
-    ),
-    localStorage.getItem(
-      "titan:research-evidence",
-    ),
-    localStorage.getItem(
-      "titan:research-findings",
-    ),
-    localStorage.getItem(
-      "titan:research-finding-validations",
-    ),
-    localStorage.getItem(
-      "titan:research-investigation-conclusions",
-    ),
-    localStorage.getItem(
-      "titan:research-provenance-events",
-    ),
-  ].join("|");
+  const raw = getResearchPersistenceSnapshot();
 
   const cached =
     snapshotCache.get(investigationId);

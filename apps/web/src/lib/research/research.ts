@@ -111,6 +111,30 @@ function writeCollection<T>(key: string, value: T[]): void {
   window.dispatchEvent(new Event(RESEARCH_CHANGE_EVENT));
 }
 
+export function getResearchPersistenceSnapshot(): string | null {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  return [
+    localStorage.getItem(INVESTIGATION_STORAGE_KEY),
+    localStorage.getItem(EXPERIMENT_STORAGE_KEY),
+    localStorage.getItem(EVIDENCE_STORAGE_KEY),
+    localStorage.getItem(FINDING_STORAGE_KEY),
+    localStorage.getItem(EVIDENCE_ASSESSMENT_STORAGE_KEY),
+    localStorage.getItem(FINDING_VALIDATION_STORAGE_KEY),
+    localStorage.getItem(
+      INVESTIGATION_CONCLUSION_STORAGE_KEY,
+    ),
+    localStorage.getItem(
+      FINDING_VALIDATION_HISTORY_STORAGE_KEY,
+    ),
+    localStorage.getItem(
+      RESEARCH_PROVENANCE_STORAGE_KEY,
+    ),
+  ].join("|");
+}
+
 function createId(prefix: string): string {
   return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 }
