@@ -13,6 +13,7 @@ import {
   getResearchProvenanceTimeline,
   getResearchProvenanceTimelineByInvestigation,
   subscribeToResearch,
+  getResearchPersistenceSnapshot,
 } from "@/lib/research";
 
 import type {
@@ -79,10 +80,7 @@ function getResearchProvenanceTimelineSnapshot(
     return EMPTY_PROVENANCE_TIMELINE;
   }
 
-  const raw =
-    localStorage.getItem(
-      "titan:research-provenance-events",
-    );
+  const raw = getResearchPersistenceSnapshot();
 
   const cacheKey =
     investigationId ?? "all";

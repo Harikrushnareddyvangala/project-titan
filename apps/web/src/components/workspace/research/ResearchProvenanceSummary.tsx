@@ -11,6 +11,7 @@ import { useSyncExternalStore } from "react";
 import {
   getResearchProvenanceInvestigationSummary,
   subscribeToResearch,
+  getResearchPersistenceSnapshot,
 } from "@/lib/research";
 
 import type {
@@ -44,9 +45,7 @@ function getSnapshot(
     return EMPTY_SUMMARY;
   }
 
-  const raw = localStorage.getItem(
-    "titan:research-provenance-events",
-  );
+  const raw = getResearchPersistenceSnapshot();
 
   const cached = snapshotCache.get(
     investigationId,

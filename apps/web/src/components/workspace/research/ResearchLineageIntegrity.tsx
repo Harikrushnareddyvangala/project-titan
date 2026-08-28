@@ -28,6 +28,7 @@ import {
   getResearchFindings,
   getResearchInvestigations,
   subscribeToResearch,
+  getResearchPersistenceSnapshot,
   validateResearchLineage,
 } from "@/lib/research";
 
@@ -75,10 +76,7 @@ function getSnapshot(
     return EMPTY_RESULT;
   }
 
-  const raw =
-    localStorage.getItem(
-      "titan:research-provenance-events",
-    );
+  const raw = getResearchPersistenceSnapshot();
 
   const cached = cache.get(
     investigationId,
