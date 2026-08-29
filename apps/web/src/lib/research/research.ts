@@ -49,30 +49,13 @@ import type {
   ResearchLineageIntegrityRemediationPostcondition,
   ResearchLineageIntegrityResolvedRemediationTarget,
   ResearchLineageIntegrityRemediationMutationContract,
-  ResearchLineageIntegrityRemediationMutationResult,
 } from "@/types/research";
 
 import { evaluateFindingValidationEligibility } from "./evidenceAssessment";
 
-const INVESTIGATION_STORAGE_KEY = "titan:research-investigations";
+import { localResearchPersistence } from "./persistence/local";
 
-const EXPERIMENT_STORAGE_KEY = "titan:research-experiments";
-
-const EVIDENCE_STORAGE_KEY = "titan:research-evidence";
-
-const FINDING_STORAGE_KEY = "titan:research-findings";
-
-const RESEARCH_CHANGE_EVENT = "titan:research-change";
-
-const EVIDENCE_ASSESSMENT_STORAGE_KEY = "titan:research-evidence-assessments";
-
-const FINDING_VALIDATION_STORAGE_KEY = "titan:research-finding-validations";
-
-const INVESTIGATION_CONCLUSION_STORAGE_KEY = "titan:research-investigation-conclusions";
-
-const FINDING_VALIDATION_HISTORY_STORAGE_KEY = "titan:research-finding-validation-history";
-
-const RESEARCH_PROVENANCE_STORAGE_KEY = "titan:research-provenance-events";
+const researchPersistence = localResearchPersistence;
 
 let investigationsSnapshot: ResearchInvestigation[] = [];
 let investigationsSnapshotRaw: string | null = null;
@@ -81,58 +64,8 @@ let investigationsSnapshotRaw: string | null = null;
 /*                              Utilities                                     */
 /* -------------------------------------------------------------------------- */
 
-function readCollection<T>(key: string): T[] {
-  if (typeof window === "undefined") {
-    return [];
-  }
-
-  const value = localStorage.getItem(key);
-
-  if (!value) {
-    return [];
-  }
-
-  try {
-    const parsed: unknown = JSON.parse(value);
-
-    return Array.isArray(parsed) ? (parsed as T[]) : [];
-  } catch {
-    return [];
-  }
-}
-
-function writeCollection<T>(key: string, value: T[]): void {
-  if (typeof window === "undefined") {
-    return;
-  }
-
-  localStorage.setItem(key, JSON.stringify(value));
-
-  window.dispatchEvent(new Event(RESEARCH_CHANGE_EVENT));
-}
-
 export function getResearchPersistenceSnapshot(): string | null {
-  if (typeof window === "undefined") {
-    return null;
-  }
-
-  return [
-    localStorage.getItem(INVESTIGATION_STORAGE_KEY),
-    localStorage.getItem(EXPERIMENT_STORAGE_KEY),
-    localStorage.getItem(EVIDENCE_STORAGE_KEY),
-    localStorage.getItem(FINDING_STORAGE_KEY),
-    localStorage.getItem(EVIDENCE_ASSESSMENT_STORAGE_KEY),
-    localStorage.getItem(FINDING_VALIDATION_STORAGE_KEY),
-    localStorage.getItem(
-      INVESTIGATION_CONCLUSION_STORAGE_KEY,
-    ),
-    localStorage.getItem(
-      FINDING_VALIDATION_HISTORY_STORAGE_KEY,
-    ),
-    localStorage.getItem(
-      RESEARCH_PROVENANCE_STORAGE_KEY,
-    ),
-  ].join("|");
+  return researchPersistence.getSnapshotKey();
 }
 
 function createId(prefix: string): string {
@@ -143,18 +76,15 @@ function createId(prefix: string): string {
 /*                         Investigations                                     */
 /* -------------------------------------------------------------------------- */
 
-// export function getResearchInvestigations():
-//   ResearchInvestigation[] {
-//   return readCollection<ResearchInvestigation>(
-//     INVESTIGATION_STORAGE_KEY,
-//   );
-// }
 export function getResearchInvestigations(): ResearchInvestigation[] {
   if (typeof window === "undefined") {
     return investigationsSnapshot;
   }
 
-  const raw = localStorage.getItem(INVESTIGATION_STORAGE_KEY);
+  const raw =
+    researchPersistence.getCollectionSnapshotKey(
+      "investigations",
+    );
 
   if (raw === investigationsSnapshotRaw) {
     return investigationsSnapshot;
@@ -186,32 +116,6 @@ export function getResearchInvestigations(): ResearchInvestigation[] {
   return investigationsSnapshot;
 }
 
-// export function saveResearchInvestigation(
-//   investigation: ResearchInvestigation,
-// ): void {
-//   const investigations =
-//     getResearchInvestigations();
-
-//   const existingIndex =
-//     investigations.findIndex(
-//       (item) =>
-//         item.id === investigation.id,
-//     );
-
-//   if (existingIndex >= 0) {
-//     investigations[existingIndex] =
-//       investigation;
-//   } else {
-//     investigations.unshift(
-//       investigation,
-//     );
-//   }
-
-//   writeCollection(
-//     INVESTIGATION_STORAGE_KEY,
-//     investigations,
-//   );
-// }
 export function saveResearchInvestigation(investigation: ResearchInvestigation): void {
   const investigations = getResearchInvestigations();
 
@@ -235,9 +139,9 @@ export function saveResearchInvestigation(investigation: ResearchInvestigation):
     return;
   }
 
-  localStorage.setItem(INVESTIGATION_STORAGE_KEY, serialized);
-
-  window.dispatchEvent(new Event(RESEARCH_CHANGE_EVENT));
+  researchPersistence.saveInvestigations(
+    nextInvestigations,
+  );
 }
 
 export function createResearchInvestigation(
@@ -478,11 +382,8 @@ export function transitionResearchInvestigationConclusion(
 /* -------------------------------------------------------------------------- */
 
 export function getResearchExperiments(): ResearchExperiment[] {
-  const stored = readCollection<
-    ResearchExperiment & {
-      lifecycle?: ResearchExperimentLifecycleEvent[];
-    }
-  >(EXPERIMENT_STORAGE_KEY);
+  const stored =
+    researchPersistence.load().experiments;
 
   return stored.map((experiment) => ({
     ...experiment,
@@ -502,7 +403,9 @@ export function saveResearchExperiment(experiment: ResearchExperiment): void {
     experiments.unshift(experiment);
   }
 
-  writeCollection(EXPERIMENT_STORAGE_KEY, experiments);
+  researchPersistence.saveExperiments(
+    experiments,
+  );
 }
 
 /* -------------------------------------------------------------------------- */
@@ -510,7 +413,7 @@ export function saveResearchExperiment(experiment: ResearchExperiment): void {
 /* -------------------------------------------------------------------------- */
 
 export function getResearchEvidence(): ResearchEvidence[] {
-  return readCollection<ResearchEvidence>(EVIDENCE_STORAGE_KEY);
+  return researchPersistence.load().evidence;
 }
 
 export function saveResearchEvidence(evidence: ResearchEvidence): void {
@@ -524,7 +427,7 @@ export function saveResearchEvidence(evidence: ResearchEvidence): void {
     collection.unshift(evidence);
   }
 
-  writeCollection(EVIDENCE_STORAGE_KEY, collection);
+ researchPersistence.saveEvidence(collection);
 }
 function normalizeResearchFinding(
   raw: ResearchFinding & {
@@ -590,11 +493,7 @@ function normalizeResearchFinding(
 /* -------------------------------------------------------------------------- */
 
 export function getResearchFindings(): ResearchFinding[] {
-  const raw = readCollection<
-    ResearchFinding & {
-      evidenceIds?: string[];
-    }
-  >(FINDING_STORAGE_KEY);
+  const raw = researchPersistence.load().findings;
 
   return raw.map(normalizeResearchFinding);
 }
@@ -610,7 +509,7 @@ export function saveResearchFinding(finding: ResearchFinding): void {
     findings.unshift(finding);
   }
 
-  writeCollection(FINDING_STORAGE_KEY, findings);
+  researchPersistence.saveFindings(findings);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -618,7 +517,7 @@ export function saveResearchFinding(finding: ResearchFinding): void {
 /* -------------------------------------------------------------------------- */
 
 export function getResearchFindingValidations(): ResearchFindingValidation[] {
-  return readCollection<ResearchFindingValidation>(FINDING_VALIDATION_STORAGE_KEY);
+  return researchPersistence.load().findingValidations;
 }
 
 export function saveResearchFindingValidation(validation: ResearchFindingValidation): void {
@@ -632,16 +531,14 @@ export function saveResearchFindingValidation(validation: ResearchFindingValidat
     validations.unshift(validation);
   }
 
-  writeCollection(FINDING_VALIDATION_STORAGE_KEY, validations);
+  researchPersistence.saveFindingValidations(validations);
 }
 /* -------------------------------------------------------------------------- */
 /*                Finding Validation History                                  */
 /* -------------------------------------------------------------------------- */
 
 export function getResearchFindingValidationHistory(): ResearchFindingValidationHistoryEvent[] {
-  return readCollection<ResearchFindingValidationHistoryEvent>(
-    FINDING_VALIDATION_HISTORY_STORAGE_KEY,
-  );
+  return researchPersistence.load().findingValidationHistory;
 }
 
 export function saveResearchFindingValidationHistoryEvent(
@@ -657,7 +554,7 @@ export function saveResearchFindingValidationHistoryEvent(
 
   history.unshift(event);
 
-  writeCollection(FINDING_VALIDATION_HISTORY_STORAGE_KEY, history);
+  researchPersistence.saveFindingValidationHistory(history);
 }
 /* -------------------------------------------------------------------------- */
 /*                    Finding Validation Lifecycle                            */
@@ -890,12 +787,7 @@ export function createResearchFindingValidation(
 /* -------------------------------------------------------------------------- */
 
 export function getResearchInvestigationConclusions(): ResearchInvestigationConclusion[] {
-  const stored = readCollection<
-    ResearchInvestigationConclusion & {
-      supportingFindingIds?: string[];
-      contradictingFindingIds?: string[];
-    }
-  >(INVESTIGATION_CONCLUSION_STORAGE_KEY);
+  const stored = researchPersistence.load().investigationConclusions;
 
   return stored.map((conclusion) => ({
     ...conclusion,
@@ -923,7 +815,7 @@ export function saveResearchInvestigationConclusion(
     conclusions.unshift(conclusion);
   }
 
-  writeCollection(INVESTIGATION_CONCLUSION_STORAGE_KEY, conclusions);
+  researchPersistence.saveInvestigationConclusions(conclusions);
 }
 
 export function createResearchInvestigationConclusion(
@@ -1100,7 +992,7 @@ export function removeResearchFindingEvidenceAssessment(
 /* -------------------------------------------------------------------------- */
 
 export function getResearchProvenanceEvents(): ResearchProvenanceEvent[] {
-  return readCollection<ResearchProvenanceEvent>(RESEARCH_PROVENANCE_STORAGE_KEY);
+  return researchPersistence.load().provenanceEvents;
 }
 
 export function getResearchProvenanceEventsByInvestigation(
@@ -3696,7 +3588,7 @@ export function saveResearchProvenanceEvent(event: ResearchProvenanceEvent): voi
 
   events.unshift(event);
 
-  writeCollection(RESEARCH_PROVENANCE_STORAGE_KEY, events);
+  researchPersistence.saveProvenanceEvents(events);
 }
 
 export function createResearchProvenanceEvent(
@@ -3719,21 +3611,5 @@ export function createResearchProvenanceEvent(
 /* -------------------------------------------------------------------------- */
 
 export function subscribeToResearch(callback: () => void): () => void {
-  if (typeof window === "undefined") {
-    return () => {};
-  }
-
-  const handleChange = () => {
-    callback();
-  };
-
-  window.addEventListener("storage", handleChange);
-
-  window.addEventListener(RESEARCH_CHANGE_EVENT, handleChange);
-
-  return () => {
-    window.removeEventListener("storage", handleChange);
-
-    window.removeEventListener(RESEARCH_CHANGE_EVENT, handleChange);
-  };
+  return researchPersistence.subscribe(callback);
 }
