@@ -53,7 +53,7 @@ import type {
 
 import { evaluateFindingValidationEligibility } from "./evidenceAssessment";
 
-import { localResearchPersistence } from "./persistence/local";
+import { localResearchPersistence } from "./persistence";
 
 const researchPersistence = localResearchPersistence;
 
