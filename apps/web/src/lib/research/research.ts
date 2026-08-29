@@ -73,6 +73,12 @@ import {
   validateResearchProvenanceIntegrity as analyzeResearchProvenanceIntegrity,
 } from "./provenance/integrity";
 
+import {
+  canTransitionResearchFindingValidation as analyzeCanTransitionResearchFindingValidation,
+  transitionResearchFindingValidation as analyzeTransitionResearchFindingValidation,
+  createResearchFindingValidation as analyzeCreateResearchFindingValidation,
+} from "./validation/lifecycle";
+
 const researchPersistence = localResearchPersistence;
 
 let investigationsSnapshot: ResearchInvestigation[] = [];
@@ -578,133 +584,36 @@ export function saveResearchFindingValidationHistoryEvent(
 /*                    Finding Validation Lifecycle                            */
 /* -------------------------------------------------------------------------- */
 
-const RESEARCH_FINDING_VALIDATION_TRANSITIONS: Record<
-  ResearchValidationStatus,
-  ResearchValidationStatus[]
-> = {
-  Pending: ["In Review"],
-
-  "In Review": ["Validated", "Rejected", "Needs Revision"],
-
-  Validated: [],
-
-  Rejected: [],
-
-  "Needs Revision": [],
-};
-
 export function canTransitionResearchFindingValidation(
   from: ResearchValidationStatus,
   to: ResearchValidationStatus,
 ): boolean {
-  if (from === to) {
-    return true;
-  }
-
-  return RESEARCH_FINDING_VALIDATION_TRANSITIONS[from]?.includes(to) ?? false;
+  return analyzeCanTransitionResearchFindingValidation(from, to);
 }
+
 export function transitionResearchFindingValidation(
   validationId: string,
   to: ResearchValidationStatus,
   reason?: string,
 ): ResearchFindingValidation | null {
-  const validations = getResearchFindingValidations();
-
-  const validation = validations.find((item) => item.id === validationId);
-
-  if (!validation) {
-    return null;
-  }
-
-  if (validation.status === to) {
-    return validation;
-  }
-
-  if (!canTransitionResearchFindingValidation(validation.status, to)) {
-    return null;
-  }
-  const normalizedReason = reason?.trim();
-
-  if ((to === "Validated" || to === "Rejected" || to === "Needs Revision") && !normalizedReason) {
-    return null;
-  }
-
-  const now = new Date().toISOString();
-
-  const updatedValidation: ResearchFindingValidation = {
-    ...validation,
-
-    status: to,
-
-    decision:
-      to === "Validated"
-        ? "Accept"
-        : to === "Rejected"
-          ? "Reject"
-          : to === "Needs Revision"
-            ? "Revise"
-            : validation.decision,
-
-    rationale: normalizedReason || validation.rationale,
-
-    updatedAt: now,
-
-    validatedAt: to === "Validated" ? now : validation.validatedAt,
-  };
-
-  saveResearchFindingValidation(updatedValidation);
-  const historyEvent: ResearchFindingValidationHistoryEvent = {
-    id: createId("finding-validation-history"),
-
-    validationId: updatedValidation.id,
-
-    from: validation.status,
-
+  return analyzeTransitionResearchFindingValidation(
+    validationId,
     to,
-
-    decision: updatedValidation.decision,
-
-    reason: normalizedReason,
-
-    timestamp: now,
-  };
-
-  saveResearchFindingValidationHistoryEvent(historyEvent);
-
-  const investigations = getResearchInvestigations();
-
-  const finding = getResearchFindings().find((item) => item.id === updatedValidation.findingId);
-
-  const investigation = finding
-    ? investigations.find((item) => item.findingIds.includes(finding.id))
-    : undefined;
-
-  if (investigation) {
-    createResearchProvenanceEvent({
-      investigationId: investigation.id,
-
-      entityType: "FindingValidation",
-
-      entityId: updatedValidation.id,
-
-      eventType:
-        to === "Validated"
-          ? "Validated"
-          : to === "Rejected"
-            ? "Rejected"
-            : to === "Needs Revision"
-              ? "RevisionRequested"
-              : "StatusChanged",
-
-      fromStatus: validation.status,
-
-      toStatus: to,
-
-      reason: normalizedReason,
-    });
-  }
-
-  return updatedValidation;
+    reason,
+    {
+      getResearchFindingValidations,
+      saveResearchFindingValidation,
+      getResearchFindingValidationHistory,
+      saveResearchFindingValidationHistoryEvent,
+      getResearchFindings,
+      saveResearchFinding,
+      getResearchInvestigations,
+      createResearchProvenanceEvent,
+      evaluateFindingValidationEligibility,
+      createId,
+      now: () => new Date().toISOString(),
+    },
+  );
 }
 
 export function createResearchFindingValidation(
@@ -722,82 +631,23 @@ export function createResearchFindingValidation(
     | "contradictingEvidenceCount"
   >,
 ): ResearchValidationDecisionResult {
-  const findings = getResearchFindings();
-
-  const finding = findings.find((item) => item.id === findingId);
-
-  if (!finding) {
-    return {
-      success: false,
-      finding: null,
-      validation: null,
-      reasons: ["Finding was not found."],
-    };
-  }
-  const eligibility = evaluateFindingValidationEligibility(
-    finding.evidenceAssessments,
-    finding.confidence,
-  );
-
-  if (!eligibility.eligible) {
-    return {
-      success: false,
-      finding,
-      validation: null,
-      reasons: eligibility.reasons,
-    };
-  }
-
-  const now = new Date().toISOString();
-
-  const supportingEvidenceCount = finding.evidenceAssessments.filter(
-    (assessment) => assessment.type === "Supporting",
-  ).length;
-
-  const contradictingEvidenceCount = finding.evidenceAssessments.filter(
-    (assessment) => assessment.type === "Contradicting",
-  ).length;
-
-  const validation: ResearchFindingValidation = {
-    ...input,
-
-    id: createId("finding-validation"),
-
+  return analyzeCreateResearchFindingValidation(
     findingId,
-
-    confidenceAtValidation: finding.confidence,
-
-    evidenceAssessmentCount: finding.evidenceAssessments.length,
-
-    supportingEvidenceCount,
-
-    contradictingEvidenceCount,
-
-    createdAt: now,
-
-    updatedAt: now,
-
-    validatedAt: input.status === "Validated" ? now : undefined,
-  };
-
-  saveResearchFindingValidation(validation);
-
-  const updatedFinding: ResearchFinding = {
-    ...finding,
-
-    validationIds: [...finding.validationIds, validation.id],
-
-    updatedAt: now,
-  };
-
-  saveResearchFinding(updatedFinding);
-
-  return {
-    success: true,
-    finding: updatedFinding,
-    validation,
-    reasons: [],
-  };
+    input,
+    {
+      getResearchFindingValidations,
+      saveResearchFindingValidation,
+      getResearchFindingValidationHistory,
+      saveResearchFindingValidationHistoryEvent,
+      getResearchFindings,
+      saveResearchFinding,
+      getResearchInvestigations,
+      createResearchProvenanceEvent,
+      evaluateFindingValidationEligibility,
+      createId,
+      now: () => new Date().toISOString(),
+    },
+  );
 }
 
 /* -------------------------------------------------------------------------- */
