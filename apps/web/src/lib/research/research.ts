@@ -59,6 +59,17 @@ import {
 } from "./lineage/integrity";
 
 import {
+  getResearchProvenanceEventsByInvestigation as queryResearchProvenanceEventsByInvestigation,
+  getResearchProvenanceEventsByEntity as queryResearchProvenanceEventsByEntity,
+  getResearchProvenanceEventsByInvestigationAndEntity as queryResearchProvenanceEventsByInvestigationAndEntity,
+  getResearchProvenanceEventsChronological as sortResearchProvenanceEventsChronological,
+  getResearchProvenanceTimeline as buildResearchProvenanceTimeline,
+  getResearchProvenanceTimelineByInvestigation as buildResearchProvenanceTimelineByInvestigation,
+  getResearchProvenanceInvestigationSummary as buildResearchProvenanceInvestigationSummary,
+  getResearchProvenanceEventsByEventType as filterResearchProvenanceEventsByEventType,
+} from "./provenance/events";
+
+import {
   validateResearchProvenanceIntegrity as analyzeResearchProvenanceIntegrity,
 } from "./provenance/integrity";
 
@@ -1005,15 +1016,20 @@ export function getResearchProvenanceEvents(): ResearchProvenanceEvent[] {
 export function getResearchProvenanceEventsByInvestigation(
   investigationId: string,
 ): ResearchProvenanceEvent[] {
-  return getResearchProvenanceEvents().filter((event) => event.investigationId === investigationId);
+  return queryResearchProvenanceEventsByInvestigation(
+    getResearchProvenanceEvents(),
+    investigationId,
+  );
 }
 
 export function getResearchProvenanceEventsByEntity(
   entityType: ResearchProvenanceEntityType,
   entityId: string,
 ): ResearchProvenanceEvent[] {
-  return getResearchProvenanceEvents().filter(
-    (event) => event.entityType === entityType && event.entityId === entityId,
+  return queryResearchProvenanceEventsByEntity(
+    getResearchProvenanceEvents(),
+    entityType,
+    entityId,
   );
 }
 
@@ -1022,175 +1038,55 @@ export function getResearchProvenanceEventsByInvestigationAndEntity(
   entityType: ResearchProvenanceEntityType,
   entityId: string,
 ): ResearchProvenanceEvent[] {
-  return getResearchProvenanceEvents().filter(
-    (event) =>
-      event.investigationId === investigationId &&
-      event.entityType === entityType &&
-      event.entityId === entityId,
+  return queryResearchProvenanceEventsByInvestigationAndEntity(
+    getResearchProvenanceEvents(),
+    investigationId,
+    entityType,
+    entityId,
   );
 }
 
 export function getResearchProvenanceEventsChronological(): ResearchProvenanceEvent[] {
-  return [...getResearchProvenanceEvents()].sort(
-    (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime(),
+  return sortResearchProvenanceEventsChronological(
+    getResearchProvenanceEvents(),
   );
 }
 
 export function getResearchProvenanceTimeline(): ResearchProvenanceTimelineItem[] {
-  return getResearchProvenanceEventsChronological().map((event) => {
-    const validation =
-      event.entityType === "FindingValidation"
-        ? getResearchFindingValidations().find((item) => item.id === event.entityId)
-        : undefined;
-
-    const finding = validation
-      ? getResearchFindings().find((item) => item.id === validation.findingId)
-      : undefined;
-
-    const statusDescription =
-      event.fromStatus && event.toStatus ? `${event.fromStatus} → ${event.toStatus}` : undefined;
-
-    return {
-      eventId: event.id,
-
-      investigationId: event.investigationId,
-
-      entityType: event.entityType,
-
-      findingId: finding?.id,
-
-      findingStatement: finding?.statement,
-
-      validationId: validation?.id,
-
-      validator: validation?.validator,
-
-      decision: validation?.decision,
-
-      entityId: event.entityId,
-
-      eventType: event.eventType,
-
-      title: `${event.entityType} ${event.eventType}`,
-
-      description:
-        statusDescription ?? event.reason ?? `${event.entityType} ${event.eventType} event.`,
-
-      fromStatus: event.fromStatus,
-
-      toStatus: event.toStatus,
-
-      reason: event.reason,
-
-      actor: event.actor,
-
-      timestamp: event.timestamp,
-
-      metadata: event.metadata,
-    };
+  return buildResearchProvenanceTimeline({
+    getResearchProvenanceEvents,
+    getResearchFindingValidations,
+    getResearchFindings,
+    validateResearchProvenanceIntegrity,
   });
 }
+
 export function getResearchProvenanceTimelineByInvestigation(
   investigationId: string,
 ): ResearchProvenanceTimelineItem[] {
-  return getResearchProvenanceEventsByInvestigationChronological(investigationId).map((event) => {
-    const validation =
-      event.entityType === "FindingValidation"
-        ? getResearchFindingValidations().find((item) => item.id === event.entityId)
-        : undefined;
-
-    const finding = validation
-      ? getResearchFindings().find((item) => item.id === validation.findingId)
-      : undefined;
-
-    const statusDescription =
-      event.fromStatus && event.toStatus ? `${event.fromStatus} → ${event.toStatus}` : undefined;
-
-    return {
-      eventId: event.id,
-
-      investigationId: event.investigationId,
-
-      entityType: event.entityType,
-
-      entityId: event.entityId,
-
-      eventType: event.eventType,
-
-      findingId: finding?.id,
-
-      findingStatement: finding?.statement,
-
-      validationId: validation?.id,
-
-      validator: validation?.validator,
-
-      decision: validation?.decision,
-
-      title: `${event.entityType} ${event.eventType}`,
-
-      description:
-        statusDescription ?? event.reason ?? `${event.entityType} ${event.eventType} event.`,
-
-      fromStatus: event.fromStatus,
-
-      toStatus: event.toStatus,
-
-      reason: event.reason,
-
-      actor: event.actor,
-
-      timestamp: event.timestamp,
-
-      metadata: event.metadata,
-    };
-  });
+  return buildResearchProvenanceTimelineByInvestigation(
+    investigationId,
+    {
+      getResearchProvenanceEvents,
+      getResearchFindingValidations,
+      getResearchFindings,
+      validateResearchProvenanceIntegrity,
+    },
+  );
 }
 
 export function getResearchProvenanceInvestigationSummary(
   investigationId: string,
 ): ResearchProvenanceInvestigationSummary {
-  const events = getResearchProvenanceEventsByInvestigationChronological(investigationId);
-
-  const latest = events.length > 0 ? events[events.length - 1] : undefined;
-
-  const validationEventCount = events.filter(
-    (event) =>
-      event.entityType === "FindingValidation" ||
-      event.eventType === "Validated" ||
-      event.eventType === "Rejected" ||
-      event.eventType === "RevisionRequested" ||
-      event.eventType === "Accepted",
-  ).length;
-
-  const statusChangeEventCount = events.filter(
-    (event) => event.eventType === "StatusChanged",
-  ).length;
-
-  return {
+  return buildResearchProvenanceInvestigationSummary(
     investigationId,
-
-    eventCount: events.length,
-
-    firstEventTimestamp: events[0]?.timestamp,
-
-    latestEventTimestamp: latest?.timestamp,
-
-    latestEventType: latest?.eventType,
-
-    latestEntityType: latest?.entityType,
-
-    latestEntityId: latest?.entityId,
-
-    validationEventCount,
-
-    statusChangeEventCount,
-
-    valid:
-      validateResearchProvenanceIntegrity().issues.filter(
-        (issue) => issue.investigationId === investigationId,
-      ).length === 0,
-  };
+    {
+      getResearchProvenanceEvents,
+      getResearchFindingValidations,
+      getResearchFindings,
+      validateResearchProvenanceIntegrity,
+    },
+  );
 }
 
 export function getResearchLineage(
@@ -2900,7 +2796,10 @@ export function validateResearchLineageForInvestigation(
 export function getResearchProvenanceEventsByEventType(
   eventType: ResearchProvenanceEventType,
 ): ResearchProvenanceEvent[] {
-  return getResearchProvenanceEvents().filter((event) => event.eventType === eventType);
+  return filterResearchProvenanceEventsByEventType(
+    getResearchProvenanceEvents(),
+    eventType,
+  );
 }
 
 export function validateResearchProvenanceIntegrity(): ResearchProvenanceIntegrityResult {
