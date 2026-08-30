@@ -184,3 +184,35 @@ export function getResearchProvenanceEventsByEventType(
 ): ResearchProvenanceEvent[] {
   return events.filter((event) => event.eventType === eventType);
 }
+
+export function getResearchProvenanceEventsByInvestigationChronological(
+  events: ResearchProvenanceEvent[],
+  investigationId: string,
+): ResearchProvenanceEvent[] {
+  return getResearchProvenanceEventsChronological(
+    getResearchProvenanceEventsByInvestigation(events, investigationId),
+  );
+}
+
+export function getLatestResearchProvenanceEvent(
+  events: ResearchProvenanceEvent[],
+  entityType: ResearchProvenanceEntityType,
+  entityId: string,
+): ResearchProvenanceEvent | null {
+  const matchingEvents = getResearchProvenanceEventsByEntity(
+    events,
+    entityType,
+    entityId,
+  );
+
+  if (matchingEvents.length === 0) {
+    return null;
+  }
+
+  return matchingEvents.reduce((latest, event) =>
+    new Date(event.timestamp).getTime() >
+    new Date(latest.timestamp).getTime()
+      ? event
+      : latest,
+  );
+}

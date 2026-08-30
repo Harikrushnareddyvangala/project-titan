@@ -64,6 +64,8 @@ import {
   getResearchProvenanceTimelineByInvestigation as buildResearchProvenanceTimelineByInvestigation,
   getResearchProvenanceInvestigationSummary as buildResearchProvenanceInvestigationSummary,
   getResearchProvenanceEventsByEventType as filterResearchProvenanceEventsByEventType,
+  getResearchProvenanceEventsByInvestigationChronological as queryResearchProvenanceEventsByInvestigationChronological,
+  getLatestResearchProvenanceEvent as queryLatestResearchProvenanceEvent,
 } from "./provenance/events";
 
 import {
@@ -832,8 +834,9 @@ export function getResearchLineage(
 export function getResearchProvenanceEventsByInvestigationChronological(
   investigationId: string,
 ): ResearchProvenanceEvent[] {
-  return getResearchProvenanceEventsByInvestigation(investigationId).sort(
-    (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime(),
+  return queryResearchProvenanceEventsByInvestigationChronological(
+    getResearchProvenanceEvents(),
+    investigationId,
   );
 }
 
@@ -841,14 +844,10 @@ export function getLatestResearchProvenanceEvent(
   entityType: ResearchProvenanceEntityType,
   entityId: string,
 ): ResearchProvenanceEvent | null {
-  const events = getResearchProvenanceEventsByEntity(entityType, entityId);
-
-  if (events.length === 0) {
-    return null;
-  }
-
-  return events.reduce((latest, event) =>
-    new Date(event.timestamp).getTime() > new Date(latest.timestamp).getTime() ? event : latest,
+  return queryLatestResearchProvenanceEvent(
+    getResearchProvenanceEvents(),
+    entityType,
+    entityId,
   );
 }
 

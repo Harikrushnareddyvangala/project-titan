@@ -7,10 +7,12 @@ import type {
 } from "@/types/research";
 
 import {
+  getLatestResearchProvenanceEvent,
   getResearchProvenanceEventsByEntity,
   getResearchProvenanceEventsByEventType,
   getResearchProvenanceEventsByInvestigation,
   getResearchProvenanceEventsByInvestigationAndEntity,
+  getResearchProvenanceEventsByInvestigationChronological,
   getResearchProvenanceEventsChronological,
   getResearchProvenanceInvestigationSummary,
   getResearchProvenanceTimeline,
@@ -225,5 +227,49 @@ describe("research provenance events", () => {
         "Created",
       ),
     ).toHaveLength(2);
+  });
+
+  it("returns investigation events chronologically", () => {
+    const chronological =
+      getResearchProvenanceEventsByInvestigationChronological(
+        events,
+        investigationId,
+      );
+
+    expect(chronological.map((event) => event.id)).toEqual([
+      "event-001",
+      "event-002",
+      "event-003",
+    ]);
+
+    expect(events.map((event) => event.id)).toEqual([
+      "event-003",
+      "event-001",
+      "event-002",
+      "event-004",
+    ]);
+  });
+
+  it("returns the latest event for an entity", () => {
+    const latest = getLatestResearchProvenanceEvent(
+      events,
+      "Finding",
+      "finding-001",
+    );
+
+    expect(latest?.id).toBe("event-003");
+    expect(latest?.timestamp).toBe(
+      "2026-01-03T00:00:00.000Z",
+    );
+  });
+
+  it("returns null when no event exists for an entity", () => {
+    expect(
+      getLatestResearchProvenanceEvent(
+        events,
+        "Conclusion",
+        "conclusion-001",
+      ),
+    ).toBeNull();
   });
 });
