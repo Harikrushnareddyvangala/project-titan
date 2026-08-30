@@ -79,6 +79,10 @@ import {
   createResearchFindingValidation as analyzeCreateResearchFindingValidation,
 } from "./validation/lifecycle";
 
+import {
+  executeResearchLineageIntegrityRemediation as analyzeExecuteResearchLineageIntegrityRemediation,
+} from "./lineage/remediation/execution";
+
 const researchPersistence = localResearchPersistence;
 
 let investigationsSnapshot: ResearchInvestigation[] = [];
@@ -2420,145 +2424,18 @@ export function preflightResearchLineageIntegrityRemediation(
 export function executeResearchLineageIntegrityRemediation(
   plan: ResearchLineageIntegrityRemediationPlan,
 ): ResearchLineageIntegrityRemediationResult {
-  if (!plan.confirmed) {
-    return {
-      investigationId: plan.investigationId,
-      action: plan.action,
-      issueCode: plan.issueCode,
-      status: "Rejected",
-      executed: false,
-      message: "Remediation execution requires explicit confirmation.",
-      plan,
-    };
-  }
-
-  if (
-    plan.action !== "RepairReference" &&
-    plan.action !== "RepairScope" &&
-    plan.action !== "RepairRelationship"
-  ) {
-    return {
-      investigationId: plan.investigationId,
-      action: plan.action,
-      issueCode: plan.issueCode,
-      status: "Rejected",
-      executed: false,
-      message: `Remediation action ${plan.action} is not executable.`,
-      plan,
-    };
-  }
-
-  const preflight = preflightResearchLineageIntegrityRemediation(plan);
-
-  if (!preflight.ready) {
-    return {
-      investigationId: plan.investigationId,
-      action: plan.action,
-      issueCode: plan.issueCode,
-      status: "Rejected",
-      executed: false,
-      message: preflight.reason,
-      plan,
-    };
-  }
-
-  const resolvedTarget = resolveResearchLineageIntegrityRemediationTarget(
-    plan.investigationId,
-    plan.target,
-    plan.action,
-  );
-
-  if (!resolvedTarget.resolvable) {
-    return {
-      investigationId: plan.investigationId,
-
-      action: plan.action,
-
-      issueCode: plan.issueCode,
-
-      status: "Rejected",
-
-      executed: false,
-
-      message: `Execution target could not be resolved: ${resolvedTarget.reason}`,
-
-      plan,
-    };
-  }
-
-  if (plan.targetUpdatedAt) {
-    const currentTargetUpdatedAt =
-      getResearchLineageRemediationEntityUpdatedAt(
-        resolvedTarget,
-      );
-
-    if (currentTargetUpdatedAt !== plan.targetUpdatedAt) {
-      return {
-        investigationId: plan.investigationId,
-        action: plan.action,
-        issueCode: plan.issueCode,
-        status: "Rejected",
-        executed: false,
-        message:
-          "Remediation execution rejected because the target changed after the remediation plan was created.",
-        plan,
-      };
-    }
-  }
-
-  if (
-    plan.replacementUpdatedAt !== undefined &&
-    plan.replacementEntityId
-  ) {
-    const currentReplacement =
-      getResearchLineageRemediationReplacement(
-        plan.investigationId,
-        plan.replacementEntityId,
-      );
-
-    const currentReplacementUpdatedAt =
-      currentReplacement?.updatedAt;
-
-    if (
-      currentReplacementUpdatedAt !==
-      plan.replacementUpdatedAt
-    ) {
-      return {
-        investigationId: plan.investigationId,
-        action: plan.action,
-        issueCode: plan.issueCode,
-        status: "Rejected",
-        executed: false,
-        message:
-          "Remediation execution rejected because the replacement changed after the remediation plan was created.",
-        plan,
-      };
-    }
-  }
-
-  const repairDecision = decideResearchLineageIntegrityRemediationRepair(plan);
-
-  const repairResult = executeResearchLineageIntegrityRemediationRepair(repairDecision);
-
-  return {
-    investigationId: plan.investigationId,
-
-    action: plan.action,
-
-    issueCode: plan.issueCode,
-
-    status: repairResult.executed ? "Executed" : "Rejected",
-
-    executed: repairResult.executed,
-
-    message: repairResult.message,
-
-    provenanceEventId: repairResult.provenanceEventId,
-
-    postcondition: repairResult.postcondition,
-
+  return analyzeExecuteResearchLineageIntegrityRemediation(
     plan,
-  };
+    {
+      getResearchLineageIntegrityRemediationExecutionPolicy,
+      validateResearchLineageIntegrityRemediationTarget,
+      resolveResearchLineageIntegrityRemediationTarget,
+      getResearchLineageRemediationEntityUpdatedAt,
+      getResearchLineageRemediationReplacement,
+      decideResearchLineageIntegrityRemediationRepair,
+      executeResearchLineageIntegrityRemediationRepair,
+    },
+  );
 }
 
 export function getResearchLineageIntegrityRemediationPreview(
