@@ -105,11 +105,29 @@ import {
   saveResearchFinding as analyzeSaveResearchFinding,
 } from "./finding/repository";
 
+import {
+  createResearchInvestigationRepository,
+} from "./investigation/repository";
+
 const researchPersistence = localResearchPersistence;
 
-let investigationsSnapshot: ResearchInvestigation[] = [];
-let investigationsSnapshotRaw: string | null = null;
+const researchInvestigationRepository =
+  createResearchInvestigationRepository({
+    loadResearchInvestigations: () =>
+      researchPersistence.load().investigations,
 
+    saveResearchInvestigations: (investigations) =>
+      researchPersistence.saveInvestigations(investigations),
+
+    getCollectionSnapshotKey: () =>
+      researchPersistence.getCollectionSnapshotKey("investigations"),
+
+    isServer: () => typeof window === "undefined",
+
+    createId,
+
+    now: () => new Date().toISOString(),
+  });
 /* -------------------------------------------------------------------------- */
 /*                              Utilities                                     */
 /* -------------------------------------------------------------------------- */
@@ -127,95 +145,23 @@ function createId(prefix: string): string {
 /* -------------------------------------------------------------------------- */
 
 export function getResearchInvestigations(): ResearchInvestigation[] {
-  if (typeof window === "undefined") {
-    return investigationsSnapshot;
-  }
-
-  const raw =
-    researchPersistence.getCollectionSnapshotKey(
-      "investigations",
-    );
-
-  if (raw === investigationsSnapshotRaw) {
-    return investigationsSnapshot;
-  }
-
-  investigationsSnapshotRaw = raw;
-
-  if (!raw) {
-    investigationsSnapshot = [];
-    return investigationsSnapshot;
-  }
-
-  try {
-    const parsed: unknown = JSON.parse(raw);
-
-    investigationsSnapshot = Array.isArray(parsed)
-      ? parsed.map((investigation) => ({
-          ...(investigation as ResearchInvestigation),
-
-          conclusionIds: Array.isArray((investigation as ResearchInvestigation).conclusionIds)
-            ? (investigation as ResearchInvestigation).conclusionIds
-            : [],
-        }))
-      : [];
-  } catch {
-    investigationsSnapshot = [];
-  }
-
-  return investigationsSnapshot;
+  return researchInvestigationRepository.getResearchInvestigations();
 }
 
-export function saveResearchInvestigation(investigation: ResearchInvestigation): void {
-  const investigations = getResearchInvestigations();
-
-  const nextInvestigations = [...investigations];
-
-  const existingIndex = nextInvestigations.findIndex((item) => item.id === investigation.id);
-
-  if (existingIndex >= 0) {
-    nextInvestigations[existingIndex] = investigation;
-  } else {
-    nextInvestigations.unshift(investigation);
-  }
-
-  const serialized = JSON.stringify(nextInvestigations);
-
-  investigationsSnapshot = nextInvestigations;
-
-  investigationsSnapshotRaw = serialized;
-
-  if (typeof window === "undefined") {
-    return;
-  }
-
-  researchPersistence.saveInvestigations(
-    nextInvestigations,
-  );
+export function saveResearchInvestigation(
+  investigation: ResearchInvestigation,
+): void {
+  researchInvestigationRepository.saveResearchInvestigation(investigation);
 }
 
 export function createResearchInvestigation(
-  input: Pick<ResearchInvestigation, "title" | "objective" | "question"> &
+  input: Pick<
+    ResearchInvestigation,
+    "title" | "objective" | "question"
+  > &
     Partial<Pick<ResearchInvestigation, "description" | "repository">>,
 ): ResearchInvestigation {
-  const now = new Date().toISOString();
-
-  return {
-    id: createId("investigation"),
-    title: input.title,
-    objective: input.objective,
-    question: input.question,
-    status: "Draft",
-    description: input.description,
-    repository: input.repository,
-    experimentIds: [],
-    evidenceIds: [],
-    findingIds: [],
-    artifactIds: [],
-    conclusionIds: [],
-    createdAt: now,
-    updatedAt: now,
-  };
+  return researchInvestigationRepository.createResearchInvestigation(input);
 }
 
 /* -------------------------------------------------------------------------- */
