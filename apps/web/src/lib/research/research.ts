@@ -2,7 +2,6 @@ import type {
   ResearchEvidence,
   ResearchEvidenceAssessment,
   ResearchExperiment,
-  ResearchExperimentLifecycleEvent,
   ResearchFinding,
   ResearchInvestigation,
   ResearchStatus,
@@ -82,6 +81,11 @@ import {
 import {
   executeResearchLineageIntegrityRemediation as analyzeExecuteResearchLineageIntegrityRemediation,
 } from "./lineage/remediation/execution";
+
+import {
+  canTransitionResearchExperiment as analyzeCanTransitionResearchExperiment,
+  transitionResearchExperiment as analyzeTransitionResearchExperiment,
+} from "./experiment/lifecycle";
 
 const researchPersistence = localResearchPersistence;
 
@@ -200,80 +204,31 @@ export function createResearchInvestigation(
 /*                    Experiment Lifecycle                                    */
 /* -------------------------------------------------------------------------- */
 
-const RESEARCH_EXPERIMENT_TRANSITIONS: Record<ResearchStatus, ResearchStatus[]> = {
-  Draft: ["Investigating"],
-
-  Investigating: ["Evidence Collected"],
-
-  "Evidence Collected": ["Finding Produced"],
-
-  "Finding Produced": ["Validated"],
-
-  Validated: ["Published"],
-
-  Published: [],
-};
-
-export function canTransitionResearchExperiment(from: ResearchStatus, to: ResearchStatus): boolean {
-  return RESEARCH_EXPERIMENT_TRANSITIONS[from]?.includes(to) ?? false;
+export function canTransitionResearchExperiment(
+  from: ResearchStatus,
+  to: ResearchStatus,
+): boolean {
+  return analyzeCanTransitionResearchExperiment(from, to);
 }
+
 export function transitionResearchExperiment(
   experiment: ResearchExperiment,
   to: ResearchStatus,
   reason?: string,
 ): ResearchExperiment | null {
-  if (experiment.status === to) {
-    return experiment;
-  }
-
-  if (!canTransitionResearchExperiment(experiment.status, to)) {
-    return null;
-  }
-
-  const now = new Date().toISOString();
-
-  const lifecycleEvent: ResearchExperimentLifecycleEvent = {
-    id: createId("experiment-lifecycle"),
-
-    from: experiment.status,
-
+  return analyzeTransitionResearchExperiment(
+    experiment,
     to,
-
-    reason: reason?.trim() || undefined,
-
-    timestamp: now,
-  };
-
-  const updatedExperiment: ResearchExperiment = {
-    ...experiment,
-
-    status: to,
-
-    lifecycle: [...experiment.lifecycle, lifecycleEvent],
-
-    updatedAt: now,
-  };
-
-  saveResearchExperiment(updatedExperiment);
-
-  createResearchProvenanceEvent({
-    investigationId: experiment.investigationId,
-
-    entityType: "Experiment",
-
-    entityId: experiment.id,
-
-    eventType: "StatusChanged",
-
-    fromStatus: experiment.status,
-
-    toStatus: to,
-
-    reason: reason?.trim() || undefined,
-  });
-
-  return updatedExperiment;
+    reason,
+    {
+      saveResearchExperiment,
+      createResearchProvenanceEvent,
+      createId,
+      now: () => new Date().toISOString(),
+    },
+  );
 }
+
 const RESEARCH_CONCLUSION_TRANSITIONS: Record<
   ResearchConclusionStatus,
   ResearchConclusionStatus[]
