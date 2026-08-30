@@ -93,6 +93,11 @@ import {
   removeResearchFindingEvidenceAssessment as analyzeRemoveResearchFindingEvidenceAssessment,
 } from "./evidence/assessment";
 
+import {
+  getResearchFindings as analyzeGetResearchFindings,
+  saveResearchFinding as analyzeSaveResearchFinding,
+} from "./finding/repository";
+
 const researchPersistence = localResearchPersistence;
 
 let investigationsSnapshot: ResearchInvestigation[] = [];
@@ -418,87 +423,30 @@ export function saveResearchEvidence(evidence: ResearchEvidence): void {
 
  researchPersistence.saveEvidence(collection);
 }
-function normalizeResearchFinding(
-  raw: ResearchFinding & {
-    evidenceIds?: string[];
-    validationIds?: string[];
-  },
-): ResearchFinding {
-  const now = raw.updatedAt ?? raw.createdAt ?? new Date().toISOString();
-
-  if (Array.isArray(raw.evidenceAssessments)) {
-    return {
-      ...raw,
-
-      validationIds: raw.validationIds ?? [],
-
-      createdAt: raw.createdAt ?? now,
-
-      updatedAt: raw.updatedAt ?? now,
-    };
-  }
-
-  const evidenceAssessments = (raw.evidenceIds ?? []).map((evidenceId) => ({
-    id: createId("evidence-assessment"),
-
-    evidenceId,
-
-    type: "Supporting" as const,
-
-    relevance: 0.5,
-
-    supportStrength: 0.5,
-
-    reliability: 0.5,
-
-    independence: 0.5,
-
-    rationale: "Migrated from the previous evidence relationship model.",
-
-    assessedAt: now,
-
-    updatedAt: now,
-  }));
-
-  return {
-    id: raw.id,
-
-    statement: raw.statement,
-
-    evidenceAssessments,
-
-    confidence: raw.confidence,
-
-    validationIds: raw.validationIds ?? [],
-
-    createdAt: raw.createdAt ?? now,
-
-    updatedAt: raw.updatedAt ?? now,
-  };
-}
-
 /* -------------------------------------------------------------------------- */
 /*                               Findings                                     */
 /* -------------------------------------------------------------------------- */
 
 export function getResearchFindings(): ResearchFinding[] {
-  const raw = researchPersistence.load().findings;
-
-  return raw.map(normalizeResearchFinding);
+  return analyzeGetResearchFindings({
+    loadResearchFindings: () => researchPersistence.load().findings,
+    saveResearchFindings: (findings) =>
+      researchPersistence.saveFindings(findings),
+    createId,
+    now: () => new Date().toISOString(),
+  });
 }
 
-export function saveResearchFinding(finding: ResearchFinding): void {
-  const findings = getResearchFindings();
-
-  const existingIndex = findings.findIndex((item) => item.id === finding.id);
-
-  if (existingIndex >= 0) {
-    findings[existingIndex] = finding;
-  } else {
-    findings.unshift(finding);
-  }
-
-  researchPersistence.saveFindings(findings);
+export function saveResearchFinding(
+  finding: ResearchFinding,
+): void {
+  analyzeSaveResearchFinding(finding, {
+    loadResearchFindings: () => researchPersistence.load().findings,
+    saveResearchFindings: (findings) =>
+      researchPersistence.saveFindings(findings),
+    createId,
+    now: () => new Date().toISOString(),
+  });
 }
 
 /* -------------------------------------------------------------------------- */
