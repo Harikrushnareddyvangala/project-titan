@@ -71,6 +71,10 @@ import {
 } from "./provenance/integrity";
 
 import {
+  createResearchProvenanceRepository,
+} from "./provenance/repository";
+
+import {
   canTransitionResearchFindingValidation as analyzeCanTransitionResearchFindingValidation,
   transitionResearchFindingValidation as analyzeTransitionResearchFindingValidation,
   createResearchFindingValidation as analyzeCreateResearchFindingValidation,
@@ -115,6 +119,19 @@ import {
 } from "./investigation/repository";
 
 const researchPersistence = localResearchPersistence;
+
+const researchProvenanceRepository =
+  createResearchProvenanceRepository({
+    loadResearchProvenanceEvents: () =>
+      researchPersistence.load().provenanceEvents,
+
+    saveResearchProvenanceEvents: (events) =>
+      researchPersistence.saveProvenanceEvents(events),
+
+    createId,
+
+    now: () => new Date().toISOString(),
+  });
 
 const researchInvestigationRepository =
   createResearchInvestigationRepository({
@@ -715,7 +732,7 @@ export function removeResearchFindingEvidenceAssessment(
 /* -------------------------------------------------------------------------- */
 
 export function getResearchProvenanceEvents(): ResearchProvenanceEvent[] {
-  return researchPersistence.load().provenanceEvents;
+  return researchProvenanceRepository.getResearchProvenanceEvents();
 }
 
 export function getResearchProvenanceEventsByInvestigation(
@@ -1906,34 +1923,16 @@ export function getResearchProvenanceIntegritySummary(): ResearchProvenanceInteg
   };
 }
 
-export function saveResearchProvenanceEvent(event: ResearchProvenanceEvent): void {
-  const events = getResearchProvenanceEvents();
-
-  const alreadyExists = events.some((item) => item.id === event.id);
-
-  if (alreadyExists) {
-    return;
-  }
-
-  events.unshift(event);
-
-  researchPersistence.saveProvenanceEvents(events);
+export function saveResearchProvenanceEvent(
+  event: ResearchProvenanceEvent,
+): void {
+  researchProvenanceRepository.saveResearchProvenanceEvent(event);
 }
 
 export function createResearchProvenanceEvent(
   input: Omit<ResearchProvenanceEvent, "id" | "timestamp">,
 ): ResearchProvenanceEvent {
-  const event: ResearchProvenanceEvent = {
-    ...input,
-
-    id: createId("research-provenance"),
-
-    timestamp: new Date().toISOString(),
-  };
-
-  saveResearchProvenanceEvent(event);
-
-  return event;
+  return researchProvenanceRepository.createResearchProvenanceEvent(input);
 }
 /* -------------------------------------------------------------------------- */
 /*                              Subscription                                  */
