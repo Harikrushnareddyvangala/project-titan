@@ -87,6 +87,12 @@ import {
   transitionResearchExperiment as analyzeTransitionResearchExperiment,
 } from "./experiment/lifecycle";
 
+import {
+  createResearchEvidenceAssessment as analyzeCreateResearchEvidenceAssessment,
+  updateResearchFindingEvidenceAssessment as analyzeUpdateResearchFindingEvidenceAssessment,
+  removeResearchFindingEvidenceAssessment as analyzeRemoveResearchFindingEvidenceAssessment,
+} from "./evidence/assessment";
+
 const researchPersistence = localResearchPersistence;
 
 let investigationsSnapshot: ResearchInvestigation[] = [];
@@ -743,77 +749,49 @@ export function detachResearchInvestigationConclusion(
 export function createResearchEvidenceAssessment(
   input: Omit<ResearchEvidenceAssessment, "id" | "assessedAt" | "updatedAt">,
 ): ResearchEvidenceAssessment {
-  const now = new Date().toISOString();
-
-  return {
-    ...input,
-    id: createId("evidence-assessment"),
-    assessedAt: now,
-    updatedAt: now,
-  };
+  return analyzeCreateResearchEvidenceAssessment(
+    input,
+    {
+      createId,
+      getResearchFindings,
+      saveResearchFinding,
+      now: () => new Date().toISOString(),
+    },
+  );
 }
 
 export function updateResearchFindingEvidenceAssessment(
   findingId: string,
   assessment: ResearchEvidenceAssessment,
 ): ResearchFinding | null {
-  const findings = getResearchFindings();
-
-  const findingIndex = findings.findIndex((finding) => finding.id === findingId);
-
-  if (findingIndex < 0) {
-    return null;
-  }
-
-  const finding = findings[findingIndex];
-
-  const existingAssessmentIndex = finding.evidenceAssessments.findIndex(
-    (item) => item.id === assessment.id,
+  return analyzeUpdateResearchFindingEvidenceAssessment(
+    findingId,
+    assessment,
+    {
+      createId,
+      getResearchFindings,
+      saveResearchFinding,
+      now: () => new Date().toISOString(),
+    },
   );
-
-  const evidenceAssessments = [...finding.evidenceAssessments];
-
-  if (existingAssessmentIndex >= 0) {
-    evidenceAssessments[existingAssessmentIndex] = assessment;
-  } else {
-    evidenceAssessments.push(assessment);
-  }
-
-  const updatedFinding: ResearchFinding = {
-    ...finding,
-    evidenceAssessments,
-    updatedAt: new Date().toISOString(),
-  };
-
-  saveResearchFinding(updatedFinding);
-
-  return updatedFinding;
 }
 
 export function removeResearchFindingEvidenceAssessment(
   findingId: string,
   assessmentId: string,
 ): ResearchFinding | null {
-  const findings = getResearchFindings();
-
-  const finding = findings.find((item) => item.id === findingId);
-
-  if (!finding) {
-    return null;
-  }
-
-  const updatedFinding: ResearchFinding = {
-    ...finding,
-    evidenceAssessments: finding.evidenceAssessments.filter(
-      (assessment) => assessment.id !== assessmentId,
-    ),
-    updatedAt: new Date().toISOString(),
-  };
-
-  saveResearchFinding(updatedFinding);
-
-  return updatedFinding;
+  return analyzeRemoveResearchFindingEvidenceAssessment(
+    findingId,
+    assessmentId,
+    {
+      createId,
+      getResearchFindings,
+      saveResearchFinding,
+      now: () => new Date().toISOString(),
+    },
+  );
 }
+
 /* -------------------------------------------------------------------------- */
 /*                         Research Provenance                                */
 /* -------------------------------------------------------------------------- */
