@@ -161,3 +161,36 @@ export function transitionResearchInvestigationConclusion(
 
   return updatedConclusion;
 }
+
+export function createResearchConclusionLifecycleService(
+  dependencies: ResearchConclusionLifecycleDependencies,
+) {
+  return {
+    canTransitionResearchInvestigationConclusion: (
+      from: ResearchConclusionStatus,
+      to: ResearchConclusionStatus,
+    ): boolean =>
+      canTransitionResearchInvestigationConclusion(
+        from,
+        to,
+      ),
+
+    evaluateResearchInvestigationConclusionAcceptance: (
+      conclusion: ResearchInvestigationConclusion,
+    ): ResearchConclusionAcceptanceResult =>
+      evaluateResearchInvestigationConclusionAcceptance(
+        conclusion,
+        dependencies,
+      ),
+
+    transitionResearchInvestigationConclusion: (
+      conclusion: ResearchInvestigationConclusion,
+      to: ResearchConclusionStatus,
+    ): ResearchInvestigationConclusion | null =>
+      transitionResearchInvestigationConclusion(
+        conclusion,
+        to,
+        dependencies,
+      ),
+  };
+}

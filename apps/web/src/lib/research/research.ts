@@ -128,9 +128,7 @@ import {
 } from "./conclusion/repository";
 
 import {
-  canTransitionResearchInvestigationConclusion as analyzeCanTransitionResearchInvestigationConclusion,
-  evaluateResearchInvestigationConclusionAcceptance as analyzeEvaluateResearchInvestigationConclusionAcceptance,
-  transitionResearchInvestigationConclusion as analyzeTransitionResearchInvestigationConclusion,
+  createResearchConclusionLifecycleService,
 } from "./conclusion/lifecycle";
 
 const researchPersistence = localResearchPersistence;
@@ -266,6 +264,15 @@ const researchExperimentLifecycleService =
     createId,
     now: () => new Date().toISOString(),
   });
+
+const researchConclusionLifecycleService =
+  createResearchConclusionLifecycleService({
+    getResearchFindings,
+    getResearchFindingValidations,
+    saveResearchInvestigationConclusion,
+    createResearchProvenanceEvent,
+    now: () => new Date().toISOString(),
+  });
 /* -------------------------------------------------------------------------- */
 /*                              Utilities                                     */
 /* -------------------------------------------------------------------------- */
@@ -338,36 +345,31 @@ export function canTransitionResearchInvestigationConclusion(
   from: ResearchConclusionStatus,
   to: ResearchConclusionStatus,
 ): boolean {
-  return analyzeCanTransitionResearchInvestigationConclusion(from, to);
+  return researchConclusionLifecycleService
+    .canTransitionResearchInvestigationConclusion(
+      from,
+      to,
+    );
 }
 
 export function evaluateResearchInvestigationConclusionAcceptance(
   conclusion: ResearchInvestigationConclusion,
 ): ResearchConclusionAcceptanceResult {
-  return analyzeEvaluateResearchInvestigationConclusionAcceptance(
-    conclusion,
-    {
-      getResearchFindings,
-      getResearchFindingValidations,
-    },
-  );
+  return researchConclusionLifecycleService
+    .evaluateResearchInvestigationConclusionAcceptance(
+      conclusion,
+    );
 }
 
 export function transitionResearchInvestigationConclusion(
   conclusion: ResearchInvestigationConclusion,
   to: ResearchConclusionStatus,
 ): ResearchInvestigationConclusion | null {
-  return analyzeTransitionResearchInvestigationConclusion(
-    conclusion,
-    to,
-    {
-      getResearchFindings,
-      getResearchFindingValidations,
-      saveResearchInvestigationConclusion,
-      createResearchProvenanceEvent,
-      now: () => new Date().toISOString(),
-    },
-  );
+  return researchConclusionLifecycleService
+    .transitionResearchInvestigationConclusion(
+      conclusion,
+      to,
+    );
 }
 
 /* -------------------------------------------------------------------------- */

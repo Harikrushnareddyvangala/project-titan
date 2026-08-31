@@ -4,6 +4,7 @@ import {
   canTransitionResearchInvestigationConclusion,
   evaluateResearchInvestigationConclusionAcceptance,
   transitionResearchInvestigationConclusion,
+  createResearchConclusionLifecycleService,
 } from "../lifecycle";
 
 import type {
@@ -245,5 +246,33 @@ describe("research conclusion lifecycle", () => {
     expect(
       dependencies.saveResearchInvestigationConclusion,
     ).not.toHaveBeenCalled();
+  });
+
+  it("exposes lifecycle operations through the service factory", () => {
+    const service =
+      createResearchConclusionLifecycleService(
+        dependencies,
+      );
+
+    expect(
+      service.canTransitionResearchInvestigationConclusion(
+        "Draft",
+        "Proposed",
+      ),
+    ).toBe(true);
+
+    const result =
+      service.transitionResearchInvestigationConclusion(
+        baseConclusion,
+        "Proposed",
+      );
+
+    expect(result).toMatchObject({
+      status: "Proposed",
+    });
+
+    expect(
+      dependencies.saveResearchInvestigationConclusion,
+    ).toHaveBeenCalledWith(result);
   });
 });
