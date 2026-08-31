@@ -10,6 +10,7 @@ import type {
 } from "@/types/research";
 
 import {
+  createResearchLineageRemediationRepairService,
   createResearchLineageIntegrityRemediationMutationContract,
   decideResearchLineageIntegrityRemediationRepair,
   discoverResearchLineageIntegrityRemediationReplacement,
@@ -428,5 +429,50 @@ describe("research lineage remediation repair", () => {
         "lineage validation still reports an invalid conclusion finding reference",
       );
     });
+  });
+
+  it("exposes remediation repair operations through the service factory", () => {
+    const dependencies = createDependencies();
+
+    const service =
+      createResearchLineageRemediationRepairService(
+        dependencies,
+      );
+
+    const discovery =
+      service.discoverResearchLineageIntegrityRemediationReplacement(
+        createPlan(),
+      );
+
+    expect(discovery.status).toBe("Resolved");
+    expect(discovery.selectedCandidate?.id).toBe(
+      REPLACEMENT_FINDING_ID,
+    );
+
+    const decision =
+      service.decideResearchLineageIntegrityRemediationRepair(
+        createPlan(),
+      );
+
+    expect(decision.decision).toBe("Repairable");
+    expect(decision.replacementEntityId).toBe(
+      REPLACEMENT_FINDING_ID,
+    );
+
+    const contract =
+      service.createResearchLineageIntegrityRemediationMutationContract(
+        decision,
+      );
+
+    expect(contract?.mutationType).toBe(
+      "ReferenceReplacement",
+    );
+
+    const execution =
+      service.executeResearchLineageIntegrityRemediationRepair(
+        decision,
+      );
+
+    expect(execution.executed).toBe(true);
   });
 });

@@ -572,3 +572,40 @@ export function executeResearchLineageIntegrityRemediationRepair(
     message: `Deterministic reference repair completed: ${sourceId} was replaced with ${replacementFindingId} on conclusion ${conclusion.id}.`,
   };
 }
+
+export function createResearchLineageRemediationRepairService(
+  dependencies: ResearchLineageRemediationRepairDependencies,
+) {
+  return {
+    discoverResearchLineageIntegrityRemediationReplacement: (
+      plan: ResearchLineageIntegrityRemediationPlan,
+    ): ResearchLineageIntegrityRemediationReplacementDiscoveryResult =>
+      discoverResearchLineageIntegrityRemediationReplacement(
+        plan,
+        dependencies,
+      ),
+
+    decideResearchLineageIntegrityRemediationRepair: (
+      plan: ResearchLineageIntegrityRemediationPlan,
+    ): ResearchLineageIntegrityRemediationRepairDecisionResult =>
+      decideResearchLineageIntegrityRemediationRepair(
+        plan,
+        dependencies,
+      ),
+
+    createResearchLineageIntegrityRemediationMutationContract: (
+      decision: ResearchLineageIntegrityRemediationRepairDecisionResult,
+    ): ResearchLineageIntegrityRemediationMutationContract | null =>
+      createResearchLineageIntegrityRemediationMutationContract(
+        decision,
+      ),
+
+    executeResearchLineageIntegrityRemediationRepair: (
+      decision: ResearchLineageIntegrityRemediationRepairDecisionResult,
+    ): ResearchLineageIntegrityRemediationRepairExecutionResult =>
+      executeResearchLineageIntegrityRemediationRepair(
+        decision,
+        dependencies,
+      ),
+  };
+}

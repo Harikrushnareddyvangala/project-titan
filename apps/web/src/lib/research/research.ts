@@ -84,10 +84,7 @@ import {
 } from "./lineage/remediation/execution";
 
 import {
-  discoverResearchLineageIntegrityRemediationReplacement as analyzeDiscoverResearchLineageIntegrityRemediationReplacement,
-  decideResearchLineageIntegrityRemediationRepair as analyzeDecideResearchLineageIntegrityRemediationRepair,
-  createResearchLineageIntegrityRemediationMutationContract as analyzeCreateResearchLineageIntegrityRemediationMutationContract,
-  executeResearchLineageIntegrityRemediationRepair as analyzeExecuteResearchLineageIntegrityRemediationRepair,
+  createResearchLineageRemediationRepairService,
 } from "./lineage/remediation/repair";
 
 export {
@@ -272,6 +269,17 @@ const researchConclusionLifecycleService =
     saveResearchInvestigationConclusion,
     createResearchProvenanceEvent,
     now: () => new Date().toISOString(),
+  });
+
+const researchLineageRemediationRepairService =
+  createResearchLineageRemediationRepairService({
+    getResearchInvestigations,
+    getResearchFindings,
+    getResearchInvestigationConclusions,
+    resolveResearchLineageIntegrityRemediationTarget,
+    saveResearchInvestigationConclusion,
+    createResearchProvenanceEvent,
+    validateResearchLineage,
   });
 /* -------------------------------------------------------------------------- */
 /*                              Utilities                                     */
@@ -687,60 +695,33 @@ export function getLatestResearchProvenanceEvent(
 export function discoverResearchLineageIntegrityRemediationReplacement(
   plan: ResearchLineageIntegrityRemediationPlan,
 ): ResearchLineageIntegrityRemediationReplacementDiscoveryResult {
-  return analyzeDiscoverResearchLineageIntegrityRemediationReplacement(
-    plan,
-    {
-      getResearchInvestigations,
-      getResearchFindings,
-      getResearchInvestigationConclusions,
-      resolveResearchLineageIntegrityRemediationTarget,
-      saveResearchInvestigationConclusion,
-      createResearchProvenanceEvent,
-      validateResearchLineage,
-    },
-  );
+  return researchLineageRemediationRepairService
+    .discoverResearchLineageIntegrityRemediationReplacement(plan);
 }
 
 export function decideResearchLineageIntegrityRemediationRepair(
   plan: ResearchLineageIntegrityRemediationPlan,
 ): ResearchLineageIntegrityRemediationRepairDecisionResult {
-  return analyzeDecideResearchLineageIntegrityRemediationRepair(
-    plan,
-    {
-      getResearchInvestigations,
-      getResearchFindings,
-      getResearchInvestigationConclusions,
-      resolveResearchLineageIntegrityRemediationTarget,
-      saveResearchInvestigationConclusion,
-      createResearchProvenanceEvent,
-      validateResearchLineage,
-    },
-  );
+  return researchLineageRemediationRepairService
+    .decideResearchLineageIntegrityRemediationRepair(plan);
 }
 
 export function createResearchLineageIntegrityRemediationMutationContract(
   decision: ResearchLineageIntegrityRemediationRepairDecisionResult,
 ): ResearchLineageIntegrityRemediationMutationContract | null {
-  return analyzeCreateResearchLineageIntegrityRemediationMutationContract(
-    decision,
-  );
+  return researchLineageRemediationRepairService
+    .createResearchLineageIntegrityRemediationMutationContract(
+      decision,
+    );
 }
 
 export function executeResearchLineageIntegrityRemediationRepair(
   decision: ResearchLineageIntegrityRemediationRepairDecisionResult,
 ): ResearchLineageIntegrityRemediationRepairExecutionResult {
-  return analyzeExecuteResearchLineageIntegrityRemediationRepair(
-    decision,
-    {
-      getResearchInvestigations,
-      getResearchFindings,
-      getResearchInvestigationConclusions,
-      resolveResearchLineageIntegrityRemediationTarget,
-      saveResearchInvestigationConclusion,
-      createResearchProvenanceEvent,
-      validateResearchLineage,
-    },
-  );
+  return researchLineageRemediationRepairService
+    .executeResearchLineageIntegrityRemediationRepair(
+      decision,
+    );
 }
 
 /* -------------------------------------------------------------------------- */
