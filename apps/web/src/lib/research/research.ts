@@ -119,6 +119,10 @@ import {
 } from "./experiment/lifecycle";
 
 import {
+  createResearchExperimentRepository,
+} from "./experiment/repository";
+
+import {
   createResearchEvidenceAssessment as analyzeCreateResearchEvidenceAssessment,
   updateResearchFindingEvidenceAssessment as analyzeUpdateResearchFindingEvidenceAssessment,
   removeResearchFindingEvidenceAssessment as analyzeRemoveResearchFindingEvidenceAssessment,
@@ -138,6 +142,15 @@ import {
 } from "./conclusion/repository";
 
 const researchPersistence = localResearchPersistence;
+
+const researchExperimentRepository =
+  createResearchExperimentRepository({
+    loadResearchExperiments: () =>
+      researchPersistence.load().experiments,
+
+    saveResearchExperiments: (experiments) =>
+      researchPersistence.saveExperiments(experiments),
+  });
 
 const researchProvenanceRepository =
   createResearchProvenanceRepository({
@@ -386,29 +399,14 @@ export function transitionResearchInvestigationConclusion(
 /* -------------------------------------------------------------------------- */
 
 export function getResearchExperiments(): ResearchExperiment[] {
-  const stored =
-    researchPersistence.load().experiments;
-
-  return stored.map((experiment) => ({
-    ...experiment,
-
-    lifecycle: experiment.lifecycle ?? [],
-  }));
+  return researchExperimentRepository.getResearchExperiments();
 }
 
-export function saveResearchExperiment(experiment: ResearchExperiment): void {
-  const experiments = getResearchExperiments();
-
-  const existingIndex = experiments.findIndex((item) => item.id === experiment.id);
-
-  if (existingIndex >= 0) {
-    experiments[existingIndex] = experiment;
-  } else {
-    experiments.unshift(experiment);
-  }
-
-  researchPersistence.saveExperiments(
-    experiments,
+export function saveResearchExperiment(
+  experiment: ResearchExperiment,
+): void {
+  researchExperimentRepository.saveResearchExperiment(
+    experiment,
   );
 }
 
