@@ -26,8 +26,8 @@ export interface ResearchConclusionLifecycleDependencies {
       | "Accepted"
       | "Superseded"
       | "StatusChanged";
-    fromStatus?: string;
-    toStatus?: string;
+    fromStatus?: ResearchConclusionStatus;
+    toStatus?: ResearchConclusionStatus;
   }) => void;
   now: () => string;
 }
