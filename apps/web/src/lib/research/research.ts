@@ -120,9 +120,7 @@ import {
 } from "./experiment/repository";
 
 import {
-  createResearchEvidenceAssessment as analyzeCreateResearchEvidenceAssessment,
-  updateResearchFindingEvidenceAssessment as analyzeUpdateResearchFindingEvidenceAssessment,
-  removeResearchFindingEvidenceAssessment as analyzeRemoveResearchFindingEvidenceAssessment,
+  createResearchEvidenceAssessmentService,
 } from "./evidence/assessment";
 
 import {
@@ -238,6 +236,14 @@ const researchConclusionRepository =
     saveResearchInvestigation: (investigation) =>
       saveResearchInvestigation(investigation),
 
+    createId,
+    now: () => new Date().toISOString(),
+  });
+
+const researchEvidenceAssessmentService =
+  createResearchEvidenceAssessmentService({
+    getResearchFindings,
+    saveResearchFinding,
     createId,
     now: () => new Date().toISOString(),
   });
@@ -536,49 +542,35 @@ export function detachResearchInvestigationConclusion(
   );
 }
 export function createResearchEvidenceAssessment(
-  input: Omit<ResearchEvidenceAssessment, "id" | "assessedAt" | "updatedAt">,
+  input: Omit<
+    ResearchEvidenceAssessment,
+    "id" | "assessedAt" | "updatedAt"
+  >,
 ): ResearchEvidenceAssessment {
-  return analyzeCreateResearchEvidenceAssessment(
-    input,
-    {
-      createId,
-      getResearchFindings,
-      saveResearchFinding,
-      now: () => new Date().toISOString(),
-    },
-  );
+  return researchEvidenceAssessmentService
+    .createResearchEvidenceAssessment(input);
 }
 
 export function updateResearchFindingEvidenceAssessment(
   findingId: string,
   assessment: ResearchEvidenceAssessment,
 ): ResearchFinding | null {
-  return analyzeUpdateResearchFindingEvidenceAssessment(
-    findingId,
-    assessment,
-    {
-      createId,
-      getResearchFindings,
-      saveResearchFinding,
-      now: () => new Date().toISOString(),
-    },
-  );
+  return researchEvidenceAssessmentService
+    .updateResearchFindingEvidenceAssessment(
+      findingId,
+      assessment,
+    );
 }
 
 export function removeResearchFindingEvidenceAssessment(
   findingId: string,
   assessmentId: string,
 ): ResearchFinding | null {
-  return analyzeRemoveResearchFindingEvidenceAssessment(
-    findingId,
-    assessmentId,
-    {
-      createId,
-      getResearchFindings,
-      saveResearchFinding,
-      now: () => new Date().toISOString(),
-    },
-  );
+  return researchEvidenceAssessmentService
+    .removeResearchFindingEvidenceAssessment(
+      findingId,
+      assessmentId,
+    );
 }
 
 /* -------------------------------------------------------------------------- */

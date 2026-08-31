@@ -92,3 +92,40 @@ export function removeResearchFindingEvidenceAssessment(
 
   return updatedFinding;
 }
+
+export function createResearchEvidenceAssessmentService(
+  dependencies: ResearchEvidenceAssessmentDependencies,
+) {
+  return {
+    createResearchEvidenceAssessment: (
+      input: Omit<
+        ResearchEvidenceAssessment,
+        "id" | "assessedAt" | "updatedAt"
+      >,
+    ): ResearchEvidenceAssessment =>
+      createResearchEvidenceAssessment(
+        input,
+        dependencies,
+      ),
+
+    updateResearchFindingEvidenceAssessment: (
+      findingId: string,
+      assessment: ResearchEvidenceAssessment,
+    ): ResearchFinding | null =>
+      updateResearchFindingEvidenceAssessment(
+        findingId,
+        assessment,
+        dependencies,
+      ),
+
+    removeResearchFindingEvidenceAssessment: (
+      findingId: string,
+      assessmentId: string,
+    ): ResearchFinding | null =>
+      removeResearchFindingEvidenceAssessment(
+        findingId,
+        assessmentId,
+        dependencies,
+      ),
+  };
+}

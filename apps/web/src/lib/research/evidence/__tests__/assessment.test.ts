@@ -7,6 +7,7 @@ import type {
 
 import {
   createResearchEvidenceAssessment,
+  createResearchEvidenceAssessmentService,
   removeResearchFindingEvidenceAssessment,
   updateResearchFindingEvidenceAssessment,
 } from "../assessment";
@@ -241,5 +242,26 @@ describe("research evidence assessment", () => {
     );
 
     expect(findings[0]).toEqual(original);
+  });
+
+  it("exposes assessment operations through the factory", () => {
+    const service = createResearchEvidenceAssessmentService(
+      dependencies(),
+    );
+
+    expect(
+      service.createResearchEvidenceAssessment({
+        evidenceId: "evidence-001",
+        type: "Supporting",
+        relevance: 0.9,
+        supportStrength: 0.8,
+        reliability: 0.95,
+        independence: 0.85,
+        rationale: "Factory test.",
+      }),
+    ).toMatchObject({
+      evidenceId: "evidence-001",
+      type: "Supporting",
+    });
   });
 });
