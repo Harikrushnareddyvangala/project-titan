@@ -71,9 +71,7 @@ import {
 } from "./provenance/repository";
 
 import {
-  canTransitionResearchFindingValidation as analyzeCanTransitionResearchFindingValidation,
-  transitionResearchFindingValidation as analyzeTransitionResearchFindingValidation,
-  createResearchFindingValidation as analyzeCreateResearchFindingValidation,
+  createResearchFindingValidationService,
 } from "./validation/lifecycle";
 
 import {
@@ -244,6 +242,21 @@ const researchEvidenceAssessmentService =
   createResearchEvidenceAssessmentService({
     getResearchFindings,
     saveResearchFinding,
+    createId,
+    now: () => new Date().toISOString(),
+  });
+
+const researchFindingValidationService =
+  createResearchFindingValidationService({
+    getResearchFindingValidations,
+    saveResearchFindingValidation,
+    getResearchFindingValidationHistory,
+    saveResearchFindingValidationHistoryEvent,
+    getResearchFindings,
+    saveResearchFinding,
+    getResearchInvestigations,
+    createResearchProvenanceEvent,
+    evaluateFindingValidationEligibility,
     createId,
     now: () => new Date().toISOString(),
   });
@@ -433,7 +446,11 @@ export function canTransitionResearchFindingValidation(
   from: ResearchValidationStatus,
   to: ResearchValidationStatus,
 ): boolean {
-  return analyzeCanTransitionResearchFindingValidation(from, to);
+  return researchFindingValidationService
+    .canTransitionResearchFindingValidation(
+      from,
+      to,
+    );
 }
 
 export function transitionResearchFindingValidation(
@@ -441,24 +458,12 @@ export function transitionResearchFindingValidation(
   to: ResearchValidationStatus,
   reason?: string,
 ): ResearchFindingValidation | null {
-  return analyzeTransitionResearchFindingValidation(
-    validationId,
-    to,
-    reason,
-    {
-      getResearchFindingValidations,
-      saveResearchFindingValidation,
-      getResearchFindingValidationHistory,
-      saveResearchFindingValidationHistoryEvent,
-      getResearchFindings,
-      saveResearchFinding,
-      getResearchInvestigations,
-      createResearchProvenanceEvent,
-      evaluateFindingValidationEligibility,
-      createId,
-      now: () => new Date().toISOString(),
-    },
-  );
+  return researchFindingValidationService
+    .transitionResearchFindingValidation(
+      validationId,
+      to,
+      reason,
+    );
 }
 
 export function createResearchFindingValidation(
@@ -476,23 +481,11 @@ export function createResearchFindingValidation(
     | "contradictingEvidenceCount"
   >,
 ): ResearchValidationDecisionResult {
-  return analyzeCreateResearchFindingValidation(
-    findingId,
-    input,
-    {
-      getResearchFindingValidations,
-      saveResearchFindingValidation,
-      getResearchFindingValidationHistory,
-      saveResearchFindingValidationHistoryEvent,
-      getResearchFindings,
-      saveResearchFinding,
-      getResearchInvestigations,
-      createResearchProvenanceEvent,
-      evaluateFindingValidationEligibility,
-      createId,
-      now: () => new Date().toISOString(),
-    },
-  );
+  return researchFindingValidationService
+    .createResearchFindingValidation(
+      findingId,
+      input,
+    );
 }
 
 /* -------------------------------------------------------------------------- */

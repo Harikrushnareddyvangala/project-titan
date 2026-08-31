@@ -299,3 +299,51 @@ export function createResearchFindingValidation(
     reasons: [],
   };
 }
+
+export function createResearchFindingValidationService(
+  dependencies: ResearchFindingValidationDependencies,
+) {
+  return {
+    canTransitionResearchFindingValidation: (
+      from: ResearchValidationStatus,
+      to: ResearchValidationStatus,
+    ): boolean =>
+      canTransitionResearchFindingValidation(
+        from,
+        to,
+      ),
+
+    transitionResearchFindingValidation: (
+      validationId: string,
+      to: ResearchValidationStatus,
+      reason: string | undefined,
+    ): ResearchFindingValidation | null =>
+      transitionResearchFindingValidation(
+        validationId,
+        to,
+        reason,
+        dependencies,
+      ),
+
+    createResearchFindingValidation: (
+      findingId: string,
+      input: Omit<
+        ResearchFindingValidation,
+        | "id"
+        | "findingId"
+        | "createdAt"
+        | "updatedAt"
+        | "validatedAt"
+        | "confidenceAtValidation"
+        | "evidenceAssessmentCount"
+        | "supportingEvidenceCount"
+        | "contradictingEvidenceCount"
+      >,
+    ): ResearchValidationDecisionResult =>
+      createResearchFindingValidation(
+        findingId,
+        input,
+        dependencies,
+      ),
+  };
+}

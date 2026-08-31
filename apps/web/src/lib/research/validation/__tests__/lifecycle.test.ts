@@ -11,6 +11,7 @@ import type {
 import {
   canTransitionResearchFindingValidation,
   createResearchFindingValidation,
+  createResearchFindingValidationService,
   transitionResearchFindingValidation,
   type ResearchFindingValidationDependencies,
 } from "../lifecycle";
@@ -424,5 +425,28 @@ describe("research finding validation lifecycle", () => {
     expect(result.reasons).toEqual([
       "Finding does not meet validation requirements.",
     ]);
+  });
+
+  it("exposes lifecycle operations through the service factory", () => {
+    const { dependencies } = createDependencies();
+
+    const service = createResearchFindingValidationService(
+      dependencies,
+    );
+
+    expect(
+      service.canTransitionResearchFindingValidation(
+        "Pending",
+        "In Review",
+      ),
+    ).toBe(true);
+
+    expect(
+      service.transitionResearchFindingValidation(
+        "validation-001",
+        "In Review",
+        "Begin review",
+      )?.status,
+    ).toBe("In Review");
   });
 });
