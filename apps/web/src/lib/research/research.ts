@@ -50,16 +50,7 @@ import {
 } from "./lineage/integrity";
 
 import {
-  getResearchProvenanceEventsByInvestigation as queryResearchProvenanceEventsByInvestigation,
-  getResearchProvenanceEventsByEntity as queryResearchProvenanceEventsByEntity,
-  getResearchProvenanceEventsByInvestigationAndEntity as queryResearchProvenanceEventsByInvestigationAndEntity,
-  getResearchProvenanceEventsChronological as sortResearchProvenanceEventsChronological,
-  getResearchProvenanceTimeline as buildResearchProvenanceTimeline,
-  getResearchProvenanceTimelineByInvestigation as buildResearchProvenanceTimelineByInvestigation,
-  getResearchProvenanceInvestigationSummary as buildResearchProvenanceInvestigationSummary,
-  getResearchProvenanceEventsByEventType as filterResearchProvenanceEventsByEventType,
-  getResearchProvenanceEventsByInvestigationChronological as queryResearchProvenanceEventsByInvestigationChronological,
-  getLatestResearchProvenanceEvent as queryLatestResearchProvenanceEvent,
+  createResearchProvenanceEventService,
 } from "./provenance/events";
 
 import {
@@ -201,6 +192,14 @@ const researchProvenanceRepository =
     createId,
 
     now: () => new Date().toISOString(),
+  });
+
+const researchProvenanceEventService =
+  createResearchProvenanceEventService({
+    getResearchProvenanceEvents,
+    getResearchFindingValidations,
+    getResearchFindings,
+    validateResearchProvenanceIntegrity,
   });
 
 const researchInvestigationRepository =
@@ -580,21 +579,23 @@ export function getResearchProvenanceEvents(): ResearchProvenanceEvent[] {
 export function getResearchProvenanceEventsByInvestigation(
   investigationId: string,
 ): ResearchProvenanceEvent[] {
-  return queryResearchProvenanceEventsByInvestigation(
-    getResearchProvenanceEvents(),
-    investigationId,
-  );
+  return researchProvenanceEventService
+    .getResearchProvenanceEventsByInvestigation(
+      getResearchProvenanceEvents(),
+      investigationId,
+    );
 }
 
 export function getResearchProvenanceEventsByEntity(
   entityType: ResearchProvenanceEntityType,
   entityId: string,
 ): ResearchProvenanceEvent[] {
-  return queryResearchProvenanceEventsByEntity(
-    getResearchProvenanceEvents(),
-    entityType,
-    entityId,
-  );
+  return researchProvenanceEventService
+    .getResearchProvenanceEventsByEntity(
+      getResearchProvenanceEvents(),
+      entityType,
+      entityId,
+    );
 }
 
 export function getResearchProvenanceEventsByInvestigationAndEntity(
@@ -602,55 +603,43 @@ export function getResearchProvenanceEventsByInvestigationAndEntity(
   entityType: ResearchProvenanceEntityType,
   entityId: string,
 ): ResearchProvenanceEvent[] {
-  return queryResearchProvenanceEventsByInvestigationAndEntity(
-    getResearchProvenanceEvents(),
-    investigationId,
-    entityType,
-    entityId,
-  );
+  return researchProvenanceEventService
+    .getResearchProvenanceEventsByInvestigationAndEntity(
+      getResearchProvenanceEvents(),
+      investigationId,
+      entityType,
+      entityId,
+    );
 }
 
 export function getResearchProvenanceEventsChronological(): ResearchProvenanceEvent[] {
-  return sortResearchProvenanceEventsChronological(
-    getResearchProvenanceEvents(),
-  );
+  return researchProvenanceEventService
+    .getResearchProvenanceEventsChronological(
+      getResearchProvenanceEvents(),
+    );
 }
 
 export function getResearchProvenanceTimeline(): ResearchProvenanceTimelineItem[] {
-  return buildResearchProvenanceTimeline({
-    getResearchProvenanceEvents,
-    getResearchFindingValidations,
-    getResearchFindings,
-    validateResearchProvenanceIntegrity,
-  });
+  return researchProvenanceEventService
+    .getResearchProvenanceTimeline();
 }
 
 export function getResearchProvenanceTimelineByInvestigation(
   investigationId: string,
 ): ResearchProvenanceTimelineItem[] {
-  return buildResearchProvenanceTimelineByInvestigation(
-    investigationId,
-    {
-      getResearchProvenanceEvents,
-      getResearchFindingValidations,
-      getResearchFindings,
-      validateResearchProvenanceIntegrity,
-    },
-  );
+  return researchProvenanceEventService
+    .getResearchProvenanceTimelineByInvestigation(
+      investigationId,
+    );
 }
 
 export function getResearchProvenanceInvestigationSummary(
   investigationId: string,
 ): ResearchProvenanceInvestigationSummary {
-  return buildResearchProvenanceInvestigationSummary(
-    investigationId,
-    {
-      getResearchProvenanceEvents,
-      getResearchFindingValidations,
-      getResearchFindings,
-      validateResearchProvenanceIntegrity,
-    },
-  );
+  return researchProvenanceEventService
+    .getResearchProvenanceInvestigationSummary(
+      investigationId,
+    );
 }
 
 export function getResearchLineage(
@@ -674,21 +663,23 @@ export function getResearchLineage(
 export function getResearchProvenanceEventsByInvestigationChronological(
   investigationId: string,
 ): ResearchProvenanceEvent[] {
-  return queryResearchProvenanceEventsByInvestigationChronological(
-    getResearchProvenanceEvents(),
-    investigationId,
-  );
+  return researchProvenanceEventService
+    .getResearchProvenanceEventsByInvestigationChronological(
+      getResearchProvenanceEvents(),
+      investigationId,
+    );
 }
 
 export function getLatestResearchProvenanceEvent(
   entityType: ResearchProvenanceEntityType,
   entityId: string,
 ): ResearchProvenanceEvent | null {
-  return queryLatestResearchProvenanceEvent(
-    getResearchProvenanceEvents(),
-    entityType,
-    entityId,
-  );
+  return researchProvenanceEventService
+    .getLatestResearchProvenanceEvent(
+      getResearchProvenanceEvents(),
+      entityType,
+      entityId,
+    );
 }
 
 export function discoverResearchLineageIntegrityRemediationReplacement(
@@ -1053,10 +1044,11 @@ export function validateResearchLineageForInvestigation(
 export function getResearchProvenanceEventsByEventType(
   eventType: ResearchProvenanceEventType,
 ): ResearchProvenanceEvent[] {
-  return filterResearchProvenanceEventsByEventType(
-    getResearchProvenanceEvents(),
-    eventType,
-  );
+  return researchProvenanceEventService
+    .getResearchProvenanceEventsByEventType(
+      getResearchProvenanceEvents(),
+      eventType,
+    );
 }
 
 export function validateResearchProvenanceIntegrity(): ResearchProvenanceIntegrityResult {
