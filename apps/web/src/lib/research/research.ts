@@ -133,6 +133,10 @@ import {
   createResearchInvestigationRepository,
 } from "./investigation/repository";
 
+import {
+  createResearchConclusionRepository,
+} from "./conclusion/repository";
+
 const researchPersistence = localResearchPersistence;
 
 const researchProvenanceRepository =
@@ -163,6 +167,22 @@ const researchInvestigationRepository =
 
     createId,
 
+    now: () => new Date().toISOString(),
+  });
+
+const researchConclusionRepository =
+  createResearchConclusionRepository({
+    loadResearchInvestigationConclusions: () =>
+      researchPersistence.load().investigationConclusions,
+
+    saveResearchInvestigationConclusions: (conclusions) =>
+      researchPersistence.saveInvestigationConclusions(conclusions),
+
+    getResearchInvestigations: () => getResearchInvestigations(),
+    saveResearchInvestigation: (investigation) =>
+      saveResearchInvestigation(investigation),
+
+    createId,
     now: () => new Date().toISOString(),
   });
 /* -------------------------------------------------------------------------- */
@@ -570,131 +590,46 @@ export function createResearchFindingValidation(
 /* -------------------------------------------------------------------------- */
 
 export function getResearchInvestigationConclusions(): ResearchInvestigationConclusion[] {
-  const stored = researchPersistence.load().investigationConclusions;
-
-  return stored.map((conclusion) => ({
-    ...conclusion,
-
-    supportingFindingIds: Array.isArray(conclusion.supportingFindingIds)
-      ? conclusion.supportingFindingIds
-      : [],
-
-    contradictingFindingIds: Array.isArray(conclusion.contradictingFindingIds)
-      ? conclusion.contradictingFindingIds
-      : [],
-  }));
+  return researchConclusionRepository.getResearchInvestigationConclusions();
 }
 
 export function saveResearchInvestigationConclusion(
   conclusion: ResearchInvestigationConclusion,
 ): void {
-  const conclusions = getResearchInvestigationConclusions();
-
-  const existingIndex = conclusions.findIndex((item) => item.id === conclusion.id);
-
-  if (existingIndex >= 0) {
-    conclusions[existingIndex] = conclusion;
-  } else {
-    conclusions.unshift(conclusion);
-  }
-
-  researchPersistence.saveInvestigationConclusions(conclusions);
+  researchConclusionRepository.saveResearchInvestigationConclusion(
+    conclusion,
+  );
 }
 
 export function createResearchInvestigationConclusion(
-  input: Omit<ResearchInvestigationConclusion, "id" | "createdAt" | "updatedAt">,
+  input: Omit<
+    ResearchInvestigationConclusion,
+    "id" | "createdAt" | "updatedAt"
+  >,
 ): ResearchInvestigationConclusion {
-  const now = new Date().toISOString();
-
-  const conclusion: ResearchInvestigationConclusion = {
-    ...input,
-
-    id: createId("investigation-conclusion"),
-
-    createdAt: now,
-
-    updatedAt: now,
-  };
-
-  saveResearchInvestigationConclusion(conclusion);
-
-  return conclusion;
+  return researchConclusionRepository.createResearchInvestigationConclusion(
+    input,
+  );
 }
 
 export function attachResearchInvestigationConclusion(
   investigationId: string,
   conclusionId: string,
 ): ResearchInvestigation | null {
-  const investigations = getResearchInvestigations();
-
-  const investigationIndex = investigations.findIndex((item) => item.id === investigationId);
-
-  if (investigationIndex < 0) {
-    return null;
-  }
-
-  const conclusion = getResearchInvestigationConclusions().find((item) => item.id === conclusionId);
-
-  if (!conclusion) {
-    return null;
-  }
-
-  if (conclusion.investigationId !== investigationId) {
-    return null;
-  }
-
-  const investigation = investigations[investigationIndex];
-
-  if (investigation.conclusionIds.includes(conclusionId)) {
-    return investigation;
-  }
-
-  const updatedInvestigation: ResearchInvestigation = {
-    ...investigation,
-
-    conclusionIds: [...investigation.conclusionIds, conclusionId],
-
-    updatedAt: new Date().toISOString(),
-  };
-
-  investigations[investigationIndex] = updatedInvestigation;
-
-  saveResearchInvestigation(updatedInvestigation);
-
-  return updatedInvestigation;
+  return researchConclusionRepository.attachResearchInvestigationConclusion(
+    investigationId,
+    conclusionId,
+  );
 }
 
 export function detachResearchInvestigationConclusion(
   investigationId: string,
   conclusionId: string,
 ): ResearchInvestigation | null {
-  const investigations = getResearchInvestigations();
-
-  const investigationIndex = investigations.findIndex((item) => item.id === investigationId);
-
-  if (investigationIndex < 0) {
-    return null;
-  }
-
-  const investigation = investigations[investigationIndex];
-
-  if (!investigation.conclusionIds.includes(conclusionId)) {
-    return investigation;
-  }
-
-  const updatedInvestigation: ResearchInvestigation = {
-    ...investigation,
-
-    conclusionIds: investigation.conclusionIds.filter((id) => id !== conclusionId),
-
-    updatedAt: new Date().toISOString(),
-  };
-
-  investigations[investigationIndex] = updatedInvestigation;
-
-  saveResearchInvestigation(updatedInvestigation);
-
-  return updatedInvestigation;
+  return researchConclusionRepository.detachResearchInvestigationConclusion(
+    investigationId,
+    conclusionId,
+  );
 }
 export function createResearchEvidenceAssessment(
   input: Omit<ResearchEvidenceAssessment, "id" | "assessedAt" | "updatedAt">,
