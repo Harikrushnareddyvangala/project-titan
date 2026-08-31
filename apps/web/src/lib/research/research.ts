@@ -133,8 +133,7 @@ import {
 } from "./evidence/repository";
 
 import {
-  getResearchFindings as analyzeGetResearchFindings,
-  saveResearchFinding as analyzeSaveResearchFinding,
+  createResearchFindingRepository,
 } from "./finding/repository";
 
 import {
@@ -152,6 +151,19 @@ import {
 } from "./conclusion/lifecycle";
 
 const researchPersistence = localResearchPersistence;
+
+const researchFindingRepository =
+  createResearchFindingRepository({
+    loadResearchFindings: () =>
+      researchPersistence.load().findings,
+
+    saveResearchFindings: (findings) =>
+      researchPersistence.saveFindings(findings),
+
+    createId,
+
+    now: () => new Date().toISOString(),
+  });
 
 const researchEvidenceRepository =
   createResearchEvidenceRepository({
@@ -361,27 +373,16 @@ export function saveResearchEvidence(
 /* -------------------------------------------------------------------------- */
 
 export function getResearchFindings(): ResearchFinding[] {
-  return analyzeGetResearchFindings({
-    loadResearchFindings: () => researchPersistence.load().findings,
-    saveResearchFindings: (findings) =>
-      researchPersistence.saveFindings(findings),
-    createId,
-    now: () => new Date().toISOString(),
-  });
+  return researchFindingRepository.getResearchFindings();
 }
 
 export function saveResearchFinding(
   finding: ResearchFinding,
 ): void {
-  analyzeSaveResearchFinding(finding, {
-    loadResearchFindings: () => researchPersistence.load().findings,
-    saveResearchFindings: (findings) =>
-      researchPersistence.saveFindings(findings),
-    createId,
-    now: () => new Date().toISOString(),
-  });
+  researchFindingRepository.saveResearchFinding(
+    finding,
+  );
 }
-
 /* -------------------------------------------------------------------------- */
 /*                         Finding Validation                                 */
 /* -------------------------------------------------------------------------- */

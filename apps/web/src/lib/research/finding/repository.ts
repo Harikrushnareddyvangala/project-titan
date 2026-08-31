@@ -83,3 +83,20 @@ export function saveResearchFinding(
 
   dependencies.saveResearchFindings(findings);
 }
+
+export function createResearchFindingRepository(
+  dependencies: ResearchFindingRepositoryDependencies,
+) {
+  return {
+    getResearchFindings: (): ResearchFinding[] =>
+      getResearchFindings(dependencies),
+
+    saveResearchFinding: (
+      finding: ResearchFinding,
+    ): void =>
+      saveResearchFinding(
+        finding,
+        dependencies,
+      ),
+  };
+}
