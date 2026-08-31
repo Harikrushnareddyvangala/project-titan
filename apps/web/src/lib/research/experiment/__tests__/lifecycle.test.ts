@@ -7,6 +7,7 @@ import type {
 
 import {
   canTransitionResearchExperiment,
+  createResearchExperimentLifecycleService,
   transitionResearchExperiment,
 } from "../lifecycle";
 
@@ -197,5 +198,36 @@ describe("research experiment lifecycle", () => {
       toStatus: "Investigating",
       reason: "Start",
     });
+  });
+
+  it("exposes lifecycle operations through the service factory", () => {
+    const dependencies = createDependencies();
+
+    const service =
+      createResearchExperimentLifecycleService(
+        dependencies,
+      );
+
+    expect(
+      service.canTransitionResearchExperiment(
+        "Draft",
+        "Investigating",
+      ),
+    ).toBe(true);
+
+    const result =
+      service.transitionResearchExperiment(
+        baseExperiment,
+        "Investigating",
+        "Factory test",
+      );
+
+    expect(result).toMatchObject({
+      status: "Investigating",
+    });
+
+    expect(
+      dependencies.saveResearchExperiment,
+    ).toHaveBeenCalledWith(result);
   });
 });

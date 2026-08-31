@@ -109,8 +109,7 @@ export {
 } from "./lineage/assessment";
 
 import {
-  canTransitionResearchExperiment as analyzeCanTransitionResearchExperiment,
-  transitionResearchExperiment as analyzeTransitionResearchExperiment,
+  createResearchExperimentLifecycleService,
 } from "./experiment/lifecycle";
 
 import {
@@ -260,6 +259,14 @@ const researchFindingValidationService =
     createId,
     now: () => new Date().toISOString(),
   });
+
+const researchExperimentLifecycleService =
+  createResearchExperimentLifecycleService({
+    saveResearchExperiment,
+    createResearchProvenanceEvent,
+    createId,
+    now: () => new Date().toISOString(),
+  });
 /* -------------------------------------------------------------------------- */
 /*                              Utilities                                     */
 /* -------------------------------------------------------------------------- */
@@ -304,7 +311,8 @@ export function canTransitionResearchExperiment(
   from: ResearchStatus,
   to: ResearchStatus,
 ): boolean {
-  return analyzeCanTransitionResearchExperiment(from, to);
+  return researchExperimentLifecycleService
+    .canTransitionResearchExperiment(from, to);
 }
 
 export function transitionResearchExperiment(
@@ -312,17 +320,12 @@ export function transitionResearchExperiment(
   to: ResearchStatus,
   reason?: string,
 ): ResearchExperiment | null {
-  return analyzeTransitionResearchExperiment(
-    experiment,
-    to,
-    reason,
-    {
-      saveResearchExperiment,
-      createResearchProvenanceEvent,
-      createId,
-      now: () => new Date().toISOString(),
-    },
-  );
+  return researchExperimentLifecycleService
+    .transitionResearchExperiment(
+      experiment,
+      to,
+      reason,
+    );
 }
 
 export interface ResearchConclusionAcceptanceResult {

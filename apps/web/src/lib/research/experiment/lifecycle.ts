@@ -85,3 +85,30 @@ export function transitionResearchExperiment(
 
   return updatedExperiment;
 }
+
+export function createResearchExperimentLifecycleService(
+  dependencies: ResearchExperimentLifecycleDependencies,
+) {
+  return {
+    canTransitionResearchExperiment: (
+      from: ResearchStatus,
+      to: ResearchStatus,
+    ): boolean =>
+      canTransitionResearchExperiment(
+        from,
+        to,
+      ),
+
+    transitionResearchExperiment: (
+      experiment: ResearchExperiment,
+      to: ResearchStatus,
+      reason?: string,
+    ): ResearchExperiment | null =>
+      transitionResearchExperiment(
+        experiment,
+        to,
+        reason,
+        dependencies,
+      ),
+  };
+}
