@@ -129,6 +129,10 @@ import {
 } from "./evidence/assessment";
 
 import {
+  createResearchEvidenceRepository,
+} from "./evidence/repository";
+
+import {
   getResearchFindings as analyzeGetResearchFindings,
   saveResearchFinding as analyzeSaveResearchFinding,
 } from "./finding/repository";
@@ -148,6 +152,15 @@ import {
 } from "./conclusion/lifecycle";
 
 const researchPersistence = localResearchPersistence;
+
+const researchEvidenceRepository =
+  createResearchEvidenceRepository({
+    loadResearchEvidence: () =>
+      researchPersistence.load().evidence,
+
+    saveResearchEvidence: (evidence) =>
+      researchPersistence.saveEvidence(evidence),
+  });
 
 const researchExperimentRepository =
   createResearchExperimentRepository({
@@ -333,21 +346,15 @@ export function saveResearchExperiment(
 /* -------------------------------------------------------------------------- */
 
 export function getResearchEvidence(): ResearchEvidence[] {
-  return researchPersistence.load().evidence;
+  return researchEvidenceRepository.getResearchEvidence();
 }
 
-export function saveResearchEvidence(evidence: ResearchEvidence): void {
-  const collection = getResearchEvidence();
-
-  const existingIndex = collection.findIndex((item) => item.id === evidence.id);
-
-  if (existingIndex >= 0) {
-    collection[existingIndex] = evidence;
-  } else {
-    collection.unshift(evidence);
-  }
-
- researchPersistence.saveEvidence(collection);
+export function saveResearchEvidence(
+  evidence: ResearchEvidence,
+): void {
+  researchEvidenceRepository.saveResearchEvidence(
+    evidence,
+  );
 }
 /* -------------------------------------------------------------------------- */
 /*                               Findings                                     */
