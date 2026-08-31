@@ -62,3 +62,32 @@ export function saveResearchFindingValidationHistoryEvent(
 
   dependencies.saveResearchFindingValidationHistory(history);
 }
+
+export function createResearchValidationRepository(
+  dependencies: ResearchFindingValidationRepositoryDependencies,
+) {
+  return {
+    getResearchFindingValidations: (): ResearchFindingValidation[] =>
+      getResearchFindingValidations(dependencies),
+
+    saveResearchFindingValidation: (
+      validation: ResearchFindingValidation,
+    ): void =>
+      saveResearchFindingValidation(
+        validation,
+        dependencies,
+      ),
+
+    getResearchFindingValidationHistory: ():
+      ResearchFindingValidationHistoryEvent[] =>
+      getResearchFindingValidationHistory(dependencies),
+
+    saveResearchFindingValidationHistoryEvent: (
+      event: ResearchFindingValidationHistoryEvent,
+    ): void =>
+      saveResearchFindingValidationHistoryEvent(
+        event,
+        dependencies,
+      ),
+  };
+}

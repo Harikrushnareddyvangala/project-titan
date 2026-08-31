@@ -77,10 +77,7 @@ import {
 } from "./validation/lifecycle";
 
 import {
-  getResearchFindingValidations as analyzeGetResearchFindingValidations,
-  saveResearchFindingValidation as analyzeSaveResearchFindingValidation,
-  getResearchFindingValidationHistory as analyzeGetResearchFindingValidationHistory,
-  saveResearchFindingValidationHistoryEvent as analyzeSaveResearchFindingValidationHistoryEvent,
+  createResearchValidationRepository,
 } from "./validation/repository";
 
 import {
@@ -151,6 +148,21 @@ import {
 } from "./conclusion/lifecycle";
 
 const researchPersistence = localResearchPersistence;
+
+const researchValidationRepository =
+  createResearchValidationRepository({
+    loadResearchFindingValidations: () =>
+      researchPersistence.load().findingValidations,
+
+    saveResearchFindingValidations: (validations) =>
+      researchPersistence.saveFindingValidations(validations),
+
+    loadResearchFindingValidationHistory: () =>
+      researchPersistence.load().findingValidationHistory,
+
+    saveResearchFindingValidationHistory: (history) =>
+      researchPersistence.saveFindingValidationHistory(history),
+  });
 
 const researchFindingRepository =
   createResearchFindingRepository({
@@ -388,59 +400,27 @@ export function saveResearchFinding(
 /* -------------------------------------------------------------------------- */
 
 export function getResearchFindingValidations(): ResearchFindingValidation[] {
-  return analyzeGetResearchFindingValidations({
-    loadResearchFindingValidations: () =>
-      researchPersistence.load().findingValidations,
-    saveResearchFindingValidations: (validations) =>
-      researchPersistence.saveFindingValidations(validations),
-    loadResearchFindingValidationHistory: () =>
-      researchPersistence.load().findingValidationHistory,
-    saveResearchFindingValidationHistory: (history) =>
-      researchPersistence.saveFindingValidationHistory(history),
-  });
+  return researchValidationRepository.getResearchFindingValidations();
 }
 
 export function saveResearchFindingValidation(
   validation: ResearchFindingValidation,
 ): void {
-  analyzeSaveResearchFindingValidation(validation, {
-    loadResearchFindingValidations: () =>
-      researchPersistence.load().findingValidations,
-    saveResearchFindingValidations: (validations) =>
-      researchPersistence.saveFindingValidations(validations),
-    loadResearchFindingValidationHistory: () =>
-      researchPersistence.load().findingValidationHistory,
-    saveResearchFindingValidationHistory: (history) =>
-      researchPersistence.saveFindingValidationHistory(history),
-  });
+  researchValidationRepository.saveResearchFindingValidation(
+    validation,
+  );
 }
 
 export function getResearchFindingValidationHistory(): ResearchFindingValidationHistoryEvent[] {
-  return analyzeGetResearchFindingValidationHistory({
-    loadResearchFindingValidations: () =>
-      researchPersistence.load().findingValidations,
-    saveResearchFindingValidations: (validations) =>
-      researchPersistence.saveFindingValidations(validations),
-    loadResearchFindingValidationHistory: () =>
-      researchPersistence.load().findingValidationHistory,
-    saveResearchFindingValidationHistory: (history) =>
-      researchPersistence.saveFindingValidationHistory(history),
-  });
+  return researchValidationRepository.getResearchFindingValidationHistory();
 }
 
 export function saveResearchFindingValidationHistoryEvent(
   event: ResearchFindingValidationHistoryEvent,
 ): void {
-  analyzeSaveResearchFindingValidationHistoryEvent(event, {
-    loadResearchFindingValidations: () =>
-      researchPersistence.load().findingValidations,
-    saveResearchFindingValidations: (validations) =>
-      researchPersistence.saveFindingValidations(validations),
-    loadResearchFindingValidationHistory: () =>
-      researchPersistence.load().findingValidationHistory,
-    saveResearchFindingValidationHistory: (history) =>
-      researchPersistence.saveFindingValidationHistory(history),
-  });
+  researchValidationRepository.saveResearchFindingValidationHistoryEvent(
+    event,
+  );
 }
 
 export function canTransitionResearchFindingValidation(
