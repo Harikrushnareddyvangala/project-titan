@@ -17,6 +17,7 @@ import {
   getResearchProvenanceInvestigationSummary,
   getResearchProvenanceTimeline,
   getResearchProvenanceTimelineByInvestigation,
+  createResearchProvenanceEventService,
 } from "../events";
 
 const investigationId = "investigation-events-001";
@@ -272,4 +273,35 @@ describe("research provenance events", () => {
       ),
     ).toBeNull();
   });
+
+  it("exposes provenance query operations through the service factory", () => {
+    const service =
+      createResearchProvenanceEventService(dependencies);
+
+    expect(
+      service.getResearchProvenanceEventsByInvestigation(
+        events,
+        investigationId,
+      ),
+    ).toHaveLength(3);
+
+    expect(
+      service.getResearchProvenanceEventsChronological(events)
+        .map((event) => event.id),
+    ).toEqual([
+      "event-001",
+      "event-002",
+      "event-003",
+      "event-004",
+    ]);
+
+    expect(
+      service.getLatestResearchProvenanceEvent(
+        events,
+        "Finding",
+        "finding-001",
+      )?.id,
+    ).toBe("event-003");
+  });
+
 });

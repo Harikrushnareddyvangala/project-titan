@@ -216,3 +216,95 @@ export function getLatestResearchProvenanceEvent(
       : latest,
   );
 }
+
+export function createResearchProvenanceEventService(
+  dependencies: ResearchProvenanceEventDependencies,
+) {
+  return {
+    getResearchProvenanceEventsByInvestigation: (
+      events: ResearchProvenanceEvent[],
+      investigationId: string,
+    ): ResearchProvenanceEvent[] =>
+      getResearchProvenanceEventsByInvestigation(
+        events,
+        investigationId,
+      ),
+
+    getResearchProvenanceEventsByEntity: (
+      events: ResearchProvenanceEvent[],
+      entityType: ResearchProvenanceEntityType,
+      entityId: string,
+    ): ResearchProvenanceEvent[] =>
+      getResearchProvenanceEventsByEntity(
+        events,
+        entityType,
+        entityId,
+      ),
+
+    getResearchProvenanceEventsByInvestigationAndEntity: (
+      events: ResearchProvenanceEvent[],
+      investigationId: string,
+      entityType: ResearchProvenanceEntityType,
+      entityId: string,
+    ): ResearchProvenanceEvent[] =>
+      getResearchProvenanceEventsByInvestigationAndEntity(
+        events,
+        investigationId,
+        entityType,
+        entityId,
+      ),
+
+    getResearchProvenanceEventsChronological: (
+      events: ResearchProvenanceEvent[],
+    ): ResearchProvenanceEvent[] =>
+      getResearchProvenanceEventsChronological(events),
+
+    getResearchProvenanceTimeline: (): ResearchProvenanceTimelineItem[] =>
+      getResearchProvenanceTimeline(dependencies),
+
+    getResearchProvenanceTimelineByInvestigation: (
+      investigationId: string,
+    ): ResearchProvenanceTimelineItem[] =>
+      getResearchProvenanceTimelineByInvestigation(
+        investigationId,
+        dependencies,
+      ),
+
+    getResearchProvenanceInvestigationSummary: (
+      investigationId: string,
+    ): ResearchProvenanceInvestigationSummary =>
+      getResearchProvenanceInvestigationSummary(
+        investigationId,
+        dependencies,
+      ),
+
+    getResearchProvenanceEventsByEventType: (
+      events: ResearchProvenanceEvent[],
+      eventType: ResearchProvenanceEventType,
+    ): ResearchProvenanceEvent[] =>
+      getResearchProvenanceEventsByEventType(
+        events,
+        eventType,
+      ),
+
+    getResearchProvenanceEventsByInvestigationChronological: (
+      events: ResearchProvenanceEvent[],
+      investigationId: string,
+    ): ResearchProvenanceEvent[] =>
+      getResearchProvenanceEventsByInvestigationChronological(
+        events,
+        investigationId,
+      ),
+
+    getLatestResearchProvenanceEvent: (
+      events: ResearchProvenanceEvent[],
+      entityType: ResearchProvenanceEntityType,
+      entityId: string,
+    ): ResearchProvenanceEvent | null =>
+      getLatestResearchProvenanceEvent(
+        events,
+        entityType,
+        entityId,
+      ),
+  };
+}
