@@ -548,3 +548,74 @@ export function resolveResearchLineageIntegrityRemediationTarget(
       };
   }
 }
+
+export function createResearchLineageRemediationPlanningService(
+  dependencies: ResearchLineageRemediationPlanningDependencies,
+) {
+  return {
+    getResearchLineageIntegrityIssueAction: (
+      issue: ResearchLineageIntegrityIssue,
+    ): ResearchLineageIntegrityIssueAction =>
+      getResearchLineageIntegrityIssueAction(issue),
+
+    createResearchLineageIntegrityRemediationRequest: (
+      investigationId: string,
+      issue: ResearchLineageIntegrityIssue,
+      confirmed: boolean,
+      replacementEntityId?: string,
+    ): ResearchLineageIntegrityRemediationRequest | null =>
+      createResearchLineageIntegrityRemediationRequest(
+        investigationId,
+        issue,
+        confirmed,
+        replacementEntityId,
+      ),
+
+    getResearchLineageRemediationReplacement: (
+      investigationId: string,
+      replacementEntityId: string | undefined,
+    ): ResearchFinding | undefined =>
+      getResearchLineageRemediationReplacement(
+        investigationId,
+        replacementEntityId,
+        dependencies,
+      ),
+
+    createResearchLineageIntegrityRemediationPlan: (
+      request: ResearchLineageIntegrityRemediationRequest,
+    ): ResearchLineageIntegrityRemediationPlan =>
+      createResearchLineageIntegrityRemediationPlan(
+        request,
+        dependencies,
+      ),
+
+    getResearchLineageIntegrityRemediationExecutionPolicy: (
+      action: ResearchLineageIntegrityRemediationRequest["action"],
+    ): ResearchLineageIntegrityRemediationExecutionPolicy =>
+      getResearchLineageIntegrityRemediationExecutionPolicy(action),
+
+    validateResearchLineageIntegrityRemediationTarget: (
+      investigationId: string,
+      target: ResearchLineageIntegrityActionTarget,
+      action?: ResearchLineageIntegrityRemediationPlan["action"],
+    ): ResearchLineageIntegrityRemediationTargetValidation =>
+      validateResearchLineageIntegrityRemediationTarget(
+        investigationId,
+        target,
+        action,
+        dependencies,
+      ),
+
+    resolveResearchLineageIntegrityRemediationTarget: (
+      investigationId: string,
+      target: ResearchLineageIntegrityActionTarget,
+      action?: ResearchLineageIntegrityRemediationPlan["action"],
+    ): ResearchLineageIntegrityResolvedRemediationTarget =>
+      resolveResearchLineageIntegrityRemediationTarget(
+        investigationId,
+        target,
+        action,
+        dependencies,
+      ),
+  };
+}

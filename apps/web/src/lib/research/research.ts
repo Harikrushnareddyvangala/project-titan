@@ -70,13 +70,7 @@ import {
 } from "./validation/repository";
 
 import {
-  getResearchLineageIntegrityIssueAction as analyzeGetResearchLineageIntegrityIssueAction,
-  createResearchLineageIntegrityRemediationRequest as analyzeCreateResearchLineageIntegrityRemediationRequest,
-  getResearchLineageRemediationReplacement as analyzeGetResearchLineageRemediationReplacement,
-  createResearchLineageIntegrityRemediationPlan as analyzeCreateResearchLineageIntegrityRemediationPlan,
-  getResearchLineageIntegrityRemediationExecutionPolicy as analyzeGetResearchLineageIntegrityRemediationExecutionPolicy,
-  validateResearchLineageIntegrityRemediationTarget as analyzeValidateResearchLineageIntegrityRemediationTarget,
-  resolveResearchLineageIntegrityRemediationTarget as analyzeResolveResearchLineageIntegrityRemediationTarget,
+  createResearchLineageRemediationPlanningService,
 } from "./lineage/remediation/planning";
 
 import {
@@ -291,6 +285,17 @@ const researchLineageRemediationExecutionService =
     getResearchLineageRemediationReplacement,
     decideResearchLineageIntegrityRemediationRepair,
     executeResearchLineageIntegrityRemediationRepair,
+  });
+
+const researchLineageRemediationPlanningService =
+  createResearchLineageRemediationPlanningService({
+    getResearchLineage,
+    getResearchInvestigations,
+    getResearchExperiments,
+    getResearchEvidence,
+    getResearchFindings,
+    getResearchFindingValidations,
+    getResearchInvestigationConclusions,
   });
 /* -------------------------------------------------------------------------- */
 /*                              Utilities                                     */
@@ -742,7 +747,8 @@ export function executeResearchLineageIntegrityRemediationRepair(
 export function getResearchLineageIntegrityIssueAction(
   issue: ResearchLineageIntegrityIssue,
 ): ResearchLineageIntegrityIssueAction {
-  return analyzeGetResearchLineageIntegrityIssueAction(issue);
+  return researchLineageRemediationPlanningService
+    .getResearchLineageIntegrityIssueAction(issue);
 }
 
 export function createResearchLineageIntegrityRemediationRequest(
@@ -751,12 +757,13 @@ export function createResearchLineageIntegrityRemediationRequest(
   confirmed: boolean,
   replacementEntityId?: string,
 ): ResearchLineageIntegrityRemediationRequest | null {
-  return analyzeCreateResearchLineageIntegrityRemediationRequest(
-    investigationId,
-    issue,
-    confirmed,
-    replacementEntityId,
-  );
+  return researchLineageRemediationPlanningService
+    .createResearchLineageIntegrityRemediationRequest(
+      investigationId,
+      issue,
+      confirmed,
+      replacementEntityId,
+    );
 }
 
 function getResearchLineageRemediationEntityUpdatedAt(
@@ -808,85 +815,61 @@ export function getResearchLineageRemediationReplacement(
   investigationId: string,
   replacementEntityId?: string,
 ): ResearchFinding | undefined {
-  return analyzeGetResearchLineageRemediationReplacement(
-    investigationId,
-    replacementEntityId,
-    {
-      getResearchInvestigations,
-      getResearchExperiments,
-      getResearchEvidence,
-      getResearchFindings,
-      getResearchFindingValidations,
-      getResearchInvestigationConclusions,
-      getResearchLineage,
-    },
-  );
+  return researchLineageRemediationPlanningService
+    .getResearchLineageRemediationReplacement(
+      investigationId,
+      replacementEntityId,
+    );
 }
 
 export function createResearchLineageIntegrityRemediationPlan(
   request: ResearchLineageIntegrityRemediationRequest,
 ): ResearchLineageIntegrityRemediationPlan {
-  return analyzeCreateResearchLineageIntegrityRemediationPlan(
-    request,
-    {
-      getResearchLineage,
-      getResearchInvestigations,
-      getResearchExperiments,
-      getResearchEvidence,
-      getResearchFindings,
-      getResearchFindingValidations,
-      getResearchInvestigationConclusions,
-    },
-  );
+  return researchLineageRemediationPlanningService
+    .createResearchLineageIntegrityRemediationPlan(
+      request,
+    );
 }
 
 export function getResearchLineageIntegrityRemediationExecutionPolicy(
   action: ResearchLineageIntegrityRemediationRequest["action"],
 ): ResearchLineageIntegrityRemediationExecutionPolicy {
-  return analyzeGetResearchLineageIntegrityRemediationExecutionPolicy(action);
+  return researchLineageRemediationPlanningService
+    .getResearchLineageIntegrityRemediationExecutionPolicy(
+      action,
+    );
 }
 
 export function validateResearchLineageIntegrityRemediationTarget(
   investigationId: string,
   target: ResearchLineageIntegrityActionTarget,
-  action: ResearchLineageIntegrityRemediationPlan["action"] | undefined,
+  action:
+    | ResearchLineageIntegrityRemediationPlan["action"]
+    | undefined,
 ): ResearchLineageIntegrityRemediationTargetValidation {
-  return analyzeValidateResearchLineageIntegrityRemediationTarget(
-    investigationId,
-    target,
-    action,
-    {
-      getResearchLineage,
-      getResearchInvestigations,
-      getResearchExperiments,
-      getResearchEvidence,
-      getResearchFindings,
-      getResearchFindingValidations,
-      getResearchInvestigationConclusions,
-    },
-  );
+  return researchLineageRemediationPlanningService
+    .validateResearchLineageIntegrityRemediationTarget(
+      investigationId,
+      target,
+      action,
+    );
 }
 
 export function resolveResearchLineageIntegrityRemediationTarget(
   investigationId: string,
   target: ResearchLineageIntegrityActionTarget,
-  action: ResearchLineageIntegrityRemediationPlan["action"] | undefined,
+  action:
+    | ResearchLineageIntegrityRemediationPlan["action"]
+    | undefined,
 ): ResearchLineageIntegrityResolvedRemediationTarget {
-  return analyzeResolveResearchLineageIntegrityRemediationTarget(
-    investigationId,
-    target,
-    action,
-    {
-      getResearchLineage,
-      getResearchInvestigations,
-      getResearchExperiments,
-      getResearchEvidence,
-      getResearchFindings,
-      getResearchFindingValidations,
-      getResearchInvestigationConclusions,
-    },
-  );
+  return researchLineageRemediationPlanningService
+    .resolveResearchLineageIntegrityRemediationTarget(
+      investigationId,
+      target,
+      action,
+    );
 }
+
 export function preflightResearchLineageIntegrityRemediation(
   plan: ResearchLineageIntegrityRemediationPlan,
 ): ResearchLineageIntegrityRemediationExecutionPreflight {

@@ -14,6 +14,7 @@ import type {
 import {
   createResearchLineageIntegrityRemediationPlan,
   createResearchLineageIntegrityRemediationRequest,
+  createResearchLineageRemediationPlanningService,
   getResearchLineageIntegrityIssueAction,
   getResearchLineageIntegrityRemediationExecutionPolicy,
   getResearchLineageRemediationReplacement,
@@ -254,5 +255,71 @@ describe("research lineage remediation planning", () => {
     expect(plan.status).toBe("Validated");
     expect(plan.replacementEntityId).toBe(replacementFinding.id);
     expect(plan.description).toContain("RepairReference");
+  });
+
+  it("exposes remediation planning operations through the service factory", () => {
+    const service =
+      createResearchLineageRemediationPlanningService(
+        dependencies,
+      );
+
+    const action =
+      service.getResearchLineageIntegrityIssueAction(
+        createIssue(),
+      );
+
+    expect(action.action).toBe("RepairReference");
+
+    const request =
+      service.createResearchLineageIntegrityRemediationRequest(
+        investigation.id,
+        createIssue(),
+        true,
+        replacementFinding.id,
+      );
+
+    expect(request?.action).toBe("RepairReference");
+
+    const replacement =
+      service.getResearchLineageRemediationReplacement(
+        investigation.id,
+        replacementFinding.id,
+      );
+
+    expect(replacement?.id).toBe(
+      replacementFinding.id,
+    );
+
+    const plan =
+      service.createResearchLineageIntegrityRemediationPlan(
+        request!,
+      );
+
+    expect(plan.status).toBe("Validated");
+
+    const policy =
+      service.getResearchLineageIntegrityRemediationExecutionPolicy(
+        "RepairReference",
+      );
+
+    expect(policy.mutatesResearchData).toBe(true);
+
+    const validation =
+      service.validateResearchLineageIntegrityRemediationTarget(
+        investigation.id,
+        { nodeId: finding.id },
+        "RepairReference",
+      );
+
+    expect(validation.valid).toBe(true);
+
+    const resolved =
+      service.resolveResearchLineageIntegrityRemediationTarget(
+        investigation.id,
+        { nodeId: finding.id },
+        "RepairReference",
+      );
+
+    expect(resolved.resolvable).toBe(true);
   });
 });
