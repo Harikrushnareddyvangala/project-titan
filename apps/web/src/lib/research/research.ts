@@ -42,14 +42,6 @@ import { evaluateFindingValidationEligibility } from "./evidenceAssessment";
 import { localResearchPersistence } from "./persistence";
 
 import {
-  getResearchLineage as buildResearchLineage,
-} from "./lineage/graph";
-
-import {
-  validateResearchLineage as analyzeResearchLineage,
-} from "./lineage/integrity";
-
-import {
   createResearchProvenanceEventService,
 } from "./provenance/events";
 
@@ -89,6 +81,10 @@ export {
   getResearchLineageIntegrityAssessmentExplanation,
   getResearchLineageIntegrityIssueExplanation,
 } from "./lineage/assessment";
+
+import {
+  createResearchLineageService,
+} from "./lineage/service";
 
 import {
   createResearchExperimentLifecycleService,
@@ -263,6 +259,18 @@ const researchConclusionLifecycleService =
     saveResearchInvestigationConclusion,
     createResearchProvenanceEvent,
     now: () => new Date().toISOString(),
+  });
+
+const researchLineageService =
+  createResearchLineageService({
+    getResearchInvestigations,
+    getResearchExperiments,
+    getResearchEvidence,
+    getResearchFindings,
+    getResearchFindingValidations,
+    getResearchInvestigationConclusions,
+    getResearchProvenanceEventsByInvestigation,
+    validateResearchProvenanceIntegrity,
   });
 
 const researchLineageRemediationRepairService =
@@ -674,18 +682,8 @@ export function getResearchProvenanceInvestigationSummary(
 export function getResearchLineage(
   investigationId: string,
 ): ResearchLineage {
-  return buildResearchLineage(
+  return researchLineageService.getResearchLineage(
     investigationId,
-    {
-      getResearchInvestigations,
-      getResearchExperiments,
-      getResearchEvidence,
-      getResearchFindings,
-      getResearchFindingValidations,
-      getResearchInvestigationConclusions,
-      getResearchProvenanceEventsByInvestigation,
-      validateResearchProvenanceIntegrity,
-    },
   );
 }
 
@@ -909,19 +907,18 @@ export function getResearchLineageIntegrityInspectionNodeId(
 export function validateResearchLineage(
   investigationId: string,
 ): ResearchLineageIntegrityResult {
-  return analyzeResearchLineage(
+  return researchLineageService.validateResearchLineage(
     investigationId,
-    {
-      getResearchLineage,
-      validateResearchProvenanceIntegrity,
-    },
   );
 }
 
 export function validateResearchLineageForInvestigation(
   investigationId: string,
 ): ResearchLineageIntegrityResult {
-  return validateResearchLineage(investigationId);
+  return researchLineageService
+    .validateResearchLineageForInvestigation(
+      investigationId,
+    );
 }
 
 export function getResearchProvenanceEventsByEventType(

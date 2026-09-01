@@ -10,6 +10,7 @@ import type {
   ResearchLineageNode,
   ResearchLineageNodeType,
   ResearchProvenanceEvent,
+  ResearchProvenanceIntegrityResult,
 } from "@/types/research";
 
 export interface ResearchLineageGraphDependencies {
@@ -30,11 +31,7 @@ export interface ResearchLineageGraphDependencies {
   getResearchProvenanceEventsByInvestigation(
     investigationId: string,
   ): ResearchProvenanceEvent[];
-  validateResearchProvenanceIntegrity(): {
-    issues: Array<{
-      investigationId?: string;
-    }>;
-  };
+  validateResearchProvenanceIntegrity(): ResearchProvenanceIntegrityResult;
 }
 
 export function getResearchLineage(
