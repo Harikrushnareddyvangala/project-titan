@@ -276,17 +276,6 @@ const researchLineageRemediationRepairService =
     validateResearchLineage,
   });
 
-const researchLineageRemediationExecutionService =
-  createResearchLineageRemediationExecutionService({
-    getResearchLineageIntegrityRemediationExecutionPolicy,
-    validateResearchLineageIntegrityRemediationTarget,
-    resolveResearchLineageIntegrityRemediationTarget,
-    getResearchLineageRemediationEntityUpdatedAt,
-    getResearchLineageRemediationReplacement,
-    decideResearchLineageIntegrityRemediationRepair,
-    executeResearchLineageIntegrityRemediationRepair,
-  });
-
 const researchLineageRemediationPlanningService =
   createResearchLineageRemediationPlanningService({
     getResearchLineage,
@@ -297,6 +286,20 @@ const researchLineageRemediationPlanningService =
     getResearchFindingValidations,
     getResearchInvestigationConclusions,
   });
+
+const researchLineageRemediationExecutionService =
+  createResearchLineageRemediationExecutionService({
+    getResearchLineageIntegrityRemediationExecutionPolicy,
+    validateResearchLineageIntegrityRemediationTarget,
+    resolveResearchLineageIntegrityRemediationTarget,
+    getResearchLineageRemediationEntityUpdatedAt:
+      researchLineageRemediationPlanningService
+        .getResearchLineageRemediationEntityUpdatedAt,
+    getResearchLineageRemediationReplacement,
+    decideResearchLineageIntegrityRemediationRepair,
+    executeResearchLineageIntegrityRemediationRepair,
+  });
+
 /* -------------------------------------------------------------------------- */
 /*                              Utilities                                     */
 /* -------------------------------------------------------------------------- */
@@ -764,51 +767,6 @@ export function createResearchLineageIntegrityRemediationRequest(
       confirmed,
       replacementEntityId,
     );
-}
-
-function getResearchLineageRemediationEntityUpdatedAt(
-  target: ResearchLineageIntegrityResolvedRemediationTarget,
-): string | undefined {
-  if (!target.resolvable || !target.entityId) {
-    return undefined;
-  }
-
-  switch (target.kind) {
-    case "Investigation":
-      return getResearchInvestigations().find(
-        (item) => item.id === target.entityId,
-      )?.updatedAt;
-
-    case "Experiment":
-      return getResearchExperiments().find(
-        (item) => item.id === target.entityId,
-      )?.updatedAt;
-
-    case "Finding":
-      return getResearchFindings().find(
-        (item) => item.id === target.entityId,
-      )?.updatedAt;
-
-    case "FindingValidation":
-      return getResearchFindingValidations().find(
-        (item) => item.id === target.entityId,
-      )?.updatedAt;
-
-    case "Conclusion":
-      return getResearchInvestigationConclusions().find(
-        (item) => item.id === target.entityId,
-      )?.updatedAt;
-
-    case "Evidence":
-      /*
-       * ResearchEvidence currently has no updatedAt field.
-       *
-       * Until ResearchEvidence gains an updatedAt timestamp,
-       * concurrency protection cannot be based on an entity
-       * update timestamp for evidence targets.
-       */
-      return undefined;
-  }
 }
 
 export function getResearchLineageRemediationReplacement(

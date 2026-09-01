@@ -171,6 +171,13 @@ function getResearchLineageRemediationEntityUpdatedAt(
       )?.updatedAt;
 
     case "Evidence":
+      /*
+       * ResearchEvidence currently has no updatedAt field.
+       *
+       * Until ResearchEvidence gains an updatedAt timestamp,
+       * concurrency protection cannot be based on an entity
+       * update timestamp for evidence targets.
+       */
       return undefined;
   }
 }
@@ -615,6 +622,14 @@ export function createResearchLineageRemediationPlanningService(
         investigationId,
         target,
         action,
+        dependencies,
+      ),
+
+    getResearchLineageRemediationEntityUpdatedAt: (
+      target: ResearchLineageIntegrityResolvedRemediationTarget,
+    ): string | undefined =>
+      getResearchLineageRemediationEntityUpdatedAt(
+        target,
         dependencies,
       ),
   };
