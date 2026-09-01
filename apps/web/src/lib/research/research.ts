@@ -46,8 +46,8 @@ import {
 } from "./provenance/events";
 
 import {
-  validateResearchProvenanceIntegrity as analyzeResearchProvenanceIntegrity,
-} from "./provenance/integrity";
+  createResearchProvenanceIntegrityService,
+} from "./provenance/service";
 
 import {
   createResearchProvenanceRepository,
@@ -185,6 +185,16 @@ const researchProvenanceEventService =
     getResearchFindingValidations,
     getResearchFindings,
     validateResearchProvenanceIntegrity,
+  });
+
+const researchProvenanceIntegrityService =
+  createResearchProvenanceIntegrityService({
+    getResearchProvenanceEvents,
+    getResearchInvestigations,
+    getResearchExperiments,
+    getResearchFindings,
+    getResearchFindingValidations,
+    getResearchInvestigationConclusions,
   });
 
 const researchInvestigationRepository =
@@ -932,14 +942,8 @@ export function getResearchProvenanceEventsByEventType(
 }
 
 export function validateResearchProvenanceIntegrity(): ResearchProvenanceIntegrityResult {
-  return analyzeResearchProvenanceIntegrity({
-    getResearchProvenanceEvents,
-    getResearchInvestigations,
-    getResearchExperiments,
-    getResearchFindings,
-    getResearchFindingValidations,
-    getResearchInvestigationConclusions,
-  });
+  return researchProvenanceIntegrityService
+    .validateResearchProvenanceIntegrity();
 }
 
 export function getResearchProvenanceIntegritySummary(): ResearchProvenanceIntegritySummary {
