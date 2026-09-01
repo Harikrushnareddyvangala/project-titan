@@ -242,3 +242,25 @@ export function executeResearchLineageIntegrityRemediation(
     plan,
   };
 }
+
+export function createResearchLineageRemediationExecutionService(
+  dependencies: ResearchLineageRemediationExecutionDependencies,
+) {
+  return {
+    preflightResearchLineageIntegrityRemediation: (
+      plan: ResearchLineageIntegrityRemediationPlan,
+    ): ResearchLineageIntegrityRemediationExecutionPreflight =>
+      preflightResearchLineageIntegrityRemediation(
+        plan,
+        dependencies,
+      ),
+
+    executeResearchLineageIntegrityRemediation: (
+      plan: ResearchLineageIntegrityRemediationPlan,
+    ): ResearchLineageIntegrityRemediationResult =>
+      executeResearchLineageIntegrityRemediation(
+        plan,
+        dependencies,
+      ),
+  };
+}

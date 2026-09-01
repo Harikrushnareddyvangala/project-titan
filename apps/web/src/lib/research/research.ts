@@ -80,7 +80,7 @@ import {
 } from "./lineage/remediation/planning";
 
 import {
-  executeResearchLineageIntegrityRemediation as analyzeExecuteResearchLineageIntegrityRemediation,
+  createResearchLineageRemediationExecutionService,
 } from "./lineage/remediation/execution";
 
 import {
@@ -280,6 +280,17 @@ const researchLineageRemediationRepairService =
     saveResearchInvestigationConclusion,
     createResearchProvenanceEvent,
     validateResearchLineage,
+  });
+
+const researchLineageRemediationExecutionService =
+  createResearchLineageRemediationExecutionService({
+    getResearchLineageIntegrityRemediationExecutionPolicy,
+    validateResearchLineageIntegrityRemediationTarget,
+    resolveResearchLineageIntegrityRemediationTarget,
+    getResearchLineageRemediationEntityUpdatedAt,
+    getResearchLineageRemediationReplacement,
+    decideResearchLineageIntegrityRemediationRepair,
+    executeResearchLineageIntegrityRemediationRepair,
   });
 /* -------------------------------------------------------------------------- */
 /*                              Utilities                                     */
@@ -928,18 +939,8 @@ export function preflightResearchLineageIntegrityRemediation(
 export function executeResearchLineageIntegrityRemediation(
   plan: ResearchLineageIntegrityRemediationPlan,
 ): ResearchLineageIntegrityRemediationResult {
-  return analyzeExecuteResearchLineageIntegrityRemediation(
-    plan,
-    {
-      getResearchLineageIntegrityRemediationExecutionPolicy,
-      validateResearchLineageIntegrityRemediationTarget,
-      resolveResearchLineageIntegrityRemediationTarget,
-      getResearchLineageRemediationEntityUpdatedAt,
-      getResearchLineageRemediationReplacement,
-      decideResearchLineageIntegrityRemediationRepair,
-      executeResearchLineageIntegrityRemediationRepair,
-    },
-  );
+  return researchLineageRemediationExecutionService
+    .executeResearchLineageIntegrityRemediation(plan);
 }
 
 export function getResearchLineageIntegrityRemediationPreview(
