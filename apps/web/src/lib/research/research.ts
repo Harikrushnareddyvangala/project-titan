@@ -898,19 +898,8 @@ export function validateResearchProvenanceIntegrity(): ResearchProvenanceIntegri
 }
 
 export function getResearchProvenanceIntegritySummary(): ResearchProvenanceIntegritySummary {
-  const result = validateResearchProvenanceIntegrity();
-
-  const issueCodes = Array.from(new Set(result.issues.map((issue) => issue.code)));
-
-  return {
-    valid: result.valid,
-
-    checkedEventCount: result.checkedEventCount,
-
-    issueCount: result.issues.length,
-
-    issueCodes,
-  };
+  return researchProvenanceIntegrityService
+    .getResearchProvenanceIntegritySummary();
 }
 
 export function saveResearchProvenanceEvent(

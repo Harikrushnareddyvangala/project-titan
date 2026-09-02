@@ -6,6 +6,7 @@ import type {
   ResearchInvestigationConclusion,
   ResearchProvenanceEvent,
   ResearchProvenanceIntegrityResult,
+  ResearchProvenanceIntegritySummary,
 } from "@/types/research";
 
 import {
@@ -23,6 +24,7 @@ export interface ResearchProvenanceIntegrityServiceDependencies {
 
 export interface ResearchProvenanceIntegrityService {
   validateResearchProvenanceIntegrity(): ResearchProvenanceIntegrityResult;
+  getResearchProvenanceIntegritySummary(): ResearchProvenanceIntegritySummary;
 }
 
 export function createResearchProvenanceIntegrityService(
@@ -45,7 +47,24 @@ export function createResearchProvenanceIntegrityService(
           dependencies.getResearchInvestigationConclusions,
       });
 
+  const getResearchProvenanceIntegritySummary =
+    (): ResearchProvenanceIntegritySummary => {
+      const result = validateResearchProvenanceIntegrity();
+
+      const issueCodes = Array.from(
+        new Set(result.issues.map((issue) => issue.code)),
+      );
+
+      return {
+        valid: result.valid,
+        checkedEventCount: result.checkedEventCount,
+        issueCount: result.issues.length,
+        issueCodes,
+      };
+    };
+
   return {
     validateResearchProvenanceIntegrity,
+    getResearchProvenanceIntegritySummary,
   };
 }
