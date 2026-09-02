@@ -37,7 +37,7 @@ import type {
   ResearchLineageIntegrityRemediationMutationContract,
 } from "@/types/research";
 
-import { evaluateFindingValidationEligibility } from "./evidenceAssessment";
+import { evaluateFindingValidationEligibility } from "./evidence/assessmentAnalysis";
 
 import { localResearchPersistence } from "./persistence";
 

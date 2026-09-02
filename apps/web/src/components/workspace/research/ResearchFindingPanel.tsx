@@ -29,7 +29,7 @@ import {
 import {
   evaluateFindingValidationEligibility,
   summarizeEvidenceAssessments,
-} from "@/lib/research/evidenceAssessment";
+} from "@/lib/research/evidence/assessmentAnalysis";
 
 import type {
   ResearchEvidenceAssessmentType,
