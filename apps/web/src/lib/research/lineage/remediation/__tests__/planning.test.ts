@@ -15,8 +15,10 @@ import {
   createResearchLineageIntegrityRemediationPlan,
   createResearchLineageIntegrityRemediationRequest,
   createResearchLineageRemediationPlanningService,
+  getResearchLineageIntegrityInspectionNodeId,
   getResearchLineageIntegrityIssueAction,
   getResearchLineageIntegrityRemediationExecutionPolicy,
+  getResearchLineageIntegrityRemediationPreview,
   getResearchLineageRemediationReplacement,
   resolveResearchLineageIntegrityRemediationTarget,
   validateResearchLineageIntegrityRemediationTarget,
@@ -128,6 +130,64 @@ describe("research lineage remediation planning", () => {
     expect(action.requiresConfirmation).toBe(true);
     expect(action.readiness).toBe("Planned");
     expect(action.target.nodeId).toBe(finding.id);
+  });
+
+  it("returns no preview for inspection-only remediation", () => {
+    const preview = getResearchLineageIntegrityRemediationPreview(
+      createIssue({
+        code: "INVALID_NODE",
+      }),
+    );
+
+    expect(preview).toBeNull();
+  });
+
+  it("creates a deterministic remediation preview", () => {
+    const preview = getResearchLineageIntegrityRemediationPreview(
+      createIssue(),
+    );
+
+    expect(preview).not.toBeNull();
+    expect(preview?.title).toBe("Proposed repair reference");
+    expect(preview?.action).toBe("RepairReference");
+    expect(preview?.issueCode).toBe(
+      "CONCLUSION_FINDING_REFERENCE_INVALID",
+    );
+    expect(preview?.target.nodeId).toBe(finding.id);
+    expect(preview?.requiresConfirmation).toBe(true);
+  });
+
+  it("resolves an explicit inspection node", () => {
+    const result = getResearchLineageIntegrityInspectionNodeId(
+      createIssue(),
+      lineage,
+    );
+
+    expect(result).toBe(finding.id);
+  });
+
+  it("falls back to a valid source node for inspection", () => {
+    const result = getResearchLineageIntegrityInspectionNodeId(
+      createIssue({
+        nodeId: undefined,
+        sourceId: investigation.id,
+      }),
+      lineage,
+    );
+
+    expect(result).toBe(investigation.id);
+  });
+
+  it("returns null when the explicit inspection node is missing", () => {
+    const result = getResearchLineageIntegrityInspectionNodeId(
+      createIssue({
+        nodeId: "missing-node",
+        sourceId: investigation.id,
+      }),
+      lineage,
+    );
+
+    expect(result).toBeNull();
   });
 
   it("creates a remediation request with the supplied issue context", () => {
@@ -269,6 +329,22 @@ describe("research lineage remediation planning", () => {
       );
 
     expect(action.action).toBe("RepairReference");
+
+    const preview =
+      service.getResearchLineageIntegrityRemediationPreview(
+        createIssue(),
+      );
+
+    expect(preview?.action).toBe("RepairReference");
+    expect(preview?.target.nodeId).toBe(finding.id);
+
+    const inspectionNodeId =
+      service.getResearchLineageIntegrityInspectionNodeId(
+        createIssue(),
+        lineage,
+      );
+
+    expect(inspectionNodeId).toBe(finding.id);
 
     const request =
       service.createResearchLineageIntegrityRemediationRequest(

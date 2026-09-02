@@ -853,65 +853,16 @@ export function executeResearchLineageIntegrityRemediation(
 export function getResearchLineageIntegrityRemediationPreview(
   issue: ResearchLineageIntegrityIssue,
 ): ResearchLineageIntegrityRemediationPreview | null {
-  const action = getResearchLineageIntegrityIssueAction(issue);
-
-  if (action.action === "Inspect" || action.action === "ReviewProvenance") {
-    return null;
-  }
-
-  return {
-    title: `Proposed ${action.label.toLowerCase()}`,
-    description: `This action would address ${issue.code} using the proposed ${action.action} remediation. No research data will be changed until confirmation is explicitly provided.`,
-    action: action.action,
-    issueCode: issue.code,
-    target: action.target,
-    requiresConfirmation: action.requiresConfirmation,
-  };
+  return researchLineageRemediationPlanningService
+    .getResearchLineageIntegrityRemediationPreview(issue);
 }
 
 export function getResearchLineageIntegrityInspectionNodeId(
   issue: ResearchLineageIntegrityIssue,
   lineage: ResearchLineage,
 ): string | null {
-  if (issue.nodeId) {
-    return lineage.nodes.some((node) => node.id === issue.nodeId) ? issue.nodeId : null;
-  }
-
-  if (issue.sourceId) {
-    const sourceExists = lineage.nodes.some((node) => node.id === issue.sourceId);
-
-    if (sourceExists) {
-      return issue.sourceId;
-    }
-  }
-
-  if (issue.targetId) {
-    const targetExists = lineage.nodes.some((node) => node.id === issue.targetId);
-
-    if (targetExists) {
-      return issue.targetId;
-    }
-  }
-
-  if (issue.edgeId) {
-    const edge = lineage.edges.find((candidate) => candidate.id === issue.edgeId);
-
-    if (edge) {
-      const sourceExists = lineage.nodes.some((node) => node.id === edge.sourceId);
-
-      if (sourceExists) {
-        return edge.sourceId;
-      }
-
-      const targetExists = lineage.nodes.some((node) => node.id === edge.targetId);
-
-      if (targetExists) {
-        return edge.targetId;
-      }
-    }
-  }
-
-  return null;
+  return researchLineageRemediationPlanningService
+    .getResearchLineageIntegrityInspectionNodeId(issue, lineage);
 }
 
 export function validateResearchLineage(

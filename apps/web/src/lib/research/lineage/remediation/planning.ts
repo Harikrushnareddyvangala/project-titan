@@ -11,6 +11,7 @@ import type {
   ResearchLineageIntegrityIssueAction,
   ResearchLineageIntegrityRemediationExecutionPolicy,
   ResearchLineageIntegrityRemediationPlan,
+  ResearchLineageIntegrityRemediationPreview,
   ResearchLineageIntegrityRemediationRequest,
   ResearchLineageIntegrityRemediationTargetValidation,
   ResearchLineageIntegrityResolvedRemediationTarget,
@@ -108,6 +109,69 @@ export function getResearchLineageIntegrityIssueAction(
         target,
       };
   }
+}
+
+export function getResearchLineageIntegrityRemediationPreview(
+  issue: ResearchLineageIntegrityIssue,
+): ResearchLineageIntegrityRemediationPreview | null {
+  const action = getResearchLineageIntegrityIssueAction(issue);
+
+  if (action.action === "Inspect" || action.action === "ReviewProvenance") {
+    return null;
+  }
+
+  return {
+    title: `Proposed ${action.label.toLowerCase()}`,
+    description: `This action would address ${issue.code} using the proposed ${action.action} remediation. No research data will be changed until confirmation is explicitly provided.`,
+    action: action.action,
+    issueCode: issue.code,
+    target: action.target,
+    requiresConfirmation: action.requiresConfirmation,
+  };
+}
+
+export function getResearchLineageIntegrityInspectionNodeId(
+  issue: ResearchLineageIntegrityIssue,
+  lineage: ResearchLineage,
+): string | null {
+  if (issue.nodeId) {
+    return lineage.nodes.some((node) => node.id === issue.nodeId)
+      ? issue.nodeId
+      : null;
+  }
+
+  if (issue.sourceId) {
+    const sourceExists = lineage.nodes.some(
+      (node) => node.id === issue.sourceId,
+    );
+
+    if (sourceExists) {
+      return issue.sourceId;
+    }
+  }
+
+  if (
+    issue.targetId &&
+    lineage.nodes.some((node) => node.id === issue.targetId)
+  ) {
+    return issue.targetId;
+  }
+
+  if (issue.edgeId) {
+    const edge = lineage.edges.find((item) => item.id === issue.edgeId);
+
+    if (edge) {
+      if (lineage.nodes.some((node) => node.id === edge.sourceId)) {
+        return edge.sourceId;
+      }
+
+      if (lineage.nodes.some((node) => node.id === edge.targetId)) {
+        return edge.targetId;
+      }
+    }
+  }
+
+  return null;
 }
 
 export function createResearchLineageIntegrityRemediationRequest(
@@ -564,6 +628,17 @@ export function createResearchLineageRemediationPlanningService(
       issue: ResearchLineageIntegrityIssue,
     ): ResearchLineageIntegrityIssueAction =>
       getResearchLineageIntegrityIssueAction(issue),
+
+    getResearchLineageIntegrityRemediationPreview: (
+      issue: ResearchLineageIntegrityIssue,
+    ): ResearchLineageIntegrityRemediationPreview | null =>
+      getResearchLineageIntegrityRemediationPreview(issue),
+
+    getResearchLineageIntegrityInspectionNodeId: (
+      issue: ResearchLineageIntegrityIssue,
+      lineage: ResearchLineage,
+    ): string | null =>
+      getResearchLineageIntegrityInspectionNodeId(issue, lineage),
 
     createResearchLineageIntegrityRemediationRequest: (
       investigationId: string,
