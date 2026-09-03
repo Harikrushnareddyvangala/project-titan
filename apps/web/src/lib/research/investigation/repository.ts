@@ -1,4 +1,5 @@
 import type { ResearchInvestigation } from "@/types/research";
+import { createResearchInvestigation } from "./create";
 
 export interface ResearchInvestigationRepositoryDependencies {
   loadResearchInvestigations(): ResearchInvestigation[];
@@ -79,36 +80,6 @@ export function saveResearchInvestigation(
   }
 
   dependencies.saveResearchInvestigations(nextInvestigations);
-}
-
-export function createResearchInvestigation(
-  input: Pick<
-    ResearchInvestigation,
-    "title" | "objective" | "question"
-  > &
-    Partial<
-      Pick<ResearchInvestigation, "description" | "repository">
-    >,
-  dependencies: ResearchInvestigationRepositoryDependencies,
-): ResearchInvestigation {
-  const now = dependencies.now();
-
-  return {
-    id: dependencies.createId("investigation"),
-    title: input.title,
-    objective: input.objective,
-    question: input.question,
-    status: "Draft",
-    description: input.description,
-    repository: input.repository,
-    experimentIds: [],
-    evidenceIds: [],
-    findingIds: [],
-    artifactIds: [],
-    conclusionIds: [],
-    createdAt: now,
-    updatedAt: now,
-  };
 }
 
 export function createResearchInvestigationRepository(

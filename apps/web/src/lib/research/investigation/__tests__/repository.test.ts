@@ -3,12 +3,13 @@ import { describe, expect, it, vi } from "vitest";
 import type { ResearchInvestigation } from "@/types/research";
 
 import {
-  createResearchInvestigation,
   getResearchInvestigations,
   saveResearchInvestigation,
   type ResearchInvestigationRepositoryDependencies,
   type ResearchInvestigationRepositoryState,
 } from "../repository";
+
+import { createResearchInvestigation } from "../create";
 
 function createState(): ResearchInvestigationRepositoryState {
   return {
