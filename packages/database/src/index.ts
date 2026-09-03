@@ -2,3 +2,5 @@ export { db, pool } from "./client.js";
 export * from "./schema/index.js";
 export * from "./research/investigations.js";
 export * from "./research/experiments.js";
+
+export * from "./research/evidence.js";
