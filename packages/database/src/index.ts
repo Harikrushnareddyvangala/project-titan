@@ -6,3 +6,5 @@ export * from "./research/experiments.js";
 export * from "./research/evidence.js";
 
 export * from "./research/findings.js";
+
+export * from "./research/validations.js";

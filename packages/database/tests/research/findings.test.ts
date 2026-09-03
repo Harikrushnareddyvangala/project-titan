@@ -13,7 +13,7 @@ describe("research finding persistence", () => {
     const updatedAt = new Date("2026-09-03T11:00:00.000Z");
 
     const finding = await createResearchFindingRecord({
-      id: "finding-test-001",
+      id: "finding-persistence-test-001",
       statement: "The experimental approach improves retrieval quality.",
       confidence: 0.87,
       createdAt,
@@ -23,7 +23,7 @@ describe("research finding persistence", () => {
     const [validation] = await db
       .insert(researchFindingValidations)
       .values({
-        id: "validation-test-001",
+        id: "finding-validation-test-001",
         findingId: finding.id,
         status: "Validated",
         decision: "Supported",
@@ -43,28 +43,28 @@ describe("research finding persistence", () => {
     const loaded = await getResearchFindingRecord(finding.id);
 
     expect(loaded).toEqual({
-      id: "finding-test-001",
+      id: "finding-persistence-test-001",
       statement: "The experimental approach improves retrieval quality.",
       confidence: 0.87,
-      validationIds: ["validation-test-001"],
+      validationIds: ["finding-validation-test-001"],
       createdAt,
       updatedAt,
     });
 
     await db
       .delete(researchFindingValidations)
-      .where(eq(researchFindingValidations.id, "validation-test-001"));
+      .where(eq(researchFindingValidations.id, "finding-validation-test-001"));
 
     await db
       .delete(researchFindings)
-      .where(eq(researchFindings.id, "finding-test-001"));
+      .where(eq(researchFindings.id, "finding-persistence-test-001"));
   });
 
   it("preserves nullable confidence as null", async () => {
     const timestamp = new Date("2026-09-03T12:00:00.000Z");
 
     const finding = await createResearchFindingRecord({
-      id: "finding-test-002",
+      id: "finding-persistence-test-002",
       statement: "Confidence has not yet been established.",
       createdAt: timestamp,
       updatedAt: timestamp,
@@ -80,7 +80,7 @@ describe("research finding persistence", () => {
 
     await db
       .delete(researchFindings)
-      .where(eq(researchFindings.id, "finding-test-002"));
+      .where(eq(researchFindings.id, "finding-persistence-test-002"));
   });
 
   it("returns null for a missing finding", async () => {
