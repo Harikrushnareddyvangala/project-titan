@@ -3,4 +3,4 @@ import "server-only";
 export {
   createResearchInvestigation,
   getResearchInvestigation,
-} from "./investigation/serverRepository";
+} from "./investigation/server";
