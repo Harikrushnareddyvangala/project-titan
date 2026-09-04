@@ -16,14 +16,26 @@ const intelligenceArtifact: ResourceIdentity = {
 };
 
 const researchFindingRevision: ResourceRevision = {
-  resourceId: researchFinding.id,
+  resource: researchFinding,
   version: "1",
   createdAt: "2026-09-04T00:00:00.000Z",
 };
 
 const intelligenceArtifactRevision: ResourceRevision = {
-  resourceId: intelligenceArtifact.id,
+  resource: intelligenceArtifact,
   version: "1.0.0",
+  createdAt: "2026-09-04T00:00:00.000Z",
+};
+
+const anotherResourceWithSameId: ResourceIdentity = {
+  id: "finding-001",
+  type: "dataset",
+  namespace: "data",
+};
+
+const anotherResourceRevision: ResourceRevision = {
+  resource: anotherResourceWithSameId,
+  version: "1",
   createdAt: "2026-09-04T00:00:00.000Z",
 };
 

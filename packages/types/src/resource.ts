@@ -32,7 +32,7 @@ export interface ResourceRevision {
   /**
    * Stable identity of the resource being revised.
    */
-  resourceId: string;
+  resource: ResourceIdentity;
 
   /**
    * Resource-specific version or revision identifier.

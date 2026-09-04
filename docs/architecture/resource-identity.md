@@ -135,14 +135,18 @@ Resource identity and resource revision are separate concepts.
 
 The canonical revision contract is:
 
-```text
 ResourceRevision
-├── resourceId
+├── resource
+│   ├── id
+│   ├── type
+│   └── namespace
 ├── version
 └── createdAt
-```
 
-`resourceId` refers to the stable conceptual resource identity.
+`resource` references the complete stable conceptual resource identity.
+
+This deliberately preserves the full identity scope of `namespace`, `type`, and
+`id`. A revision must not rely on `id` alone being globally unique.
 
 `version` identifies a particular revision of that resource and is treated by
 the platform as opaque.
@@ -151,17 +155,13 @@ TITAN does not impose a universal versioning scheme at this layer.
 
 For example, both of the following may be valid:
 
-```text
 1
-```
 
 and:
 
-```text
 1.0.0
-```
 
-The interpretation of a revision belongs to the resource's domain unless a
+The interpretation of a revision belongs to the resource domain unless a
 future platform-level versioning specification establishes otherwise.
 
 ## 6. Identity Invariants
