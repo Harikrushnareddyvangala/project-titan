@@ -10,3 +10,5 @@ export * from "./research/findings.js";
 
 export * from "./research/validations.js";
 export * from "./research/conclusions.js";
+
+export * from "./research/provenance.js";
