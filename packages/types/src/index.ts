@@ -13,6 +13,8 @@ export type {
 
 export type { RoleReference } from "./role.js";
 
+export type { OperationReference } from "./operation.js";
+
 export type { ExecutionIdentity } from "./execution.js";
 
 export type {
