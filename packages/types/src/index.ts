@@ -18,6 +18,12 @@ export type { OperationReference } from "./operation.js";
 export type { ExecutionIdentity } from "./execution.js";
 
 export type {
+  ExecutionLifecycle,
+  ExecutionLifecycleState,
+  ExecutionLifecycleTransition,
+} from "./executionLifecycle.js";
+
+export type {
   ExecutionActorParticipation,
 } from "./participation.js";
 
