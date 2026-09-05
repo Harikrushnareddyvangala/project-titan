@@ -17,6 +17,11 @@ export type { OperationReference } from "./operation.js";
 
 export type { ExecutionIdentity } from "./execution.js";
 
+export {
+  canTransitionExecutionLifecycle,
+  transitionExecutionLifecycle,
+} from "./executionLifecycle.js";
+
 export type {
   ExecutionLifecycle,
   ExecutionLifecycleState,
