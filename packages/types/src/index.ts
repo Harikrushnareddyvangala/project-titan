@@ -6,3 +6,7 @@ export type {
 export type {
   ResourceRelationship,
 } from "./relationship.js";
+
+export type {
+  ActorIdentity,
+} from "./actor.js";
