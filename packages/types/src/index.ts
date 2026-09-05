@@ -14,3 +14,7 @@ export type {
 export type { RoleReference } from "./role.js";
 
 export type { ExecutionIdentity } from "./execution.js";
+
+export type {
+  ExecutionActorParticipation,
+} from "./participation.js";
