@@ -35,13 +35,22 @@ const humanInitiator: ExecutionActorParticipation = {
   createdAt: "2026-01-01T00:00:00.000Z",
 };
 
-const systemExecutor: ExecutionActorParticipation = {
+const humanExecutor: ExecutionActorParticipation = {
   id: "participation-002",
   execution,
-  actor: systemActor,
+  actor: humanActor,
   role: executorRole,
   createdAt: "2026-01-01T00:00:01.000Z",
 };
 
+const systemExecutor: ExecutionActorParticipation = {
+  id: "participation-003",
+  execution,
+  actor: systemActor,
+  role: executorRole,
+  createdAt: "2026-01-01T00:00:02.000Z",
+};
+
 void humanInitiator;
+void humanExecutor;
 void systemExecutor;
