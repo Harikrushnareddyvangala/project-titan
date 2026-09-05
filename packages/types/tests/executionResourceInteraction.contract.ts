@@ -40,6 +40,14 @@ const resourceLevelInteraction: ExecutionResourceInteraction = {
   createdAt: "2026-09-04T00:00:00.000Z",
 };
 
+const repeatedResourceReadInteraction: ExecutionResourceInteraction = {
+  id: "interaction-004",
+  execution,
+  target: dataset,
+  operation: readOperation,
+  createdAt: "2026-09-04T00:00:01.000Z",
+};
+
 const revisionLevelInteraction: ExecutionResourceInteraction = {
   id: "interaction-002",
   execution,
@@ -59,3 +67,4 @@ const observationInteraction: ExecutionResourceInteraction = {
 void resourceLevelInteraction;
 void revisionLevelInteraction;
 void observationInteraction;
+void repeatedResourceReadInteraction;
