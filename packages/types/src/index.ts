@@ -12,3 +12,5 @@ export type {
 } from "./actor.js";
 
 export type { RoleReference } from "./role.js";
+
+export type { ExecutionIdentity } from "./execution.js";
