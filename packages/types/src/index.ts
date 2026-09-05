@@ -20,3 +20,7 @@ export type { ExecutionIdentity } from "./execution.js";
 export type {
   ExecutionActorParticipation,
 } from "./participation.js";
+
+export type {
+  ExecutionResourceInteraction,
+} from "./interaction.js";
