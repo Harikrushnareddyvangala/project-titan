@@ -87,3 +87,71 @@ if (completedLifecycle.transitions.length !== 1) {
 if (completedLifecycle.transitions[0]?.execution.id !== execution.id) {
   throw new Error("Transition should preserve execution identity.");
 }
+
+const firstCompletedLifecycle = transitionExecutionLifecycle(
+  runningLifecycle,
+  execution,
+  "Completed",
+  "Execution completed successfully.",
+  "2026-09-06T00:00:02.000Z",
+);
+
+const firstTransition = firstCompletedLifecycle.transitions[0];
+
+if (firstTransition?.from !== "Running") {
+  throw new Error("Transition history must record the previous state.");
+}
+
+if (firstTransition?.to !== "Completed") {
+  throw new Error("Transition history must record the resulting state.");
+}
+
+if (firstTransition?.execution.id !== execution.id) {
+  throw new Error("Transition history must preserve execution identity.");
+}
+
+const failedExecution: ExecutionIdentity = {
+  id: "execution-lifecycle-002",
+};
+
+const failedLifecycle = transitionExecutionLifecycle(
+  runningLifecycle,
+  failedExecution,
+  "Failed",
+  "Execution failed.",
+  "2026-09-06T00:00:03.000Z",
+);
+
+if (failedLifecycle.currentState !== "Failed") {
+  throw new Error("Failed transition must update the current state.");
+}
+
+if (failedLifecycle.transitions.length !== 1) {
+  throw new Error("Failed transition must append exactly one history record.");
+}
+
+let invalidTransitionRejected = false;
+
+try {
+  transitionExecutionLifecycle(
+    firstCompletedLifecycle,
+    execution,
+    "Running",
+    "Attempted invalid terminal transition.",
+    "2026-09-06T00:00:05.000Z",
+  );
+} catch {
+  invalidTransitionRejected = true;
+}
+
+if (!invalidTransitionRejected) {
+  throw new Error("Terminal lifecycle transitions must be rejected.");
+}
+
+if (firstCompletedLifecycle.currentState !== "Completed") {
+  throw new Error("Rejected transitions must not mutate the lifecycle.");
+}
+
+if (firstCompletedLifecycle.transitions.length !== 1) {
+  throw new Error("Rejected transitions must not append history.");
+}
