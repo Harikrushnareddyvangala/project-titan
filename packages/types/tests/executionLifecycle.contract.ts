@@ -155,3 +155,36 @@ if (firstCompletedLifecycle.currentState !== "Completed") {
 if (firstCompletedLifecycle.transitions.length !== 1) {
   throw new Error("Rejected transitions must not append history.");
 }
+
+const immutableSourceLifecycle: ExecutionLifecycle = {
+  currentState: "Running",
+  transitions: [],
+};
+
+const immutableResultLifecycle = transitionExecutionLifecycle(
+  immutableSourceLifecycle,
+  execution,
+  "Completed",
+  "Completion for immutability contract.",
+  "2026-09-06T00:00:06.000Z",
+);
+
+if (immutableSourceLifecycle.currentState !== "Running") {
+  throw new Error("Transition must not mutate the source lifecycle state.");
+}
+
+if (immutableSourceLifecycle.transitions.length !== 0) {
+  throw new Error("Transition must not mutate the source transition history.");
+}
+
+if (immutableResultLifecycle.currentState !== "Completed") {
+  throw new Error("Transition result must contain the new lifecycle state.");
+}
+
+if (immutableResultLifecycle.transitions.length !== 1) {
+  throw new Error("Transition result must contain the new history record.");
+}
+
+if (immutableResultLifecycle.transitions === immutableSourceLifecycle.transitions) {
+  throw new Error("Transition result must use a new transition-history array.");
+}
