@@ -8,11 +8,13 @@ import type { ExecutionIdentity } from "./execution.js";
  * - Running
  * - Completed
  * - Failed
+ * - Cancelled
  */
 export type ExecutionLifecycleState =
   | "Running"
   | "Completed"
-  | "Failed";
+  | "Failed"
+  | "Cancelled";
 
 /**
  * Immutable historical assertion that an execution changed lifecycle state.
@@ -78,9 +80,12 @@ export function canTransitionExecutionLifecycle(
   }
 
   if (from === "Running") {
-    return to === "Completed" || to === "Failed";
+    return (
+      to === "Completed" ||
+      to === "Failed" ||
+      to === "Cancelled"
+    );
   }
-
   return false;
 }
 

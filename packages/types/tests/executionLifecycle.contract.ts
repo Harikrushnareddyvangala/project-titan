@@ -18,6 +18,7 @@ const execution: ExecutionIdentity = {
 const running: ExecutionLifecycleState = "Running";
 const completed: ExecutionLifecycleState = "Completed";
 const failed: ExecutionLifecycleState = "Failed";
+const cancelled: ExecutionLifecycleState = "Cancelled";
 
 const completedTransition: ExecutionLifecycleTransition = {
   id: "transition-001",
@@ -57,6 +58,10 @@ if (!canTransitionExecutionLifecycle(runningLifecycle.currentState, "Failed")) {
   throw new Error("Running → Failed should be valid.");
 }
 
+if (!canTransitionExecutionLifecycle(runningLifecycle.currentState, cancelled)) {
+  throw new Error("Running → Cancelled should be valid.");
+}
+
 if (canTransitionExecutionLifecycle("Completed", "Running")) {
   throw new Error("Completed → Running should be invalid.");
 }
@@ -65,8 +70,24 @@ if (canTransitionExecutionLifecycle("Failed", "Running")) {
   throw new Error("Failed → Running should be invalid.");
 }
 
+if (canTransitionExecutionLifecycle(cancelled, "Running")) {
+  throw new Error("Cancelled → Running should be invalid.");
+}
+
+if (canTransitionExecutionLifecycle(cancelled, "Completed")) {
+  throw new Error("Cancelled → Completed should be invalid.");
+}
+
+if (canTransitionExecutionLifecycle(cancelled, "Failed")) {
+  throw new Error("Cancelled → Failed should be invalid.");
+}
+
 if (canTransitionExecutionLifecycle("Running", "Running")) {
   throw new Error("Running → Running should be invalid.");
+}
+
+if (canTransitionExecutionLifecycle(cancelled, cancelled)) {
+  throw new Error("Cancelled → Cancelled should be invalid.");
 }
 
 const completedLifecycle = transitionExecutionLifecycle(
@@ -155,6 +176,44 @@ if (firstCompletedLifecycle.currentState !== "Completed") {
 
 if (firstCompletedLifecycle.transitions.length !== 1) {
   throw new Error("Rejected transitions must not append history.");
+}
+
+const cancelledExecution: ExecutionIdentity = {
+  id: "execution-lifecycle-003",
+};
+
+const cancelledLifecycle = transitionExecutionLifecycle(
+  runningLifecycle,
+  cancelledExecution,
+  cancelled,
+  "User requested cancellation.",
+  "2026-09-06T00:00:04.000Z",
+);
+
+if (cancelledLifecycle.currentState !== cancelled) {
+  throw new Error("Cancelled transition must update the current state.");
+}
+
+if (cancelledLifecycle.transitions.length !== 1) {
+  throw new Error("Cancelled transition must append exactly one history record.");
+}
+
+const cancellationTransition = cancelledLifecycle.transitions[0];
+
+if (cancellationTransition?.from !== "Running") {
+  throw new Error("Cancellation history must record the previous state.");
+}
+
+if (cancellationTransition?.to !== cancelled) {
+  throw new Error("Cancellation history must record the resulting state.");
+}
+
+if (cancellationTransition?.reason !== "User requested cancellation.") {
+  throw new Error("Cancellation history must preserve the transition reason.");
+}
+
+if (cancellationTransition?.execution.id !== cancelledExecution.id) {
+  throw new Error("Cancellation history must preserve execution identity.");
 }
 
 const immutableSourceLifecycle: ExecutionLifecycle = {
