@@ -1,5 +1,6 @@
 import {
   canTransitionExecutionLifecycle,
+  createExecutionLifecycle,
   transitionExecutionLifecycle,
 } from "@titan/types";
 
@@ -187,4 +188,14 @@ if (immutableResultLifecycle.transitions.length !== 1) {
 
 if (immutableResultLifecycle.transitions === immutableSourceLifecycle.transitions) {
   throw new Error("Transition result must use a new transition-history array.");
+}
+
+const constructedLifecycle = createExecutionLifecycle();
+
+if (constructedLifecycle.currentState !== "Running") {
+  throw new Error("New execution lifecycle must begin at Running.");
+}
+
+if (constructedLifecycle.transitions.length !== 0) {
+  throw new Error("Lifecycle construction must not create a transition.");
 }

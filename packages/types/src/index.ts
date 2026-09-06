@@ -19,6 +19,7 @@ export type { ExecutionIdentity } from "./execution.js";
 
 export {
   canTransitionExecutionLifecycle,
+  createExecutionLifecycle,
   transitionExecutionLifecycle,
 } from "./executionLifecycle.js";
 

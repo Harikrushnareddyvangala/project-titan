@@ -52,6 +52,20 @@ export interface ExecutionLifecycle {
 }
 
 /**
+ * Creates the initial lifecycle representation for an execution occurrence.
+ *
+ * Lifecycle observation begins at Running. Construction does not create a
+ * historical transition because no prior canonical lifecycle state has been
+ * established.
+ */
+export function createExecutionLifecycle(): ExecutionLifecycle {
+  return {
+    currentState: "Running",
+    transitions: [],
+  };
+}
+
+/**
  * Determines whether a lifecycle state transition is valid for the
  * canonical execution lifecycle.
  */
