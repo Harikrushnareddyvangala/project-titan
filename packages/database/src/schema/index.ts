@@ -65,3 +65,7 @@ export {
 export {
   executionActorParticipations,
 } from "./executionActorParticipations.js";
+
+export {
+  executionResourceInteractions,
+} from "./executionResourceInteractions.js";

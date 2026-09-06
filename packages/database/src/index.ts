@@ -23,3 +23,8 @@ export {
   createExecutionActorParticipationRecord,
   getExecutionActorParticipationRecord,
 } from "./executionActorParticipations.js";
+
+export {
+  createExecutionResourceInteractionRecord,
+  getExecutionResourceInteractionRecord,
+} from "./executionResourceInteractions.js";
