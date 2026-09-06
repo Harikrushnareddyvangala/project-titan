@@ -47,4 +47,5 @@ export type {
 
 export {
   createExecution,
+  transitionExecution,
 } from "./executionOccurrence.js";

@@ -1,9 +1,14 @@
 import type { ExecutionIdentity } from "./execution.js";
+
 import {
   createExecutionLifecycle,
+  transitionExecutionLifecycle,
   type ExecutionLifecycle,
+  type ExecutionLifecycleState,
 } from "./executionLifecycle.js";
+
 import type { ExecutionTemporalContext } from "./executionTemporal.js";
+
 
 /**
  * Canonical representation of one TITAN execution occurrence.
@@ -30,10 +35,54 @@ export interface Execution {
  * It does not fabricate an execution start timestamp or lifecycle
  * transition.
  */
-export function createExecution(id: string): Execution {
+export function createExecution(
+  id: string,
+  options?: {
+    startedAt?: string;
+  },
+): Execution {
   return {
     identity: { id },
     lifecycle: createExecutionLifecycle(),
-    temporal: {},
+    temporal:
+      options?.startedAt !== undefined
+        ? { startedAt: options.startedAt }
+        : {},
+  };
+}
+
+export function transitionExecution(
+  execution: Execution,
+  to: ExecutionLifecycleState,
+  options: {
+    endedAt: string;
+    reason?: string;
+    timestamp?: string;
+  },
+): Execution {
+  if (
+    execution.temporal.startedAt !== undefined &&
+    options.endedAt < execution.temporal.startedAt
+  ) {
+    throw new Error(
+      "Execution termination time must not precede execution start time.",
+    );
+  }
+
+  const lifecycle = transitionExecutionLifecycle(
+    execution.lifecycle,
+    execution.identity,
+    to,
+    options.reason,
+    options.timestamp,
+  );
+
+  return {
+    ...execution,
+    lifecycle,
+    temporal: {
+      ...execution.temporal,
+      endedAt: options.endedAt,
+    },
   };
 }
