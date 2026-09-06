@@ -8,6 +8,13 @@
       "when": 1788363125705,
       "tag": "0000_research-foundation",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1788671883575,
+      "tag": "0001_living_pestilence",
+      "breakpoints": true
     }
   ]
 }

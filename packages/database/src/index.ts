@@ -12,3 +12,9 @@ export * from "./research/validations.js";
 export * from "./research/conclusions.js";
 
 export * from "./research/provenance.js";
+
+export {
+  createExecutionRecord,
+  getExecutionRecord,
+  persistExecutionLifecycleTransition,
+} from "./executions.js";
