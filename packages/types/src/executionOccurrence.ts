@@ -1,5 +1,8 @@
 import type { ExecutionIdentity } from "./execution.js";
-import type { ExecutionLifecycle } from "./executionLifecycle.js";
+import {
+  createExecutionLifecycle,
+  type ExecutionLifecycle,
+} from "./executionLifecycle.js";
 import type { ExecutionTemporalContext } from "./executionTemporal.js";
 
 /**
@@ -18,4 +21,19 @@ export interface Execution {
 
   /** Actual execution timing when known. */
   temporal: ExecutionTemporalContext;
+}
+
+/**
+ * Creates the initial representation of one execution occurrence.
+ *
+ * Construction establishes identity and the initial lifecycle state.
+ * It does not fabricate an execution start timestamp or lifecycle
+ * transition.
+ */
+export function createExecution(id: string): Execution {
+  return {
+    identity: { id },
+    lifecycle: createExecutionLifecycle(),
+    temporal: {},
+  };
 }

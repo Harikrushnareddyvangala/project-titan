@@ -44,3 +44,7 @@ export type {
 export type {
   Execution,
 } from "./executionOccurrence.js";
+
+export {
+  createExecution,
+} from "./executionOccurrence.js";
