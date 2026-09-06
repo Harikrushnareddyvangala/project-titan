@@ -61,3 +61,7 @@ export {
 export {
   executionLifecycleTransitions,
 } from "./executionLifecycleTransitions.js";
+
+export {
+  executionActorParticipations,
+} from "./executionActorParticipations.js";

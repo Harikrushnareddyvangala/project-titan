@@ -15,6 +15,13 @@
       "when": 1788671883575,
       "tag": "0001_living_pestilence",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1788691577485,
+      "tag": "0002_cold_tempest",
+      "breakpoints": true
     }
   ]
 }

@@ -18,3 +18,8 @@ export {
   getExecutionRecord,
   persistExecutionLifecycleTransition,
 } from "./executions.js";
+
+export {
+  createExecutionActorParticipationRecord,
+  getExecutionActorParticipationRecord,
+} from "./executionActorParticipations.js";
