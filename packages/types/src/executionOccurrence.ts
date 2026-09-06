@@ -9,7 +9,6 @@ import {
 
 import type { ExecutionTemporalContext } from "./executionTemporal.js";
 
-
 /**
  * Canonical representation of one TITAN execution occurrence.
  *
@@ -48,6 +47,40 @@ export function createExecution(
       options?.startedAt !== undefined
         ? { startedAt: options.startedAt }
         : {},
+  };
+}
+
+/**
+ * Establishes the actual start time of an execution occurrence.
+ *
+ * Start-time establishment is a one-time temporal assertion.
+ * It does not change lifecycle state or create lifecycle history.
+ */
+export function establishExecutionStart(
+  execution: Execution,
+  startedAt: string,
+): Execution {
+  if (execution.temporal.startedAt !== undefined) {
+    throw new Error(
+      "Execution start time has already been established.",
+    );
+  }
+
+  if (
+    execution.temporal.endedAt !== undefined &&
+    startedAt > execution.temporal.endedAt
+  ) {
+    throw new Error(
+      "Execution start time must not follow execution termination time.",
+    );
+  }
+
+  return {
+    ...execution,
+    temporal: {
+      ...execution.temporal,
+      startedAt,
+    },
   };
 }
 
