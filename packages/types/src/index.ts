@@ -36,3 +36,7 @@ export type {
 export type {
   ExecutionResourceInteraction,
 } from "./interaction.js";
+
+export type {
+  ExecutionTemporalContext,
+} from "./executionTemporal.js";
