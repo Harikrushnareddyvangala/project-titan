@@ -40,3 +40,7 @@ export type {
 export type {
   ExecutionTemporalContext,
 } from "./executionTemporal.js";
+
+export type {
+  Execution,
+} from "./executionOccurrence.js";
