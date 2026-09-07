@@ -4,6 +4,7 @@ import { beforeAll, afterAll, describe, expect, it } from "vitest";
 import {
     createResearchInvestigationRecord,
     getResearchInvestigationRecord,
+    getResearchInvestigationRecords,
     pool,
 } from "../../src/index.js";
 
@@ -99,5 +100,51 @@ describe("research investigation persistence", () => {
         const result = await getResearchInvestigationRecord(id);
 
         expect(result).toBeNull();
+    });
+
+    it("reads investigations as a deterministically ordered collection", async () => {
+        const firstId = `collection-investigation-a-${randomUUID()}`;
+        const secondId = `collection-investigation-b-${randomUUID()}`;
+
+        const createdAt = new Date("2026-09-03T04:00:00.000Z");
+        const updatedAt = new Date("2026-09-03T04:05:00.000Z");
+
+        try {
+            await createResearchInvestigationRecord({
+                id: secondId,
+                title: "Collection Test B",
+                objective: "Verify collection reads",
+                question: "Are investigations returned deterministically?",
+                status: "active",
+                createdAt,
+                updatedAt,
+            });
+
+            await createResearchInvestigationRecord({
+                id: firstId,
+                title: "Collection Test A",
+                objective: "Verify collection reads",
+                question: "Are investigations returned deterministically?",
+                status: "active",
+                createdAt,
+                updatedAt,
+            });
+
+            const investigations = await getResearchInvestigationRecords();
+
+            const testInvestigations = investigations.filter(
+                ({ id }) => id === firstId || id === secondId,
+            );
+
+            expect(testInvestigations.map(({ id }) => id)).toEqual([
+                firstId,
+                secondId,
+            ]);
+        } finally {
+            await pool.query(
+                "DELETE FROM research_investigations WHERE id = ANY($1)",
+                [[firstId, secondId]],
+            );
+        }
     });
 });
