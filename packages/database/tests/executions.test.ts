@@ -136,6 +136,44 @@ describe("execution persistence", () => {
     expect(retrieved).toEqual(transitioned);
   });
 
+  it("persists a cancellation lifecycle transition", async () => {
+    await createExecutionRecord({
+      id: "execution-test-007",
+      lifecycleState: "Running",
+      startedAt: new Date("2026-09-07T08:00:00.000Z"),
+    });
+
+    const transitioned = await persistExecutionLifecycleTransition({
+      executionId: "execution-test-007",
+      transitionId: "transition-test-007",
+      from: "Running",
+      to: "Cancelled",
+      reason: "User requested cancellation.",
+      timestamp: new Date("2026-09-07T08:05:00.000Z"),
+      endedAt: new Date("2026-09-07T08:05:00.000Z"),
+    });
+
+    expect(transitioned).toEqual({
+      id: "execution-test-007",
+      lifecycleState: "Cancelled",
+      startedAt: new Date("2026-09-07T08:00:00.000Z"),
+      endedAt: new Date("2026-09-07T08:05:00.000Z"),
+      lifecycle: [
+        {
+          id: "transition-test-007",
+          from: "Running",
+          to: "Cancelled",
+          reason: "User requested cancellation.",
+          timestamp: new Date("2026-09-07T08:05:00.000Z"),
+        },
+      ],
+    });
+
+    const retrieved = await getExecutionRecord("execution-test-007");
+
+    expect(retrieved).toEqual(transitioned);
+  });
+
   it("rolls back lifecycle persistence when the execution update fails", async () => {
     await createExecutionRecord({
       id: "execution-test-006",
