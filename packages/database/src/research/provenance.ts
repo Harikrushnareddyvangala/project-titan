@@ -2,7 +2,10 @@ import { eq } from "drizzle-orm";
 
 import { db } from "../client.js";
 import { researchProvenanceEvents } from "../schema/index.js";
-import { withDatabaseTransaction } from "../transaction.js";
+import {
+  type TitanDatabaseTransaction,
+  withDatabaseTransaction,
+} from "../transaction.js";
 
 export interface ResearchProvenanceEventRecord {
   id: string;
@@ -66,35 +69,42 @@ export async function getResearchProvenanceEventRecord(
   return mapResearchProvenanceEventRecord(event);
 }
 
+async function createResearchProvenanceEventRecordInTransaction(
+  tx: TitanDatabaseTransaction,
+  input: CreateResearchProvenanceEventRecordInput,
+): Promise<typeof researchProvenanceEvents.$inferSelect> {
+  const [row] = await tx
+    .insert(researchProvenanceEvents)
+    .values({
+      id: input.id,
+      investigationId: input.investigationId,
+      entityType: input.entityType,
+      entityId: input.entityId,
+      eventType: input.eventType,
+      fromStatus: input.fromStatus ?? null,
+      toStatus: input.toStatus ?? null,
+      reason: input.reason ?? null,
+      actor: input.actor ?? null,
+      timestamp: input.timestamp,
+      metadata: input.metadata ?? null,
+    })
+    .returning();
+
+  if (!row) {
+    throw new Error(
+      `Failed to create research provenance event: ${input.id}`,
+    );
+  }
+
+  return row;
+}
+
 export async function createResearchProvenanceEventRecord(
   input: CreateResearchProvenanceEventRecordInput,
 ): Promise<ResearchProvenanceEventRecord> {
-  const event = await withDatabaseTransaction(async (tx) => {
-    const [row] = await tx
-      .insert(researchProvenanceEvents)
-      .values({
-        id: input.id,
-        investigationId: input.investigationId,
-        entityType: input.entityType,
-        entityId: input.entityId,
-        eventType: input.eventType,
-        fromStatus: input.fromStatus ?? null,
-        toStatus: input.toStatus ?? null,
-        reason: input.reason ?? null,
-        actor: input.actor ?? null,
-        timestamp: input.timestamp,
-        metadata: input.metadata ?? null,
-      })
-      .returning();
-
-    if (!row) {
-      throw new Error(
-        `Failed to create research provenance event: ${input.id}`,
-      );
-    }
-
-    return row;
-  });
+  const event = await withDatabaseTransaction((tx) =>
+    createResearchProvenanceEventRecordInTransaction(tx, input),
+  );
 
   return mapResearchProvenanceEventRecord(event);
 }
