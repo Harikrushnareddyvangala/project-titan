@@ -6,8 +6,10 @@ import {
   researchConclusionSupportingFindings,
   researchInvestigationConclusions,
 } from "../schema/index.js";
-import { withDatabaseTransaction } from "../transaction.js";
-
+import {
+  type TitanDatabaseTransaction,
+  withDatabaseTransaction,
+} from "../transaction.js";
 export interface ResearchInvestigationConclusionRecord {
   id: string;
   investigationId: string;
@@ -156,55 +158,63 @@ export async function createResearchInvestigationConclusionRecord(
   return hydrateResearchInvestigationConclusion(db, conclusion);
 }
 
+async function updateResearchInvestigationConclusionRecordInTransaction(
+  tx: TitanDatabaseTransaction,
+  id: string,
+  input: UpdateResearchInvestigationConclusionRecordInput,
+): Promise<typeof researchInvestigationConclusions.$inferSelect> {
+  const [row] = await tx
+    .update(researchInvestigationConclusions)
+    .set({
+      statement: input.statement,
+      status: input.status,
+      uncertainty: input.uncertainty ?? null,
+      nextAction: input.nextAction ?? null,
+      updatedAt: input.updatedAt,
+    })
+    .where(eq(researchInvestigationConclusions.id, id))
+    .returning();
+
+  if (!row) {
+    throw new Error(`Research conclusion not found: ${id}`);
+  }
+
+  await tx
+    .delete(researchConclusionSupportingFindings)
+    .where(eq(researchConclusionSupportingFindings.conclusionId, id));
+
+  await tx
+    .delete(researchConclusionContradictingFindings)
+    .where(eq(researchConclusionContradictingFindings.conclusionId, id));
+
+  if (input.supportingFindingIds?.length) {
+    await tx.insert(researchConclusionSupportingFindings).values(
+      input.supportingFindingIds.map((findingId) => ({
+        conclusionId: id,
+        findingId,
+      })),
+    );
+  }
+
+  if (input.contradictingFindingIds?.length) {
+    await tx.insert(researchConclusionContradictingFindings).values(
+      input.contradictingFindingIds.map((findingId) => ({
+        conclusionId: id,
+        findingId,
+      })),
+    );
+  }
+
+  return row;
+}
+
 export async function updateResearchInvestigationConclusionRecord(
   id: string,
   input: UpdateResearchInvestigationConclusionRecordInput,
 ): Promise<ResearchInvestigationConclusionRecord> {
-  const conclusion = await withDatabaseTransaction(async (tx) => {
-    const [row] = await tx
-      .update(researchInvestigationConclusions)
-      .set({
-        statement: input.statement,
-        status: input.status,
-        uncertainty: input.uncertainty ?? null,
-        nextAction: input.nextAction ?? null,
-        updatedAt: input.updatedAt,
-      })
-      .where(eq(researchInvestigationConclusions.id, id))
-      .returning();
-
-    if (!row) {
-      throw new Error(`Research conclusion not found: ${id}`);
-    }
-
-    await tx
-      .delete(researchConclusionSupportingFindings)
-      .where(eq(researchConclusionSupportingFindings.conclusionId, id));
-
-    await tx
-      .delete(researchConclusionContradictingFindings)
-      .where(eq(researchConclusionContradictingFindings.conclusionId, id));
-
-    if (input.supportingFindingIds?.length) {
-      await tx.insert(researchConclusionSupportingFindings).values(
-        input.supportingFindingIds.map((findingId) => ({
-          conclusionId: id,
-          findingId,
-        })),
-      );
-    }
-
-    if (input.contradictingFindingIds?.length) {
-      await tx.insert(researchConclusionContradictingFindings).values(
-        input.contradictingFindingIds.map((findingId) => ({
-          conclusionId: id,
-          findingId,
-        })),
-      );
-    }
-
-    return row;
-  });
+  const conclusion = await withDatabaseTransaction((tx) =>
+    updateResearchInvestigationConclusionRecordInTransaction(tx, id, input),
+  );
 
   return hydrateResearchInvestigationConclusion(db, conclusion);
 }
