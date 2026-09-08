@@ -6,6 +6,7 @@ import { eq } from "drizzle-orm";
 import {
   createResearchEvidenceRecord,
   getResearchEvidenceRecord,
+  getResearchEvidenceRecords,
 } from "../../src/research/evidence.js";
 import { db, pool } from "../../src/index.js";
 import { researchEvidence } from "../../src/schema/index.js";
@@ -86,6 +87,38 @@ describe("research evidence persistence", () => {
     );
 
     expect(loaded).toBeNull();
+  });
+
+  it("reads evidence as a deterministically ordered collection", async () => {
+    const firstId = `evidence-a-${randomUUID()}`;
+    const secondId = `evidence-b-${randomUUID()}`;
+
+      await createResearchEvidenceRecord({
+        id: secondId,
+        type: "Metric",
+        title: "Evidence B",
+        createdAt: new Date("2026-04-02T00:00:00.000Z"),
+      });
+
+      await createResearchEvidenceRecord({
+        id: firstId,
+        type: "Metric",
+        title: "Evidence A",
+        createdAt: new Date("2026-04-01T00:00:00.000Z"),
+      });
+
+      createdEvidenceIds.push(firstId, secondId);
+
+      const evidence = await getResearchEvidenceRecords();
+
+      const testEvidence = evidence.filter(
+        ({ id }) => id === firstId || id === secondId,
+      );
+
+      expect(testEvidence.map(({ id }) => id)).toEqual([
+        firstId,
+        secondId,
+      ]);
   });
 
   it("rolls back an evidence insert when the transaction fails", async () => {

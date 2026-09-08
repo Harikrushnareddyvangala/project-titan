@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { asc, eq } from "drizzle-orm";
 
 import { db } from "../client.js";
 import { researchEvidence } from "../schema/index.js";
@@ -43,6 +43,27 @@ export async function getResearchEvidenceRecord(
     reference: evidence.reference,
     createdAt: evidence.createdAt,
   };
+}
+
+export async function getResearchEvidenceRecords(): Promise<
+  ResearchEvidenceRecord[]
+> {
+  const rows = await db
+    .select()
+    .from(researchEvidence)
+    .orderBy(
+      asc(researchEvidence.createdAt),
+      asc(researchEvidence.id),
+    );
+
+  return rows.map((evidence) => ({
+    id: evidence.id,
+    type: evidence.type,
+    title: evidence.title,
+    description: evidence.description,
+    reference: evidence.reference,
+    createdAt: evidence.createdAt,
+  }));
 }
 
 export async function createResearchEvidenceRecord(
