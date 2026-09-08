@@ -1,9 +1,15 @@
 import { eq } from "drizzle-orm";
-
-import { db, researchFindingValidations, researchFindings } from "@titan/database";
+import { randomUUID } from "node:crypto";
+import {
+  db,
+  pool,
+  researchFindingValidations,
+  researchFindings,
+} from "@titan/database";
 import {
   createResearchFindingRecord,
   getResearchFindingRecord,
+  getResearchFindingRecords,
 } from "../../src/research/findings.js";
 import { withDatabaseTransaction } from "../../src/transaction.js";
 
@@ -87,6 +93,48 @@ describe("research finding persistence", () => {
     await expect(
       getResearchFindingRecord("finding-does-not-exist"),
     ).resolves.toBeNull();
+  });
+
+  it("reads findings as a deterministically ordered collection", async () => {
+    const firstId = `collection-finding-a-${randomUUID()}`;
+    const secondId = `collection-finding-b-${randomUUID()}`;
+
+    const createdAt = new Date("2026-09-03T14:00:00.000Z");
+    const updatedAt = new Date("2026-09-03T14:05:00.000Z");
+
+    try {
+      await createResearchFindingRecord({
+        id: secondId,
+        statement: "Collection finding B",
+        confidence: 0.8,
+        createdAt,
+        updatedAt,
+      });
+
+      await createResearchFindingRecord({
+        id: firstId,
+        statement: "Collection finding A",
+        confidence: 0.9,
+        createdAt,
+        updatedAt,
+      });
+
+      const findings = await getResearchFindingRecords();
+
+      const testFindings = findings.filter(
+        ({ id }) => id === firstId || id === secondId,
+      );
+
+      expect(testFindings.map(({ id }) => id)).toEqual([
+        firstId,
+        secondId,
+      ]);
+    } finally {
+      await pool.query(
+        "DELETE FROM research_findings WHERE id = ANY($1)",
+        [[firstId, secondId]],
+      );
+    }
   });
 
   it("rolls back a finding insert when the transaction fails", async () => {
