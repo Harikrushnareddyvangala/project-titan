@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { asc, eq } from "drizzle-orm";
 
 import { db } from "../client.js";
 import {
@@ -84,6 +84,33 @@ export async function getResearchFindingValidationRecord(
     updatedAt: validation.updatedAt,
     validatedAt: validation.validatedAt,
   };
+}
+
+export async function getResearchFindingValidationRecords(): Promise<
+  ResearchFindingValidationRecord[]
+> {
+  const rows = await db
+    .select()
+    .from(researchFindingValidations)
+    .orderBy(
+      asc(researchFindingValidations.updatedAt),
+      asc(researchFindingValidations.id),
+    );
+
+  return rows.map((validation) => ({
+    id: validation.id,
+    findingId: validation.findingId,
+    status: validation.status,
+    decision: validation.decision,
+    rationale: validation.rationale,
+    validator: validation.validator,
+    confidenceAtValidation: validation.confidenceAtValidation,
+    supportingEvidenceCount: validation.supportingEvidenceCount,
+    contradictingEvidenceCount: validation.contradictingEvidenceCount,
+    createdAt: validation.createdAt,
+    updatedAt: validation.updatedAt,
+    validatedAt: validation.validatedAt,
+  }));
 }
 
 export async function createResearchFindingValidationRecord(

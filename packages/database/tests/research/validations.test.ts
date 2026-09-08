@@ -1,4 +1,6 @@
 import { eq } from "drizzle-orm";
+import { randomUUID } from "node:crypto";
+import { describe, expect, it } from "vitest";
 
 import {
   db,
@@ -10,6 +12,7 @@ import {
   createResearchFindingValidationHistoryRecord,
   createResearchFindingValidationRecord,
   getResearchFindingValidationHistoryRecord,
+  getResearchFindingValidationRecords,
   getResearchFindingValidationRecord,
 } from "../../src/research/validations.js";
 import { withDatabaseTransaction } from "../../src/transaction.js";
@@ -132,6 +135,56 @@ describe("research finding validation persistence", () => {
       updatedAt: timestamp,
       validatedAt: null,
     });
+  });
+
+  it("reads validations as a deterministically ordered collection", async () => {
+    const firstId = `validation-a-${randomUUID()}`;
+    const secondId = `validation-b-${randomUUID()}`;
+
+    await createResearchFindingValidationRecord({
+      id: secondId,
+      findingId,
+      status: "Validated",
+      supportingEvidenceCount: 2,
+      contradictingEvidenceCount: 0,
+      createdAt: new Date("2026-09-03T10:00:00.000Z"),
+      updatedAt: new Date("2026-09-03T12:00:00.000Z"),
+    });
+
+    await createResearchFindingValidationRecord({
+      id: firstId,
+      findingId,
+      status: "Pending",
+      supportingEvidenceCount: 1,
+      contradictingEvidenceCount: 0,
+      createdAt: new Date("2026-09-03T11:00:00.000Z"),
+      updatedAt: new Date("2026-09-03T11:00:00.000Z"),
+    });
+
+    const validationIds = [firstId, secondId];
+
+    const validations = await getResearchFindingValidationRecords();
+
+    const testValidations = validations.filter(({ id }) =>
+      validationIds.includes(id),
+    );
+
+    expect(testValidations.map(({ id }) => id)).toEqual([
+      firstId,
+      secondId,
+    ]);
+
+    await db
+      .delete(researchFindingValidations)
+      .where(
+        eq(researchFindingValidations.id, firstId),
+      );
+
+    await db
+      .delete(researchFindingValidations)
+      .where(
+        eq(researchFindingValidations.id, secondId),
+      );
   });
 
   it("creates and reads a validation history record", async () => {
