@@ -8,6 +8,7 @@ import {
 import {
   createResearchProvenanceEventRecord,
   getResearchProvenanceEventRecord,
+  getResearchProvenanceEventRecords,
 } from "../../src/research/provenance.js";
 
 const investigationId = "test-investigation-provenance";
@@ -125,6 +126,52 @@ describe("research provenance persistence", () => {
     ).resolves.toMatchObject({
       metadata,
     });
+  });
+
+  it("reads provenance events in chronological deterministic order", async () => {
+    const firstId = "provenance-test-collection-a";
+    const secondId = "provenance-test-collection-b";
+
+    const timestamp = new Date("2026-01-02T10:00:00.000Z");
+
+    try {
+      await createResearchProvenanceEventRecord({
+        id: secondId,
+        investigationId,
+        entityType: "Finding",
+        entityId: "finding-2",
+        eventType: "Updated",
+        timestamp: new Date("2026-01-02T11:00:00.000Z"),
+      });
+
+      await createResearchProvenanceEventRecord({
+        id: firstId,
+        investigationId,
+        entityType: "Finding",
+        entityId: "finding-1",
+        eventType: "Created",
+        timestamp,
+      });
+
+      const events = await getResearchProvenanceEventRecords();
+
+      const testEvents = events.filter(
+        ({ id }) => id === firstId || id === secondId,
+      );
+
+      expect(testEvents.map(({ id }) => id)).toEqual([
+        firstId,
+        secondId,
+      ]);
+    } finally {
+      await db
+        .delete(researchProvenanceEvents)
+        .where(eq(researchProvenanceEvents.id, firstId));
+
+      await db
+        .delete(researchProvenanceEvents)
+        .where(eq(researchProvenanceEvents.id, secondId));
+    }
   });
 
   it("returns null for a missing provenance event", async () => {

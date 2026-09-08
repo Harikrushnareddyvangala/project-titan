@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { asc, eq } from "drizzle-orm";
 
 import { db } from "../client.js";
 import { researchProvenanceEvents } from "../schema/index.js";
@@ -67,6 +67,20 @@ export async function getResearchProvenanceEventRecord(
   }
 
   return mapResearchProvenanceEventRecord(event);
+}
+
+export async function getResearchProvenanceEventRecords(): Promise<
+  ResearchProvenanceEventRecord[]
+> {
+  const events = await db
+    .select()
+    .from(researchProvenanceEvents)
+    .orderBy(
+      asc(researchProvenanceEvents.timestamp),
+      asc(researchProvenanceEvents.id),
+    );
+
+  return events.map(mapResearchProvenanceEventRecord);
 }
 
 async function createResearchProvenanceEventRecordInTransaction(
