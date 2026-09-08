@@ -4,6 +4,7 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import {
   createResearchExperimentRecord,
   getResearchExperimentRecord,
+  getResearchExperimentRecords,
   pool,
 } from "../../src/index.js";
 
@@ -172,5 +173,69 @@ describe("research experiment persistence", () => {
     const result = await getResearchExperimentRecord(id);
 
     expect(result).toBeNull();
+  });
+
+  it("reads experiments as a deterministically ordered collection", async () => {
+    const investigationId = `collection-investigation-${randomUUID()}`;
+    const firstId = `collection-experiment-a-${randomUUID()}`;
+    const secondId = `collection-experiment-b-${randomUUID()}`;
+
+    const createdAt = new Date("2026-09-03T04:00:00.000Z");
+    const updatedAt = new Date("2026-09-03T04:05:00.000Z");
+
+    try {
+      await db.insert(researchInvestigations).values({
+        id: investigationId,
+        title: "Experiment Collection Test Investigation",
+        objective: "Provide a parent investigation for collection reads",
+        question: "Are experiments returned deterministically?",
+        status: "active",
+        description: null,
+        repository: "project-titan",
+        createdAt,
+        updatedAt,
+      });
+
+      await createResearchExperimentRecord({
+        id: secondId,
+        investigationId,
+        title: "Collection Test B",
+        objective: "Verify experiment collection reads",
+        status: "Investigating",
+        createdAt,
+        updatedAt,
+      });
+
+      await createResearchExperimentRecord({
+        id: firstId,
+        investigationId,
+        title: "Collection Test A",
+        objective: "Verify experiment collection reads",
+        status: "Investigating",
+        createdAt,
+        updatedAt,
+      });
+
+      const experiments = await getResearchExperimentRecords();
+
+      const testExperiments = experiments.filter(
+        ({ id }) => id === firstId || id === secondId,
+      );
+
+      expect(testExperiments.map(({ id }) => id)).toEqual([
+        firstId,
+        secondId,
+      ]);
+    } finally {
+      await pool.query(
+        "DELETE FROM research_experiments WHERE id = ANY($1)",
+        [[firstId, secondId]],
+      );
+
+      await pool.query(
+        "DELETE FROM research_investigations WHERE id = $1",
+        [investigationId],
+      );
+    }
   });
 });
