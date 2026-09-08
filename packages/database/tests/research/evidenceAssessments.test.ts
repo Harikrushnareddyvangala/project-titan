@@ -10,6 +10,7 @@ import {
   createResearchEvidenceAssessmentRecord,
   deleteResearchEvidenceAssessmentRecord,
   getResearchEvidenceAssessmentRecord,
+  getResearchEvidenceAssessmentRecords,
   updateResearchEvidenceAssessmentRecord,
 } from "../../src/research/evidenceAssessments.js";
 import { withDatabaseTransaction } from "../../src/transaction.js";
@@ -100,6 +101,39 @@ describe("research evidence assessment persistence", () => {
     await expect(
       getResearchEvidenceAssessmentRecord(assessmentId),
     ).resolves.toEqual(assessment);
+  });
+
+  it("reads persisted evidence assessments as a collection", async () => {
+    await createResearchEvidenceAssessmentRecord({
+      id: assessmentId,
+      findingId,
+      evidenceId,
+      type: "Supporting",
+      relevance: 0.9,
+      supportStrength: 0.85,
+      reliability: 0.95,
+      independence: 0.8,
+      rationale: "Persisted assessment.",
+      assessedAt: createdAt,
+      updatedAt,
+    });
+
+    const assessments =
+      await getResearchEvidenceAssessmentRecords();
+
+    expect(assessments).toContainEqual({
+      id: assessmentId,
+      findingId,
+      evidenceId,
+      type: "Supporting",
+      relevance: 0.9,
+      supportStrength: 0.85,
+      reliability: 0.95,
+      independence: 0.8,
+      rationale: "Persisted assessment.",
+      assessedAt: createdAt,
+      updatedAt,
+    });
   });
 
   it("preserves nullable rationale as null", async () => {
