@@ -11,6 +11,7 @@ import {
 import {
   createResearchInvestigationConclusionRecord,
   getResearchInvestigationConclusionRecord,
+  getResearchInvestigationConclusionRecords,
   updateResearchInvestigationConclusionRecord,
 } from "../../src/research/conclusions.js";
 
@@ -267,6 +268,59 @@ describe("research conclusion database persistence", () => {
     await expect(
       getResearchInvestigationConclusionRecord("missing-conclusion"),
     ).resolves.toBeNull();
+  });
+
+  it("reads conclusions as a deterministically ordered collection", async () => {
+    const firstId = "test-conclusion-collection-a";
+    const secondId = "test-conclusion-collection-b";
+
+    try {
+      await createResearchInvestigationConclusionRecord({
+        id: secondId,
+        investigationId,
+        statement: "Collection conclusion B.",
+        status: "Draft",
+        createdAt,
+        updatedAt,
+      });
+
+      await createResearchInvestigationConclusionRecord({
+        id: firstId,
+        investigationId,
+        statement: "Collection conclusion A.",
+        status: "Proposed",
+        supportingFindingIds: [findingOneId],
+        contradictingFindingIds: [findingThreeId],
+        createdAt,
+        updatedAt,
+      });
+
+      const conclusions =
+        await getResearchInvestigationConclusionRecords();
+
+      const testConclusions = conclusions.filter(
+        ({ id }) => id === firstId || id === secondId,
+      );
+
+      expect(testConclusions.map(({ id }) => id)).toEqual([
+        firstId,
+        secondId,
+      ]);
+
+      expect(testConclusions[0]).toMatchObject({
+        id: firstId,
+        supportingFindingIds: [findingOneId],
+        contradictingFindingIds: [findingThreeId],
+      });
+    } finally {
+      await db
+        .delete(researchInvestigationConclusions)
+        .where(eq(researchInvestigationConclusions.id, firstId));
+
+      await db
+        .delete(researchInvestigationConclusions)
+        .where(eq(researchInvestigationConclusions.id, secondId));
+    }
   });
 
   it("preserves nullable conclusion fields", async () => {

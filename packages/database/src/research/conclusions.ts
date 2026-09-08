@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { asc, eq } from "drizzle-orm";
 
 import { db } from "../client.js";
 import {
@@ -108,6 +108,21 @@ export async function getResearchInvestigationConclusionRecord(
   }
 
   return hydrateResearchInvestigationConclusion(db, conclusion);
+}
+
+export async function getResearchInvestigationConclusionRecords(): Promise<
+  ResearchInvestigationConclusionRecord[]
+> {
+  const rows = await db
+    .select()
+    .from(researchInvestigationConclusions)
+    .orderBy(asc(researchInvestigationConclusions.id));
+
+  return Promise.all(
+    rows.map((conclusion) =>
+      hydrateResearchInvestigationConclusion(db, conclusion),
+    ),
+  );
 }
 
 export async function createResearchInvestigationConclusionRecord(
