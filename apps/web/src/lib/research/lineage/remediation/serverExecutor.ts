@@ -247,6 +247,7 @@ export async function executeResearchLineageIntegrityRemediationOnServer(
   const persistenceResult =
     await researchLineageRemediationDatabasePersistence.persistResearchLineageRemediationMutation({
       conclusion: preparation.mutation.updatedConclusion,
+      expectedUpdatedAt: new Date(preparation.mutation.conclusion.updatedAt),
       provenance: preparation.mutation.provenanceInput,
     });
 

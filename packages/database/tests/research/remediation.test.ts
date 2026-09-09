@@ -80,6 +80,7 @@ describe("research remediation database persistence", () => {
 
     const result = await persistResearchLineageRemediationMutation({
       conclusionId,
+      expectedUpdatedAt: initialUpdatedAt,
       conclusion: {
         statement: "Updated conclusion.",
         status: "Proposed",
@@ -144,6 +145,7 @@ describe("research remediation database persistence", () => {
     await expect(
       persistResearchLineageRemediationMutation({
         conclusionId,
+        expectedUpdatedAt: initialUpdatedAt,
         conclusion: {
           statement: "This update must be rolled back.",
           status: "Proposed",
@@ -186,6 +188,64 @@ describe("research remediation database persistence", () => {
 
     expect(supportingLinks).toHaveLength(1);
     expect(supportingLinks[0]?.findingId).toBe(findingId);
+
+    const provenanceEvents = await db
+      .select()
+      .from(researchProvenanceEvents)
+      .where(eq(researchProvenanceEvents.entityId, conclusionId));
+
+    expect(provenanceEvents).toEqual([]);
+  });
+
+  it("rejects a stale remediation plan without persisting a mutation or provenance event", async () => {
+    const staleUpdatedAt = new Date("2025-12-31T23:00:00.000Z");
+    const newerUpdatedAt = new Date("2026-01-01T03:00:00.000Z");
+
+    await db
+      .update(researchInvestigationConclusions)
+      .set({
+        statement: "Conclusion changed after remediation planning.",
+        updatedAt: newerUpdatedAt,
+      })
+      .where(eq(researchInvestigationConclusions.id, conclusionId));
+
+    await expect(
+      persistResearchLineageRemediationMutation({
+        conclusionId,
+        expectedUpdatedAt: staleUpdatedAt,
+        conclusion: {
+          statement: "Stale remediation update.",
+          status: "Proposed",
+          supportingFindingIds: [],
+          contradictingFindingIds: [findingId],
+          uncertainty: "This must not persist.",
+          nextAction: "This must not persist.",
+          updatedAt: mutationUpdatedAt,
+        },
+        provenance: {
+          id: "test-remediation-stale-provenance",
+          investigationId,
+          entityType: "Conclusion",
+          entityId: conclusionId,
+          eventType: "Updated",
+          reason: "Attempt stale remediation.",
+          timestamp: mutationUpdatedAt,
+        },
+      }),
+    ).rejects.toThrow(
+      "Research remediation rejected because the conclusion changed after the remediation plan was created",
+    );
+
+    const [conclusion] = await db
+      .select()
+      .from(researchInvestigationConclusions)
+      .where(eq(researchInvestigationConclusions.id, conclusionId));
+
+    expect(conclusion).toMatchObject({
+      id: conclusionId,
+      statement: "Conclusion changed after remediation planning.",
+      updatedAt: newerUpdatedAt,
+    });
 
     const provenanceEvents = await db
       .select()

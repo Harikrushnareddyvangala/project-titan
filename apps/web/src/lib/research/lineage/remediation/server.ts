@@ -7,6 +7,7 @@ import type { ResearchInvestigationConclusion } from "@/types/research";
 export interface ResearchLineageRemediationAsyncPersistence {
   persistResearchLineageRemediationMutation(input: {
     conclusion: ResearchInvestigationConclusion;
+    expectedUpdatedAt: Date;
     provenance: {
       investigationId: string;
       entityType: "Conclusion";
@@ -28,6 +29,7 @@ export const researchLineageRemediationDatabasePersistence: ResearchLineageRemed
     async persistResearchLineageRemediationMutation(input) {
       return persistResearchLineageRemediationMutation({
         conclusionId: input.conclusion.id,
+        expectedUpdatedAt: input.expectedUpdatedAt,
         conclusion: {
           statement: input.conclusion.statement,
           status: input.conclusion.status,

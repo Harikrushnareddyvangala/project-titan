@@ -151,6 +151,10 @@ describe("research lineage remediation server executor", () => {
 
     expect(input.conclusionId).toBe(CONCLUSION_ID);
 
+    expect(input.expectedUpdatedAt).toEqual(
+      new Date("2026-08-30T00:00:00.000Z"),
+    );
+
     expect(input.conclusion).toMatchObject({
       statement: expect.any(String),
       status: expect.any(String),
