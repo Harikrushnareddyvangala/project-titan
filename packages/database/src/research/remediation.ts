@@ -15,6 +15,17 @@ import {
 } from "../schema/index.js";
 import { type TitanDatabaseTransaction } from "../transaction.js";
 
+export class ResearchRemediationStalePlanError extends Error {
+  readonly code = "RESEARCH_REMEDIATION_STALE_PLAN";
+
+  constructor(conclusionId: string) {
+    super(
+      `Research remediation rejected because the conclusion changed after the remediation plan was created: ${conclusionId}`,
+    );
+    this.name = "ResearchRemediationStalePlanError";
+  }
+}
+
 export interface PersistResearchLineageRemediationMutationInput {
   conclusionId: string;
   expectedUpdatedAt: Date;
@@ -50,9 +61,7 @@ async function updateResearchInvestigationConclusionForRemediation(
     .returning();
 
   if (!row) {
-    throw new Error(
-      `Research remediation rejected because the conclusion changed after the remediation plan was created: ${id}`,
-    );
+    throw new ResearchRemediationStalePlanError(id);
   }
 
   await tx

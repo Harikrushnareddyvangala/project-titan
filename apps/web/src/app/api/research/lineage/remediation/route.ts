@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 
+import { ResearchRemediationStalePlanError } from "@titan/database";
+
 import type {
   ResearchLineageIntegrityRemediationPlan,
   ResearchLineageIntegrityRemediationRepairExecutionResult,
@@ -75,6 +77,17 @@ export async function POST(request: Request) {
 
     return NextResponse.json(result);
   } catch (error: unknown) {
+    if (error instanceof ResearchRemediationStalePlanError) {
+      return NextResponse.json(
+        {
+          error: error.message,
+        },
+        {
+          status: 409,
+        },
+      );
+    }
+
     console.error("Research lineage remediation API error:", error);
 
     return NextResponse.json(
