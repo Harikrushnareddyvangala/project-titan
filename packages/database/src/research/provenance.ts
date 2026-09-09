@@ -2,10 +2,7 @@ import { asc, eq } from "drizzle-orm";
 
 import { db } from "../client.js";
 import { researchProvenanceEvents } from "../schema/index.js";
-import {
-  type TitanDatabaseTransaction,
-  withDatabaseTransaction,
-} from "../transaction.js";
+import { type TitanDatabaseTransaction, withDatabaseTransaction } from "../transaction.js";
 
 export interface ResearchProvenanceEventRecord {
   id: string;
@@ -75,15 +72,12 @@ export async function getResearchProvenanceEventRecords(): Promise<
   const events = await db
     .select()
     .from(researchProvenanceEvents)
-    .orderBy(
-      asc(researchProvenanceEvents.timestamp),
-      asc(researchProvenanceEvents.id),
-    );
+    .orderBy(asc(researchProvenanceEvents.timestamp), asc(researchProvenanceEvents.id));
 
   return events.map(mapResearchProvenanceEventRecord);
 }
 
-async function createResearchProvenanceEventRecordInTransaction(
+export async function createResearchProvenanceEventRecordInTransaction(
   tx: TitanDatabaseTransaction,
   input: CreateResearchProvenanceEventRecordInput,
 ): Promise<typeof researchProvenanceEvents.$inferSelect> {
@@ -105,9 +99,7 @@ async function createResearchProvenanceEventRecordInTransaction(
     .returning();
 
   if (!row) {
-    throw new Error(
-      `Failed to create research provenance event: ${input.id}`,
-    );
+    throw new Error(`Failed to create research provenance event: ${input.id}`);
   }
 
   return row;

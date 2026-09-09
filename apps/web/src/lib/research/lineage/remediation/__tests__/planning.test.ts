@@ -68,7 +68,6 @@ const lineage: ResearchLineage = {
       valid: true,
       issueCount: 0,
       missingLinks: [],
-
     },
     {
       id: finding.id,
@@ -89,23 +88,17 @@ const lineage: ResearchLineage = {
 const dependencies = {
   getResearchLineage: () => lineage,
 
-  getResearchInvestigations: (): ResearchInvestigation[] => [
-    investigation,
-  ],
+  getResearchInvestigations: (): ResearchInvestigation[] => [investigation],
 
   getResearchExperiments: (): ResearchExperiment[] => [],
 
   getResearchEvidence: (): ResearchEvidence[] => [],
 
-  getResearchFindings: (): ResearchFinding[] => [
-    finding,
-    replacementFinding,
-  ],
+  getResearchFindings: (): ResearchFinding[] => [finding, replacementFinding],
 
   getResearchFindingValidations: (): ResearchFindingValidation[] => [],
 
-  getResearchInvestigationConclusions:
-    (): ResearchInvestigationConclusion[] => [],
+  getResearchInvestigationConclusions: (): ResearchInvestigationConclusion[] => [],
 };
 
 function createIssue(
@@ -122,9 +115,7 @@ function createIssue(
 
 describe("research lineage remediation planning", () => {
   it("maps a known integrity issue to a deterministic action", () => {
-    const action = getResearchLineageIntegrityIssueAction(
-      createIssue(),
-    );
+    const action = getResearchLineageIntegrityIssueAction(createIssue());
 
     expect(action.action).toBe("RepairReference");
     expect(action.requiresConfirmation).toBe(true);
@@ -143,25 +134,18 @@ describe("research lineage remediation planning", () => {
   });
 
   it("creates a deterministic remediation preview", () => {
-    const preview = getResearchLineageIntegrityRemediationPreview(
-      createIssue(),
-    );
+    const preview = getResearchLineageIntegrityRemediationPreview(createIssue());
 
     expect(preview).not.toBeNull();
     expect(preview?.title).toBe("Proposed repair reference");
     expect(preview?.action).toBe("RepairReference");
-    expect(preview?.issueCode).toBe(
-      "CONCLUSION_FINDING_REFERENCE_INVALID",
-    );
+    expect(preview?.issueCode).toBe("CONCLUSION_FINDING_REFERENCE_INVALID");
     expect(preview?.target.nodeId).toBe(finding.id);
     expect(preview?.requiresConfirmation).toBe(true);
   });
 
   it("resolves an explicit inspection node", () => {
-    const result = getResearchLineageIntegrityInspectionNodeId(
-      createIssue(),
-      lineage,
-    );
+    const result = getResearchLineageIntegrityInspectionNodeId(createIssue(), lineage);
 
     expect(result).toBe(finding.id);
   });
@@ -202,9 +186,7 @@ describe("research lineage remediation planning", () => {
 
     expect(request).not.toBeNull();
     expect(request?.investigationId).toBe(investigation.id);
-    expect(request?.issueCode).toBe(
-      "CONCLUSION_FINDING_REFERENCE_INVALID",
-    );
+    expect(request?.issueCode).toBe("CONCLUSION_FINDING_REFERENCE_INVALID");
     expect(request?.action).toBe("RepairReference");
     expect(request?.confirmed).toBe(true);
     expect(request?.replacementEntityId).toBe(replacementFinding.id);
@@ -231,10 +213,7 @@ describe("research lineage remediation planning", () => {
   });
 
   it("returns the deterministic remediation execution policy", () => {
-    const policy =
-      getResearchLineageIntegrityRemediationExecutionPolicy(
-        "RepairReference",
-      );
+    const policy = getResearchLineageIntegrityRemediationExecutionPolicy("RepairReference");
 
     expect(policy.action).toBe("RepairReference");
     expect(policy.requiresConfirmation).toBe(true);
@@ -273,15 +252,14 @@ describe("research lineage remediation planning", () => {
   });
 
   it("validates a repairable remediation target", () => {
-    const result =
-      validateResearchLineageIntegrityRemediationTarget(
-        investigation.id,
-        {
-          nodeId: finding.id,
-        },
-        "RepairReference",
-        dependencies,
-      );
+    const result = validateResearchLineageIntegrityRemediationTarget(
+      investigation.id,
+      {
+        nodeId: finding.id,
+      },
+      "RepairReference",
+      dependencies,
+    );
 
     expect(result.valid).toBe(true);
     expect(result.investigationId).toBe(investigation.id);
@@ -291,25 +269,19 @@ describe("research lineage remediation planning", () => {
   it("creates a deterministic remediation plan", () => {
     const issue = createIssue();
 
-    const request =
-      createResearchLineageIntegrityRemediationRequest(
-        investigation.id,
-        issue,
-        true,
-        replacementFinding.id,
-      );
+    const request = createResearchLineageIntegrityRemediationRequest(
+      investigation.id,
+      issue,
+      true,
+      replacementFinding.id,
+    );
 
     expect(request).not.toBeNull();
 
-    const plan = createResearchLineageIntegrityRemediationPlan(
-      request!,
-      dependencies,
-    );
+    const plan = createResearchLineageIntegrityRemediationPlan(request!, dependencies);
 
     expect(plan.investigationId).toBe(investigation.id);
-    expect(plan.issueCode).toBe(
-      "CONCLUSION_FINDING_REFERENCE_INVALID",
-    );
+    expect(plan.issueCode).toBe("CONCLUSION_FINDING_REFERENCE_INVALID");
     expect(plan.action).toBe("RepairReference");
     expect(plan.confirmed).toBe(true);
     expect(plan.status).toBe("Validated");
@@ -318,83 +290,61 @@ describe("research lineage remediation planning", () => {
   });
 
   it("exposes remediation planning operations through the service factory", () => {
-    const service =
-      createResearchLineageRemediationPlanningService(
-        dependencies,
-      );
+    const service = createResearchLineageRemediationPlanningService(dependencies);
 
-    const action =
-      service.getResearchLineageIntegrityIssueAction(
-        createIssue(),
-      );
+    const action = service.getResearchLineageIntegrityIssueAction(createIssue());
 
     expect(action.action).toBe("RepairReference");
 
-    const preview =
-      service.getResearchLineageIntegrityRemediationPreview(
-        createIssue(),
-      );
+    const preview = service.getResearchLineageIntegrityRemediationPreview(createIssue());
 
     expect(preview?.action).toBe("RepairReference");
     expect(preview?.target.nodeId).toBe(finding.id);
 
-    const inspectionNodeId =
-      service.getResearchLineageIntegrityInspectionNodeId(
-        createIssue(),
-        lineage,
-      );
+    const inspectionNodeId = service.getResearchLineageIntegrityInspectionNodeId(
+      createIssue(),
+      lineage,
+    );
 
     expect(inspectionNodeId).toBe(finding.id);
 
-    const request =
-      service.createResearchLineageIntegrityRemediationRequest(
-        investigation.id,
-        createIssue(),
-        true,
-        replacementFinding.id,
-      );
-
-    expect(request?.action).toBe("RepairReference");
-
-    const replacement =
-      service.getResearchLineageRemediationReplacement(
-        investigation.id,
-        replacementFinding.id,
-      );
-
-    expect(replacement?.id).toBe(
+    const request = service.createResearchLineageIntegrityRemediationRequest(
+      investigation.id,
+      createIssue(),
+      true,
       replacementFinding.id,
     );
 
-    const plan =
-      service.createResearchLineageIntegrityRemediationPlan(
-        request!,
-      );
+    expect(request?.action).toBe("RepairReference");
+
+    const replacement = service.getResearchLineageRemediationReplacement(
+      investigation.id,
+      replacementFinding.id,
+    );
+
+    expect(replacement?.id).toBe(replacementFinding.id);
+
+    const plan = service.createResearchLineageIntegrityRemediationPlan(request!);
 
     expect(plan.status).toBe("Validated");
 
-    const policy =
-      service.getResearchLineageIntegrityRemediationExecutionPolicy(
-        "RepairReference",
-      );
+    const policy = service.getResearchLineageIntegrityRemediationExecutionPolicy("RepairReference");
 
     expect(policy.mutatesResearchData).toBe(true);
 
-    const validation =
-      service.validateResearchLineageIntegrityRemediationTarget(
-        investigation.id,
-        { nodeId: finding.id },
-        "RepairReference",
-      );
+    const validation = service.validateResearchLineageIntegrityRemediationTarget(
+      investigation.id,
+      { nodeId: finding.id },
+      "RepairReference",
+    );
 
     expect(validation.valid).toBe(true);
 
-    const resolved =
-      service.resolveResearchLineageIntegrityRemediationTarget(
-        investigation.id,
-        { nodeId: finding.id },
-        "RepairReference",
-      );
+    const resolved = service.resolveResearchLineageIntegrityRemediationTarget(
+      investigation.id,
+      { nodeId: finding.id },
+      "RepairReference",
+    );
 
     expect(resolved.resolvable).toBe(true);
   });

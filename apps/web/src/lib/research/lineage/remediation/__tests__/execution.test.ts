@@ -71,60 +71,49 @@ function createDependencies(
     statement: "Replacement finding",
   } as ResearchFinding;
 
-  const repairDecision: ResearchLineageIntegrityRemediationRepairDecisionResult =
-    {
-      investigationId: INVESTIGATION_ID,
-      action: "RepairReference",
-      issueCode: "CONCLUSION_FINDING_REFERENCE_INVALID",
-      decision: "Repairable",
-      resolvedTarget: createResolvedTarget(),
-      replacementEntityId: replacement.id,
-      repairDescription: "Deterministic replacement.",
-      reason: "Exactly one replacement was selected.",
-    };
+  const repairDecision: ResearchLineageIntegrityRemediationRepairDecisionResult = {
+    investigationId: INVESTIGATION_ID,
+    action: "RepairReference",
+    issueCode: "CONCLUSION_FINDING_REFERENCE_INVALID",
+    decision: "Repairable",
+    resolvedTarget: createResolvedTarget(),
+    replacementEntityId: replacement.id,
+    repairDescription: "Deterministic replacement.",
+    reason: "Exactly one replacement was selected.",
+  };
 
-  const repairExecution: ResearchLineageIntegrityRemediationRepairExecutionResult =
-    {
-      investigationId: INVESTIGATION_ID,
-      action: "RepairReference",
-      issueCode: "CONCLUSION_FINDING_REFERENCE_INVALID",
-      mutationType: "ReferenceReplacement",
-      executed: true,
-      message: "Repair completed.",
-      provenanceEventId: "event-001",
-      postcondition: {
-        validated: true,
-        valid: true,
-        issueCount: 0,
-        issues: [],
-        checkedNodeCount: 3,
-        checkedEdgeCount: 2,
-      },
-    };
+  const repairExecution: ResearchLineageIntegrityRemediationRepairExecutionResult = {
+    investigationId: INVESTIGATION_ID,
+    action: "RepairReference",
+    issueCode: "CONCLUSION_FINDING_REFERENCE_INVALID",
+    mutationType: "ReferenceReplacement",
+    executed: true,
+    message: "Repair completed.",
+    provenanceEventId: "event-001",
+    postcondition: {
+      validated: true,
+      valid: true,
+      issueCount: 0,
+      issues: [],
+      checkedNodeCount: 3,
+      checkedEdgeCount: 2,
+    },
+  };
 
   return {
-    getResearchLineageIntegrityRemediationExecutionPolicy: () =>
-      policy,
+    getResearchLineageIntegrityRemediationExecutionPolicy: () => policy,
 
-    validateResearchLineageIntegrityRemediationTarget: () =>
-      targetValidation,
+    validateResearchLineageIntegrityRemediationTarget: () => targetValidation,
 
-    resolveResearchLineageIntegrityRemediationTarget: () =>
-      createResolvedTarget(),
+    resolveResearchLineageIntegrityRemediationTarget: () => createResolvedTarget(),
 
-    getResearchLineageRemediationEntityUpdatedAt: () =>
-      "2026-01-01T00:00:00.000Z",
+    getResearchLineageRemediationEntityUpdatedAt: () => "2026-01-01T00:00:00.000Z",
 
-    getResearchLineageRemediationReplacement: () =>
-      replacement,
+    getResearchLineageRemediationReplacement: () => replacement,
 
-    decideResearchLineageIntegrityRemediationRepair: vi.fn(
-      () => repairDecision,
-    ),
+    decideResearchLineageIntegrityRemediationRepair: vi.fn(() => repairDecision),
 
-    executeResearchLineageIntegrityRemediationRepair: vi.fn(
-      () => repairExecution,
-    ),
+    executeResearchLineageIntegrityRemediationRepair: vi.fn(() => repairExecution),
 
     ...overrides,
   };
@@ -133,61 +122,40 @@ function createDependencies(
 describe("research lineage remediation execution", () => {
   it("exposes execution operations through the service factory", () => {
     const dependencies = createDependencies();
-    const service =
-      createResearchLineageRemediationExecutionService(
-        dependencies,
-      );
+    const service = createResearchLineageRemediationExecutionService(dependencies);
 
     const plan = createPlan();
 
-    const preflight =
-      service.preflightResearchLineageIntegrityRemediation(
-        plan,
-      );
+    const preflight = service.preflightResearchLineageIntegrityRemediation(plan);
 
     expect(preflight.ready).toBe(true);
     expect(preflight.confirmed).toBe(true);
 
-    const result =
-      service.executeResearchLineageIntegrityRemediation(
-        plan,
-      );
+    const result = service.executeResearchLineageIntegrityRemediation(plan);
 
     expect(result.executed).toBe(true);
     expect(result.status).toBe("Executed");
     expect(result.provenanceEventId).toBe("event-001");
 
-    expect(
-      dependencies.decideResearchLineageIntegrityRemediationRepair,
-    ).toHaveBeenCalledWith(plan);
+    expect(dependencies.decideResearchLineageIntegrityRemediationRepair).toHaveBeenCalledWith(plan);
 
-    expect(
-      dependencies.executeResearchLineageIntegrityRemediationRepair,
-    ).toHaveBeenCalled();
+    expect(dependencies.executeResearchLineageIntegrityRemediationRepair).toHaveBeenCalled();
   });
 
   it("preserves rejection through the service factory when confirmation is missing", () => {
     const dependencies = createDependencies();
-    const service =
-      createResearchLineageRemediationExecutionService(
-        dependencies,
-      );
+    const service = createResearchLineageRemediationExecutionService(dependencies);
 
-    const result =
-      service.executeResearchLineageIntegrityRemediation(
-        createPlan({
-          confirmed: false,
-        }),
-      );
+    const result = service.executeResearchLineageIntegrityRemediation(
+      createPlan({
+        confirmed: false,
+      }),
+    );
 
     expect(result.status).toBe("Rejected");
     expect(result.executed).toBe(false);
-    expect(result.message).toBe(
-      "Remediation execution requires explicit confirmation.",
-    );
+    expect(result.message).toBe("Remediation execution requires explicit confirmation.");
 
-    expect(
-      dependencies.decideResearchLineageIntegrityRemediationRepair,
-    ).not.toHaveBeenCalled();
+    expect(dependencies.decideResearchLineageIntegrityRemediationRepair).not.toHaveBeenCalled();
   });
 });

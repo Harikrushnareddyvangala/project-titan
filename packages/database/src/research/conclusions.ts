@@ -6,10 +6,7 @@ import {
   researchConclusionSupportingFindings,
   researchInvestigationConclusions,
 } from "../schema/index.js";
-import {
-  type TitanDatabaseTransaction,
-  withDatabaseTransaction,
-} from "../transaction.js";
+import { type TitanDatabaseTransaction, withDatabaseTransaction } from "../transaction.js";
 export interface ResearchInvestigationConclusionRecord {
   id: string;
   investigationId: string;
@@ -58,24 +55,14 @@ async function hydrateResearchInvestigationConclusion(
         findingId: researchConclusionSupportingFindings.findingId,
       })
       .from(researchConclusionSupportingFindings)
-      .where(
-        eq(
-          researchConclusionSupportingFindings.conclusionId,
-          conclusion.id,
-        ),
-      ),
+      .where(eq(researchConclusionSupportingFindings.conclusionId, conclusion.id)),
 
     database
       .select({
         findingId: researchConclusionContradictingFindings.findingId,
       })
       .from(researchConclusionContradictingFindings)
-      .where(
-        eq(
-          researchConclusionContradictingFindings.conclusionId,
-          conclusion.id,
-        ),
-      ),
+      .where(eq(researchConclusionContradictingFindings.conclusionId, conclusion.id)),
   ]);
 
   return {
@@ -84,9 +71,7 @@ async function hydrateResearchInvestigationConclusion(
     statement: conclusion.statement,
     status: conclusion.status,
     supportingFindingIds: supportingFindings.map(({ findingId }) => findingId),
-    contradictingFindingIds: contradictingFindings.map(
-      ({ findingId }) => findingId,
-    ),
+    contradictingFindingIds: contradictingFindings.map(({ findingId }) => findingId),
     uncertainty: conclusion.uncertainty,
     nextAction: conclusion.nextAction,
     createdAt: conclusion.createdAt,
@@ -119,9 +104,7 @@ export async function getResearchInvestigationConclusionRecords(): Promise<
     .orderBy(asc(researchInvestigationConclusions.id));
 
   return Promise.all(
-    rows.map((conclusion) =>
-      hydrateResearchInvestigationConclusion(db, conclusion),
-    ),
+    rows.map((conclusion) => hydrateResearchInvestigationConclusion(db, conclusion)),
   );
 }
 
@@ -144,9 +127,7 @@ export async function createResearchInvestigationConclusionRecord(
       .returning();
 
     if (!row) {
-      throw new Error(
-        `Failed to create research conclusion: ${input.id}`,
-      );
+      throw new Error(`Failed to create research conclusion: ${input.id}`);
     }
 
     if (input.supportingFindingIds?.length) {
@@ -173,7 +154,7 @@ export async function createResearchInvestigationConclusionRecord(
   return hydrateResearchInvestigationConclusion(db, conclusion);
 }
 
-async function updateResearchInvestigationConclusionRecordInTransaction(
+export async function updateResearchInvestigationConclusionRecordInTransaction(
   tx: TitanDatabaseTransaction,
   id: string,
   input: UpdateResearchInvestigationConclusionRecordInput,

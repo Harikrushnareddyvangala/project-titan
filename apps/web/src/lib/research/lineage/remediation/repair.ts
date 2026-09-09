@@ -13,7 +13,7 @@ import type {
   ResearchLineageIntegrityResult,
 } from "@/types/research";
 
-export interface ResearchLineageRemediationRepairDependencies {
+export interface ResearchLineageRemediationMutationPreparationDependencies {
   getResearchInvestigations(): ResearchInvestigation[];
   getResearchFindings(): ResearchFinding[];
   getResearchInvestigationConclusions(): ResearchInvestigationConclusion[];
@@ -23,10 +23,10 @@ export interface ResearchLineageRemediationRepairDependencies {
     target: ResearchLineageIntegrityRemediationPlan["target"],
     action?: ResearchLineageIntegrityRemediationPlan["action"],
   ): ResearchLineageIntegrityResolvedRemediationTarget;
+}
 
-  saveResearchInvestigationConclusion(
-    conclusion: ResearchInvestigationConclusion,
-  ): void;
+export interface ResearchLineageRemediationRepairDependencies extends ResearchLineageRemediationMutationPreparationDependencies {
+  saveResearchInvestigationConclusion(conclusion: ResearchInvestigationConclusion): void;
 
   createResearchProvenanceEvent(input: {
     investigationId: string;
@@ -38,14 +38,12 @@ export interface ResearchLineageRemediationRepairDependencies {
     id: string;
   };
 
-  validateResearchLineage(
-    investigationId: string,
-  ): ResearchLineageIntegrityResult;
+  validateResearchLineage(investigationId: string): ResearchLineageIntegrityResult;
 }
 
 export function discoverResearchLineageIntegrityRemediationReplacement(
   plan: ResearchLineageIntegrityRemediationPlan,
-  dependencies: ResearchLineageRemediationRepairDependencies,
+  dependencies: ResearchLineageRemediationMutationPreparationDependencies,
 ): ResearchLineageIntegrityRemediationReplacementDiscoveryResult {
   const investigation = dependencies
     .getResearchInvestigations()
@@ -58,8 +56,7 @@ export function discoverResearchLineageIntegrityRemediationReplacement(
       status: "NotFound",
       candidates: [],
       selectedCandidate: null,
-      reason:
-        "The investigation does not exist, so no canonical replacement can be discovered.",
+      reason: "The investigation does not exist, so no canonical replacement can be discovered.",
     };
   }
 
@@ -70,28 +67,21 @@ export function discoverResearchLineageIntegrityRemediationReplacement(
       status: "NotFound",
       candidates: [],
       selectedCandidate: null,
-      reason:
-        "No canonical replacement-discovery rule is defined for this issue.",
+      reason: "No canonical replacement-discovery rule is defined for this issue.",
     };
   }
 
   if (!plan.replacementEntityId) {
     const candidates = dependencies
       .getResearchFindings()
-      .filter((finding) =>
-        investigation.findingIds.includes(finding.id),
-      )
-      .map(
-        (
-          finding,
-        ): ResearchLineageIntegrityRemediationReplacementCandidate => ({
-          id: finding.id,
-          title: finding.statement,
-          investigationId: plan.investigationId,
-          reason:
-            "The finding belongs to the investigation and is eligible for replacement discovery.",
-        }),
-      );
+      .filter((finding) => investigation.findingIds.includes(finding.id))
+      .map((finding): ResearchLineageIntegrityRemediationReplacementCandidate => ({
+        id: finding.id,
+        title: finding.statement,
+        investigationId: plan.investigationId,
+        reason:
+          "The finding belongs to the investigation and is eligible for replacement discovery.",
+      }));
 
     if (candidates.length === 0) {
       return {
@@ -100,8 +90,7 @@ export function discoverResearchLineageIntegrityRemediationReplacement(
         status: "NotFound",
         candidates: [],
         selectedCandidate: null,
-        reason:
-          "No candidate replacement finding could be discovered within the investigation.",
+        reason: "No candidate replacement finding could be discovered within the investigation.",
       };
     }
 
@@ -123,16 +112,15 @@ export function discoverResearchLineageIntegrityRemediationReplacement(
       status: "Resolved",
       candidates,
       selectedCandidate: candidates[0],
-      reason:
-        "Exactly one candidate replacement finding was discovered within the investigation.",
+      reason: "Exactly one candidate replacement finding was discovered within the investigation.",
     };
   }
 
-  const finding = dependencies.getResearchFindings().find(
-    (item) =>
-      item.id === plan.replacementEntityId &&
-      investigation.findingIds.includes(item.id),
-  );
+  const finding = dependencies
+    .getResearchFindings()
+    .find(
+      (item) => item.id === plan.replacementEntityId && investigation.findingIds.includes(item.id),
+    );
 
   if (!finding) {
     return {
@@ -145,14 +133,13 @@ export function discoverResearchLineageIntegrityRemediationReplacement(
     };
   }
 
-  const candidate: ResearchLineageIntegrityRemediationReplacementCandidate =
-    {
-      id: finding.id,
-      title: finding.statement,
-      investigationId: plan.investigationId,
-      reason:
-        "The replacement finding was explicitly identified and resolved by exact ID within the investigation.",
-    };
+  const candidate: ResearchLineageIntegrityRemediationReplacementCandidate = {
+    id: finding.id,
+    title: finding.statement,
+    investigationId: plan.investigationId,
+    reason:
+      "The replacement finding was explicitly identified and resolved by exact ID within the investigation.",
+  };
 
   return {
     investigationId: plan.investigationId,
@@ -160,21 +147,19 @@ export function discoverResearchLineageIntegrityRemediationReplacement(
     status: "Resolved",
     candidates: [candidate],
     selectedCandidate: candidate,
-    reason:
-      "The explicit replacement finding resolved uniquely within the investigation.",
+    reason: "The explicit replacement finding resolved uniquely within the investigation.",
   };
 }
 
 export function decideResearchLineageIntegrityRemediationRepair(
   plan: ResearchLineageIntegrityRemediationPlan,
-  dependencies: ResearchLineageRemediationRepairDependencies,
+  dependencies: ResearchLineageRemediationMutationPreparationDependencies,
 ): ResearchLineageIntegrityRemediationRepairDecisionResult {
-  const resolvedTarget =
-    dependencies.resolveResearchLineageIntegrityRemediationTarget(
-      plan.investigationId,
-      plan.target,
-      plan.action,
-    );
+  const resolvedTarget = dependencies.resolveResearchLineageIntegrityRemediationTarget(
+    plan.investigationId,
+    plan.target,
+    plan.action,
+  );
 
   if (!resolvedTarget.resolvable) {
     return {
@@ -201,11 +186,10 @@ export function decideResearchLineageIntegrityRemediationRepair(
     };
   }
 
-  const replacementDiscovery =
-    discoverResearchLineageIntegrityRemediationReplacement(
-      plan,
-      dependencies,
-    );
+  const replacementDiscovery = discoverResearchLineageIntegrityRemediationReplacement(
+    plan,
+    dependencies,
+  );
 
   if (replacementDiscovery.status === "NotFound") {
     return {
@@ -247,8 +231,7 @@ export function decideResearchLineageIntegrityRemediationRepair(
       resolvedTarget,
       repairDescription:
         "The discovered replacement does not satisfy the deterministic repair contract.",
-      reason:
-        "A repair candidate must be uniquely selected and belong to the same investigation.",
+      reason: "A repair candidate must be uniquely selected and belong to the same investigation.",
     };
   }
 
@@ -295,60 +278,93 @@ export function createResearchLineageIntegrityRemediationMutationContract(
   };
 }
 
-export function executeResearchLineageIntegrityRemediationRepair(
+interface PreparedResearchLineageIntegrityRemediationMutation {
+  investigationId: string;
+  action: ResearchLineageIntegrityRemediationRepairDecisionResult["action"];
+  issueCode: ResearchLineageIntegrityRemediationRepairDecisionResult["issueCode"];
+  mutationContract: ResearchLineageIntegrityRemediationMutationContract;
+  conclusion: ResearchInvestigationConclusion;
+  updatedConclusion: ResearchInvestigationConclusion;
+  sourceId: string;
+  replacementFindingId: string;
+  provenanceInput: {
+    investigationId: string;
+    entityType: "Conclusion";
+    entityId: string;
+    eventType: "Updated";
+    reason: string;
+  };
+}
+
+type ResearchLineageIntegrityRemediationMutationPreparation =
+  | {
+      prepared: true;
+      mutation: PreparedResearchLineageIntegrityRemediationMutation;
+    }
+  | {
+      prepared: false;
+      result: ResearchLineageIntegrityRemediationRepairExecutionResult;
+    };
+
+export function prepareResearchLineageIntegrityRemediationMutation(
   decision: ResearchLineageIntegrityRemediationRepairDecisionResult,
-  dependencies: ResearchLineageRemediationRepairDependencies,
-): ResearchLineageIntegrityRemediationRepairExecutionResult {
+  dependencies: ResearchLineageRemediationMutationPreparationDependencies,
+): ResearchLineageIntegrityRemediationMutationPreparation {
   if (decision.decision !== "Repairable") {
     return {
-      investigationId: decision.investigationId,
-      action: decision.action,
-      issueCode: decision.issueCode,
-      executed: false,
-      mutationType: null,
-      message:
-        "Repair execution rejected because the repair decision is not deterministic.",
+      prepared: false,
+      result: {
+        investigationId: decision.investigationId,
+        action: decision.action,
+        issueCode: decision.issueCode,
+        executed: false,
+        mutationType: null,
+        message: "Repair execution rejected because the repair decision is not deterministic.",
+      },
     };
   }
 
-  const mutationContract =
-    createResearchLineageIntegrityRemediationMutationContract(
-      decision,
-    );
+  const mutationContract = createResearchLineageIntegrityRemediationMutationContract(decision);
 
   if (!mutationContract) {
     return {
-      investigationId: decision.investigationId,
-      action: decision.action,
-      issueCode: decision.issueCode,
-      executed: false,
-      mutationType: null,
-      message:
-        "Repair execution rejected because no valid mutation contract exists.",
+      prepared: false,
+      result: {
+        investigationId: decision.investigationId,
+        action: decision.action,
+        issueCode: decision.issueCode,
+        executed: false,
+        mutationType: null,
+        message: "Repair execution rejected because no valid mutation contract exists.",
+      },
     };
   }
 
   if (!mutationContract.deterministic) {
     return {
-      investigationId: decision.investigationId,
-      action: decision.action,
-      issueCode: decision.issueCode,
-      executed: false,
-      mutationType: null,
-      message:
-        "Repair execution rejected because the mutation is not deterministic.",
+      prepared: false,
+      result: {
+        investigationId: decision.investigationId,
+        action: decision.action,
+        issueCode: decision.issueCode,
+        executed: false,
+        mutationType: null,
+        message: "Repair execution rejected because the mutation is not deterministic.",
+      },
     };
   }
 
   if (mutationContract.mutationType !== "ReferenceReplacement") {
     return {
-      investigationId: decision.investigationId,
-      action: decision.action,
-      issueCode: decision.issueCode,
-      executed: false,
-      mutationType: null,
-      message:
-        "Repair execution rejected because the mutation type is unsupported.",
+      prepared: false,
+      result: {
+        investigationId: decision.investigationId,
+        action: decision.action,
+        issueCode: decision.issueCode,
+        executed: false,
+        mutationType: null,
+        message: "Repair execution rejected because the mutation type is unsupported.",
+      },
     };
   }
 
@@ -356,13 +372,15 @@ export function executeResearchLineageIntegrityRemediationRepair(
 
   if (!conclusionId) {
     return {
-      investigationId: decision.investigationId,
-      action: decision.action,
-      issueCode: decision.issueCode,
-      executed: false,
-      mutationType: mutationContract.mutationType,
-      message:
-        "Repair execution rejected because the target conclusion could not be resolved.",
+      prepared: false,
+      result: {
+        investigationId: decision.investigationId,
+        action: decision.action,
+        issueCode: decision.issueCode,
+        executed: false,
+        mutationType: mutationContract.mutationType,
+        message: "Repair execution rejected because the target conclusion could not be resolved.",
+      },
     };
   }
 
@@ -370,33 +388,35 @@ export function executeResearchLineageIntegrityRemediationRepair(
 
   if (!replacementFindingId) {
     return {
-      investigationId: decision.investigationId,
-      action: decision.action,
-      issueCode: decision.issueCode,
-      executed: false,
-      mutationType: mutationContract.mutationType,
-      message:
-        "Repair execution rejected because the repair decision does not contain a replacement entity ID.",
+      prepared: false,
+      result: {
+        investigationId: decision.investigationId,
+        action: decision.action,
+        issueCode: decision.issueCode,
+        executed: false,
+        mutationType: mutationContract.mutationType,
+        message:
+          "Repair execution rejected because the repair decision does not contain a replacement entity ID.",
+      },
     };
   }
 
   const conclusion = dependencies
     .getResearchInvestigationConclusions()
-    .find(
-      (item) =>
-        item.id === conclusionId &&
-        item.investigationId === decision.investigationId,
-    );
+    .find((item) => item.id === conclusionId && item.investigationId === decision.investigationId);
 
   if (!conclusion) {
     return {
-      investigationId: decision.investigationId,
-      action: decision.action,
-      issueCode: decision.issueCode,
-      executed: false,
-      mutationType: mutationContract.mutationType,
-      message:
-        "Repair execution rejected because the target conclusion could not be found within the investigation.",
+      prepared: false,
+      result: {
+        investigationId: decision.investigationId,
+        action: decision.action,
+        issueCode: decision.issueCode,
+        executed: false,
+        mutationType: mutationContract.mutationType,
+        message:
+          "Repair execution rejected because the target conclusion could not be found within the investigation.",
+      },
     };
   }
 
@@ -406,13 +426,15 @@ export function executeResearchLineageIntegrityRemediationRepair(
 
   if (!finding) {
     return {
-      investigationId: decision.investigationId,
-      action: decision.action,
-      issueCode: decision.issueCode,
-      executed: false,
-      mutationType: mutationContract.mutationType,
-      message:
-        "Repair execution rejected because the replacement finding could not be found.",
+      prepared: false,
+      result: {
+        investigationId: decision.investigationId,
+        action: decision.action,
+        issueCode: decision.issueCode,
+        executed: false,
+        mutationType: mutationContract.mutationType,
+        message: "Repair execution rejected because the replacement finding could not be found.",
+      },
     };
   }
 
@@ -420,40 +442,38 @@ export function executeResearchLineageIntegrityRemediationRepair(
     .getResearchInvestigations()
     .find((item) => item.id === decision.investigationId);
 
-  if (
-    !investigation ||
-    !investigation.findingIds.includes(replacementFindingId)
-  ) {
+  if (!investigation || !investigation.findingIds.includes(replacementFindingId)) {
     return {
-      investigationId: decision.investigationId,
-      action: decision.action,
-      issueCode: decision.issueCode,
-      executed: false,
-      mutationType: mutationContract.mutationType,
-      message:
-        "Repair execution rejected because the replacement finding does not belong to the investigation.",
+      prepared: false,
+      result: {
+        investigationId: decision.investigationId,
+        action: decision.action,
+        issueCode: decision.issueCode,
+        executed: false,
+        mutationType: mutationContract.mutationType,
+        message:
+          "Repair execution rejected because the replacement finding does not belong to the investigation.",
+      },
     };
   }
 
-  const hasSupportingReference =
-    conclusion.supportingFindingIds.includes(
-      replacementFindingId,
-    );
+  const hasSupportingReference = conclusion.supportingFindingIds.includes(replacementFindingId);
 
   const hasContradictingReference =
-    conclusion.contradictingFindingIds.includes(
-      replacementFindingId,
-    );
+    conclusion.contradictingFindingIds.includes(replacementFindingId);
 
   if (hasSupportingReference || hasContradictingReference) {
     return {
-      investigationId: decision.investigationId,
-      action: decision.action,
-      issueCode: decision.issueCode,
-      executed: false,
-      mutationType: mutationContract.mutationType,
-      message:
-        "Repair execution rejected because the replacement finding is already referenced by the conclusion.",
+      prepared: false,
+      result: {
+        investigationId: decision.investigationId,
+        action: decision.action,
+        issueCode: decision.issueCode,
+        executed: false,
+        mutationType: mutationContract.mutationType,
+        message:
+          "Repair execution rejected because the replacement finding is already referenced by the conclusion.",
+      },
     };
   }
 
@@ -461,34 +481,35 @@ export function executeResearchLineageIntegrityRemediationRepair(
 
   if (!sourceId) {
     return {
-      investigationId: decision.investigationId,
-      action: decision.action,
-      issueCode: decision.issueCode,
-      executed: false,
-      mutationType: mutationContract.mutationType,
-      message:
-        "Repair execution rejected because the invalid source reference could not be resolved.",
+      prepared: false,
+      result: {
+        investigationId: decision.investigationId,
+        action: decision.action,
+        issueCode: decision.issueCode,
+        executed: false,
+        mutationType: mutationContract.mutationType,
+        message:
+          "Repair execution rejected because the invalid source reference could not be resolved.",
+      },
     };
   }
 
-  const replacesSupportingReference =
-    conclusion.supportingFindingIds.includes(sourceId);
+  const replacesSupportingReference = conclusion.supportingFindingIds.includes(sourceId);
 
-  const replacesContradictingReference =
-    conclusion.contradictingFindingIds.includes(sourceId);
+  const replacesContradictingReference = conclusion.contradictingFindingIds.includes(sourceId);
 
-  if (
-    !replacesSupportingReference &&
-    !replacesContradictingReference
-  ) {
+  if (!replacesSupportingReference && !replacesContradictingReference) {
     return {
-      investigationId: decision.investigationId,
-      action: decision.action,
-      issueCode: decision.issueCode,
-      executed: false,
-      mutationType: mutationContract.mutationType,
-      message:
-        "Repair execution rejected because the invalid finding reference is not present on the target conclusion.",
+      prepared: false,
+      result: {
+        investigationId: decision.investigationId,
+        action: decision.action,
+        issueCode: decision.issueCode,
+        executed: false,
+        mutationType: mutationContract.mutationType,
+        message:
+          "Repair execution rejected because the invalid finding reference is not present on the target conclusion.",
+      },
     };
   }
 
@@ -497,55 +518,74 @@ export function executeResearchLineageIntegrityRemediationRepair(
 
     supportingFindingIds: replacesSupportingReference
       ? conclusion.supportingFindingIds.map((findingId) =>
-          findingId === sourceId
-            ? replacementFindingId
-            : findingId,
+          findingId === sourceId ? replacementFindingId : findingId,
         )
       : conclusion.supportingFindingIds,
 
     contradictingFindingIds: replacesContradictingReference
       ? conclusion.contradictingFindingIds.map((findingId) =>
-          findingId === sourceId
-            ? replacementFindingId
-            : findingId,
+          findingId === sourceId ? replacementFindingId : findingId,
         )
       : conclusion.contradictingFindingIds,
 
     updatedAt: new Date().toISOString(),
   };
 
-  dependencies.saveResearchInvestigationConclusion(
-    updatedConclusion,
-  );
-
-  const provenanceEvent =
-    dependencies.createResearchProvenanceEvent({
+  return {
+    prepared: true,
+    mutation: {
       investigationId: decision.investigationId,
-      entityType: "Conclusion",
-      entityId: conclusion.id,
-      eventType: "Updated",
-      reason: `Deterministic remediation replaced invalid finding reference ${sourceId} with ${replacementFindingId}.`,
-    });
+      action: decision.action,
+      issueCode: decision.issueCode,
+      mutationContract,
+      conclusion,
+      updatedConclusion,
+      sourceId,
+      replacementFindingId,
+      provenanceInput: {
+        investigationId: decision.investigationId,
+        entityType: "Conclusion",
+        entityId: conclusion.id,
+        eventType: "Updated",
+        reason: `Deterministic remediation replaced invalid finding reference ${sourceId} with ${replacementFindingId}.`,
+      },
+    },
+  };
+}
 
-  const validation = dependencies.validateResearchLineage(
-    decision.investigationId,
-  );
+export function executeResearchLineageIntegrityRemediationRepair(
+  decision: ResearchLineageIntegrityRemediationRepairDecisionResult,
+  dependencies: ResearchLineageRemediationRepairDependencies,
+): ResearchLineageIntegrityRemediationRepairExecutionResult {
+  const preparation = prepareResearchLineageIntegrityRemediationMutation(decision, dependencies);
 
-  const postcondition: ResearchLineageIntegrityRemediationPostcondition =
-    {
-      validated: true,
-      valid: validation.valid,
-      issueCount: validation.issueCount,
-      issues: validation.issues,
-      checkedNodeCount: validation.checkedNodeCount,
-      checkedEdgeCount: validation.checkedEdgeCount,
-    };
+  if (!preparation.prepared) {
+    return preparation.result;
+  }
+
+  const { mutationContract, updatedConclusion, sourceId, replacementFindingId, provenanceInput } =
+    preparation.mutation;
+
+  dependencies.saveResearchInvestigationConclusion(updatedConclusion);
+
+  const provenanceEvent = dependencies.createResearchProvenanceEvent(provenanceInput);
+
+  const validation = dependencies.validateResearchLineage(decision.investigationId);
+
+  const postcondition: ResearchLineageIntegrityRemediationPostcondition = {
+    validated: true,
+    valid: validation.valid,
+    issueCount: validation.issueCount,
+    issues: validation.issues,
+    checkedNodeCount: validation.checkedNodeCount,
+    checkedEdgeCount: validation.checkedEdgeCount,
+  };
 
   if (
     validation.issues.some(
       (issue) =>
         issue.code === "CONCLUSION_FINDING_REFERENCE_INVALID" &&
-        issue.targetId === conclusion.id,
+        issue.targetId === updatedConclusion.id,
     )
   ) {
     return {
@@ -569,7 +609,7 @@ export function executeResearchLineageIntegrityRemediationRepair(
     mutationType: mutationContract.mutationType,
     provenanceEventId: provenanceEvent.id,
     postcondition,
-    message: `Deterministic reference repair completed: ${sourceId} was replaced with ${replacementFindingId} on conclusion ${conclusion.id}.`,
+    message: `Deterministic reference repair completed: ${sourceId} was replaced with ${replacementFindingId} on conclusion ${updatedConclusion.id}.`,
   };
 }
 
@@ -580,32 +620,21 @@ export function createResearchLineageRemediationRepairService(
     discoverResearchLineageIntegrityRemediationReplacement: (
       plan: ResearchLineageIntegrityRemediationPlan,
     ): ResearchLineageIntegrityRemediationReplacementDiscoveryResult =>
-      discoverResearchLineageIntegrityRemediationReplacement(
-        plan,
-        dependencies,
-      ),
+      discoverResearchLineageIntegrityRemediationReplacement(plan, dependencies),
 
     decideResearchLineageIntegrityRemediationRepair: (
       plan: ResearchLineageIntegrityRemediationPlan,
     ): ResearchLineageIntegrityRemediationRepairDecisionResult =>
-      decideResearchLineageIntegrityRemediationRepair(
-        plan,
-        dependencies,
-      ),
+      decideResearchLineageIntegrityRemediationRepair(plan, dependencies),
 
     createResearchLineageIntegrityRemediationMutationContract: (
       decision: ResearchLineageIntegrityRemediationRepairDecisionResult,
     ): ResearchLineageIntegrityRemediationMutationContract | null =>
-      createResearchLineageIntegrityRemediationMutationContract(
-        decision,
-      ),
+      createResearchLineageIntegrityRemediationMutationContract(decision),
 
     executeResearchLineageIntegrityRemediationRepair: (
       decision: ResearchLineageIntegrityRemediationRepairDecisionResult,
     ): ResearchLineageIntegrityRemediationRepairExecutionResult =>
-      executeResearchLineageIntegrityRemediationRepair(
-        decision,
-        dependencies,
-      ),
+      executeResearchLineageIntegrityRemediationRepair(decision, dependencies),
   };
 }

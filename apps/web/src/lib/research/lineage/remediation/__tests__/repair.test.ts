@@ -93,11 +93,8 @@ function createDependencies(
   return {
     getResearchInvestigations: () => [createInvestigation()],
     getResearchFindings: () => [createFinding(REPLACEMENT_FINDING_ID)],
-    getResearchInvestigationConclusions: () => [
-      createConclusion(),
-    ],
-    resolveResearchLineageIntegrityRemediationTarget: () =>
-      createResolvedTarget(),
+    getResearchInvestigationConclusions: () => [createConclusion()],
+    resolveResearchLineageIntegrityRemediationTarget: () => createResolvedTarget(),
     saveResearchInvestigationConclusion: vi.fn(),
     createResearchProvenanceEvent: vi.fn(() => ({
       id: "event-001",
@@ -115,9 +112,7 @@ function createDependencies(
 }
 
 function createRepairableDecision(
-  overrides: Partial<
-    ResearchLineageIntegrityRemediationRepairDecisionResult
-  > = {},
+  overrides: Partial<ResearchLineageIntegrityRemediationRepairDecisionResult> = {},
 ): ResearchLineageIntegrityRemediationRepairDecisionResult {
   return {
     investigationId: INVESTIGATION_ID,
@@ -163,12 +158,8 @@ describe("research lineage remediation repair", () => {
       const result = discoverResearchLineageIntegrityRemediationReplacement(
         createPlan(),
         createDependencies({
-          getResearchFindings: () => [
-            createFinding("finding-001"),
-            createFinding("finding-002"),
-          ],
-          getResearchInvestigations: () =>
-            [createInvestigation(["finding-001", "finding-002"])],
+          getResearchFindings: () => [createFinding("finding-001"), createFinding("finding-002")],
+          getResearchInvestigations: () => [createInvestigation(["finding-001", "finding-002"])],
         }),
       );
 
@@ -186,9 +177,7 @@ describe("research lineage remediation repair", () => {
       expect(result.status).toBe("Resolved");
       expect(result.candidates).toHaveLength(1);
       expect(result.selectedCandidate?.id).toBe(REPLACEMENT_FINDING_ID);
-      expect(result.selectedCandidate?.investigationId).toBe(
-        INVESTIGATION_ID,
-      );
+      expect(result.selectedCandidate?.investigationId).toBe(INVESTIGATION_ID);
     });
 
     it("resolves an explicit replacement finding by exact ID", () => {
@@ -235,10 +224,9 @@ describe("research lineage remediation repair", () => {
     });
 
     it("creates a deterministic reference-replacement contract", () => {
-      const contract =
-        createResearchLineageIntegrityRemediationMutationContract(
-          createRepairableDecision(),
-        );
+      const contract = createResearchLineageIntegrityRemediationMutationContract(
+        createRepairableDecision(),
+      );
 
       expect(contract).toEqual({
         mutationType: "ReferenceReplacement",
@@ -284,9 +272,7 @@ describe("research lineage remediation repair", () => {
 
     it("rejects a replacement finding outside the investigation", () => {
       const dependencies = createDependencies({
-        getResearchInvestigations: () => [
-          createInvestigation(["another-finding"]),
-        ],
+        getResearchInvestigations: () => [createInvestigation(["another-finding"])],
       });
 
       const result = executeResearchLineageIntegrityRemediationRepair(
@@ -295,9 +281,7 @@ describe("research lineage remediation repair", () => {
       );
 
       expect(result.executed).toBe(false);
-      expect(result.message).toContain(
-        "replacement finding does not belong to the investigation",
-      );
+      expect(result.message).toContain("replacement finding does not belong to the investigation");
     });
 
     it("replaces a supporting finding reference and records provenance", () => {
@@ -351,18 +335,14 @@ describe("research lineage remediation repair", () => {
         }),
       );
 
-      expect(validateResearchLineage).toHaveBeenCalledWith(
-        INVESTIGATION_ID,
-      );
+      expect(validateResearchLineage).toHaveBeenCalledWith(INVESTIGATION_ID);
     });
 
     it("replaces a contradicting finding reference", () => {
       const saveResearchInvestigationConclusion = vi.fn();
 
       const dependencies = createDependencies({
-        getResearchInvestigationConclusions: () => [
-          createConclusion([], [SOURCE_FINDING_ID]),
-        ],
+        getResearchInvestigationConclusions: () => [createConclusion([], [SOURCE_FINDING_ID])],
         saveResearchInvestigationConclusion,
       });
 
@@ -393,9 +373,7 @@ describe("research lineage remediation repair", () => {
       );
 
       expect(result.executed).toBe(false);
-      expect(result.message).toContain(
-        "replacement finding is already referenced",
-      );
+      expect(result.message).toContain("replacement finding is already referenced");
     });
 
     it("reports a failed postcondition when the invalid reference remains", () => {
@@ -434,44 +412,23 @@ describe("research lineage remediation repair", () => {
   it("exposes remediation repair operations through the service factory", () => {
     const dependencies = createDependencies();
 
-    const service =
-      createResearchLineageRemediationRepairService(
-        dependencies,
-      );
+    const service = createResearchLineageRemediationRepairService(dependencies);
 
-    const discovery =
-      service.discoverResearchLineageIntegrityRemediationReplacement(
-        createPlan(),
-      );
+    const discovery = service.discoverResearchLineageIntegrityRemediationReplacement(createPlan());
 
     expect(discovery.status).toBe("Resolved");
-    expect(discovery.selectedCandidate?.id).toBe(
-      REPLACEMENT_FINDING_ID,
-    );
+    expect(discovery.selectedCandidate?.id).toBe(REPLACEMENT_FINDING_ID);
 
-    const decision =
-      service.decideResearchLineageIntegrityRemediationRepair(
-        createPlan(),
-      );
+    const decision = service.decideResearchLineageIntegrityRemediationRepair(createPlan());
 
     expect(decision.decision).toBe("Repairable");
-    expect(decision.replacementEntityId).toBe(
-      REPLACEMENT_FINDING_ID,
-    );
+    expect(decision.replacementEntityId).toBe(REPLACEMENT_FINDING_ID);
 
-    const contract =
-      service.createResearchLineageIntegrityRemediationMutationContract(
-        decision,
-      );
+    const contract = service.createResearchLineageIntegrityRemediationMutationContract(decision);
 
-    expect(contract?.mutationType).toBe(
-      "ReferenceReplacement",
-    );
+    expect(contract?.mutationType).toBe("ReferenceReplacement");
 
-    const execution =
-      service.executeResearchLineageIntegrityRemediationRepair(
-        decision,
-      );
+    const execution = service.executeResearchLineageIntegrityRemediationRepair(decision);
 
     expect(execution.executed).toBe(true);
   });

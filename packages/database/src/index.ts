@@ -28,3 +28,5 @@ export {
   createExecutionResourceInteractionRecord,
   getExecutionResourceInteractionRecord,
 } from "./executionResourceInteractions.js";
+
+export * from "./research/remediation.js";

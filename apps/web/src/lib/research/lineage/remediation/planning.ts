@@ -135,25 +135,18 @@ export function getResearchLineageIntegrityInspectionNodeId(
   lineage: ResearchLineage,
 ): string | null {
   if (issue.nodeId) {
-    return lineage.nodes.some((node) => node.id === issue.nodeId)
-      ? issue.nodeId
-      : null;
+    return lineage.nodes.some((node) => node.id === issue.nodeId) ? issue.nodeId : null;
   }
 
   if (issue.sourceId) {
-    const sourceExists = lineage.nodes.some(
-      (node) => node.id === issue.sourceId,
-    );
+    const sourceExists = lineage.nodes.some((node) => node.id === issue.sourceId);
 
     if (sourceExists) {
       return issue.sourceId;
     }
   }
 
-  if (
-    issue.targetId &&
-    lineage.nodes.some((node) => node.id === issue.targetId)
-  ) {
+  if (issue.targetId && lineage.nodes.some((node) => node.id === issue.targetId)) {
     return issue.targetId;
   }
 
@@ -210,29 +203,26 @@ function getResearchLineageRemediationEntityUpdatedAt(
 
   switch (target.kind) {
     case "Investigation":
-      return dependencies.getResearchInvestigations().find(
-        (item) => item.id === target.entityId,
-      )?.updatedAt;
+      return dependencies.getResearchInvestigations().find((item) => item.id === target.entityId)
+        ?.updatedAt;
 
     case "Experiment":
-      return dependencies.getResearchExperiments().find(
-        (item) => item.id === target.entityId,
-      )?.updatedAt;
+      return dependencies.getResearchExperiments().find((item) => item.id === target.entityId)
+        ?.updatedAt;
 
     case "Finding":
-      return dependencies.getResearchFindings().find(
-        (item) => item.id === target.entityId,
-      )?.updatedAt;
+      return dependencies.getResearchFindings().find((item) => item.id === target.entityId)
+        ?.updatedAt;
 
     case "FindingValidation":
-      return dependencies.getResearchFindingValidations().find(
-        (item) => item.id === target.entityId,
-      )?.updatedAt;
+      return dependencies
+        .getResearchFindingValidations()
+        .find((item) => item.id === target.entityId)?.updatedAt;
 
     case "Conclusion":
-      return dependencies.getResearchInvestigationConclusions().find(
-        (item) => item.id === target.entityId,
-      )?.updatedAt;
+      return dependencies
+        .getResearchInvestigationConclusions()
+        .find((item) => item.id === target.entityId)?.updatedAt;
 
     case "Evidence":
       /*
@@ -255,17 +245,15 @@ export function getResearchLineageRemediationReplacement(
     return undefined;
   }
 
-  const investigation = dependencies.getResearchInvestigations().find(
-    (item) => item.id === investigationId,
-  );
+  const investigation = dependencies
+    .getResearchInvestigations()
+    .find((item) => item.id === investigationId);
 
   if (!investigation || !investigation.findingIds.includes(replacementEntityId)) {
     return undefined;
   }
 
-  return dependencies.getResearchFindings().find(
-    (finding) => finding.id === replacementEntityId,
-  );
+  return dependencies.getResearchFindings().find((finding) => finding.id === replacementEntityId);
 }
 
 export function createResearchLineageIntegrityRemediationPlan(
@@ -300,8 +288,7 @@ export function createResearchLineageIntegrityRemediationPlan(
     replacementEntityId: request.replacementEntityId,
     confirmed: request.confirmed,
     status: request.confirmed ? "Validated" : "Planned",
-    description:
-      `Proposed ${request.action} remediation for ${request.issueCode}.`,
+    description: `Proposed ${request.action} remediation for ${request.issueCode}.`,
     targetUpdatedAt,
     replacementUpdatedAt,
   };
@@ -429,8 +416,7 @@ export function resolveResearchLineageIntegrityRemediationTarget(
         kind: "Relationship",
         entityId: target.targetId,
         resolvable: false,
-        reason:
-          "The owning remediation target could not be resolved in the investigation lineage.",
+        reason: "The owning remediation target could not be resolved in the investigation lineage.",
       };
     }
 
@@ -483,8 +469,7 @@ export function resolveResearchLineageIntegrityRemediationTarget(
       targetId: edge.targetId,
       relationshipType: edge.type,
       resolvable: true,
-      reason:
-        "The remediation relationship was resolved from the investigation lineage.",
+      reason: "The remediation relationship was resolved from the investigation lineage.",
     };
   }
 
@@ -507,16 +492,13 @@ export function resolveResearchLineageIntegrityRemediationTarget(
       kind: "Relationship",
       entityId: nodeId,
       resolvable: false,
-      reason:
-        "The requested remediation node could not be resolved in the investigation lineage.",
+      reason: "The requested remediation node could not be resolved in the investigation lineage.",
     };
   }
 
   switch (node.type) {
     case "Investigation": {
-      const exists = dependencies.getResearchInvestigations().some(
-        (item) => item.id === node.id,
-      );
+      const exists = dependencies.getResearchInvestigations().some((item) => item.id === node.id);
 
       return {
         investigationId,
@@ -530,9 +512,7 @@ export function resolveResearchLineageIntegrityRemediationTarget(
     }
 
     case "Experiment": {
-      const exists = dependencies.getResearchExperiments().some(
-        (item) => item.id === node.id,
-      );
+      const exists = dependencies.getResearchExperiments().some((item) => item.id === node.id);
 
       return {
         investigationId,
@@ -546,9 +526,7 @@ export function resolveResearchLineageIntegrityRemediationTarget(
     }
 
     case "Evidence": {
-      const exists = dependencies.getResearchEvidence().some(
-        (item) => item.id === node.id,
-      );
+      const exists = dependencies.getResearchEvidence().some((item) => item.id === node.id);
 
       return {
         investigationId,
@@ -562,9 +540,7 @@ export function resolveResearchLineageIntegrityRemediationTarget(
     }
 
     case "Finding": {
-      const exists = dependencies.getResearchFindings().some(
-        (item) => item.id === node.id,
-      );
+      const exists = dependencies.getResearchFindings().some((item) => item.id === node.id);
 
       return {
         investigationId,
@@ -578,9 +554,9 @@ export function resolveResearchLineageIntegrityRemediationTarget(
     }
 
     case "FindingValidation": {
-      const exists = dependencies.getResearchFindingValidations().some(
-        (item) => item.id === node.id,
-      );
+      const exists = dependencies
+        .getResearchFindingValidations()
+        .some((item) => item.id === node.id);
 
       return {
         investigationId,
@@ -594,9 +570,9 @@ export function resolveResearchLineageIntegrityRemediationTarget(
     }
 
     case "Conclusion": {
-      const exists = dependencies.getResearchInvestigationConclusions().some(
-        (item) => item.id === node.id,
-      );
+      const exists = dependencies
+        .getResearchInvestigationConclusions()
+        .some((item) => item.id === node.id);
 
       return {
         investigationId,
@@ -626,8 +602,7 @@ export function createResearchLineageRemediationPlanningService(
   return {
     getResearchLineageIntegrityIssueAction: (
       issue: ResearchLineageIntegrityIssue,
-    ): ResearchLineageIntegrityIssueAction =>
-      getResearchLineageIntegrityIssueAction(issue),
+    ): ResearchLineageIntegrityIssueAction => getResearchLineageIntegrityIssueAction(issue),
 
     getResearchLineageIntegrityRemediationPreview: (
       issue: ResearchLineageIntegrityIssue,
@@ -637,8 +612,7 @@ export function createResearchLineageRemediationPlanningService(
     getResearchLineageIntegrityInspectionNodeId: (
       issue: ResearchLineageIntegrityIssue,
       lineage: ResearchLineage,
-    ): string | null =>
-      getResearchLineageIntegrityInspectionNodeId(issue, lineage),
+    ): string | null => getResearchLineageIntegrityInspectionNodeId(issue, lineage),
 
     createResearchLineageIntegrityRemediationRequest: (
       investigationId: string,
@@ -657,19 +631,12 @@ export function createResearchLineageRemediationPlanningService(
       investigationId: string,
       replacementEntityId: string | undefined,
     ): ResearchFinding | undefined =>
-      getResearchLineageRemediationReplacement(
-        investigationId,
-        replacementEntityId,
-        dependencies,
-      ),
+      getResearchLineageRemediationReplacement(investigationId, replacementEntityId, dependencies),
 
     createResearchLineageIntegrityRemediationPlan: (
       request: ResearchLineageIntegrityRemediationRequest,
     ): ResearchLineageIntegrityRemediationPlan =>
-      createResearchLineageIntegrityRemediationPlan(
-        request,
-        dependencies,
-      ),
+      createResearchLineageIntegrityRemediationPlan(request, dependencies),
 
     getResearchLineageIntegrityRemediationExecutionPolicy: (
       action: ResearchLineageIntegrityRemediationRequest["action"],
@@ -702,10 +669,6 @@ export function createResearchLineageRemediationPlanningService(
 
     getResearchLineageRemediationEntityUpdatedAt: (
       target: ResearchLineageIntegrityResolvedRemediationTarget,
-    ): string | undefined =>
-      getResearchLineageRemediationEntityUpdatedAt(
-        target,
-        dependencies,
-      ),
+    ): string | undefined => getResearchLineageRemediationEntityUpdatedAt(target, dependencies),
   };
 }

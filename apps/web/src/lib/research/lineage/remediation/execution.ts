@@ -51,17 +51,13 @@ export function preflightResearchLineageIntegrityRemediation(
   plan: ResearchLineageIntegrityRemediationPlan,
   dependencies: ResearchLineageRemediationExecutionDependencies,
 ): ResearchLineageIntegrityRemediationExecutionPreflight {
-  const policy =
-    dependencies.getResearchLineageIntegrityRemediationExecutionPolicy(
-      plan.action,
-    );
+  const policy = dependencies.getResearchLineageIntegrityRemediationExecutionPolicy(plan.action);
 
-  const targetValidation =
-    dependencies.validateResearchLineageIntegrityRemediationTarget(
-      plan.investigationId,
-      plan.target,
-      plan.action,
-    );
+  const targetValidation = dependencies.validateResearchLineageIntegrityRemediationTarget(
+    plan.investigationId,
+    plan.target,
+    plan.action,
+  );
 
   if (!plan.confirmed) {
     return {
@@ -97,8 +93,7 @@ export function preflightResearchLineageIntegrityRemediation(
     targetValidation,
     confirmed: true,
     ready: true,
-    reason:
-      "Remediation passed confirmation, execution-policy, and target-validation checks.",
+    reason: "Remediation passed confirmation, execution-policy, and target-validation checks.",
   };
 }
 
@@ -134,10 +129,7 @@ export function executeResearchLineageIntegrityRemediation(
     };
   }
 
-  const preflight = preflightResearchLineageIntegrityRemediation(
-    plan,
-    dependencies,
-  );
+  const preflight = preflightResearchLineageIntegrityRemediation(plan, dependencies);
 
   if (!preflight.ready) {
     return {
@@ -151,12 +143,11 @@ export function executeResearchLineageIntegrityRemediation(
     };
   }
 
-  const resolvedTarget =
-    dependencies.resolveResearchLineageIntegrityRemediationTarget(
-      plan.investigationId,
-      plan.target,
-      plan.action,
-    );
+  const resolvedTarget = dependencies.resolveResearchLineageIntegrityRemediationTarget(
+    plan.investigationId,
+    plan.target,
+    plan.action,
+  );
 
   if (!resolvedTarget.resolvable) {
     return {
@@ -172,9 +163,7 @@ export function executeResearchLineageIntegrityRemediation(
 
   if (plan.targetUpdatedAt) {
     const currentTargetUpdatedAt =
-      dependencies.getResearchLineageRemediationEntityUpdatedAt(
-        resolvedTarget,
-      );
+      dependencies.getResearchLineageRemediationEntityUpdatedAt(resolvedTarget);
 
     if (currentTargetUpdatedAt !== plan.targetUpdatedAt) {
       return {
@@ -190,23 +179,15 @@ export function executeResearchLineageIntegrityRemediation(
     }
   }
 
-  if (
-    plan.replacementUpdatedAt !== undefined &&
-    plan.replacementEntityId
-  ) {
-    const currentReplacement =
-      dependencies.getResearchLineageRemediationReplacement(
-        plan.investigationId,
-        plan.replacementEntityId,
-      );
+  if (plan.replacementUpdatedAt !== undefined && plan.replacementEntityId) {
+    const currentReplacement = dependencies.getResearchLineageRemediationReplacement(
+      plan.investigationId,
+      plan.replacementEntityId,
+    );
 
-    const currentReplacementUpdatedAt =
-      currentReplacement?.updatedAt;
+    const currentReplacementUpdatedAt = currentReplacement?.updatedAt;
 
-    if (
-      currentReplacementUpdatedAt !==
-      plan.replacementUpdatedAt
-    ) {
+    if (currentReplacementUpdatedAt !== plan.replacementUpdatedAt) {
       return {
         investigationId: plan.investigationId,
         action: plan.action,
@@ -220,15 +201,10 @@ export function executeResearchLineageIntegrityRemediation(
     }
   }
 
-  const repairDecision =
-    dependencies.decideResearchLineageIntegrityRemediationRepair(
-      plan,
-    );
+  const repairDecision = dependencies.decideResearchLineageIntegrityRemediationRepair(plan);
 
   const repairResult =
-    dependencies.executeResearchLineageIntegrityRemediationRepair(
-      repairDecision,
-    );
+    dependencies.executeResearchLineageIntegrityRemediationRepair(repairDecision);
 
   return {
     investigationId: plan.investigationId,
@@ -250,17 +226,11 @@ export function createResearchLineageRemediationExecutionService(
     preflightResearchLineageIntegrityRemediation: (
       plan: ResearchLineageIntegrityRemediationPlan,
     ): ResearchLineageIntegrityRemediationExecutionPreflight =>
-      preflightResearchLineageIntegrityRemediation(
-        plan,
-        dependencies,
-      ),
+      preflightResearchLineageIntegrityRemediation(plan, dependencies),
 
     executeResearchLineageIntegrityRemediation: (
       plan: ResearchLineageIntegrityRemediationPlan,
     ): ResearchLineageIntegrityRemediationResult =>
-      executeResearchLineageIntegrityRemediation(
-        plan,
-        dependencies,
-      ),
+      executeResearchLineageIntegrityRemediation(plan, dependencies),
   };
 }
