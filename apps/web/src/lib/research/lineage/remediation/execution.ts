@@ -210,7 +210,12 @@ export function executeResearchLineageIntegrityRemediation(
     investigationId: plan.investigationId,
     action: plan.action,
     issueCode: plan.issueCode,
-    status: repairResult.executed ? "Executed" : "Rejected",
+    status:
+      repairResult.executed && repairResult.postcondition?.valid === false
+        ? "Failed"
+        : repairResult.executed
+          ? "Executed"
+          : "Rejected",
     executed: repairResult.executed,
     message: repairResult.message,
     provenanceEventId: repairResult.provenanceEventId,

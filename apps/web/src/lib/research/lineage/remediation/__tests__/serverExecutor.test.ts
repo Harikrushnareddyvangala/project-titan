@@ -182,4 +182,32 @@ describe("research lineage remediation server executor", () => {
       provenanceEventId: "research-provenance-001",
     });
   });
+
+  it("reports a committed mutation when postcondition verification remains invalid", async () => {
+    configureSnapshot();
+
+    const persistedConclusions = [
+      {
+        ...createConclusion(),
+        supportingFindingIds: [SOURCE_FINDING_ID],
+      },
+    ];
+
+    getResearchInvestigationConclusions.mockImplementationOnce(
+      async () => [createConclusion()],
+    ).mockImplementation(async () => persistedConclusions);
+
+    persistResearchLineageRemediationMutation.mockImplementationOnce(async () => ({
+      provenanceEventId: "research-provenance-committed",
+    }));
+
+    const result = await executeResearchLineageIntegrityRemediationOnServer(createPlan());
+
+    expect(persistResearchLineageRemediationMutation).toHaveBeenCalledTimes(1);
+    expect(result.executed).toBe(true);
+    expect(result.provenanceEventId).toBe("research-provenance-committed");
+    expect(result.postcondition?.validated).toBe(true);
+    expect(result.postcondition?.valid).toBe(false);
+    expect(result.message).toContain("reference mutation was persisted");
+  });
 });

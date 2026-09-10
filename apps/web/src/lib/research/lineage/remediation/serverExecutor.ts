@@ -276,7 +276,7 @@ export async function executeResearchLineageIntegrityRemediationOnServer(
     investigationId: plan.investigationId,
     action: plan.action,
     issueCode: plan.issueCode,
-    executed: !remainingInvalidReference,
+    executed: true,
     mutationType: preparation.mutation.mutationContract.mutationType,
     provenanceEventId: persistenceResult.provenanceEventId,
     postcondition,

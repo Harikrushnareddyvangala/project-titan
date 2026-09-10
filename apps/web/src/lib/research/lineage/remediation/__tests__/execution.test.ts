@@ -142,6 +142,42 @@ describe("research lineage remediation execution", () => {
     expect(dependencies.executeResearchLineageIntegrityRemediationRepair).toHaveBeenCalled();
   });
 
+  it("reports committed remediation as failed when postcondition verification fails", () => {
+    const dependencies = createDependencies({
+      executeResearchLineageIntegrityRemediationRepair: vi.fn(() => ({
+        ...createDependencies().executeResearchLineageIntegrityRemediationRepair(),
+        executed: true,
+        message: "Repair committed, but postcondition verification failed.",
+        provenanceEventId: "event-committed",
+        postcondition: {
+          validated: true,
+          valid: false,
+          issueCount: 1,
+          issues: [
+            {
+              code: "CONCLUSION_FINDING_REFERENCE_INVALID",
+              targetId: "conclusion-001",
+            },
+          ],
+          checkedNodeCount: 3,
+          checkedEdgeCount: 2,
+        },
+      })),
+    });
+
+    const service = createResearchLineageRemediationExecutionService(dependencies);
+
+    const result = service.executeResearchLineageIntegrityRemediation(createPlan());
+
+    expect(result.status).toBe("Failed");
+    expect(result.executed).toBe(true);
+    expect(result.provenanceEventId).toBe("event-committed");
+    expect(result.postcondition?.valid).toBe(false);
+    expect(result.message).toBe(
+      "Repair committed, but postcondition verification failed.",
+    );
+  });
+
   it("preserves rejection through the service factory when confirmation is missing", () => {
     const dependencies = createDependencies();
     const service = createResearchLineageRemediationExecutionService(dependencies);
