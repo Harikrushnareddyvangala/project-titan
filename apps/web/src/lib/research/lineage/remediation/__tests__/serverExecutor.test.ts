@@ -224,8 +224,8 @@ describe("research lineage remediation server executor", () => {
       status: "Open",
       reason:
         "The remediation mutation was committed, but postcondition validation still reports an invalid conclusion finding reference.",
-      createdAt: expect.any(Date),
-      updatedAt: expect.any(Date),
+      createdAt: expect.any(String),
+      updatedAt: expect.any(String),
     });
     expect(obligation.id).toMatch(/^research-reconciliation-/);
     expect(obligation.remediationExecutionId).toBeUndefined();
