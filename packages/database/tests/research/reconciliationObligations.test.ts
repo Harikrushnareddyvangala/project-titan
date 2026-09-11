@@ -10,6 +10,7 @@ import {
   getResearchReconciliationObligationRecord,
   getResearchReconciliationObligationRecords,
   getResearchReconciliationObligationRecordsByInvestigation,
+  getUnresolvedResearchReconciliationObligationRecords,
   ResearchReconciliationObligationStaleError,
   updateResearchReconciliationObligationStatus,
 } from "../../src/research/reconciliationObligations.js";
@@ -320,6 +321,201 @@ describe("research reconciliation obligation persistence", () => {
         "reconciliation-obligation-empty-investigation",
       ),
     ).resolves.toEqual([]);
+  });
+
+  it("retrieves only unresolved obligations for the requested investigation", async () => {
+    const openId = "reconciliation-obligation-unresolved-open";
+    const inProgressId = "reconciliation-obligation-unresolved-progress";
+    const resolvedId = "reconciliation-obligation-unresolved-resolved";
+    const abandonedId = "reconciliation-obligation-unresolved-abandoned";
+    const supersededId = "reconciliation-obligation-unresolved-superseded";
+
+    const obligations = [
+      {
+        id: openId,
+        status: "Open",
+        issueCode: "ISSUE_UNRESOLVED_OPEN",
+        targetEntityId: "conclusion-unresolved-open",
+      },
+      {
+        id: inProgressId,
+        status: "In Progress",
+        issueCode: "ISSUE_UNRESOLVED_PROGRESS",
+        targetEntityId: "conclusion-unresolved-progress",
+      },
+      {
+        id: resolvedId,
+        status: "Resolved",
+        issueCode: "ISSUE_UNRESOLVED_RESOLVED",
+        targetEntityId: "conclusion-unresolved-resolved",
+      },
+      {
+        id: abandonedId,
+        status: "Abandoned",
+        issueCode: "ISSUE_UNRESOLVED_ABANDONED",
+        targetEntityId: "conclusion-unresolved-abandoned",
+      },
+      {
+        id: supersededId,
+        status: "Superseded",
+        issueCode: "ISSUE_UNRESOLVED_SUPERSEDED",
+        targetEntityId: "conclusion-unresolved-superseded",
+      },
+    ] as const;
+
+    try {
+      for (const obligation of obligations) {
+        await createResearchReconciliationObligationRecord({
+          id: obligation.id,
+          investigationId,
+          issueCode: obligation.issueCode,
+          targetEntityType: "Conclusion",
+          targetEntityId: obligation.targetEntityId,
+          remediationAction: "RepairReference",
+          status: obligation.status,
+          reason: `Testing ${obligation.status} unresolved retrieval semantics.`,
+          createdAt,
+          updatedAt,
+        });
+      }
+
+      const unresolved =
+        await getUnresolvedResearchReconciliationObligationRecords(
+          investigationId,
+        );
+
+      expect(unresolved.map(({ id }) => id)).toEqual([
+        openId,
+        inProgressId,
+      ]);
+      expect(
+        unresolved.every(
+          ({ status }) => status === "Open" || status === "In Progress",
+        ),
+      ).toBe(true);
+    } finally {
+      for (const { id } of obligations) {
+        await db
+          .delete(researchReconciliationObligations)
+          .where(eq(researchReconciliationObligations.id, id));
+      }
+    }
+  });
+
+  it("excludes terminal reconciliation obligation statuses from unresolved retrieval", async () => {
+    const resolvedId = "reconciliation-obligation-terminal-resolved";
+    const abandonedId = "reconciliation-obligation-terminal-abandoned";
+    const supersededId = "reconciliation-obligation-terminal-superseded";
+
+    const obligations = [
+      {
+        id: resolvedId,
+        status: "Resolved",
+        issueCode: "ISSUE_TERMINAL_RESOLVED",
+        targetEntityId: "conclusion-terminal-resolved",
+      },
+      {
+        id: abandonedId,
+        status: "Abandoned",
+        issueCode: "ISSUE_TERMINAL_ABANDONED",
+        targetEntityId: "conclusion-terminal-abandoned",
+      },
+      {
+        id: supersededId,
+        status: "Superseded",
+        issueCode: "ISSUE_TERMINAL_SUPERSEDED",
+        targetEntityId: "conclusion-terminal-superseded",
+      },
+    ] as const;
+
+    try {
+      for (const obligation of obligations) {
+        await createResearchReconciliationObligationRecord({
+          id: obligation.id,
+          investigationId,
+          issueCode: obligation.issueCode,
+          targetEntityType: "Conclusion",
+          targetEntityId: obligation.targetEntityId,
+          remediationAction: "RepairReference",
+          status: obligation.status,
+          reason: `Testing exclusion of ${obligation.status}.`,
+          createdAt,
+          updatedAt,
+        });
+      }
+
+      const unresolved =
+        await getUnresolvedResearchReconciliationObligationRecords(
+          investigationId,
+        );
+
+      expect(
+        unresolved.some(({ id }) =>
+          [resolvedId, abandonedId, supersededId].includes(id),
+        ),
+      ).toBe(false);
+    } finally {
+      for (const { id } of obligations) {
+        await db
+          .delete(researchReconciliationObligations)
+          .where(eq(researchReconciliationObligations.id, id));
+      }
+    }
+  });
+
+  it("returns unresolved obligations in deterministic creation order", async () => {
+    const secondId = "reconciliation-obligation-unresolved-order-b";
+    const firstId = "reconciliation-obligation-unresolved-order-a";
+
+    try {
+      await createResearchReconciliationObligationRecord({
+        id: secondId,
+        investigationId,
+        issueCode: "ISSUE_UNRESOLVED_ORDER_B",
+        targetEntityType: "Conclusion",
+        targetEntityId: "conclusion-unresolved-order-b",
+        remediationAction: "RepairReference",
+        status: "Open",
+        reason: "Second unresolved obligation.",
+        createdAt,
+        updatedAt,
+      });
+
+      await createResearchReconciliationObligationRecord({
+        id: firstId,
+        investigationId,
+        issueCode: "ISSUE_UNRESOLVED_ORDER_A",
+        targetEntityType: "Conclusion",
+        targetEntityId: "conclusion-unresolved-order-a",
+        remediationAction: "RepairReference",
+        status: "In Progress",
+        reason: "First unresolved obligation.",
+        createdAt,
+        updatedAt,
+      });
+
+      const unresolved =
+        await getUnresolvedResearchReconciliationObligationRecords(
+          investigationId,
+        );
+
+      const testObligations = unresolved.filter(
+        ({ id }) => id === firstId || id === secondId,
+      );
+
+      expect(testObligations.map(({ id }) => id)).toEqual([
+        firstId,
+        secondId,
+      ]);
+    } finally {
+      await db
+        .delete(researchReconciliationObligations)
+        .where(eq(researchReconciliationObligations.id, firstId));
+
+      await db
+        .delete(researchReconciliationObligations)
+        .where(eq(researchReconciliationObligations.id, secondId));
+    }
   });
 
   it("updates an obligation through a legal lifecycle transition", async () => {

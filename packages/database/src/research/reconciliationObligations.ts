@@ -1,4 +1,4 @@
-import { and, asc, eq } from "drizzle-orm";
+import { and, asc, eq, inArray } from "drizzle-orm";
 
 import { db } from "../client.js";
 import { researchReconciliationObligations } from "../schema/index.js";
@@ -173,6 +173,29 @@ export async function getResearchReconciliationObligationRecordsByInvestigation(
     .select()
     .from(researchReconciliationObligations)
     .where(eq(researchReconciliationObligations.investigationId, investigationId))
+    .orderBy(
+      asc(researchReconciliationObligations.createdAt),
+      asc(researchReconciliationObligations.id),
+    );
+
+  return obligations.map(mapResearchReconciliationObligationRecord);
+}
+
+export async function getUnresolvedResearchReconciliationObligationRecords(
+  investigationId: string,
+): Promise<ResearchReconciliationObligationRecord[]> {
+  const obligations = await db
+    .select()
+    .from(researchReconciliationObligations)
+    .where(
+      and(
+        eq(researchReconciliationObligations.investigationId, investigationId),
+        inArray(researchReconciliationObligations.status, [
+          "Open",
+          "In Progress",
+        ]),
+      ),
+    )
     .orderBy(
       asc(researchReconciliationObligations.createdAt),
       asc(researchReconciliationObligations.id),
