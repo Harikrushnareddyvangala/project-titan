@@ -166,6 +166,21 @@ export async function getResearchReconciliationObligationRecord(
   return mapResearchReconciliationObligationRecord(obligation);
 }
 
+export async function getResearchReconciliationObligationRecordsByInvestigation(
+  investigationId: string,
+): Promise<ResearchReconciliationObligationRecord[]> {
+  const obligations = await db
+    .select()
+    .from(researchReconciliationObligations)
+    .where(eq(researchReconciliationObligations.investigationId, investigationId))
+    .orderBy(
+      asc(researchReconciliationObligations.createdAt),
+      asc(researchReconciliationObligations.id),
+    );
+
+  return obligations.map(mapResearchReconciliationObligationRecord);
+}
+
 export async function getResearchReconciliationObligationRecords(): Promise<
   ResearchReconciliationObligationRecord[]
 > {

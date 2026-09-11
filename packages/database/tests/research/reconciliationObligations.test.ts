@@ -9,6 +9,7 @@ import {
   createResearchReconciliationObligationRecord,
   getResearchReconciliationObligationRecord,
   getResearchReconciliationObligationRecords,
+  getResearchReconciliationObligationRecordsByInvestigation,
   ResearchReconciliationObligationStaleError,
   updateResearchReconciliationObligationStatus,
 } from "../../src/research/reconciliationObligations.js";
@@ -165,6 +166,160 @@ describe("research reconciliation obligation persistence", () => {
         .delete(researchReconciliationObligations)
         .where(eq(researchReconciliationObligations.id, secondId));
     }
+  });
+
+  it("retrieves only obligations belonging to the requested investigation", async () => {
+    const otherInvestigationId =
+      "test-reconciliation-obligation-other-investigation";
+
+    const firstId = "reconciliation-obligation-investigation-a";
+    const secondId = "reconciliation-obligation-investigation-b";
+    const otherId = "reconciliation-obligation-investigation-other";
+
+    await db.insert(researchInvestigations).values({
+      id: otherInvestigationId,
+      title: "Other Reconciliation Obligation Test Investigation",
+      objective: "Test investigation-scoped retrieval",
+      question: "Does retrieval isolate investigations?",
+      status: "Draft",
+      description: null,
+      repository: null,
+      createdAt,
+      updatedAt,
+    });
+
+    try {
+      await createResearchReconciliationObligationRecord({
+        id: firstId,
+        investigationId,
+        issueCode: "ISSUE_INVESTIGATION_A",
+        targetEntityType: "Conclusion",
+        targetEntityId: "conclusion-investigation-a",
+        remediationAction: "RepairReference",
+        status: "Open",
+        reason: "First investigation-scoped obligation.",
+        createdAt,
+        updatedAt,
+      });
+
+      await createResearchReconciliationObligationRecord({
+        id: secondId,
+        investigationId,
+        issueCode: "ISSUE_INVESTIGATION_B",
+        targetEntityType: "Conclusion",
+        targetEntityId: "conclusion-investigation-b",
+        remediationAction: "RepairReference",
+        status: "In Progress",
+        reason: "Second investigation-scoped obligation.",
+        createdAt: new Date("2026-09-10T03:10:00.000Z"),
+        updatedAt: new Date("2026-09-10T03:10:00.000Z"),
+      });
+
+      await createResearchReconciliationObligationRecord({
+        id: otherId,
+        investigationId: otherInvestigationId,
+        issueCode: "ISSUE_OTHER_INVESTIGATION",
+        targetEntityType: "Conclusion",
+        targetEntityId: "conclusion-other",
+        remediationAction: "RepairReference",
+        status: "Open",
+        reason: "Obligation for another investigation.",
+        createdAt,
+        updatedAt,
+      });
+
+      const obligations =
+        await getResearchReconciliationObligationRecordsByInvestigation(
+          investigationId,
+        );
+
+      expect(obligations.map(({ id }) => id)).toEqual([firstId, secondId]);
+      expect(
+        obligations.every(
+          ({ investigationId: returnedInvestigationId }) =>
+            returnedInvestigationId === investigationId,
+        ),
+      ).toBe(true);
+    } finally {
+      await db
+        .delete(researchReconciliationObligations)
+        .where(eq(researchReconciliationObligations.id, firstId));
+
+      await db
+        .delete(researchReconciliationObligations)
+        .where(eq(researchReconciliationObligations.id, secondId));
+
+      await db
+        .delete(researchReconciliationObligations)
+        .where(eq(researchReconciliationObligations.id, otherId));
+
+      await db
+        .delete(researchInvestigations)
+        .where(eq(researchInvestigations.id, otherInvestigationId));
+    }
+  });
+
+  it("retrieves investigation obligations in deterministic creation order", async () => {
+    const firstId = "reconciliation-obligation-investigation-order-a";
+    const secondId = "reconciliation-obligation-investigation-order-b";
+
+    try {
+      await createResearchReconciliationObligationRecord({
+        id: secondId,
+        investigationId,
+        issueCode: "ISSUE_INVESTIGATION_ORDER_B",
+        targetEntityType: "Conclusion",
+        targetEntityId: "conclusion-order-b",
+        remediationAction: "RepairReference",
+        status: "Open",
+        reason: "Second obligation.",
+        createdAt,
+        updatedAt,
+      });
+
+      await createResearchReconciliationObligationRecord({
+        id: firstId,
+        investigationId,
+        issueCode: "ISSUE_INVESTIGATION_ORDER_A",
+        targetEntityType: "Conclusion",
+        targetEntityId: "conclusion-order-a",
+        remediationAction: "RepairReference",
+        status: "Open",
+        reason: "First obligation.",
+        createdAt,
+        updatedAt,
+      });
+
+      const obligations =
+        await getResearchReconciliationObligationRecordsByInvestigation(
+          investigationId,
+        );
+
+      const testObligations = obligations.filter(
+        ({ id }) => id === firstId || id === secondId,
+      );
+
+      expect(testObligations.map(({ id }) => id)).toEqual([
+        firstId,
+        secondId,
+      ]);
+    } finally {
+      await db
+        .delete(researchReconciliationObligations)
+        .where(eq(researchReconciliationObligations.id, firstId));
+
+      await db
+        .delete(researchReconciliationObligations)
+        .where(eq(researchReconciliationObligations.id, secondId));
+    }
+  });
+
+  it("returns an empty list when an investigation has no reconciliation obligations", async () => {
+    await expect(
+      getResearchReconciliationObligationRecordsByInvestigation(
+        "reconciliation-obligation-empty-investigation",
+      ),
+    ).resolves.toEqual([]);
   });
 
   it("updates an obligation through a legal lifecycle transition", async () => {
