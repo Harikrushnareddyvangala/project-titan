@@ -172,6 +172,7 @@ export function createResearchLineageIntegrityRemediationRequest(
   issue: ResearchLineageIntegrityIssue,
   confirmed: boolean,
   replacementEntityId?: string,
+  enforceConfirmation = true,
 ): ResearchLineageIntegrityRemediationRequest | null {
   const action = getResearchLineageIntegrityIssueAction(issue);
 
@@ -179,7 +180,7 @@ export function createResearchLineageIntegrityRemediationRequest(
     return null;
   }
 
-  if (action.requiresConfirmation && !confirmed) {
+  if (action.requiresConfirmation && !confirmed && enforceConfirmation) {
     return null;
   }
 

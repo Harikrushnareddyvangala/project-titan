@@ -192,6 +192,39 @@ describe("research lineage remediation planning", () => {
     expect(request?.replacementEntityId).toBe(replacementFinding.id);
   });
 
+  it("creates an unconfirmed remediation request when confirmation enforcement is deferred", () => {
+    const issue = createIssue();
+
+    const request = createResearchLineageIntegrityRemediationRequest(
+      investigation.id,
+      issue,
+      false,
+      undefined,
+      false,
+    );
+
+    expect(request).toEqual({
+      investigationId: investigation.id,
+      action: "RepairReference",
+      issueCode: "CONCLUSION_FINDING_REFERENCE_INVALID",
+      target: {
+        nodeId: finding.id,
+      },
+      replacementEntityId: undefined,
+      confirmed: false,
+    });
+  });
+
+  it("continues rejecting unconfirmed executable requests by default", () => {
+    const request = createResearchLineageIntegrityRemediationRequest(
+      investigation.id,
+      createIssue(),
+      false,
+    );
+
+    expect(request).toBeNull();
+  });
+
   it("resolves an explicit replacement only inside the investigation", () => {
     const replacement = getResearchLineageRemediationReplacement(
       investigation.id,
