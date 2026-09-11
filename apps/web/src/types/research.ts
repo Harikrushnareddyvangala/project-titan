@@ -330,6 +330,45 @@ export interface ResearchInvestigationConclusion {
   updatedAt: string;
 }
 /* -------------------------------------------------------------------------- */
+/*                    Research Reconciliation Obligation                      */
+/* -------------------------------------------------------------------------- */
+
+export type ResearchReconciliationObligationStatus =
+  | "Open"
+  | "In Progress"
+  | "Resolved"
+  | "Abandoned"
+  | "Superseded";
+
+export interface ResearchReconciliationObligation {
+  id: string;
+
+  investigationId: string;
+
+  issueCode: string;
+
+  targetEntityType: string;
+
+  targetEntityId: string;
+
+  remediationAction: string;
+
+  remediationExecutionId?: string;
+
+  provenanceEventId?: string;
+
+  status: ResearchReconciliationObligationStatus;
+
+  reason: string;
+
+  createdAt: string;
+
+  updatedAt: string;
+
+  resolvedAt?: string;
+}
+
+/* -------------------------------------------------------------------------- */
 /*                         Research Investigation                             */
 /* -------------------------------------------------------------------------- */
 
