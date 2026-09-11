@@ -25,9 +25,9 @@ function isRemediationPlan(
     value.action === "RepairScope" ||
     value.action === "RepairRelationship";
 
-  const validStatus =
-    value.status === "Planned" ||
-    value.status === "Validated";
+  const validConfirmationStatus =
+    (value.confirmed === false && value.status === "Planned") ||
+    (value.confirmed === true && value.status === "Validated");
 
   const validTarget =
     isObject(value.target) &&
@@ -46,7 +46,7 @@ function isRemediationPlan(
     typeof value.issueCode === "string" &&
     validTarget &&
     typeof value.confirmed === "boolean" &&
-    validStatus &&
+    validConfirmationStatus &&
     typeof value.description === "string" &&
     (value.targetUpdatedAt === undefined ||
       typeof value.targetUpdatedAt === "string") &&

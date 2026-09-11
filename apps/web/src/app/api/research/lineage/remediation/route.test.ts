@@ -176,4 +176,64 @@ describe("POST /api/research/lineage/remediation", () => {
       error: "Invalid research lineage remediation plan.",
     });
   });
+
+  it("rejects a validated remediation plan when explicit confirmation is false", async () => {
+    const request = new Request(
+      "http://localhost/api/research/lineage/remediation",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          plan: {
+            ...plan,
+            confirmed: false,
+            status: "Validated",
+          },
+        }),
+      },
+    );
+
+    const response = await POST(request);
+
+    expect(response.status).toBe(400);
+    expect(
+      executeResearchLineageIntegrityRemediationOnServer,
+    ).not.toHaveBeenCalled();
+
+    await expect(response.json()).resolves.toEqual({
+      error: "Invalid research lineage remediation plan.",
+    });
+  });
+
+  it("rejects a planned remediation plan when explicit confirmation is true", async () => {
+    const request = new Request(
+      "http://localhost/api/research/lineage/remediation",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          plan: {
+            ...plan,
+            confirmed: true,
+            status: "Planned",
+          },
+        }),
+      },
+    );
+
+    const response = await POST(request);
+
+    expect(response.status).toBe(400);
+    expect(
+      executeResearchLineageIntegrityRemediationOnServer,
+    ).not.toHaveBeenCalled();
+
+    await expect(response.json()).resolves.toEqual({
+      error: "Invalid research lineage remediation plan.",
+    });
+  });
 });
