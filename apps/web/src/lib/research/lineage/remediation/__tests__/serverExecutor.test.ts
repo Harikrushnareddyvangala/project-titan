@@ -16,6 +16,7 @@ const {
   getResearchInvestigationConclusions,
   getResearchProvenanceEvents,
   persistResearchLineageRemediationMutation,
+  createResearchReconciliationObligationRecord,
 } = vi.hoisted(() => ({
   getResearchInvestigations: vi.fn(),
   getResearchExperiments: vi.fn(),
@@ -25,6 +26,7 @@ const {
   getResearchInvestigationConclusions: vi.fn(),
   getResearchProvenanceEvents: vi.fn(),
   persistResearchLineageRemediationMutation: vi.fn(),
+  createResearchReconciliationObligationRecord: vi.fn(),
 }));
 
 vi.mock("@/lib/research/serverRepository", () => ({
@@ -39,6 +41,7 @@ vi.mock("@/lib/research/serverRepository", () => ({
 
 vi.mock("@titan/database", () => ({
   persistResearchLineageRemediationMutation,
+  createResearchReconciliationObligationRecord,
 }));
 
 import { executeResearchLineageIntegrityRemediationOnServer } from "../serverExecutor";
@@ -204,6 +207,28 @@ describe("research lineage remediation server executor", () => {
     const result = await executeResearchLineageIntegrityRemediationOnServer(createPlan());
 
     expect(persistResearchLineageRemediationMutation).toHaveBeenCalledTimes(1);
+    expect(createResearchReconciliationObligationRecord).toHaveBeenCalledTimes(1);
+
+    const [obligation] = createResearchReconciliationObligationRecord.mock.calls[0];
+
+    expect(obligation).toMatchObject({
+      investigationId: INVESTIGATION_ID,
+      issueCode: "CONCLUSION_FINDING_REFERENCE_INVALID",
+      targetEntityType: "Conclusion",
+      targetEntityId: CONCLUSION_ID,
+      remediationAction: "RepairReference",
+      provenanceEventId: "research-provenance-committed",
+      status: "Open",
+      reason:
+        "The remediation mutation was committed, but postcondition validation still reports an invalid conclusion finding reference.",
+      createdAt: expect.any(Date),
+      updatedAt: expect.any(Date),
+    });
+    expect(obligation.id).toMatch(/^research-reconciliation-/);
+    expect(obligation.remediationExecutionId).toBeUndefined();
+    expect(obligation.resolvedAt).toBeUndefined();
+    expect(obligation.createdAt).toEqual(obligation.updatedAt);
+
     expect(result.executed).toBe(true);
     expect(result.provenanceEventId).toBe("research-provenance-committed");
     expect(result.postcondition?.validated).toBe(true);

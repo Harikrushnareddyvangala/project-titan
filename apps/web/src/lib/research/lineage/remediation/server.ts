@@ -1,6 +1,9 @@
 import "server-only";
 
-import { persistResearchLineageRemediationMutation } from "@titan/database";
+import {
+  createResearchReconciliationObligationRecord,
+  persistResearchLineageRemediationMutation,
+} from "@titan/database";
 
 import type { ResearchInvestigationConclusion } from "@/types/research";
 
@@ -18,6 +21,22 @@ export interface ResearchLineageRemediationAsyncPersistence {
   }): Promise<{
     provenanceEventId: string;
   }>;
+
+  createResearchReconciliationObligation(input: {
+    id: string;
+    investigationId: string;
+    issueCode: string;
+    targetEntityType: string;
+    targetEntityId: string;
+    remediationAction: string;
+    remediationExecutionId?: string;
+    provenanceEventId?: string;
+    status: string;
+    reason: string;
+    createdAt: Date;
+    updatedAt: Date;
+    resolvedAt?: Date;
+  }): Promise<void>;
 }
 
 function createResearchProvenanceId(): string {
@@ -49,5 +68,9 @@ export const researchLineageRemediationDatabasePersistence: ResearchLineageRemed
           timestamp: new Date(),
         },
       });
+    },
+
+    async createResearchReconciliationObligation(input) {
+      await createResearchReconciliationObligationRecord(input);
     },
   };

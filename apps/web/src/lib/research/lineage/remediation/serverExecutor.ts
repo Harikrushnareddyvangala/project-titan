@@ -97,6 +97,10 @@ function createServerLineageService(snapshot: ServerResearchSnapshot) {
   });
 }
 
+function createResearchReconciliationObligationId(): string {
+  return `research-reconciliation-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+}
+
 function createServerPlanningService(snapshot: ServerResearchSnapshot) {
   const lineageService = createServerLineageService(snapshot);
 
@@ -271,6 +275,25 @@ export async function executeResearchLineageIntegrityRemediationOnServer(
       issue.code === "CONCLUSION_FINDING_REFERENCE_INVALID" &&
       issue.targetId === preparation.mutation.updatedConclusion.id,
   );
+
+  if (remainingInvalidReference) {
+    const now = new Date();
+
+    await researchLineageRemediationDatabasePersistence.createResearchReconciliationObligation({
+      id: createResearchReconciliationObligationId(),
+      investigationId: plan.investigationId,
+      issueCode: plan.issueCode,
+      targetEntityType: "Conclusion",
+      targetEntityId: preparation.mutation.updatedConclusion.id,
+      remediationAction: plan.action,
+      provenanceEventId: persistenceResult.provenanceEventId,
+      status: "Open",
+      reason:
+        "The remediation mutation was committed, but postcondition validation still reports an invalid conclusion finding reference.",
+      createdAt: now,
+      updatedAt: now,
+    });
+  }
 
   return {
     investigationId: plan.investigationId,

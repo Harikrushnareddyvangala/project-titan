@@ -46,6 +46,7 @@ describe("research lineage remediation server persistence", () => {
       await researchLineageRemediationDatabasePersistence.persistResearchLineageRemediationMutation(
         {
           conclusion,
+          expectedUpdatedAt: new Date(conclusion.createdAt),
           provenance,
         },
       );
@@ -54,6 +55,7 @@ describe("research lineage remediation server persistence", () => {
 
     expect(persistResearchLineageRemediationMutation).toHaveBeenCalledWith({
       conclusionId: "conclusion-1",
+      expectedUpdatedAt: new Date("2026-01-01T10:00:00.000Z"),
       conclusion: {
         statement: "Updated conclusion",
         status: "Proposed",

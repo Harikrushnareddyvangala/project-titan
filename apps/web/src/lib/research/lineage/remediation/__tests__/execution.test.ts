@@ -145,7 +145,10 @@ describe("research lineage remediation execution", () => {
   it("reports committed remediation as failed when postcondition verification fails", () => {
     const dependencies = createDependencies({
       executeResearchLineageIntegrityRemediationRepair: vi.fn(() => ({
-        ...createDependencies().executeResearchLineageIntegrityRemediationRepair(),
+        investigationId: INVESTIGATION_ID,
+        action: "RepairReference" as const,
+        issueCode: "CONCLUSION_FINDING_REFERENCE_INVALID",
+        mutationType: "ReferenceReplacement" as const,
         executed: true,
         message: "Repair committed, but postcondition verification failed.",
         provenanceEventId: "event-committed",
@@ -155,7 +158,9 @@ describe("research lineage remediation execution", () => {
           issueCount: 1,
           issues: [
             {
+              investigationId: INVESTIGATION_ID,
               code: "CONCLUSION_FINDING_REFERENCE_INVALID",
+              message: "Conclusion finding reference remains invalid.",
               targetId: "conclusion-001",
             },
           ],
