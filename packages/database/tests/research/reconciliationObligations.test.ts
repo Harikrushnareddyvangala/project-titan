@@ -10,6 +10,7 @@ import {
   getResearchReconciliationObligationRecord,
   getResearchReconciliationObligationRecords,
   getResearchReconciliationObligationRecordsByInvestigation,
+  getResearchReconciliationObligationRecordsByTarget,
   getUnresolvedResearchReconciliationObligationRecords,
   getUnresolvedResearchReconciliationObligationRecordsByInvestigation,
   ResearchReconciliationObligationStaleError,
@@ -305,6 +306,176 @@ describe("research reconciliation obligation persistence", () => {
         firstId,
         secondId,
       ]);
+    } finally {
+      await db
+        .delete(researchReconciliationObligations)
+        .where(eq(researchReconciliationObligations.id, firstId));
+
+      await db
+        .delete(researchReconciliationObligations)
+        .where(eq(researchReconciliationObligations.id, secondId));
+    }
+  });
+
+  it("retrieves only obligations belonging to the requested target", async () => {
+    const targetEntityType = "Conclusion";
+    const targetEntityId = "conclusion-target-scoped";
+    const matchingId = "reconciliation-obligation-target-match";
+    const otherEntityId = "conclusion-target-other";
+    const otherId = "reconciliation-obligation-target-other";
+    const otherTypeObligationId = "reconciliation-obligation-target-other-type";
+
+    try {
+      await createResearchReconciliationObligationRecord({
+        id: matchingId,
+        investigationId,
+        issueCode: "ISSUE_TARGET_MATCH",
+        targetEntityType,
+        targetEntityId,
+        remediationAction: "RepairReference",
+        status: "Open",
+        reason: "Matching target.",
+        createdAt,
+        updatedAt,
+      });
+
+      await createResearchReconciliationObligationRecord({
+        id: otherId,
+        investigationId,
+        issueCode: "ISSUE_TARGET_OTHER",
+        targetEntityType,
+        targetEntityId: otherEntityId,
+        remediationAction: "RepairReference",
+        status: "Open",
+        reason: "Different target entity.",
+        createdAt,
+        updatedAt,
+      });
+
+      await createResearchReconciliationObligationRecord({
+        id: otherTypeObligationId,
+        investigationId,
+        issueCode: "ISSUE_TARGET_OTHER_TYPE",
+        targetEntityType: "Finding",
+        targetEntityId: targetEntityId,
+        remediationAction: "RepairReference",
+        status: "Open",
+        reason: "Different target entity type.",
+        createdAt,
+        updatedAt,
+      });
+
+      const obligations = await getResearchReconciliationObligationRecordsByTarget(
+        targetEntityType,
+        targetEntityId,
+      );
+
+      expect(obligations.map(({ id }) => id)).toEqual([matchingId]);
+    } finally {
+      await db
+        .delete(researchReconciliationObligations)
+        .where(eq(researchReconciliationObligations.id, matchingId));
+
+      await db
+        .delete(researchReconciliationObligations)
+        .where(eq(researchReconciliationObligations.id, otherId));
+
+      await db
+        .delete(researchReconciliationObligations)
+        .where(eq(researchReconciliationObligations.id, otherTypeObligationId));
+    }
+  });
+
+  it("includes all lifecycle statuses for a requested target", async () => {
+    const targetEntityType = "Conclusion";
+    const targetEntityId = "conclusion-target-statuses";
+    const statuses = [
+      "Open",
+      "In Progress",
+      "Resolved",
+      "Abandoned",
+      "Superseded",
+    ] as const;
+
+    const obligationIds = statuses.map(
+      (status) => `reconciliation-obligation-target-status-${status
+        .toLowerCase()
+        .replace(" ", "-")}`,
+    );
+
+    try {
+      for (const [index, status] of statuses.entries()) {
+        await createResearchReconciliationObligationRecord({
+          id: obligationIds[index],
+          investigationId,
+          issueCode: `ISSUE_TARGET_STATUS_${index}`,
+          targetEntityType,
+          targetEntityId,
+          remediationAction: "RepairReference",
+          status,
+          reason: `Target lifecycle status: ${status}.`,
+          createdAt: new Date(createdAt.getTime() + index * 60_000),
+          updatedAt: new Date(updatedAt.getTime() + index * 60_000),
+          resolvedAt: status === "Resolved"
+            ? new Date(updatedAt.getTime() + index * 60_000)
+            : undefined,
+        });
+      }
+
+      const obligations = await getResearchReconciliationObligationRecordsByTarget(
+        targetEntityType,
+        targetEntityId,
+      );
+
+      expect(obligations.map(({ status }) => status)).toEqual([...statuses]);
+    } finally {
+      for (const id of obligationIds) {
+        await db
+          .delete(researchReconciliationObligations)
+          .where(eq(researchReconciliationObligations.id, id));
+      }
+    }
+  });
+
+  it("retrieves target obligations in deterministic creation order", async () => {
+    const targetEntityType = "Conclusion";
+    const targetEntityId = "conclusion-target-order";
+    const firstId = "reconciliation-obligation-target-order-a";
+    const secondId = "reconciliation-obligation-target-order-b";
+
+    try {
+      await createResearchReconciliationObligationRecord({
+        id: secondId,
+        investigationId,
+        issueCode: "ISSUE_TARGET_ORDER_B",
+        targetEntityType,
+        targetEntityId,
+        remediationAction: "RepairReference",
+        status: "Open",
+        reason: "Second target obligation.",
+        createdAt,
+        updatedAt,
+      });
+
+      await createResearchReconciliationObligationRecord({
+        id: firstId,
+        investigationId,
+        issueCode: "ISSUE_TARGET_ORDER_A",
+        targetEntityType,
+        targetEntityId,
+        remediationAction: "RepairReference",
+        status: "In Progress",
+        reason: "First target obligation.",
+        createdAt,
+        updatedAt,
+      });
+
+      const obligations = await getResearchReconciliationObligationRecordsByTarget(
+        targetEntityType,
+        targetEntityId,
+      );
+
+      expect(obligations.map(({ id }) => id)).toEqual([firstId, secondId]);
     } finally {
       await db
         .delete(researchReconciliationObligations)

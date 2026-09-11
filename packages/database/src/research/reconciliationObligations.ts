@@ -204,6 +204,27 @@ export async function getUnresolvedResearchReconciliationObligationRecordsByInve
   return obligations.map(mapResearchReconciliationObligationRecord);
 }
 
+export async function getResearchReconciliationObligationRecordsByTarget(
+  targetEntityType: string,
+  targetEntityId: string,
+): Promise<ResearchReconciliationObligationRecord[]> {
+  const obligations = await db
+    .select()
+    .from(researchReconciliationObligations)
+    .where(
+      and(
+        eq(researchReconciliationObligations.targetEntityType, targetEntityType),
+        eq(researchReconciliationObligations.targetEntityId, targetEntityId),
+      ),
+    )
+    .orderBy(
+      asc(researchReconciliationObligations.createdAt),
+      asc(researchReconciliationObligations.id),
+    );
+
+  return obligations.map(mapResearchReconciliationObligationRecord);
+}
+
 export async function getResearchReconciliationObligationRecords(): Promise<
   ResearchReconciliationObligationRecord[]
 > {
