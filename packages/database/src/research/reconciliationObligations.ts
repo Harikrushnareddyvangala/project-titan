@@ -181,7 +181,7 @@ export async function getResearchReconciliationObligationRecordsByInvestigation(
   return obligations.map(mapResearchReconciliationObligationRecord);
 }
 
-export async function getUnresolvedResearchReconciliationObligationRecords(
+export async function getUnresolvedResearchReconciliationObligationRecordsByInvestigation(
   investigationId: string,
 ): Promise<ResearchReconciliationObligationRecord[]> {
   const obligations = await db
@@ -210,6 +210,26 @@ export async function getResearchReconciliationObligationRecords(): Promise<
   const obligations = await db
     .select()
     .from(researchReconciliationObligations)
+    .orderBy(
+      asc(researchReconciliationObligations.createdAt),
+      asc(researchReconciliationObligations.id),
+    );
+
+  return obligations.map(mapResearchReconciliationObligationRecord);
+}
+
+export async function getUnresolvedResearchReconciliationObligationRecords(): Promise<
+  ResearchReconciliationObligationRecord[]
+> {
+  const obligations = await db
+    .select()
+    .from(researchReconciliationObligations)
+    .where(
+      inArray(researchReconciliationObligations.status, [
+        "Open",
+        "In Progress",
+      ]),
+    )
     .orderBy(
       asc(researchReconciliationObligations.createdAt),
       asc(researchReconciliationObligations.id),

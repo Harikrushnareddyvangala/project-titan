@@ -11,6 +11,7 @@ import {
   getResearchReconciliationObligationRecords,
   getResearchReconciliationObligationRecordsByInvestigation,
   getUnresolvedResearchReconciliationObligationRecords,
+  getUnresolvedResearchReconciliationObligationRecordsByInvestigation,
   ResearchReconciliationObligationStaleError,
   updateResearchReconciliationObligationStatus,
 } from "../../src/research/reconciliationObligations.js";
@@ -380,7 +381,7 @@ describe("research reconciliation obligation persistence", () => {
       }
 
       const unresolved =
-        await getUnresolvedResearchReconciliationObligationRecords(
+        await getUnresolvedResearchReconciliationObligationRecordsByInvestigation(
           investigationId,
         );
 
@@ -445,7 +446,7 @@ describe("research reconciliation obligation persistence", () => {
       }
 
       const unresolved =
-        await getUnresolvedResearchReconciliationObligationRecords(
+        await getUnresolvedResearchReconciliationObligationRecordsByInvestigation(
           investigationId,
         );
 
@@ -460,6 +461,200 @@ describe("research reconciliation obligation persistence", () => {
           .delete(researchReconciliationObligations)
           .where(eq(researchReconciliationObligations.id, id));
       }
+    }
+  });
+
+  it("retrieves unresolved obligations across investigations", async () => {
+    const otherInvestigationId =
+      "test-reconciliation-obligation-global-other-investigation";
+    const firstId = "reconciliation-obligation-global-open";
+    const secondId = "reconciliation-obligation-global-progress";
+
+    await db.insert(researchInvestigations).values({
+      id: otherInvestigationId,
+      title: "Other Global Reconciliation Test Investigation",
+      objective: "Test global unresolved retrieval",
+      question: "Does global retrieval span investigations?",
+      status: "Draft",
+      description: null,
+      repository: null,
+      createdAt,
+      updatedAt,
+    });
+
+    try {
+      await createResearchReconciliationObligationRecord({
+        id: firstId,
+        investigationId,
+        issueCode: "ISSUE_GLOBAL_OPEN",
+        targetEntityType: "Conclusion",
+        targetEntityId: "conclusion-global-open",
+        remediationAction: "RepairReference",
+        status: "Open",
+        reason: "Global unresolved open obligation.",
+        createdAt,
+        updatedAt,
+      });
+
+      await createResearchReconciliationObligationRecord({
+        id: secondId,
+        investigationId: otherInvestigationId,
+        issueCode: "ISSUE_GLOBAL_PROGRESS",
+        targetEntityType: "Conclusion",
+        targetEntityId: "conclusion-global-progress",
+        remediationAction: "RepairReference",
+        status: "In Progress",
+        reason: "Global unresolved in-progress obligation.",
+        createdAt: new Date("2026-09-10T03:10:00.000Z"),
+        updatedAt: new Date("2026-09-10T03:10:00.000Z"),
+      });
+
+      const unresolved =
+        await getUnresolvedResearchReconciliationObligationRecords();
+
+      const testObligations = unresolved.filter(
+        ({ id }) => id === firstId || id === secondId,
+      );
+
+      expect(testObligations.map(({ id }) => id)).toEqual([
+        firstId,
+        secondId,
+      ]);
+      expect(
+        testObligations.every(
+          ({ status }) => status === "Open" || status === "In Progress",
+        ),
+      ).toBe(true);
+      expect(
+        testObligations.some(
+          ({ investigationId: returnedInvestigationId }) =>
+            returnedInvestigationId === investigationId,
+        ),
+      ).toBe(true);
+      expect(
+        testObligations.some(
+          ({ investigationId: returnedInvestigationId }) =>
+            returnedInvestigationId === otherInvestigationId,
+        ),
+      ).toBe(true);
+    } finally {
+      await db
+        .delete(researchReconciliationObligations)
+        .where(eq(researchReconciliationObligations.id, firstId));
+
+      await db
+        .delete(researchReconciliationObligations)
+        .where(eq(researchReconciliationObligations.id, secondId));
+
+      await db
+        .delete(researchInvestigations)
+        .where(eq(researchInvestigations.id, otherInvestigationId));
+    }
+  });
+
+  it("excludes terminal statuses from global unresolved retrieval", async () => {
+    const resolvedId = "reconciliation-obligation-global-resolved";
+    const abandonedId = "reconciliation-obligation-global-abandoned";
+    const supersededId = "reconciliation-obligation-global-superseded";
+
+    const obligations = [
+      {
+        id: resolvedId,
+        status: "Resolved",
+      },
+      {
+        id: abandonedId,
+        status: "Abandoned",
+      },
+      {
+        id: supersededId,
+        status: "Superseded",
+      },
+    ] as const;
+
+    try {
+      for (const obligation of obligations) {
+        await createResearchReconciliationObligationRecord({
+          id: obligation.id,
+          investigationId,
+          issueCode: `ISSUE_GLOBAL_${obligation.status.replace(" ", "_")}`,
+          targetEntityType: "Conclusion",
+          targetEntityId: `conclusion-global-${obligation.status.toLowerCase().replace(" ", "-")}`,
+          remediationAction: "RepairReference",
+          status: obligation.status,
+          reason: `Testing global exclusion of ${obligation.status}.`,
+          createdAt,
+          updatedAt,
+        });
+      }
+
+      const unresolved =
+        await getUnresolvedResearchReconciliationObligationRecords();
+
+      expect(
+        unresolved.some(({ id }) =>
+          [resolvedId, abandonedId, supersededId].includes(id),
+        ),
+      ).toBe(false);
+    } finally {
+      for (const { id } of obligations) {
+        await db
+          .delete(researchReconciliationObligations)
+          .where(eq(researchReconciliationObligations.id, id));
+      }
+    }
+  });
+
+  it("returns global unresolved obligations in deterministic creation order", async () => {
+    const secondId = "reconciliation-obligation-global-order-b";
+    const firstId = "reconciliation-obligation-global-order-a";
+
+    try {
+      await createResearchReconciliationObligationRecord({
+        id: secondId,
+        investigationId,
+        issueCode: "ISSUE_GLOBAL_ORDER_B",
+        targetEntityType: "Conclusion",
+        targetEntityId: "conclusion-global-order-b",
+        remediationAction: "RepairReference",
+        status: "Open",
+        reason: "Second global unresolved obligation.",
+        createdAt,
+        updatedAt,
+      });
+
+      await createResearchReconciliationObligationRecord({
+        id: firstId,
+        investigationId,
+        issueCode: "ISSUE_GLOBAL_ORDER_A",
+        targetEntityType: "Conclusion",
+        targetEntityId: "conclusion-global-order-a",
+        remediationAction: "RepairReference",
+        status: "In Progress",
+        reason: "First global unresolved obligation.",
+        createdAt,
+        updatedAt,
+      });
+
+      const unresolved =
+        await getUnresolvedResearchReconciliationObligationRecords();
+
+      const testObligations = unresolved.filter(
+        ({ id }) => id === firstId || id === secondId,
+      );
+
+      expect(testObligations.map(({ id }) => id)).toEqual([
+        firstId,
+        secondId,
+      ]);
+    } finally {
+      await db
+        .delete(researchReconciliationObligations)
+        .where(eq(researchReconciliationObligations.id, firstId));
+
+      await db
+        .delete(researchReconciliationObligations)
+        .where(eq(researchReconciliationObligations.id, secondId));
     }
   });
 
@@ -495,7 +690,7 @@ describe("research reconciliation obligation persistence", () => {
       });
 
       const unresolved =
-        await getUnresolvedResearchReconciliationObligationRecords(
+        await getUnresolvedResearchReconciliationObligationRecordsByInvestigation(
           investigationId,
         );
 
