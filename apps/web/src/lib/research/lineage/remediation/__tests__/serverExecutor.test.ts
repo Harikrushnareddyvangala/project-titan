@@ -16,7 +16,7 @@ const {
   getResearchInvestigationConclusions,
   getResearchProvenanceEvents,
   persistResearchLineageRemediationMutation,
-  createResearchReconciliationObligationRecord,
+  createResearchReconciliationObligation,
 } = vi.hoisted(() => ({
   getResearchInvestigations: vi.fn(),
   getResearchExperiments: vi.fn(),
@@ -26,7 +26,7 @@ const {
   getResearchInvestigationConclusions: vi.fn(),
   getResearchProvenanceEvents: vi.fn(),
   persistResearchLineageRemediationMutation: vi.fn(),
-  createResearchReconciliationObligationRecord: vi.fn(),
+  createResearchReconciliationObligation: vi.fn(),
 }));
 
 vi.mock("@/lib/research/serverRepository", () => ({
@@ -41,7 +41,10 @@ vi.mock("@/lib/research/serverRepository", () => ({
 
 vi.mock("@titan/database", () => ({
   persistResearchLineageRemediationMutation,
-  createResearchReconciliationObligationRecord,
+}));
+
+vi.mock("@/lib/research/reconciliationObligation/serverRepository", () => ({
+  createResearchReconciliationObligation,
 }));
 
 import { executeResearchLineageIntegrityRemediationOnServer } from "../serverExecutor";
@@ -207,9 +210,9 @@ describe("research lineage remediation server executor", () => {
     const result = await executeResearchLineageIntegrityRemediationOnServer(createPlan());
 
     expect(persistResearchLineageRemediationMutation).toHaveBeenCalledTimes(1);
-    expect(createResearchReconciliationObligationRecord).toHaveBeenCalledTimes(1);
+    expect(createResearchReconciliationObligation).toHaveBeenCalledTimes(1);
 
-    const [obligation] = createResearchReconciliationObligationRecord.mock.calls[0];
+    const [obligation] = createResearchReconciliationObligation.mock.calls[0];
 
     expect(obligation).toMatchObject({
       investigationId: INVESTIGATION_ID,

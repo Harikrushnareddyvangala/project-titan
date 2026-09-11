@@ -30,6 +30,7 @@ import {
 import { createResearchLineageRemediationPlanningService } from "./planning";
 
 import { researchLineageRemediationDatabasePersistence } from "./server";
+import { createResearchReconciliationObligation } from "../../reconciliationObligation/serverRepository";
 
 interface ServerResearchSnapshot {
   getResearchInvestigations: Awaited<ReturnType<typeof getResearchInvestigations>>;
@@ -279,7 +280,7 @@ export async function executeResearchLineageIntegrityRemediationOnServer(
   if (remainingInvalidReference) {
     const now = new Date();
 
-    await researchLineageRemediationDatabasePersistence.createResearchReconciliationObligation({
+    await createResearchReconciliationObligation({
       id: createResearchReconciliationObligationId(),
       investigationId: plan.investigationId,
       issueCode: plan.issueCode,
@@ -290,8 +291,8 @@ export async function executeResearchLineageIntegrityRemediationOnServer(
       status: "Open",
       reason:
         "The remediation mutation was committed, but postcondition validation still reports an invalid conclusion finding reference.",
-      createdAt: now,
-      updatedAt: now,
+      createdAt: now.toISOString(),
+      updatedAt: now.toISOString(),
     });
   }
 
