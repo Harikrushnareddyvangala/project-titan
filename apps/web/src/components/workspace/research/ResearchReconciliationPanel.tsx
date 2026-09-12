@@ -12,13 +12,18 @@ import { useState } from "react";
 
 import { useResearchReconciliationObligations } from "@/hooks/useResearchReconciliationObligations";
 import type { ResearchReconciliationObligationRecoveryPlanningResult } from "@/lib/research/reconciliationObligation/recoveryPlanning";
+import type { ResearchReconciliationObligationConfirmationResult } from "@/lib/research/reconciliationObligation/confirmation";
 import type {
+  ResearchLineageIntegrityRemediationPlan,
   ResearchReconciliationObligation,
   ResearchReconciliationObligationStatus,
 } from "@/types/research";
 
 interface ResearchReconciliationPanelProps {
   investigationId: string;
+  onRecoveryPlanValidated: (
+    plan: ResearchLineageIntegrityRemediationPlan,
+  ) => void;
 }
 
 function getStatusPresentation(status: ResearchReconciliationObligationStatus) {
@@ -80,8 +85,12 @@ interface ObligationCardProps {
   planning: boolean;
   planningResult: ResearchReconciliationObligationRecoveryPlanningResult | null;
   planningError: string | null;
+  confirmation: boolean;
+  confirmationResult: ResearchReconciliationObligationConfirmationResult | null;
+  confirmationError: string | null;
   onActivate: (obligationId: string) => void;
   onPlanRecovery: (obligationId: string) => void;
+  onConfirmRecovery: (obligationId: string) => void;
 }
 
 function ObligationCard({
@@ -91,8 +100,12 @@ function ObligationCard({
   planning,
   planningResult,
   planningError,
+  confirmation,
+  confirmationResult,
+  confirmationError,
   onActivate,
   onPlanRecovery,
+  onConfirmRecovery,
 }: ObligationCardProps) {
   const status = getStatusPresentation(obligation.status);
   const StatusIcon = status.icon;
@@ -232,7 +245,70 @@ function ObligationCard({
                 </p>
 
                 {planningResult.plan ? (
-                  <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                  <>
+                    <div className="mt-3 rounded-lg border border-sky-400/20 bg-sky-500/[0.04] px-3 py-3">
+                      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                        <div>
+                          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-sky-300">
+                            Recovery confirmation
+                          </p>
+                          <p className="mt-1 text-xs leading-5 text-zinc-500">
+                            Confirm the fresh recovery plan explicitly. Confirmation
+                            does not execute remediation or resolve the obligation.
+                          </p>
+                        </div>
+
+                        {planningResult.status === "Planned" ? (
+                          <button
+                            type="button"
+                            onClick={() => onConfirmRecovery(obligation.id)}
+                            disabled={confirmation}
+                            className="inline-flex w-fit items-center rounded-lg border border-sky-400/30 bg-sky-500/10 px-3 py-2 text-xs font-semibold text-sky-200 transition hover:border-sky-400/50 hover:bg-sky-500/15 disabled:cursor-not-allowed disabled:opacity-50"
+                          >
+                            {confirmation ? (
+                              <>
+                                <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+                                Confirming…
+                              </>
+                            ) : (
+                              "Confirm recovery"
+                            )}
+                          </button>
+                        ) : null}
+                      </div>
+
+                      {confirmationError ? (
+                        <p className="mt-3 text-xs leading-5 text-red-300">
+                          {confirmationError}
+                        </p>
+                      ) : null}
+
+                      {confirmationResult ? (
+                        <div className="mt-3 rounded-lg border border-white/10 bg-black/20 px-3 py-3">
+                          <div className="flex items-center justify-between gap-3">
+                            <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-zinc-600">
+                              Confirmation result
+                            </p>
+                            <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-sky-300">
+                              {confirmationResult.status}
+                            </span>
+                          </div>
+
+                          <p className="mt-2 text-xs leading-5 text-zinc-400">
+                            {confirmationResult.reason}
+                          </p>
+
+                          {confirmationResult.status === "Validated" &&
+                          confirmationResult.plan ? (
+                            <p className="mt-2 text-xs font-semibold leading-5 text-emerald-300">
+                              Validated recovery plan is ready for execution handoff.
+                            </p>
+                          ) : null}
+                        </div>
+                      ) : null}
+                    </div>
+
+                    <div className="mt-3 grid gap-3 sm:grid-cols-2">
                     <div>
                       <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-zinc-600">
                         Action
@@ -283,7 +359,8 @@ function ObligationCard({
                         {planningResult.plan.description}
                       </p>
                     </div>
-                  </div>
+                    </div>
+                  </>
                 ) : null}
               </div>
             ) : null}
@@ -325,6 +402,7 @@ function ObligationCard({
 
 export function ResearchReconciliationPanel({
   investigationId,
+  onRecoveryPlanValidated,
 }: ResearchReconciliationPanelProps) {
   const { obligations, loading, error, refresh } =
     useResearchReconciliationObligations(investigationId);
@@ -345,6 +423,15 @@ export function ResearchReconciliationPanel({
     >
   >({});
   const [planningErrors, setPlanningErrors] = useState<
+    Record<string, string>
+  >({});
+  const [confirmationObligationId, setConfirmationObligationId] = useState<
+    string | null
+  >(null);
+  const [confirmationResults, setConfirmationResults] = useState<
+    Record<string, ResearchReconciliationObligationConfirmationResult>
+  >({});
+  const [confirmationErrors, setConfirmationErrors] = useState<
     Record<string, string>
   >({});
 
@@ -395,6 +482,62 @@ export function ResearchReconciliationPanel({
       }));
     } finally {
       setPlanningObligationId(null);
+    }
+  }
+
+  async function handleConfirmRecovery(obligationId: string) {
+    setConfirmationObligationId(obligationId);
+    setConfirmationErrors((current) => {
+      const next = { ...current };
+      delete next[obligationId];
+      return next;
+    });
+
+    try {
+      const response = await fetch(
+        `/api/research/reconciliation/obligations/${encodeURIComponent(
+          obligationId,
+        )}/confirm`,
+        {
+          method: "POST",
+        },
+      );
+
+      const data: unknown = await response.json();
+
+      if (!response.ok) {
+        const message =
+          typeof data === "object" &&
+          data !== null &&
+          "error" in data &&
+          typeof data.error === "string"
+            ? data.error
+            : "Reconciliation recovery confirmation failed.";
+
+        throw new Error(message);
+      }
+
+      const result =
+        data as ResearchReconciliationObligationConfirmationResult;
+
+      setConfirmationResults((current) => ({
+        ...current,
+        [obligationId]: result,
+      }));
+
+      if (result.status === "Validated" && result.plan) {
+        onRecoveryPlanValidated(result.plan);
+      }
+    } catch (err) {
+      setConfirmationErrors((current) => ({
+        ...current,
+        [obligationId]:
+          err instanceof Error
+            ? err.message
+            : "Reconciliation recovery confirmation failed.",
+      }));
+    } finally {
+      setConfirmationObligationId(null);
     }
   }
 
@@ -535,8 +678,12 @@ export function ResearchReconciliationPanel({
               planning={planningObligationId === obligation.id}
               planningResult={planningResults[obligation.id] ?? null}
               planningError={planningErrors[obligation.id] ?? null}
+              confirmation={confirmationObligationId === obligation.id}
+              confirmationResult={confirmationResults[obligation.id] ?? null}
+              confirmationError={confirmationErrors[obligation.id] ?? null}
               onActivate={handleActivate}
               onPlanRecovery={handlePlanRecovery}
+              onConfirmRecovery={handleConfirmRecovery}
             />
           ))}
         </div>

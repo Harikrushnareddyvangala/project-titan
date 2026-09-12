@@ -1,19 +1,14 @@
 "use client";
 
-import {
-  ClipboardList,
-  Plus,
-  Search,
-} from "lucide-react";
+import { ClipboardList, Plus, Search } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
-import {
-  useResearchInvestigations,
-} from "@/hooks/useResearchInvestigations";
+import { useResearchInvestigations } from "@/hooks/useResearchInvestigations";
 
 import type {
   ResearchInvestigation,
   ResearchLineageNode,
+  ResearchLineageIntegrityRemediationPlan,
   ResearchLineageIntegrityRemediationRequest,
   ResearchLineageIntegrityRemediationResult,
 } from "@/types/research";
@@ -27,7 +22,6 @@ import {
   getResearchInvestigationConclusions,
   createResearchLineageIntegrityRemediationPlan,
   preflightResearchLineageIntegrityRemediation,
-  executeResearchLineageIntegrityRemediation,
 } from "@/lib/research";
 
 import { ResearchEvidencePanel } from "./ResearchEvidencePanel";
@@ -43,109 +37,68 @@ import { ResearchLineageNodeInspector } from "./ResearchLineageNodeInspector";
 
 type ResearchArtifactFocus = {
   type:
-  | "Investigation"
-  | "Experiment"
-  | "Evidence"
-  | "Finding"
-  | "FindingValidation"
-  | "Conclusion";
+    "Investigation" | "Experiment" | "Evidence" | "Finding" | "FindingValidation" | "Conclusion";
   id: string;
 };
 
 type ResearchLineageInspectionContext = {
   source: "Integrity";
-  action:
-  | "Inspect"
-  | "RepairReference"
-  | "RepairScope"
-  | "RepairRelationship"
-  | "ReviewProvenance";
+  action: "Inspect" | "RepairReference" | "RepairScope" | "RepairRelationship" | "ReviewProvenance";
   label: string;
 };
 
-const statuses =
-  [
-    "Draft",
-    "Investigating",
-    "Evidence Collected",
-    "Finding Produced",
-    "Validated",
-    "Published",
-  ] as const;
+const statuses = [
+  "Draft",
+  "Investigating",
+  "Evidence Collected",
+  "Finding Produced",
+  "Validated",
+  "Published",
+] as const;
 
 export function ResearchInvestigationPanel() {
-  const {
-    investigations,
-    save,
-    updateStatus,
-  } = useResearchInvestigations();
+  const { investigations, save, updateStatus } = useResearchInvestigations();
 
-  const [title, setTitle] =
-    useState("");
+  const [title, setTitle] = useState("");
 
-  const [objective, setObjective] =
-    useState("");
+  const [objective, setObjective] = useState("");
 
-  const [question, setQuestion] =
-    useState("");
+  const [question, setQuestion] = useState("");
 
-  const [search, setSearch] =
-    useState("");
+  const [search, setSearch] = useState("");
 
-  const filteredInvestigations =
-    useMemo(() => {
-      const query =
-        search
-          .trim()
-          .toLowerCase();
+  const filteredInvestigations = useMemo(() => {
+    const query = search.trim().toLowerCase();
 
-      if (!query) {
-        return investigations;
-      }
+    if (!query) {
+      return investigations;
+    }
 
-      return investigations.filter(
-        (investigation) =>
-          investigation.title
-            .toLowerCase()
-            .includes(query) ||
-          investigation.question
-            .toLowerCase()
-            .includes(query),
-      );
-    }, [
-      investigations,
-      search,
-    ]);
+    return investigations.filter(
+      (investigation) =>
+        investigation.title.toLowerCase().includes(query) ||
+        investigation.question.toLowerCase().includes(query),
+    );
+  }, [investigations, search]);
 
   function createInvestigation() {
-    const cleanTitle =
-      title.trim();
+    const cleanTitle = title.trim();
 
-    const cleanObjective =
-      objective.trim();
+    const cleanObjective = objective.trim();
 
-    const cleanQuestion =
-      question.trim();
+    const cleanQuestion = question.trim();
 
-    if (
-      !cleanTitle ||
-      !cleanObjective ||
-      !cleanQuestion
-    ) {
+    if (!cleanTitle || !cleanObjective || !cleanQuestion) {
       return;
     }
 
-    const now =
-      new Date().toISOString();
+    const now = new Date().toISOString();
 
-    const investigation:
-      ResearchInvestigation = {
+    const investigation: ResearchInvestigation = {
       id: `investigation-${Date.now()}`,
       title: cleanTitle,
-      objective:
-        cleanObjective,
-      question:
-        cleanQuestion,
+      objective: cleanObjective,
+      question: cleanQuestion,
       status: "Draft",
       experimentIds: [],
       evidenceIds: [],
@@ -175,48 +128,33 @@ export function ResearchInvestigationPanel() {
                 Research Management
               </p>
 
-              <h2 className="mt-2 text-2xl font-bold text-white">
-                Active Investigations
-              </h2>
+              <h2 className="mt-2 text-2xl font-bold text-white">Active Investigations</h2>
             </div>
           </div>
 
           <p className="mt-4 max-w-3xl leading-7 text-zinc-400">
-            Create and manage structured engineering
-            investigations inside Project TITAN.
+            Create and manage structured engineering investigations inside Project TITAN.
           </p>
         </div>
 
         <div className="grid gap-4 lg:grid-cols-3">
           <input
             value={title}
-            onChange={(event) =>
-              setTitle(
-                event.target.value,
-              )
-            }
+            onChange={(event) => setTitle(event.target.value)}
             placeholder="Investigation title"
             className="rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white outline-none placeholder:text-zinc-600 focus:border-cyan-400/40"
           />
 
           <input
             value={objective}
-            onChange={(event) =>
-              setObjective(
-                event.target.value,
-              )
-            }
+            onChange={(event) => setObjective(event.target.value)}
             placeholder="Investigation objective"
             className="rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white outline-none placeholder:text-zinc-600 focus:border-cyan-400/40"
           />
 
           <input
             value={question}
-            onChange={(event) =>
-              setQuestion(
-                event.target.value,
-              )
-            }
+            onChange={(event) => setQuestion(event.target.value)}
             placeholder="Research question"
             className="rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white outline-none placeholder:text-zinc-600 focus:border-cyan-400/40"
           />
@@ -224,9 +162,7 @@ export function ResearchInvestigationPanel() {
 
         <button
           type="button"
-          onClick={
-            createInvestigation
-          }
+          onClick={createInvestigation}
           className="inline-flex w-fit items-center rounded-2xl border border-cyan-400/40 bg-cyan-500/10 px-5 py-3 text-sm font-semibold text-cyan-300 transition hover:bg-cyan-500/20"
         >
           <Plus className="mr-2 h-4 w-4" />
@@ -238,51 +174,30 @@ export function ResearchInvestigationPanel() {
 
           <input
             value={search}
-            onChange={(event) =>
-              setSearch(
-                event.target.value,
-              )
-            }
+            onChange={(event) => setSearch(event.target.value)}
             placeholder="Search investigations"
             className="w-full rounded-2xl border border-white/10 bg-black/30 py-3 pl-11 pr-4 text-sm text-white outline-none placeholder:text-zinc-600 focus:border-cyan-400/40"
           />
         </div>
 
         <div className="grid gap-4">
-          {filteredInvestigations.length ===
-            0 ? (
+          {filteredInvestigations.length === 0 ? (
             <div className="rounded-3xl border border-dashed border-white/10 bg-black/20 p-8 text-center">
-              <p className="text-sm font-semibold text-zinc-400">
-                No investigations yet.
-              </p>
+              <p className="text-sm font-semibold text-zinc-400">No investigations yet.</p>
 
               <p className="mt-2 text-xs text-zinc-600">
-                Create your first engineering
-                investigation above.
+                Create your first engineering investigation above.
               </p>
             </div>
           ) : (
-            filteredInvestigations.map(
-              (investigation) => (
-                <InvestigationCard
-                  key={
-                    investigation.id
-                  }
-                  investigation={
-                    investigation
-                  }
-                  onStatusChange={(
-                    status,
-                  ) =>
-                    updateStatus(
-                      investigation,
-                      status,
-                    )
-                  }
-                  onInvestigationUpdated={save}
-                />
-              ),
-            )
+            filteredInvestigations.map((investigation) => (
+              <InvestigationCard
+                key={investigation.id}
+                investigation={investigation}
+                onStatusChange={(status) => updateStatus(investigation, status)}
+                onInvestigationUpdated={save}
+              />
+            ))
           )}
         </div>
       </div>
@@ -291,16 +206,11 @@ export function ResearchInvestigationPanel() {
 }
 
 interface InvestigationCardProps {
-  investigation:
-  ResearchInvestigation;
+  investigation: ResearchInvestigation;
 
-  onStatusChange: (
-    status: ResearchInvestigation["status"],
-  ) => void;
+  onStatusChange: (status: ResearchInvestigation["status"]) => void;
 
-  onInvestigationUpdated: (
-    investigation: ResearchInvestigation,
-  ) => void;
+  onInvestigationUpdated: (investigation: ResearchInvestigation) => void;
 }
 
 function InvestigationCard({
@@ -308,73 +218,57 @@ function InvestigationCard({
   onStatusChange,
   onInvestigationUpdated,
 }: InvestigationCardProps) {
-  const [selectedLineageNodeId, setSelectedLineageNodeId] =
-    useState<string | null>(null);
+  const [selectedLineageNodeId, setSelectedLineageNodeId] = useState<string | null>(null);
 
-  const [
-    provenanceInspectionEventId,
-    setProvenanceInspectionEventId,
-  ] = useState<string | null>(null);
-
-  const [
-  remediationRequest,
-  setRemediationRequest,
-] =
-  useState<ResearchLineageIntegrityRemediationRequest | null>(
+  const [provenanceInspectionEventId, setProvenanceInspectionEventId] = useState<string | null>(
     null,
   );
 
-  const [
-    remediationResult,
-    setRemediationResult
-  ] =
-    useState<ResearchLineageIntegrityRemediationResult | null>(
-    null,
-  );
+  const [remediationRequest, setRemediationRequest] =
+    useState<ResearchLineageIntegrityRemediationRequest | null>(null);
+
+  const [remediationResult, setRemediationResult] =
+    useState<ResearchLineageIntegrityRemediationResult | null>(null);
+
+  const [validatedRecoveryPlan, setValidatedRecoveryPlan] =
+    useState<ResearchLineageIntegrityRemediationPlan | null>(null);
 
   const remediationPlan = useMemo(() => {
     if (!remediationRequest) {
       return null;
     }
 
-    return createResearchLineageIntegrityRemediationPlan(
-      remediationRequest,
-    );
+    return createResearchLineageIntegrityRemediationPlan(remediationRequest);
   }, [remediationRequest]);
 
+  const executionPlan = validatedRecoveryPlan ?? remediationPlan;
+
+  const handleRemediationRequest = (
+    request: ResearchLineageIntegrityRemediationRequest,
+  ) => {
+    setValidatedRecoveryPlan(null);
+    setRemediationRequest(request);
+  };
+
   const remediationPreflight = useMemo(() => {
-    if (!remediationRequest) {
+    if (!executionPlan) {
       return null;
     }
 
-    const plan =
-      createResearchLineageIntegrityRemediationPlan(
-        remediationRequest,
-      );
-
-    return preflightResearchLineageIntegrityRemediation(
-      plan,
-    );
-  }, [remediationRequest]);
+    return preflightResearchLineageIntegrityRemediation(executionPlan);
+  }, [executionPlan]);
 
   const [lineageInspectionContext, setLineageInspectionContext] =
     useState<ResearchLineageInspectionContext | null>(null);
 
-  const [artifactFocus, setArtifactFocus] =
-    useState<ResearchArtifactFocus | null>(null);
+  const [artifactFocus, setArtifactFocus] = useState<ResearchArtifactFocus | null>(null);
 
-  const lineage =
-    getResearchLineage(investigation.id);
+  const lineage = getResearchLineage(investigation.id);
 
   const selectedLineageNode =
-    lineage.nodes.find(
-      (node) =>
-        node.id === selectedLineageNodeId,
-    ) ?? null;
+    lineage.nodes.find((node) => node.id === selectedLineageNodeId) ?? null;
 
-  const handleLineageNodeSelect = (
-    nodeId: string | null,
-  ) => {
+  const handleLineageNodeSelect = (nodeId: string | null) => {
     setSelectedLineageNodeId(nodeId);
     setLineageInspectionContext(null);
     setProvenanceInspectionEventId(null);
@@ -384,16 +278,15 @@ function InvestigationCard({
     }
   };
 
-  const handleIntegrityNodeSelect = (
-    nodeId: string | null,
-  ) => {
+  const handleIntegrityNodeSelect = (nodeId: string | null) => {
     setSelectedLineageNodeId(nodeId);
     setLineageInspectionContext(
-      nodeId ? {
-        source: "Integrity",
-        action: "Inspect",
-        label: "Integrity finding",
-      }
+      nodeId
+        ? {
+            source: "Integrity",
+            action: "Inspect",
+            label: "Integrity finding",
+          }
         : null,
     );
     setProvenanceInspectionEventId(null);
@@ -405,26 +298,18 @@ function InvestigationCard({
 
   const activeArtifactFocus =
     artifactFocus &&
-      lineage.nodes.some(
-        (node) =>
-          node.type === artifactFocus.type &&
-          node.id === artifactFocus.id,
-      )
+    lineage.nodes.some((node) => node.type === artifactFocus.type && node.id === artifactFocus.id)
       ? artifactFocus
       : null;
 
   useEffect(() => {
-    if (
-      activeArtifactFocus?.type !==
-      "Investigation"
-    ) {
+    if (activeArtifactFocus?.type !== "Investigation") {
       return;
     }
 
-    const element =
-      document.querySelector(
-        `[data-research-artifact-id="${activeArtifactFocus.id}"]`,
-      );
+    const element = document.querySelector(
+      `[data-research-artifact-id="${activeArtifactFocus.id}"]`,
+    );
 
     if (!element) {
       return;
@@ -436,9 +321,7 @@ function InvestigationCard({
     });
   }, [activeArtifactFocus]);
 
-  const handleOpenLineageArtifact = (
-    node: ResearchLineageNode,
-  ) => {
+  const handleOpenLineageArtifact = (node: ResearchLineageNode) => {
     switch (node.type) {
       case "Investigation":
         setArtifactFocus({
@@ -448,10 +331,7 @@ function InvestigationCard({
         break;
 
       case "Experiment": {
-        const experiment =
-          getResearchExperiments().find(
-            (item) => item.id === node.id,
-          );
+        const experiment = getResearchExperiments().find((item) => item.id === node.id);
 
         if (!experiment) {
           return;
@@ -465,10 +345,7 @@ function InvestigationCard({
       }
 
       case "Evidence": {
-        const evidence =
-          getResearchEvidence().find(
-            (item) => item.id === node.id,
-          );
+        const evidence = getResearchEvidence().find((item) => item.id === node.id);
 
         if (!evidence) {
           return;
@@ -482,10 +359,7 @@ function InvestigationCard({
       }
 
       case "Finding": {
-        const finding =
-          getResearchFindings().find(
-            (item) => item.id === node.id,
-          );
+        const finding = getResearchFindings().find((item) => item.id === node.id);
 
         if (!finding) {
           return;
@@ -499,20 +373,13 @@ function InvestigationCard({
       }
 
       case "FindingValidation": {
-        const validation =
-          getResearchFindingValidations().find(
-            (item) => item.id === node.id,
-          );
+        const validation = getResearchFindingValidations().find((item) => item.id === node.id);
 
         if (!validation) {
           return;
         }
 
-        const finding =
-          getResearchFindings().find(
-            (item) =>
-              item.id === validation.findingId,
-          );
+        const finding = getResearchFindings().find((item) => item.id === validation.findingId);
 
         if (!finding) {
           return;
@@ -527,10 +394,9 @@ function InvestigationCard({
       }
 
       case "Conclusion": {
-        const conclusion =
-          getResearchInvestigationConclusions().find(
-            (item) => item.id === node.id,
-          );
+        const conclusion = getResearchInvestigationConclusions().find(
+          (item) => item.id === node.id,
+        );
 
         if (!conclusion) {
           return;
@@ -546,53 +412,36 @@ function InvestigationCard({
   };
   return (
     <article
-      data-research-artifact-id={
-        investigation.id
-      }
-      className={`rounded-3xl border p-6 transition ${activeArtifactFocus?.type ===
-        "Investigation"
-        ? "border-cyan-400/60 bg-cyan-500/[0.08] ring-1 ring-cyan-400/30"
-        : "border-white/10 bg-black/30"
-        }`}
+      data-research-artifact-id={investigation.id}
+      className={`rounded-3xl border p-6 transition ${
+        activeArtifactFocus?.type === "Investigation"
+          ? "border-cyan-400/60 bg-cyan-500/[0.08] ring-1 ring-cyan-400/30"
+          : "border-white/10 bg-black/30"
+      }`}
     >
       <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
         <div>
-          <h3 className="text-xl font-bold text-white">
-            {investigation.title}
-          </h3>
+          <h3 className="text-xl font-bold text-white">{investigation.title}</h3>
 
-          <p className="mt-3 text-sm leading-6 text-zinc-400">
-            {investigation.question}
-          </p>
+          <p className="mt-3 text-sm leading-6 text-zinc-400">{investigation.question}</p>
 
           <p className="mt-3 text-xs leading-5 text-zinc-600">
-            Objective:{" "}
-            {investigation.objective}
+            Objective: {investigation.objective}
           </p>
         </div>
 
         <select
-          value={
-            investigation.status
-          }
+          value={investigation.status}
           onChange={(event) =>
-            onStatusChange(
-              event.target
-                .value as ResearchInvestigation["status"],
-            )
+            onStatusChange(event.target.value as ResearchInvestigation["status"])
           }
           className="rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-xs font-semibold text-zinc-300 outline-none focus:border-cyan-400/40"
         >
-          {statuses.map(
-            (status) => (
-              <option
-                key={status}
-                value={status}
-              >
-                {status}
-              </option>
-            ),
-          )}
+          {statuses.map((status) => (
+            <option key={status} value={status}>
+              {status}
+            </option>
+          ))}
         </select>
       </div>
 
@@ -602,94 +451,62 @@ function InvestigationCard({
         </span>
 
         <span className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-xs text-zinc-500">
-          Experimets:{" "}
-          {investigation.experimentIds.length}
+          Experimets: {investigation.experimentIds.length}
         </span>
 
         <span className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-xs text-zinc-500">
-          Evidence:{" "}
-          {investigation.evidenceIds.length}
+          Evidence: {investigation.evidenceIds.length}
         </span>
 
         <span className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-xs text-zinc-500">
-          Findings:{" "}
-          {investigation.findingIds.length}
+          Findings: {investigation.findingIds.length}
         </span>
 
         <span className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-xs text-zinc-500">
-          Conclusions:{" "}
-          {investigation.conclusionIds.length}
+          Conclusions: {investigation.conclusionIds.length}
         </span>
       </div>
       <ResearchExperimentPanel
         investigation={investigation}
-        onInvestigationUpdated={
-          onInvestigationUpdated
-        }
+        onInvestigationUpdated={onInvestigationUpdated}
         focusedArtifactId={
-          activeArtifactFocus?.type === "Experiment"
-            ? activeArtifactFocus.id
-            : null
+          activeArtifactFocus?.type === "Experiment" ? activeArtifactFocus.id : null
         }
       />
 
       <ResearchEvidencePanel
         investigation={investigation}
-        onInvestigationUpdated={
-          onInvestigationUpdated
-        }
-        focusedArtifactId={
-          activeArtifactFocus?.type === "Evidence"
-            ? activeArtifactFocus.id
-            : null
-        }
+        onInvestigationUpdated={onInvestigationUpdated}
+        focusedArtifactId={activeArtifactFocus?.type === "Evidence" ? activeArtifactFocus.id : null}
       />
 
       <ResearchFindingPanel
         investigation={investigation}
-        onInvestigationUpdated={
-          onInvestigationUpdated
-        }
-        focusedArtifactId={
-          activeArtifactFocus?.type === "Finding"
-            ? activeArtifactFocus.id
-            : null
-        }
+        onInvestigationUpdated={onInvestigationUpdated}
+        focusedArtifactId={activeArtifactFocus?.type === "Finding" ? activeArtifactFocus.id : null}
       />
 
       <ResearchConclusionPanel
         investigation={investigation}
-        onInvestigationUpdated={
-          onInvestigationUpdated
-        }
+        onInvestigationUpdated={onInvestigationUpdated}
         focusedArtifactId={
-          activeArtifactFocus?.type === "Conclusion"
-            ? activeArtifactFocus.id
-            : null
+          activeArtifactFocus?.type === "Conclusion" ? activeArtifactFocus.id : null
         }
       />
 
       <ResearchLineageGraph
         investigationId={investigation.id}
         selectedNodeId={selectedLineageNodeId}
-        onNodeSelect={
-          handleLineageNodeSelect
-        }
+        onNodeSelect={handleLineageNodeSelect}
       />
 
       <ResearchLineageNodeInspector
         node={selectedLineageNode}
-        inspectionContext={
-          lineageInspectionContext
-        }
-        onOpenArtifact={
-          handleOpenLineageArtifact
-        }
+        inspectionContext={lineageInspectionContext}
+        onOpenArtifact={handleOpenLineageArtifact}
       />
 
-      <ResearchProvenanceSummary
-        investigationId={investigation.id}
-      />
+      <ResearchProvenanceSummary investigationId={investigation.id} />
 
       <ResearchProvenanceTimeline
         investigationId={investigation.id}
@@ -697,18 +514,13 @@ function InvestigationCard({
       />
       <ResearchLineageIntegrity
         investigationId={investigation.id}
-        onSelectNode={
-          handleIntegrityNodeSelect
-        }
-        onSelectProvenanceEvent={
-          setProvenanceInspectionEventId
-        }
-        onRemediationRequest={
-          setRemediationRequest
-        }
+        onSelectNode={handleIntegrityNodeSelect}
+        onSelectProvenanceEvent={setProvenanceInspectionEventId}
+        onRemediationRequest={handleRemediationRequest}
       />
       <ResearchReconciliationPanel
         investigationId={investigation.id}
+        onRecoveryPlanValidated={setValidatedRecoveryPlan}
       />
       {remediationPreflight ? (
         <div className="mt-4 rounded-2xl border border-amber-400/20 bg-amber-500/[0.05] p-4">
@@ -719,8 +531,7 @@ function InvestigationCard({
               </p>
 
               <p className="mt-2 text-xs text-zinc-400">
-                {remediationPreflight.action} ·{" "}
-                {remediationPreflight.issueCode}
+                {remediationPreflight.action} · {remediationPreflight.issueCode}
               </p>
             </div>
 
@@ -731,9 +542,7 @@ function InvestigationCard({
                   : "rounded-full border border-red-400/30 bg-red-400/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-red-300"
               }
             >
-              {remediationPreflight.ready
-                ? "Ready"
-                : "Not ready"}
+              {remediationPreflight.ready ? "Ready" : "Not ready"}
             </span>
           </div>
 
@@ -743,21 +552,13 @@ function InvestigationCard({
             </p>
 
             <div className="mt-2 space-y-1.5 text-xs text-zinc-400">
-              <p>
-                ✓ Confirmation required
-              </p>
+              <p>✓ Confirmation required</p>
 
-              <p>
-                ✓ Research data mutation
-              </p>
+              <p>✓ Research data mutation</p>
 
-              <p>
-                ✓ Provenance event
-              </p>
+              <p>✓ Provenance event</p>
 
-              <p>
-                ✓ Target validation
-              </p>
+              <p>✓ Target validation</p>
             </div>
           </div>
 
@@ -774,9 +575,7 @@ function InvestigationCard({
                     : "text-xs font-semibold text-red-300"
                 }
               >
-                {remediationPreflight.targetValidation.valid
-                  ? "✓ Valid"
-                  : "✕ Invalid"}
+                {remediationPreflight.targetValidation.valid ? "✓ Valid" : "✕ Invalid"}
               </p>
 
               <p className="mt-1 text-xs leading-5 text-zinc-500">
@@ -797,29 +596,68 @@ function InvestigationCard({
                   : "mt-2 text-xs font-bold uppercase tracking-[0.12em] text-red-300"
               }
             >
-              {remediationPreflight.ready
-                ? "● Ready for execution"
-                : "● Not ready for execution"}
+              {remediationPreflight.ready ? "● Ready for execution" : "● Not ready for execution"}
             </p>
 
-            <p className="mt-2 text-xs leading-5 text-zinc-500">
-              {remediationPreflight.reason}
-            </p>
+            <p className="mt-2 text-xs leading-5 text-zinc-500">{remediationPreflight.reason}</p>
 
             <p className="mt-2 text-xs leading-5 text-zinc-500">
               No research data has been modified.
             </p>
-            {remediationPreflight.ready &&
-              remediationPlan ? (
+            {remediationPreflight.ready && executionPlan ? (
               <button
                 type="button"
-                onClick={() => {
-                  const result =
-                    executeResearchLineageIntegrityRemediation(
-                      remediationPlan,
-                    );
+                onClick={async () => {
+                  try {
+                    const response = await fetch("/api/research/lineage/remediation", {
+                      method: "POST",
+                      headers: {
+                        "Content-Type": "application/json",
+                      },
+                      body: JSON.stringify({
+                        plan: executionPlan,
+                      }),
+                    });
 
-                  setRemediationResult(result);
+                    const payload: unknown = await response.json();
+
+                    if (!response.ok) {
+                      const message =
+                        typeof payload === "object" &&
+                          payload !== null &&
+                          "error" in payload &&
+                          typeof payload.error === "string"
+                          ? payload.error
+                          : "Research lineage remediation execution failed.";
+
+                      throw new Error(message);
+                    }
+
+                    const result = payload as Omit<
+                      ResearchLineageIntegrityRemediationResult,
+                      "plan" | "status"
+                    > & {
+                      status: ResearchLineageIntegrityRemediationResult["status"];
+                    };
+
+                    setRemediationResult({
+                      ...result,
+                      plan: executionPlan,
+                    });
+                  } catch (error: unknown) {
+                    setRemediationResult({
+                      investigationId: executionPlan.investigationId,
+                      action: executionPlan.action,
+                      issueCode: executionPlan.issueCode,
+                      status: "Failed",
+                      executed: false,
+                      message:
+                        error instanceof Error
+                          ? error.message
+                          : "Research lineage remediation execution failed.",
+                      plan: executionPlan,
+                    });
+                  }
                 }}
                 className="mt-4 rounded-xl border border-red-400/30 bg-red-500/10 px-4 py-2 text-xs font-semibold text-red-300 transition hover:bg-red-500/20"
               >
@@ -844,9 +682,7 @@ function InvestigationCard({
                   {remediationResult.status}
                 </p>
 
-                <p className="mt-2 text-xs leading-5 text-zinc-400">
-                  {remediationResult.message}
-                </p>
+                <p className="mt-2 text-xs leading-5 text-zinc-400">{remediationResult.message}</p>
               </div>
             ) : null}
           </div>
