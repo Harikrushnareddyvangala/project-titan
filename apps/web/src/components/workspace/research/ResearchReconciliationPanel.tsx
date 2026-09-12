@@ -5,8 +5,10 @@ import {
   CheckCircle2,
   Clock3,
   History,
+  Loader2,
   ShieldAlert,
 } from "lucide-react";
+import { useState } from "react";
 
 import { useResearchReconciliationObligations } from "@/hooks/useResearchReconciliationObligations";
 import type {
@@ -70,11 +72,19 @@ function formatTimestamp(timestamp?: string): string {
   return new Date(timestamp).toLocaleString();
 }
 
+interface ObligationCardProps {
+  obligation: ResearchReconciliationObligation;
+  activating: boolean;
+  activationError: string | null;
+  onActivate: (obligationId: string) => void;
+}
+
 function ObligationCard({
   obligation,
-}: {
-  obligation: ResearchReconciliationObligation;
-}) {
+  activating,
+  activationError,
+  onActivate,
+}: ObligationCardProps) {
   const status = getStatusPresentation(obligation.status);
   const StatusIcon = status.icon;
 
@@ -123,6 +133,44 @@ function ObligationCard({
           </div>
         </div>
 
+        {obligation.status === "Open" ? (
+          <div className="rounded-xl border border-amber-400/20 bg-amber-500/[0.04] px-3 py-3">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-amber-300">
+                  Recovery ownership
+                </p>
+                <p className="mt-1 text-xs leading-5 text-zinc-500">
+                  Activate this obligation when an operator begins working on
+                  the outstanding reconciliation responsibility.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => onActivate(obligation.id)}
+                disabled={activating}
+                className="inline-flex w-fit items-center rounded-lg border border-amber-400/30 bg-amber-500/10 px-3 py-2 text-xs font-semibold text-amber-200 transition hover:border-amber-400/50 hover:bg-amber-500/15 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {activating ? (
+                  <>
+                    <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+                    Activating…
+                  </>
+                ) : (
+                  "Activate obligation"
+                )}
+              </button>
+            </div>
+
+            {activationError ? (
+              <p className="mt-3 text-xs leading-5 text-red-300">
+                {activationError}
+              </p>
+            ) : null}
+          </div>
+        ) : null}
+
         <div className="grid gap-3 text-xs sm:grid-cols-3">
           <div>
             <p className="font-semibold uppercase tracking-[0.12em] text-zinc-600">
@@ -159,8 +207,61 @@ function ObligationCard({
 export function ResearchReconciliationPanel({
   investigationId,
 }: ResearchReconciliationPanelProps) {
-  const { obligations, loading, error } =
+  const { obligations, loading, error, refresh } =
     useResearchReconciliationObligations(investigationId);
+
+  const [activatingObligationId, setActivatingObligationId] = useState<
+    string | null
+  >(null);
+  const [activationErrors, setActivationErrors] = useState<
+    Record<string, string>
+  >({});
+
+  async function handleActivate(obligationId: string) {
+    setActivatingObligationId(obligationId);
+    setActivationErrors((current) => {
+      const next = { ...current };
+      delete next[obligationId];
+      return next;
+    });
+
+    try {
+      const response = await fetch(
+        `/api/research/reconciliation/obligations/${encodeURIComponent(
+          obligationId,
+        )}/activate`,
+        {
+          method: "POST",
+        },
+      );
+
+      const data: unknown = await response.json();
+
+      if (!response.ok) {
+        const message =
+          typeof data === "object" &&
+          data !== null &&
+          "error" in data &&
+          typeof data.error === "string"
+            ? data.error
+            : "Reconciliation obligation activation failed.";
+
+        throw new Error(message);
+      }
+
+      refresh();
+    } catch (err) {
+      setActivationErrors((current) => ({
+        ...current,
+        [obligationId]:
+          err instanceof Error
+            ? err.message
+            : "Reconciliation obligation activation failed.",
+      }));
+    } finally {
+      setActivatingObligationId(null);
+    }
+  }
 
   const openCount = obligations.filter(
     (obligation) => obligation.status === "Open",
@@ -248,6 +349,9 @@ export function ResearchReconciliationPanel({
             <ObligationCard
               key={obligation.id}
               obligation={obligation}
+              activating={activatingObligationId === obligation.id}
+              activationError={activationErrors[obligation.id] ?? null}
+              onActivate={handleActivate}
             />
           ))}
         </div>

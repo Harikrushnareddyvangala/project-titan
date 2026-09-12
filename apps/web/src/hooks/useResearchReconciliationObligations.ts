@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import type { ResearchReconciliationObligation } from "@/types/research";
 
@@ -8,14 +8,22 @@ interface ResearchReconciliationObligationsResult {
   obligations: ResearchReconciliationObligation[];
   loading: boolean;
   error: string | null;
+  refresh: () => void;
 }
 
 export function useResearchReconciliationObligations(
   investigationId: string,
 ): ResearchReconciliationObligationsResult {
-  const [obligations, setObligations] = useState<ResearchReconciliationObligation[]>([]);
+  const [obligations, setObligations] = useState<
+    ResearchReconciliationObligation[]
+  >([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  const refresh = useCallback(() => {
+    setRefreshKey((current) => current + 1);
+  }, []);
 
   useEffect(() => {
     const cleanInvestigationId = investigationId.trim();
@@ -67,7 +75,9 @@ export function useResearchReconciliationObligations(
           return;
         }
 
-        setObligations(data.obligations as ResearchReconciliationObligation[]);
+        setObligations(
+          data.obligations as ResearchReconciliationObligation[],
+        );
       } catch (err) {
         if (cancelled) {
           return;
@@ -91,11 +101,12 @@ export function useResearchReconciliationObligations(
     return () => {
       cancelled = true;
     };
-  }, [investigationId]);
+  }, [investigationId, refreshKey]);
 
   return {
     obligations,
     loading,
     error,
+    refresh,
   };
 }
