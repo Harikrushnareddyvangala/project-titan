@@ -8,7 +8,7 @@ import {
   Loader2,
   ShieldAlert,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { useResearchReconciliationObligations } from "@/hooks/useResearchReconciliationObligations";
 import type { ResearchReconciliationObligationRecoveryPlanningResult } from "@/lib/research/reconciliationObligation/recoveryPlanning";
@@ -25,6 +25,7 @@ interface ResearchReconciliationPanelProps {
   onRecoveryPlanValidated: (
     plan: ResearchLineageIntegrityRemediationPlan,
   ) => void;
+  refreshGeneration: number;
 }
 
 function getStatusPresentation(status: ResearchReconciliationObligationStatus) {
@@ -476,9 +477,18 @@ function ObligationCard({
 export function ResearchReconciliationPanel({
   investigationId,
   onRecoveryPlanValidated,
+  refreshGeneration,
 }: ResearchReconciliationPanelProps) {
   const { obligations, loading, error, refresh } =
     useResearchReconciliationObligations(investigationId);
+
+  useEffect(() => {
+    if (refreshGeneration === 0) {
+      return;
+    }
+
+    refresh();
+  }, [refreshGeneration, refresh]);
 
   const [activatingObligationId, setActivatingObligationId] = useState<
     string | null

@@ -233,6 +233,9 @@ function InvestigationCard({
   const [validatedRecoveryPlan, setValidatedRecoveryPlan] =
     useState<ResearchLineageIntegrityRemediationPlan | null>(null);
 
+  const [reconciliationRefreshGeneration, setReconciliationRefreshGeneration] =
+    useState(0);
+
   const remediationPlan = useMemo(() => {
     if (!remediationRequest) {
       return null;
@@ -521,6 +524,7 @@ function InvestigationCard({
       <ResearchReconciliationPanel
         investigationId={investigation.id}
         onRecoveryPlanValidated={setValidatedRecoveryPlan}
+        refreshGeneration={reconciliationRefreshGeneration}
       />
       {remediationPreflight ? (
         <div className="mt-4 rounded-2xl border border-amber-400/20 bg-amber-500/[0.05] p-4">
@@ -639,6 +643,8 @@ function InvestigationCard({
                     > & {
                       status: ResearchLineageIntegrityRemediationResult["status"];
                     };
+
+                    setReconciliationRefreshGeneration((current) => current + 1);
 
                     setRemediationResult({
                       ...result,
