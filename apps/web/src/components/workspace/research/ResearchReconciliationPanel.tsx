@@ -13,6 +13,7 @@ import { useState } from "react";
 import { useResearchReconciliationObligations } from "@/hooks/useResearchReconciliationObligations";
 import type { ResearchReconciliationObligationRecoveryPlanningResult } from "@/lib/research/reconciliationObligation/recoveryPlanning";
 import type { ResearchReconciliationObligationConfirmationResult } from "@/lib/research/reconciliationObligation/confirmation";
+import type { ResearchReconciliationObligationLifecycleResult } from "@/lib/research/reconciliationObligation/lifecycle";
 import type {
   ResearchLineageIntegrityRemediationPlan,
   ResearchReconciliationObligation,
@@ -88,9 +89,13 @@ interface ObligationCardProps {
   confirmation: boolean;
   confirmationResult: ResearchReconciliationObligationConfirmationResult | null;
   confirmationError: string | null;
+  resolving: boolean;
+  resolutionResult: ResearchReconciliationObligationLifecycleResult | null;
+  resolutionError: string | null;
   onActivate: (obligationId: string) => void;
   onPlanRecovery: (obligationId: string) => void;
   onConfirmRecovery: (obligationId: string) => void;
+  onResolve: (obligationId: string) => void;
 }
 
 function ObligationCard({
@@ -103,9 +108,13 @@ function ObligationCard({
   confirmation,
   confirmationResult,
   confirmationError,
+  resolving,
+  resolutionResult,
+  resolutionError,
   onActivate,
   onPlanRecovery,
   onConfirmRecovery,
+  onResolve,
 }: ObligationCardProps) {
   const status = getStatusPresentation(obligation.status);
   const StatusIcon = status.icon;
@@ -367,6 +376,70 @@ function ObligationCard({
           </div>
         ) : null}
 
+        {obligation.status === "In Progress" ? (
+          <div className="rounded-xl border border-emerald-400/20 bg-emerald-500/[0.04] px-3 py-3">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-emerald-300">
+                  Reconciliation verification
+                </p>
+                <p className="mt-1 text-xs leading-5 text-zinc-500">
+                  Re-check the specific outstanding condition against the current
+                  research state. Resolution never executes recovery work.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => onResolve(obligation.id)}
+                disabled={resolving}
+                className="inline-flex w-fit items-center rounded-lg border border-emerald-400/30 bg-emerald-500/10 px-3 py-2 text-xs font-semibold text-emerald-200 transition hover:border-emerald-400/50 hover:bg-emerald-500/15 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {resolving ? (
+                  <>
+                    <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+                    Verifying…
+                  </>
+                ) : (
+                  "Resolve obligation"
+                )}
+              </button>
+            </div>
+
+            {resolutionError ? (
+              <p className="mt-3 text-xs leading-5 text-red-300">
+                {resolutionError}
+              </p>
+            ) : null}
+
+            {resolutionResult ? (
+              <div className="mt-3 rounded-lg border border-white/10 bg-black/20 px-3 py-3">
+                <div className="flex items-center justify-between gap-3">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-zinc-600">
+                    Resolution result
+                  </p>
+                  <span
+                    className={
+                      resolutionResult.obligation.status === "Resolved"
+                        ? "text-[10px] font-bold uppercase tracking-[0.14em] text-emerald-300"
+                        : "text-[10px] font-bold uppercase tracking-[0.14em] text-amber-300"
+                    }
+                  >
+                    {resolutionResult.obligation.status}
+                  </span>
+                </div>
+
+                <p className="mt-2 text-xs leading-5 text-zinc-400">
+                  {resolutionResult.reason ??
+                    (resolutionResult.transitioned
+                      ? "Reconciliation obligation resolved after fresh verification."
+                      : "Reconciliation obligation remains unresolved.")}
+                </p>
+              </div>
+            ) : null}
+          </div>
+        ) : null}
+
         <div className="grid gap-3 text-xs sm:grid-cols-3">
           <div>
             <p className="font-semibold uppercase tracking-[0.12em] text-zinc-600">
@@ -432,6 +505,15 @@ export function ResearchReconciliationPanel({
     Record<string, ResearchReconciliationObligationConfirmationResult>
   >({});
   const [confirmationErrors, setConfirmationErrors] = useState<
+    Record<string, string>
+  >({});
+  const [resolvingObligationId, setResolvingObligationId] = useState<
+    string | null
+  >(null);
+  const [resolutionResults, setResolutionResults] = useState<
+    Record<string, ResearchReconciliationObligationLifecycleResult>
+  >({});
+  const [resolutionErrors, setResolutionErrors] = useState<
     Record<string, string>
   >({});
 
@@ -538,6 +620,58 @@ export function ResearchReconciliationPanel({
       }));
     } finally {
       setConfirmationObligationId(null);
+    }
+  }
+
+  async function handleResolve(obligationId: string) {
+    setResolvingObligationId(obligationId);
+    setResolutionErrors((current) => {
+      const next = { ...current };
+      delete next[obligationId];
+      return next;
+    });
+
+    try {
+      const response = await fetch(
+        `/api/research/reconciliation/obligations/${encodeURIComponent(
+          obligationId,
+        )}/resolve`,
+        {
+          method: "POST",
+        },
+      );
+
+      const data: unknown = await response.json();
+
+      if (!response.ok) {
+        const message =
+          typeof data === "object" &&
+          data !== null &&
+          "error" in data &&
+          typeof data.error === "string"
+            ? data.error
+            : "Reconciliation obligation resolution failed.";
+
+        throw new Error(message);
+      }
+
+      setResolutionResults((current) => ({
+        ...current,
+        [obligationId]:
+          data as ResearchReconciliationObligationLifecycleResult,
+      }));
+
+      refresh();
+    } catch (err) {
+      setResolutionErrors((current) => ({
+        ...current,
+        [obligationId]:
+          err instanceof Error
+            ? err.message
+            : "Reconciliation obligation resolution failed.",
+      }));
+    } finally {
+      setResolvingObligationId(null);
     }
   }
 
@@ -681,9 +815,13 @@ export function ResearchReconciliationPanel({
               confirmation={confirmationObligationId === obligation.id}
               confirmationResult={confirmationResults[obligation.id] ?? null}
               confirmationError={confirmationErrors[obligation.id] ?? null}
+              resolving={resolvingObligationId === obligation.id}
+              resolutionResult={resolutionResults[obligation.id] ?? null}
+              resolutionError={resolutionErrors[obligation.id] ?? null}
               onActivate={handleActivate}
               onPlanRecovery={handlePlanRecovery}
               onConfirmRecovery={handleConfirmRecovery}
+              onResolve={handleResolve}
             />
           ))}
         </div>
