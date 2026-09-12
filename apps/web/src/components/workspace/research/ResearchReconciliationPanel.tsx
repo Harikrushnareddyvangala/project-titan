@@ -11,6 +11,7 @@ import {
 import { useState } from "react";
 
 import { useResearchReconciliationObligations } from "@/hooks/useResearchReconciliationObligations";
+import type { ResearchReconciliationObligationRecoveryPlanningResult } from "@/lib/research/reconciliationObligation/recoveryPlanning";
 import type {
   ResearchReconciliationObligation,
   ResearchReconciliationObligationStatus,
@@ -76,14 +77,22 @@ interface ObligationCardProps {
   obligation: ResearchReconciliationObligation;
   activating: boolean;
   activationError: string | null;
+  planning: boolean;
+  planningResult: ResearchReconciliationObligationRecoveryPlanningResult | null;
+  planningError: string | null;
   onActivate: (obligationId: string) => void;
+  onPlanRecovery: (obligationId: string) => void;
 }
 
 function ObligationCard({
   obligation,
   activating,
   activationError,
+  planning,
+  planningResult,
+  planningError,
   onActivate,
+  onPlanRecovery,
 }: ObligationCardProps) {
   const status = getStatusPresentation(obligation.status);
   const StatusIcon = status.icon;
@@ -171,6 +180,116 @@ function ObligationCard({
           </div>
         ) : null}
 
+        {obligation.status === "In Progress" ? (
+          <div className="rounded-xl border border-sky-400/20 bg-sky-500/[0.04] px-3 py-3">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-sky-300">
+                  Recovery planning
+                </p>
+                <p className="mt-1 text-xs leading-5 text-zinc-500">
+                  Build a fresh recovery plan from the current lineage state.
+                  Planning does not execute or confirm remediation.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => onPlanRecovery(obligation.id)}
+                disabled={planning}
+                className="inline-flex w-fit items-center rounded-lg border border-sky-400/30 bg-sky-500/10 px-3 py-2 text-xs font-semibold text-sky-200 transition hover:border-sky-400/50 hover:bg-sky-500/15 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {planning ? (
+                  <>
+                    <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+                    Planning…
+                  </>
+                ) : (
+                  "Plan recovery"
+                )}
+              </button>
+            </div>
+
+            {planningError ? (
+              <p className="mt-3 text-xs leading-5 text-red-300">
+                {planningError}
+              </p>
+            ) : null}
+
+            {planningResult ? (
+              <div className="mt-3 rounded-lg border border-white/10 bg-black/20 px-3 py-3">
+                <div className="flex items-center justify-between gap-3">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-zinc-600">
+                    Planning result
+                  </p>
+                  <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-sky-300">
+                    {planningResult.status}
+                  </span>
+                </div>
+
+                <p className="mt-2 text-xs leading-5 text-zinc-400">
+                  {planningResult.reason}
+                </p>
+
+                {planningResult.plan ? (
+                  <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                    <div>
+                      <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-zinc-600">
+                        Action
+                      </p>
+                      <p className="mt-1 text-xs text-zinc-300">
+                        {planningResult.plan.action}
+                      </p>
+                    </div>
+
+                    <div>
+                      <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-zinc-600">
+                        Issue
+                      </p>
+                      <p className="mt-1 text-xs text-zinc-300">
+                        {planningResult.plan.issueCode}
+                      </p>
+                    </div>
+
+                    <div className="sm:col-span-2">
+                      <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-zinc-600">
+                        Target
+                      </p>
+                      <p className="mt-1 break-all text-xs text-zinc-300">
+                        {[
+                          planningResult.plan.target.nodeId
+                            ? `Node: ${planningResult.plan.target.nodeId}`
+                            : null,
+                          planningResult.plan.target.edgeId
+                            ? `Edge: ${planningResult.plan.target.edgeId}`
+                            : null,
+                          planningResult.plan.target.sourceId
+                            ? `Source: ${planningResult.plan.target.sourceId}`
+                            : null,
+                          planningResult.plan.target.targetId
+                            ? `Target: ${planningResult.plan.target.targetId}`
+                            : null,
+                        ]
+                          .filter(Boolean)
+                          .join(" · ")}
+                      </p>
+                    </div>
+
+                    <div className="sm:col-span-2">
+                      <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-zinc-600">
+                        Description
+                      </p>
+                      <p className="mt-1 text-xs leading-5 text-zinc-400">
+                        {planningResult.plan.description}
+                      </p>
+                    </div>
+                  </div>
+                ) : null}
+              </div>
+            ) : null}
+          </div>
+        ) : null}
+
         <div className="grid gap-3 text-xs sm:grid-cols-3">
           <div>
             <p className="font-semibold uppercase tracking-[0.12em] text-zinc-600">
@@ -216,6 +335,68 @@ export function ResearchReconciliationPanel({
   const [activationErrors, setActivationErrors] = useState<
     Record<string, string>
   >({});
+  const [planningObligationId, setPlanningObligationId] = useState<
+    string | null
+  >(null);
+  const [planningResults, setPlanningResults] = useState<
+    Record<
+      string,
+      ResearchReconciliationObligationRecoveryPlanningResult
+    >
+  >({});
+  const [planningErrors, setPlanningErrors] = useState<
+    Record<string, string>
+  >({});
+
+  async function handlePlanRecovery(obligationId: string) {
+    setPlanningObligationId(obligationId);
+    setPlanningErrors((current) => {
+      const next = { ...current };
+      delete next[obligationId];
+      return next;
+    });
+
+    try {
+      const response = await fetch(
+        `/api/research/reconciliation/obligations/${encodeURIComponent(
+          obligationId,
+        )}/recovery`,
+        {
+          method: "POST",
+        },
+      );
+
+      const data: unknown = await response.json();
+
+      if (!response.ok) {
+        const message =
+          typeof data === "object" &&
+          data !== null &&
+          "error" in data &&
+          typeof data.error === "string"
+            ? data.error
+            : "Reconciliation recovery planning failed.";
+
+        throw new Error(message);
+      }
+
+      setPlanningResults((current) => ({
+        ...current,
+        [obligationId]:
+          data as ResearchReconciliationObligationRecoveryPlanningResult,
+      }));
+    } catch (err) {
+      setPlanningErrors((current) => ({
+        ...current,
+        [obligationId]:
+          err instanceof Error
+            ? err.message
+            : "Reconciliation recovery planning failed.",
+      }));
+    } finally {
+      setPlanningObligationId(null);
+    }
+  }
 
   async function handleActivate(obligationId: string) {
     setActivatingObligationId(obligationId);
@@ -351,7 +532,11 @@ export function ResearchReconciliationPanel({
               obligation={obligation}
               activating={activatingObligationId === obligation.id}
               activationError={activationErrors[obligation.id] ?? null}
+              planning={planningObligationId === obligation.id}
+              planningResult={planningResults[obligation.id] ?? null}
+              planningError={planningErrors[obligation.id] ?? null}
               onActivate={handleActivate}
+              onPlanRecovery={handlePlanRecovery}
             />
           ))}
         </div>
