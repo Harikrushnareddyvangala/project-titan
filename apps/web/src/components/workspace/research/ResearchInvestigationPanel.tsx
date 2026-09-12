@@ -37,6 +37,7 @@ import { ResearchConclusionPanel } from "./ResearchConclusionPanel";
 import { ResearchProvenanceSummary } from "./ResearchProvenanceSummary";
 import { ResearchProvenanceTimeline } from "./ResearchProvenanceTimeline";
 import { ResearchLineageIntegrity } from "./ResearchLineageIntegrity";
+import { ResearchReconciliationPanel } from "./ResearchReconciliationPanel";
 import { ResearchLineageGraph } from "./ResearchLineageGraph";
 import { ResearchLineageNodeInspector } from "./ResearchLineageNodeInspector";
 
@@ -705,6 +706,9 @@ function InvestigationCard({
         onRemediationRequest={
           setRemediationRequest
         }
+      />
+      <ResearchReconciliationPanel
+        investigationId={investigation.id}
       />
       {remediationPreflight ? (
         <div className="mt-4 rounded-2xl border border-amber-400/20 bg-amber-500/[0.05] p-4">
