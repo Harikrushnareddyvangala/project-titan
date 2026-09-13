@@ -3,8 +3,8 @@ import "server-only";
 import type { ResearchReconciliationObligation } from "@/types/research";
 
 import {
+  activateResearchReconciliationObligation,
   getResearchReconciliationObligation,
-  updateResearchReconciliationObligationStatus,
 } from "./serverRepository";
 
 export interface ResearchReconciliationObligationActivationDependencies {
@@ -12,11 +12,10 @@ export interface ResearchReconciliationObligationActivationDependencies {
     id: string,
   ): Promise<ResearchReconciliationObligation | null>;
 
-  updateResearchReconciliationObligationStatus(
+  activateResearchReconciliationObligation(
     id: string,
     input: {
       expectedUpdatedAt: string;
-      toStatus: "In Progress";
       updatedAt: string;
     },
   ): Promise<ResearchReconciliationObligation>;
@@ -27,7 +26,7 @@ export interface ResearchReconciliationObligationActivationDependencies {
 const defaultDependencies: ResearchReconciliationObligationActivationDependencies =
   {
     getResearchReconciliationObligation,
-    updateResearchReconciliationObligationStatus,
+    activateResearchReconciliationObligation,
     now: () => new Date().toISOString(),
   };
 
@@ -60,11 +59,10 @@ export async function activateResearchReconciliationObligationOnServer(
   const updatedAt = dependencies.now();
 
   const updatedObligation =
-    await dependencies.updateResearchReconciliationObligationStatus(
+    await dependencies.activateResearchReconciliationObligation(
       obligation.id,
       {
-      expectedUpdatedAt: obligation.updatedAt,
-        toStatus: "In Progress",
+        expectedUpdatedAt: obligation.updatedAt,
         updatedAt,
       },
     );

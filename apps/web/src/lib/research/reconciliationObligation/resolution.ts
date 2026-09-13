@@ -49,10 +49,13 @@ const defaultDependencies: ResearchReconciliationObligationResolutionDependencie
       verification,
       {
         updateResearchReconciliationObligationStatus: async (id, input) => {
-          const { updateResearchReconciliationObligationStatus } =
+          const { resolveResearchReconciliationObligation } =
             await import("./serverRepository");
 
-          return updateResearchReconciliationObligationStatus(id, input);
+          return resolveResearchReconciliationObligation(id, {
+            expectedUpdatedAt: input.expectedUpdatedAt,
+            updatedAt: input.updatedAt,
+          });
         },
         now: () => new Date().toISOString(),
       },

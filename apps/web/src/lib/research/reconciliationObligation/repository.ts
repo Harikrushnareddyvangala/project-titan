@@ -19,12 +19,6 @@ export interface ResearchReconciliationObligationCreateInput {
   resolvedAt?: string;
 }
 
-export interface ResearchReconciliationObligationStatusUpdateInput {
-  expectedUpdatedAt: string;
-  toStatus: ResearchReconciliationObligationStatus;
-  updatedAt: string;
-}
-
 export interface ResearchReconciliationObligationRepositoryDependencies {
   getResearchReconciliationObligation(
     id: string,
@@ -59,10 +53,6 @@ export interface ResearchReconciliationObligationRepositoryDependencies {
     input: ResearchReconciliationObligationCreateInput,
   ): Promise<ResearchReconciliationObligation>;
 
-  updateResearchReconciliationObligationStatus(
-    id: string,
-    input: ResearchReconciliationObligationStatusUpdateInput,
-  ): Promise<ResearchReconciliationObligation>;
 }
 
 export function getResearchReconciliationObligation(
@@ -127,14 +117,6 @@ export function ensureActiveResearchReconciliationObligation(
   return dependencies.ensureActiveResearchReconciliationObligation(input);
 }
 
-export function updateResearchReconciliationObligationStatus(
-  id: string,
-  input: ResearchReconciliationObligationStatusUpdateInput,
-  dependencies: ResearchReconciliationObligationRepositoryDependencies,
-): Promise<ResearchReconciliationObligation> {
-  return dependencies.updateResearchReconciliationObligationStatus(id, input);
-}
-
 export function createResearchReconciliationObligationRepository(
   dependencies: ResearchReconciliationObligationRepositoryDependencies,
 ) {
@@ -182,9 +164,5 @@ export function createResearchReconciliationObligationRepository(
       input: ResearchReconciliationObligationCreateInput,
     ) => ensureActiveResearchReconciliationObligation(input, dependencies),
 
-    updateResearchReconciliationObligationStatus: (
-      id: string,
-      input: ResearchReconciliationObligationStatusUpdateInput,
-    ) => updateResearchReconciliationObligationStatus(id, input, dependencies),
   };
 }

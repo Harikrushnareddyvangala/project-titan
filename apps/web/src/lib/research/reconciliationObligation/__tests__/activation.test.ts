@@ -4,15 +4,15 @@ import type { ResearchReconciliationObligation } from "@/types/research";
 
 const {
   getResearchReconciliationObligation,
-  updateResearchReconciliationObligationStatus,
+  activateResearchReconciliationObligation,
 } = vi.hoisted(() => ({
   getResearchReconciliationObligation: vi.fn(),
-  updateResearchReconciliationObligationStatus: vi.fn(),
+  activateResearchReconciliationObligation: vi.fn(),
 }));
 
 vi.mock("../serverRepository", () => ({
   getResearchReconciliationObligation,
-  updateResearchReconciliationObligationStatus,
+  activateResearchReconciliationObligation,
 }));
 
 import { activateResearchReconciliationObligationOnServer } from "../activation";
@@ -52,7 +52,7 @@ describe("research reconciliation obligation activation boundary", () => {
     expect(getResearchReconciliationObligation).toHaveBeenCalledWith(
       "missing-obligation",
     );
-    expect(updateResearchReconciliationObligationStatus).not.toHaveBeenCalled();
+    expect(activateResearchReconciliationObligation).not.toHaveBeenCalled();
   });
 
   it("activates an open obligation into in-progress", async () => {
@@ -65,7 +65,7 @@ describe("research reconciliation obligation activation boundary", () => {
       updatedAt: "2026-01-01T00:10:00.000Z",
     });
 
-    updateResearchReconciliationObligationStatus.mockResolvedValue(
+    activateResearchReconciliationObligation.mockResolvedValue(
       updatedObligation,
     );
 
@@ -74,16 +74,15 @@ describe("research reconciliation obligation activation boundary", () => {
         obligation.id,
         {
           getResearchReconciliationObligation,
-          updateResearchReconciliationObligationStatus,
+          activateResearchReconciliationObligation,
           now: () => "2026-01-01T00:10:00.000Z",
         },
       );
 
-    expect(updateResearchReconciliationObligationStatus).toHaveBeenCalledWith(
+    expect(activateResearchReconciliationObligation).toHaveBeenCalledWith(
       obligation.id,
       {
         expectedUpdatedAt: obligation.updatedAt,
-        toStatus: "In Progress",
         updatedAt: "2026-01-01T00:10:00.000Z",
       },
     );
@@ -106,7 +105,7 @@ describe("research reconciliation obligation activation boundary", () => {
         obligation.id,
       );
 
-    expect(updateResearchReconciliationObligationStatus).not.toHaveBeenCalled();
+    expect(activateResearchReconciliationObligation).not.toHaveBeenCalled();
 
     expect(result).toEqual({
       obligation,
@@ -133,7 +132,7 @@ describe("research reconciliation obligation activation boundary", () => {
           obligation.id,
         );
 
-      expect(updateResearchReconciliationObligationStatus).not.toHaveBeenCalled();
+      expect(activateResearchReconciliationObligation).not.toHaveBeenCalled();
 
       expect(result).toEqual({
         obligation,
@@ -150,14 +149,14 @@ describe("research reconciliation obligation activation boundary", () => {
     );
 
     getResearchReconciliationObligation.mockResolvedValue(obligation);
-    updateResearchReconciliationObligationStatus.mockRejectedValue(
+    activateResearchReconciliationObligation.mockRejectedValue(
       staleError,
     );
 
     await expect(
       activateResearchReconciliationObligationOnServer(obligation.id, {
         getResearchReconciliationObligation,
-        updateResearchReconciliationObligationStatus,
+        activateResearchReconciliationObligation,
         now: () => "2026-01-01T00:10:00.000Z",
       }),
     ).rejects.toBe(staleError);
@@ -167,7 +166,7 @@ describe("research reconciliation obligation activation boundary", () => {
     const obligation = createObligation();
 
     getResearchReconciliationObligation.mockResolvedValue(obligation);
-    updateResearchReconciliationObligationStatus.mockResolvedValue(
+    activateResearchReconciliationObligation.mockResolvedValue(
       createObligation({
         status: "In Progress",
         updatedAt: "2026-01-01T00:10:00.000Z",
@@ -179,14 +178,14 @@ describe("research reconciliation obligation activation boundary", () => {
         obligation.id,
         {
           getResearchReconciliationObligation,
-          updateResearchReconciliationObligationStatus,
+          activateResearchReconciliationObligation,
           now: () => "2026-01-01T00:10:00.000Z",
         },
       );
 
     expect(result?.transitioned).toBe(true);
     expect(getResearchReconciliationObligation).toHaveBeenCalledTimes(1);
-    expect(updateResearchReconciliationObligationStatus).toHaveBeenCalledTimes(
+    expect(activateResearchReconciliationObligation).toHaveBeenCalledTimes(
       1,
     );
   });

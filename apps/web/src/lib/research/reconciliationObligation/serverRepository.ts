@@ -15,7 +15,6 @@ import type { ResearchReconciliationObligation } from "@/types/research";
 import {
   createResearchReconciliationObligationRepository,
   type ResearchReconciliationObligationCreateInput,
-  type ResearchReconciliationObligationStatusUpdateInput,
 } from "./repository";
 
 function toDate(value: string, field: string): Date {
@@ -173,25 +172,58 @@ const repository = createResearchReconciliationObligationRepository({
     return mapResearchReconciliationObligationRecord(record)!;
   },
 
-  async updateResearchReconciliationObligationStatus(
-    id: string,
-    input: ResearchReconciliationObligationStatusUpdateInput,
-  ) {
-    const record = await updateResearchReconciliationObligationStatusRecord(
-      id,
-      {
-        expectedUpdatedAt: toDate(
-          input.expectedUpdatedAt,
-          "expectedUpdatedAt",
-        ),
-        toStatus: input.toStatus,
-        updatedAt: toDate(input.updatedAt, "updatedAt"),
-      },
-    );
-
-    return mapResearchReconciliationObligationRecord(record)!;
-  },
 });
+
+async function updateResearchReconciliationObligationStatus(
+  id: string,
+  input: {
+    expectedUpdatedAt: string;
+    toStatus: ResearchReconciliationObligation["status"];
+    updatedAt: string;
+  },
+): Promise<ResearchReconciliationObligation> {
+  const record = await updateResearchReconciliationObligationStatusRecord(
+    id,
+    {
+      expectedUpdatedAt: toDate(
+        input.expectedUpdatedAt,
+        "expectedUpdatedAt",
+      ),
+      toStatus: input.toStatus,
+      updatedAt: toDate(input.updatedAt, "updatedAt"),
+    },
+  );
+
+  return mapResearchReconciliationObligationRecord(record)!;
+}
+
+export async function activateResearchReconciliationObligation(
+  id: string,
+  input: {
+    expectedUpdatedAt: string;
+    updatedAt: string;
+  },
+): Promise<ResearchReconciliationObligation> {
+  return updateResearchReconciliationObligationStatus(id, {
+    expectedUpdatedAt: input.expectedUpdatedAt,
+    toStatus: "In Progress",
+    updatedAt: input.updatedAt,
+  });
+}
+
+export async function resolveResearchReconciliationObligation(
+  id: string,
+  input: {
+    expectedUpdatedAt: string;
+    updatedAt: string;
+  },
+): Promise<ResearchReconciliationObligation> {
+  return updateResearchReconciliationObligationStatus(id, {
+    expectedUpdatedAt: input.expectedUpdatedAt,
+    toStatus: "Resolved",
+    updatedAt: input.updatedAt,
+  });
+}
 
 export const {
   getResearchReconciliationObligation,
@@ -202,5 +234,4 @@ export const {
   getResearchReconciliationObligationsByTarget,
   createResearchReconciliationObligation,
   ensureActiveResearchReconciliationObligation,
-  updateResearchReconciliationObligationStatus,
 } = repository;

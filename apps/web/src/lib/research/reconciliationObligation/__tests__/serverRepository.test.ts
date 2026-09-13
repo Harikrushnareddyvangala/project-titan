@@ -23,7 +23,7 @@ import {
   getResearchReconciliationObligationsByTarget,
   getUnresolvedResearchReconciliationObligations,
   getUnresolvedResearchReconciliationObligationsByInvestigation,
-  updateResearchReconciliationObligationStatus as updateResearchReconciliationObligationStatusRepository,
+  resolveResearchReconciliationObligation,
 } from "../serverRepository";
 
 vi.mock("@titan/database", () => ({
@@ -366,7 +366,7 @@ describe("research reconciliation obligation server repository", () => {
     ).not.toHaveBeenCalled();
   });
 
-  it("converts status update timestamps to database dates", async () => {
+  it("resolves a reconciliation obligation through the semantic database boundary", async () => {
     const record = {
       ...createDatabaseRecord(),
       status: "Resolved",
@@ -378,23 +378,22 @@ describe("research reconciliation obligation server repository", () => {
       record,
     );
 
-    const result =
-      await updateResearchReconciliationObligationStatusRepository(
-        "reconciliation-001",
-        {
-          expectedUpdatedAt: updatedAt,
-          toStatus: "Resolved",
-          updatedAt: resolvedAt,
-        },
-      );
+    const result = await resolveResearchReconciliationObligation(
+      "reconciliation-001",
+      {
+        expectedUpdatedAt: updatedAt,
+        updatedAt: resolvedAt,
+      },
+    );
 
-    expect(
-      mockedUpdateResearchReconciliationObligationStatus,
-    ).toHaveBeenCalledWith("reconciliation-001", {
-      expectedUpdatedAt: new Date(updatedAt),
-      toStatus: "Resolved",
-      updatedAt: new Date(resolvedAt),
-    });
+    expect(mockedUpdateResearchReconciliationObligationStatus).toHaveBeenCalledWith(
+      "reconciliation-001",
+      {
+        expectedUpdatedAt: new Date(updatedAt),
+        toStatus: "Resolved",
+        updatedAt: new Date(resolvedAt),
+      },
+    );
 
     expect(result).toMatchObject({
       id: "reconciliation-001",
@@ -406,14 +405,10 @@ describe("research reconciliation obligation server repository", () => {
 
   it("rejects an invalid expected update timestamp before database persistence", async () => {
     await expect(
-      updateResearchReconciliationObligationStatusRepository(
-        "reconciliation-001",
-        {
-          expectedUpdatedAt: "not-a-timestamp",
-          toStatus: "Resolved",
-          updatedAt: resolvedAt,
-        },
-      ),
+      resolveResearchReconciliationObligation("reconciliation-001", {
+        expectedUpdatedAt: "not-a-timestamp",
+        updatedAt: resolvedAt,
+      }),
     ).rejects.toThrow(
       "Invalid reconciliation obligation expectedUpdatedAt: not-a-timestamp",
     );
@@ -425,14 +420,10 @@ describe("research reconciliation obligation server repository", () => {
 
   it("rejects an invalid update timestamp before database persistence", async () => {
     await expect(
-      updateResearchReconciliationObligationStatusRepository(
-        "reconciliation-001",
-        {
-          expectedUpdatedAt: updatedAt,
-          toStatus: "Resolved",
-          updatedAt: "not-a-timestamp",
-        },
-      ),
+      resolveResearchReconciliationObligation("reconciliation-001", {
+        expectedUpdatedAt: updatedAt,
+        updatedAt: "not-a-timestamp",
+      }),
     ).rejects.toThrow(
       "Invalid reconciliation obligation updatedAt: not-a-timestamp",
     );
@@ -441,4 +432,5 @@ describe("research reconciliation obligation server repository", () => {
       mockedUpdateResearchReconciliationObligationStatus,
     ).not.toHaveBeenCalled();
   });
+
 });
