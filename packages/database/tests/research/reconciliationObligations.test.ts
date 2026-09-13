@@ -7,6 +7,7 @@ import {
 } from "../../src/schema/index.js";
 import {
   createResearchReconciliationObligationRecord,
+  ensureActiveResearchReconciliationObligationRecord,
   getResearchReconciliationObligationRecord,
   getResearchReconciliationObligationRecords,
   getResearchReconciliationObligationRecordsByInvestigation,
@@ -59,6 +60,385 @@ describe("research reconciliation obligation persistence", () => {
 
   afterEach(async () => {
     await cleanup();
+  });
+
+  it("creates an active reconciliation obligation when no active identity exists", async () => {
+    const obligation = await ensureActiveResearchReconciliationObligationRecord({
+      id: "reconciliation-obligation-ensure-create",
+      investigationId,
+      issueCode: "ISSUE_ENSURE_CREATE",
+      targetEntityType: "Conclusion",
+      targetEntityId: "conclusion-ensure-create",
+      remediationAction: "RepairReference",
+      status: "Open",
+      reason: "Create the canonical active obligation.",
+      createdAt,
+      updatedAt,
+    });
+
+    expect(obligation).toMatchObject({
+      id: "reconciliation-obligation-ensure-create",
+      investigationId,
+      issueCode: "ISSUE_ENSURE_CREATE",
+      targetEntityType: "Conclusion",
+      targetEntityId: "conclusion-ensure-create",
+      status: "Open",
+    });
+  });
+
+  it("returns the existing Open obligation for the same active identity", async () => {
+    const existing = await createResearchReconciliationObligationRecord({
+      id: "reconciliation-obligation-ensure-open-existing",
+      investigationId,
+      issueCode: "ISSUE_ENSURE_OPEN",
+      targetEntityType: "Conclusion",
+      targetEntityId: "conclusion-ensure-open",
+      remediationAction: "RepairReference",
+      status: "Open",
+      reason: "Existing Open obligation.",
+      createdAt,
+      updatedAt,
+    });
+
+    const result = await ensureActiveResearchReconciliationObligationRecord({
+      id: "reconciliation-obligation-ensure-open-candidate",
+      investigationId,
+      issueCode: "ISSUE_ENSURE_OPEN",
+      targetEntityType: "Conclusion",
+      targetEntityId: "conclusion-ensure-open",
+      remediationAction: "DifferentAction",
+      status: "Open",
+      reason: "Candidate should converge on the existing obligation.",
+      createdAt: new Date(createdAt.getTime() + 60_000),
+      updatedAt: new Date(updatedAt.getTime() + 60_000),
+    });
+
+    expect(result).toEqual(existing);
+
+    const matching = await getResearchReconciliationObligationRecordsByTarget(
+      "Conclusion",
+      "conclusion-ensure-open",
+    );
+
+    expect(matching.map(({ id }) => id)).toEqual([
+      "reconciliation-obligation-ensure-open-existing",
+    ]);
+  });
+
+  it("returns the existing In Progress obligation for the same active identity", async () => {
+    const existing = await createResearchReconciliationObligationRecord({
+      id: "reconciliation-obligation-ensure-progress-existing",
+      investigationId,
+      issueCode: "ISSUE_ENSURE_PROGRESS",
+      targetEntityType: "Conclusion",
+      targetEntityId: "conclusion-ensure-progress",
+      remediationAction: "RepairReference",
+      status: "In Progress",
+      reason: "Existing In Progress obligation.",
+      createdAt,
+      updatedAt,
+    });
+
+    const result = await ensureActiveResearchReconciliationObligationRecord({
+      id: "reconciliation-obligation-ensure-progress-candidate",
+      investigationId,
+      issueCode: "ISSUE_ENSURE_PROGRESS",
+      targetEntityType: "Conclusion",
+      targetEntityId: "conclusion-ensure-progress",
+      remediationAction: "DifferentAction",
+      status: "In Progress",
+      reason: "Candidate should converge on the existing obligation.",
+      createdAt: new Date(createdAt.getTime() + 60_000),
+      updatedAt: new Date(updatedAt.getTime() + 60_000),
+    });
+
+    expect(result).toEqual(existing);
+
+    const matching = await getResearchReconciliationObligationRecordsByTarget(
+      "Conclusion",
+      "conclusion-ensure-progress",
+    );
+
+    expect(matching.map(({ id }) => id)).toEqual([
+      "reconciliation-obligation-ensure-progress-existing",
+    ]);
+  });
+
+  it("creates a new active obligation when only a terminal obligation has the same identity", async () => {
+    const terminal = await createResearchReconciliationObligationRecord({
+      id: "reconciliation-obligation-ensure-terminal",
+      investigationId,
+      issueCode: "ISSUE_ENSURE_TERMINAL",
+      targetEntityType: "Conclusion",
+      targetEntityId: "conclusion-ensure-terminal",
+      remediationAction: "RepairReference",
+      status: "Resolved",
+      reason: "Historical resolved obligation.",
+      createdAt,
+      updatedAt,
+      resolvedAt: updatedAt,
+    });
+
+    const result = await ensureActiveResearchReconciliationObligationRecord({
+      id: "reconciliation-obligation-ensure-terminal-new",
+      investigationId,
+      issueCode: "ISSUE_ENSURE_TERMINAL",
+      targetEntityType: "Conclusion",
+      targetEntityId: "conclusion-ensure-terminal",
+      remediationAction: "RepairReference",
+      status: "Open",
+      reason: "New active obligation after prior resolution.",
+      createdAt: new Date(createdAt.getTime() + 60_000),
+      updatedAt: new Date(updatedAt.getTime() + 60_000),
+    });
+
+    expect(terminal.status).toBe("Resolved");
+    expect(result).toMatchObject({
+      id: "reconciliation-obligation-ensure-terminal-new",
+      status: "Open",
+    });
+
+    const matching = await getResearchReconciliationObligationRecordsByTarget(
+      "Conclusion",
+      "conclusion-ensure-terminal",
+    );
+
+    expect(matching.map(({ id, status }) => ({ id, status }))).toEqual([
+      {
+        id: "reconciliation-obligation-ensure-terminal",
+        status: "Resolved",
+      },
+      {
+        id: "reconciliation-obligation-ensure-terminal-new",
+        status: "Open",
+      },
+    ]);
+  });
+
+  it("creates a new active obligation when only an Abandoned obligation has the same identity", async () => {
+    const terminal = await createResearchReconciliationObligationRecord({
+      id: "reconciliation-obligation-ensure-abandoned",
+      investigationId,
+      issueCode: "ISSUE_ENSURE_ABANDONED",
+      targetEntityType: "Conclusion",
+      targetEntityId: "conclusion-ensure-abandoned",
+      remediationAction: "RepairReference",
+      status: "Abandoned",
+      reason: "Historical abandoned obligation.",
+      createdAt,
+      updatedAt,
+    });
+
+    const result = await ensureActiveResearchReconciliationObligationRecord({
+      id: "reconciliation-obligation-ensure-abandoned-new",
+      investigationId,
+      issueCode: "ISSUE_ENSURE_ABANDONED",
+      targetEntityType: "Conclusion",
+      targetEntityId: "conclusion-ensure-abandoned",
+      remediationAction: "RepairReference",
+      status: "Open",
+      reason: "New active obligation after prior abandonment.",
+      createdAt: new Date(createdAt.getTime() + 60_000),
+      updatedAt: new Date(updatedAt.getTime() + 60_000),
+    });
+
+    expect(terminal.status).toBe("Abandoned");
+    expect(result).toMatchObject({
+      id: "reconciliation-obligation-ensure-abandoned-new",
+      status: "Open",
+    });
+  });
+
+  it("creates a new active obligation when only a Superseded obligation has the same identity", async () => {
+    const terminal = await createResearchReconciliationObligationRecord({
+      id: "reconciliation-obligation-ensure-superseded",
+      investigationId,
+      issueCode: "ISSUE_ENSURE_SUPERSEDED",
+      targetEntityType: "Conclusion",
+      targetEntityId: "conclusion-ensure-superseded",
+      remediationAction: "RepairReference",
+      status: "Superseded",
+      reason: "Historical superseded obligation.",
+      createdAt,
+      updatedAt,
+    });
+
+    const result = await ensureActiveResearchReconciliationObligationRecord({
+      id: "reconciliation-obligation-ensure-superseded-new",
+      investigationId,
+      issueCode: "ISSUE_ENSURE_SUPERSEDED",
+      targetEntityType: "Conclusion",
+      targetEntityId: "conclusion-ensure-superseded",
+      remediationAction: "RepairReference",
+      status: "Open",
+      reason: "New active obligation after prior supersession.",
+      createdAt: new Date(createdAt.getTime() + 60_000),
+      updatedAt: new Date(updatedAt.getTime() + 60_000),
+    });
+
+    expect(terminal.status).toBe("Superseded");
+    expect(result).toMatchObject({
+      id: "reconciliation-obligation-ensure-superseded-new",
+      status: "Open",
+    });
+  });
+
+  it("creates a new active obligation when the targetEntityId differs", async () => {
+    const existing = await createResearchReconciliationObligationRecord({
+      id: "reconciliation-obligation-ensure-different-target-id-existing",
+      investigationId,
+      issueCode: "ISSUE_ENSURE_IDENTITY",
+      targetEntityType: "Conclusion",
+      targetEntityId: "conclusion-ensure-identity-a",
+      remediationAction: "RepairReference",
+      status: "Open",
+      reason: "Existing obligation for target A.",
+      createdAt,
+      updatedAt,
+    });
+
+    const result = await ensureActiveResearchReconciliationObligationRecord({
+      id: "reconciliation-obligation-ensure-different-target-id-new",
+      investigationId,
+      issueCode: "ISSUE_ENSURE_IDENTITY",
+      targetEntityType: "Conclusion",
+      targetEntityId: "conclusion-ensure-identity-b",
+      remediationAction: "RepairReference",
+      status: "Open",
+      reason: "Different target must have a distinct active obligation.",
+      createdAt: new Date(createdAt.getTime() + 60_000),
+      updatedAt: new Date(updatedAt.getTime() + 60_000),
+    });
+
+    expect(existing.id).not.toBe(result.id);
+    expect(result).toMatchObject({
+      id: "reconciliation-obligation-ensure-different-target-id-new",
+      issueCode: "ISSUE_ENSURE_IDENTITY",
+      targetEntityType: "Conclusion",
+      targetEntityId: "conclusion-ensure-identity-b",
+      status: "Open",
+    });
+  });
+
+  it("creates a new active obligation when the issueCode differs", async () => {
+    const existing = await createResearchReconciliationObligationRecord({
+      id: "reconciliation-obligation-ensure-different-issue-existing",
+      investigationId,
+      issueCode: "ISSUE_ENSURE_IDENTITY_A",
+      targetEntityType: "Conclusion",
+      targetEntityId: "conclusion-ensure-issue",
+      remediationAction: "RepairReference",
+      status: "Open",
+      reason: "Existing obligation for issue A.",
+      createdAt,
+      updatedAt,
+    });
+
+    const result = await ensureActiveResearchReconciliationObligationRecord({
+      id: "reconciliation-obligation-ensure-different-issue-new",
+      investigationId,
+      issueCode: "ISSUE_ENSURE_IDENTITY_B",
+      targetEntityType: "Conclusion",
+      targetEntityId: "conclusion-ensure-issue",
+      remediationAction: "RepairReference",
+      status: "Open",
+      reason: "Different issue must have a distinct active obligation.",
+      createdAt: new Date(createdAt.getTime() + 60_000),
+      updatedAt: new Date(updatedAt.getTime() + 60_000),
+    });
+
+    expect(existing.id).not.toBe(result.id);
+    expect(result).toMatchObject({
+      id: "reconciliation-obligation-ensure-different-issue-new",
+      issueCode: "ISSUE_ENSURE_IDENTITY_B",
+      targetEntityType: "Conclusion",
+      targetEntityId: "conclusion-ensure-issue",
+      status: "Open",
+    });
+  });
+
+  it("creates a new active obligation when the targetEntityType differs", async () => {
+    const existing = await createResearchReconciliationObligationRecord({
+      id: "reconciliation-obligation-ensure-different-type-existing",
+      investigationId,
+      issueCode: "ISSUE_ENSURE_IDENTITY_TYPE",
+      targetEntityType: "Conclusion",
+      targetEntityId: "shared-entity-id",
+      remediationAction: "RepairReference",
+      status: "Open",
+      reason: "Existing obligation for a conclusion target.",
+      createdAt,
+      updatedAt,
+    });
+
+    const result = await ensureActiveResearchReconciliationObligationRecord({
+      id: "reconciliation-obligation-ensure-different-type-new",
+      investigationId,
+      issueCode: "ISSUE_ENSURE_IDENTITY_TYPE",
+      targetEntityType: "Finding",
+      targetEntityId: "shared-entity-id",
+      remediationAction: "RepairReference",
+      status: "Open",
+      reason: "Different target type must have a distinct active obligation.",
+      createdAt: new Date(createdAt.getTime() + 60_000),
+      updatedAt: new Date(updatedAt.getTime() + 60_000),
+    });
+
+    expect(existing.id).not.toBe(result.id);
+    expect(result).toMatchObject({
+      id: "reconciliation-obligation-ensure-different-type-new",
+      issueCode: "ISSUE_ENSURE_IDENTITY_TYPE",
+      targetEntityType: "Finding",
+      targetEntityId: "shared-entity-id",
+      status: "Open",
+    });
+  });
+
+  it("converges concurrent duplicate creation on one active obligation", async () => {
+    const identity = {
+      investigationId,
+      issueCode: "ISSUE_ENSURE_CONCURRENT",
+      targetEntityType: "Conclusion",
+      targetEntityId: "conclusion-ensure-concurrent",
+    };
+
+    const [first, second] = await Promise.all([
+      ensureActiveResearchReconciliationObligationRecord({
+        id: "reconciliation-obligation-ensure-concurrent-a",
+        ...identity,
+        remediationAction: "RepairReference",
+        status: "Open",
+        reason: "First concurrent candidate.",
+        createdAt,
+        updatedAt,
+      }),
+      ensureActiveResearchReconciliationObligationRecord({
+        id: "reconciliation-obligation-ensure-concurrent-b",
+        ...identity,
+        remediationAction: "RepairScope",
+        status: "Open",
+        reason: "Second concurrent candidate.",
+        createdAt: new Date(createdAt.getTime() + 60_000),
+        updatedAt: new Date(updatedAt.getTime() + 60_000),
+      }),
+    ]);
+
+    expect(first.id).toBe(second.id);
+
+    const matching = await getResearchReconciliationObligationRecordsByTarget(
+      identity.targetEntityType,
+      identity.targetEntityId,
+    );
+
+    const activeMatching = matching.filter(
+      ({ investigationId: returnedInvestigationId, issueCode, status }) =>
+        returnedInvestigationId === identity.investigationId &&
+        issueCode === identity.issueCode &&
+        (status === "Open" || status === "In Progress"),
+    );
+
+    expect(activeMatching).toHaveLength(1);
+    expect(activeMatching[0]?.id).toBe(first.id);
   });
 
   it("creates and reads a reconciliation obligation", async () => {

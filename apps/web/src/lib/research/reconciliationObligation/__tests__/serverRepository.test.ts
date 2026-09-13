@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { ResearchReconciliationObligation } from "@/types/research";
 
 import {
+  ensureActiveResearchReconciliationObligationRecord,
   createResearchReconciliationObligationRecord,
   getResearchReconciliationObligationRecord,
   getResearchReconciliationObligationRecords,
@@ -15,6 +16,7 @@ import {
 
 import {
   createResearchReconciliationObligation,
+  ensureActiveResearchReconciliationObligation,
   getResearchReconciliationObligation,
   getResearchReconciliationObligations,
   getResearchReconciliationObligationsByInvestigation,
@@ -25,6 +27,7 @@ import {
 } from "../serverRepository";
 
 vi.mock("@titan/database", () => ({
+  ensureActiveResearchReconciliationObligationRecord: vi.fn(),
   createResearchReconciliationObligationRecord: vi.fn(),
   getResearchReconciliationObligationRecord: vi.fn(),
   getResearchReconciliationObligationRecords: vi.fn(),
@@ -34,6 +37,10 @@ vi.mock("@titan/database", () => ({
   getUnresolvedResearchReconciliationObligationRecordsByInvestigation: vi.fn(),
   updateResearchReconciliationObligationStatus: vi.fn(),
 }));
+
+const mockedEnsureActiveResearchReconciliationObligationRecord = vi.mocked(
+  ensureActiveResearchReconciliationObligationRecord,
+);
 
 const mockedCreateResearchReconciliationObligationRecord = vi.mocked(
   createResearchReconciliationObligationRecord,
@@ -274,6 +281,55 @@ describe("research reconciliation obligation server repository", () => {
     });
 
     expect(result).toEqual(obligation);
+  });
+
+  it("ensures an active reconciliation obligation through the database semantic boundary", async () => {
+    const record = createDatabaseRecord();
+    const obligation = createDomainObligation();
+
+    mockedEnsureActiveResearchReconciliationObligationRecord.mockResolvedValue(
+      record,
+    );
+
+    const result = await ensureActiveResearchReconciliationObligation(obligation);
+
+    expect(
+      mockedEnsureActiveResearchReconciliationObligationRecord,
+    ).toHaveBeenCalledWith({
+      id: obligation.id,
+      investigationId: obligation.investigationId,
+      issueCode: obligation.issueCode,
+      targetEntityType: obligation.targetEntityType,
+      targetEntityId: obligation.targetEntityId,
+      remediationAction: obligation.remediationAction,
+      remediationExecutionId: obligation.remediationExecutionId,
+      provenanceEventId: obligation.provenanceEventId,
+      status: obligation.status,
+      reason: obligation.reason,
+      createdAt: new Date(createdAt),
+      updatedAt: new Date(updatedAt),
+      resolvedAt: new Date(resolvedAt),
+    });
+
+    expect(mockedCreateResearchReconciliationObligationRecord).not.toHaveBeenCalled();
+    expect(result).toEqual(obligation);
+  });
+
+  it("rejects an invalid ensure creation timestamp before database persistence", async () => {
+    const obligation = {
+      ...createDomainObligation(),
+      createdAt: "not-a-timestamp",
+    };
+
+    await expect(
+      ensureActiveResearchReconciliationObligation(obligation),
+    ).rejects.toThrow(
+      "Invalid reconciliation obligation createdAt: not-a-timestamp",
+    );
+
+    expect(
+      mockedEnsureActiveResearchReconciliationObligationRecord,
+    ).not.toHaveBeenCalled();
   });
 
   it("rejects an invalid creation timestamp before database persistence", async () => {

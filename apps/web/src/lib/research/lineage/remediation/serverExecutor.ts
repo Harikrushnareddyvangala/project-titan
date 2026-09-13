@@ -22,7 +22,7 @@ import {
 import { createResearchLineageRemediationPlanningService } from "./planning";
 
 import { researchLineageRemediationDatabasePersistence } from "./server";
-import { createResearchReconciliationObligation } from "../../reconciliationObligation/serverRepository";
+import { ensureActiveResearchReconciliationObligation } from "../../reconciliationObligation/serverRepository";
 
 function createResearchReconciliationObligationId(): string {
   return `research-reconciliation-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
@@ -206,7 +206,7 @@ export async function executeResearchLineageIntegrityRemediationOnServer(
   if (remainingInvalidReference) {
     const now = new Date();
 
-    await createResearchReconciliationObligation({
+    await ensureActiveResearchReconciliationObligation({
       id: createResearchReconciliationObligationId(),
       investigationId: plan.investigationId,
       issueCode: plan.issueCode,

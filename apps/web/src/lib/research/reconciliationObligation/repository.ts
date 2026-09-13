@@ -55,6 +55,10 @@ export interface ResearchReconciliationObligationRepositoryDependencies {
     input: ResearchReconciliationObligationCreateInput,
   ): Promise<ResearchReconciliationObligation>;
 
+  ensureActiveResearchReconciliationObligation(
+    input: ResearchReconciliationObligationCreateInput,
+  ): Promise<ResearchReconciliationObligation>;
+
   updateResearchReconciliationObligationStatus(
     id: string,
     input: ResearchReconciliationObligationStatusUpdateInput,
@@ -116,6 +120,13 @@ export function createResearchReconciliationObligation(
   return dependencies.createResearchReconciliationObligation(input);
 }
 
+export function ensureActiveResearchReconciliationObligation(
+  input: ResearchReconciliationObligationCreateInput,
+  dependencies: ResearchReconciliationObligationRepositoryDependencies,
+): Promise<ResearchReconciliationObligation> {
+  return dependencies.ensureActiveResearchReconciliationObligation(input);
+}
+
 export function updateResearchReconciliationObligationStatus(
   id: string,
   input: ResearchReconciliationObligationStatusUpdateInput,
@@ -166,6 +177,10 @@ export function createResearchReconciliationObligationRepository(
     createResearchReconciliationObligation: (
       input: ResearchReconciliationObligationCreateInput,
     ) => createResearchReconciliationObligation(input, dependencies),
+
+    ensureActiveResearchReconciliationObligation: (
+      input: ResearchReconciliationObligationCreateInput,
+    ) => ensureActiveResearchReconciliationObligation(input, dependencies),
 
     updateResearchReconciliationObligationStatus: (
       id: string,

@@ -1,4 +1,5 @@
 import {
+  ensureActiveResearchReconciliationObligationRecord,
   createResearchReconciliationObligationRecord,
   getResearchReconciliationObligationRecord,
   getResearchReconciliationObligationRecords,
@@ -124,6 +125,30 @@ const repository = createResearchReconciliationObligationRepository({
     );
   },
 
+  async ensureActiveResearchReconciliationObligation(
+    input: ResearchReconciliationObligationCreateInput,
+  ) {
+    const record = await ensureActiveResearchReconciliationObligationRecord({
+      id: input.id,
+      investigationId: input.investigationId,
+      issueCode: input.issueCode,
+      targetEntityType: input.targetEntityType,
+      targetEntityId: input.targetEntityId,
+      remediationAction: input.remediationAction,
+      remediationExecutionId: input.remediationExecutionId,
+      provenanceEventId: input.provenanceEventId,
+      status: input.status,
+      reason: input.reason,
+      createdAt: toDate(input.createdAt, "createdAt"),
+      updatedAt: toDate(input.updatedAt, "updatedAt"),
+      resolvedAt: input.resolvedAt
+        ? toDate(input.resolvedAt, "resolvedAt")
+        : undefined,
+    });
+
+    return mapResearchReconciliationObligationRecord(record)!;
+  },
+
   async createResearchReconciliationObligation(
     input: ResearchReconciliationObligationCreateInput,
   ) {
@@ -176,5 +201,6 @@ export const {
   getUnresolvedResearchReconciliationObligationsByInvestigation,
   getResearchReconciliationObligationsByTarget,
   createResearchReconciliationObligation,
+  ensureActiveResearchReconciliationObligation,
   updateResearchReconciliationObligationStatus,
 } = repository;

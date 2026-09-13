@@ -1,4 +1,4 @@
-import { and, asc, eq, inArray } from "drizzle-orm";
+import { and, asc, eq, inArray, sql } from "drizzle-orm";
 
 import { db } from "../client.js";
 import { researchReconciliationObligations } from "../schema/index.js";
@@ -257,6 +257,86 @@ export async function getUnresolvedResearchReconciliationObligationRecords(): Pr
     );
 
   return obligations.map(mapResearchReconciliationObligationRecord);
+}
+
+export async function ensureActiveResearchReconciliationObligationRecord(
+  input: CreateResearchReconciliationObligationRecordInput,
+): Promise<ResearchReconciliationObligationRecord> {
+  if (input.status !== "Open" && input.status !== "In Progress") {
+    throw new Error(
+      `Active research reconciliation obligation requires an active status: ${input.status}`,
+    );
+  }
+
+  const obligation = await withDatabaseTransaction(async (tx) => {
+    const [inserted] = await tx
+      .insert(researchReconciliationObligations)
+      .values({
+        id: input.id,
+        investigationId: input.investigationId,
+        issueCode: input.issueCode,
+        targetEntityType: input.targetEntityType,
+        targetEntityId: input.targetEntityId,
+        remediationAction: input.remediationAction,
+        remediationExecutionId: input.remediationExecutionId ?? null,
+        provenanceEventId: input.provenanceEventId ?? null,
+        status: input.status,
+        reason: input.reason,
+        createdAt: input.createdAt,
+        updatedAt: input.updatedAt,
+        resolvedAt: input.resolvedAt ?? null,
+      })
+      .onConflictDoNothing({
+        target: [
+          researchReconciliationObligations.investigationId,
+          researchReconciliationObligations.issueCode,
+          researchReconciliationObligations.targetEntityType,
+          researchReconciliationObligations.targetEntityId,
+        ],
+        where: sql`"status" IN ('Open', 'In Progress')`,
+      })
+      .returning();
+
+    if (inserted) {
+      return inserted;
+    }
+
+    const [existing] = await tx
+      .select()
+      .from(researchReconciliationObligations)
+      .where(
+        and(
+          eq(
+            researchReconciliationObligations.investigationId,
+            input.investigationId,
+          ),
+          eq(researchReconciliationObligations.issueCode, input.issueCode),
+          eq(
+            researchReconciliationObligations.targetEntityType,
+            input.targetEntityType,
+          ),
+          eq(
+            researchReconciliationObligations.targetEntityId,
+            input.targetEntityId,
+          ),
+          inArray(researchReconciliationObligations.status, [
+            "Open",
+            "In Progress",
+          ]),
+        ),
+      )
+      .limit(1);
+
+    if (!existing) {
+      throw new Error(
+        "Active research reconciliation obligation conflict occurred but no canonical obligation was found",
+      );
+    }
+
+    return existing;
+  });
+
+  return mapResearchReconciliationObligationRecord(obligation);
 }
 
 export async function createResearchReconciliationObligationRecord(

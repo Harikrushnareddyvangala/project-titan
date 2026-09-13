@@ -1,7 +1,10 @@
+import { sql } from "drizzle-orm";
+
 import {
   foreignKey,
   index,
   pgTable,
+  uniqueIndex,
   text,
   timestamp,
 } from "drizzle-orm/pg-core";
@@ -64,5 +67,16 @@ export const researchReconciliationObligations = pgTable(
     index(
       "research_reconciliation_obligations_updated_at_idx",
     ).on(table.updatedAt),
+
+    uniqueIndex(
+      "research_reconciliation_obligations_active_identity_unique",
+    )
+      .on(
+        table.investigationId,
+        table.issueCode,
+        table.targetEntityType,
+        table.targetEntityId,
+      )
+      .where(sql`"status" IN ('Open', 'In Progress')`),
   ],
 );
