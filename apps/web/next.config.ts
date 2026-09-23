@@ -1,10 +1,11 @@
 import type { NextConfig } from "next";
-import path from 'path';
+import path from "path";
 
 const nextConfig: NextConfig = {
-  allowedDevOrigins: ['192.168.1.*'],
+  output: "standalone",
+  allowedDevOrigins: ["192.168.1.*"],
   turbopack: {
-    root: path.join(__dirname, '../../'), 
+    root: path.join(__dirname, "../../"),
   },
   images: {
     remotePatterns: [
