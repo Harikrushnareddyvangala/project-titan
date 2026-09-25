@@ -2,11 +2,22 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { ResearchReconciliationObligationActivationResult } from "@/lib/research/reconciliationObligation/activation";
 
-const { activateResearchReconciliationObligationOnServer } = vi.hoisted(
-  () => ({
-    activateResearchReconciliationObligationOnServer: vi.fn(),
-  }),
-);
+const {
+  activateResearchReconciliationObligationOnServer,
+  authenticateRequest,
+  UnauthenticatedRequestError,
+} = vi.hoisted(() => ({
+  activateResearchReconciliationObligationOnServer: vi.fn(),
+  authenticateRequest: vi.fn(),
+  UnauthenticatedRequestError: class UnauthenticatedRequestError extends Error {
+    readonly status = 401;
+
+    constructor(message = "Authentication required.") {
+      super(message);
+      this.name = "UnauthenticatedRequestError";
+    }
+  },
+}));
 
 vi.mock(
   "@/lib/research/reconciliationObligation/activation",
@@ -14,6 +25,11 @@ vi.mock(
     activateResearchReconciliationObligationOnServer,
   }),
 );
+
+vi.mock("@/lib/server/auth/principal", () => ({
+  authenticateRequest,
+  UnauthenticatedRequestError,
+}));
 
 import { POST } from "./route";
 
@@ -53,6 +69,30 @@ describe(
   () => {
     beforeEach(() => {
       vi.clearAllMocks();
+
+      authenticateRequest.mockResolvedValue({
+        provider: "cognito",
+        subject: "test-subject",
+      });
+    });
+
+    it("rejects an unauthenticated request before reaching the server boundary", async () => {
+      authenticateRequest.mockRejectedValue(
+        new UnauthenticatedRequestError(),
+      );
+
+      const response = await POST(createRequest(), {
+        params: createParams("research-reconciliation-001"),
+      });
+
+      expect(response.status).toBe(401);
+      expect(
+        activateResearchReconciliationObligationOnServer,
+      ).not.toHaveBeenCalled();
+
+      await expect(response.json()).resolves.toEqual({
+        error: "Authentication required.",
+      });
     });
 
     it("activates the reconciliation obligation through the server boundary", async () => {

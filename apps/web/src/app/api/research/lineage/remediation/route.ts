@@ -8,6 +8,10 @@ import type {
 } from "@/types/research";
 
 import { executeResearchLineageIntegrityRemediationOnServer } from "@/lib/research/lineage/remediation/serverExecutor";
+import {
+  authenticateRequest,
+  UnauthenticatedRequestError,
+} from "@/lib/server/auth/principal";
 
 function isObject(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -59,6 +63,8 @@ function isRemediationPlan(
 
 export async function POST(request: Request) {
   try {
+    await authenticateRequest(request);
+
     const body: unknown = await request.json();
 
     if (!isObject(body) || !isRemediationPlan(body.plan)) {
@@ -77,6 +83,17 @@ export async function POST(request: Request) {
 
     return NextResponse.json(result);
   } catch (error: unknown) {
+    if (error instanceof UnauthenticatedRequestError) {
+      return NextResponse.json(
+        {
+          error: "Authentication required.",
+        },
+        {
+          status: 401,
+        },
+      );
+    }
+
     if (error instanceof ResearchRemediationStalePlanError) {
       return NextResponse.json(
         {

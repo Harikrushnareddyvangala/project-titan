@@ -1,9 +1,13 @@
 import { NextResponse } from "next/server";
 
 import { confirmResearchReconciliationObligationRecoveryOnServer } from "@/lib/research/reconciliationObligation/confirmation";
+import {
+  authenticateRequest,
+  UnauthenticatedRequestError,
+} from "@/lib/server/auth/principal";
 
 export async function POST(
-  _request: Request,
+  request: Request,
   {
     params,
   }: {
@@ -13,6 +17,8 @@ export async function POST(
   },
 ) {
   try {
+    await authenticateRequest(request);
+
     const { obligationId } = await params;
 
     if (!obligationId) {
@@ -44,6 +50,17 @@ export async function POST(
 
     return NextResponse.json(result);
   } catch (error: unknown) {
+    if (error instanceof UnauthenticatedRequestError) {
+      return NextResponse.json(
+        {
+          error: "Authentication required.",
+        },
+        {
+          status: 401,
+        },
+      );
+    }
+
     console.error(
       "Research reconciliation recovery confirmation API error:",
       error,

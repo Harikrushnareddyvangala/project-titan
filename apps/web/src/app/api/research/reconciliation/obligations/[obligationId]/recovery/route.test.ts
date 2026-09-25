@@ -2,11 +2,22 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { ResearchReconciliationObligationRecoveryPlanningResult } from "@/lib/research/reconciliationObligation/recoveryPlanning";
 
-const { planResearchReconciliationObligationRecoveryOnServer } = vi.hoisted(
-  () => ({
-    planResearchReconciliationObligationRecoveryOnServer: vi.fn(),
-  }),
-);
+const {
+  planResearchReconciliationObligationRecoveryOnServer,
+  authenticateRequest,
+  UnauthenticatedRequestError,
+} = vi.hoisted(() => ({
+  planResearchReconciliationObligationRecoveryOnServer: vi.fn(),
+  authenticateRequest: vi.fn(),
+  UnauthenticatedRequestError: class UnauthenticatedRequestError extends Error {
+    readonly status = 401;
+
+    constructor(message = "Authentication required.") {
+      super(message);
+      this.name = "UnauthenticatedRequestError";
+    }
+  },
+}));
 
 vi.mock(
   "@/lib/research/reconciliationObligation/recoveryPlanning",
@@ -14,6 +25,11 @@ vi.mock(
     planResearchReconciliationObligationRecoveryOnServer,
   }),
 );
+
+vi.mock("@/lib/server/auth/principal", () => ({
+  authenticateRequest,
+  UnauthenticatedRequestError,
+}));
 
 import { POST } from "./route";
 
@@ -82,6 +98,30 @@ function createParams(obligationId: string) {
 describe("POST /api/research/reconciliation/obligations/[obligationId]/recovery", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+
+    authenticateRequest.mockResolvedValue({
+      provider: "cognito",
+      subject: "test-subject",
+    });
+  });
+
+  it("rejects an unauthenticated request before reaching the server boundary", async () => {
+    authenticateRequest.mockRejectedValue(
+      new UnauthenticatedRequestError(),
+    );
+
+    const response = await POST(createRequest(), {
+      params: createParams("research-reconciliation-001"),
+    });
+
+    expect(response.status).toBe(401);
+    expect(await response.json()).toEqual({
+      error: "Authentication required.",
+    });
+    expect(
+      planResearchReconciliationObligationRecoveryOnServer,
+    ).not.toHaveBeenCalled();
+
   });
 
   it("plans recovery through the server boundary", async () => {

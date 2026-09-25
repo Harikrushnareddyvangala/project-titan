@@ -2,11 +2,22 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { ResearchReconciliationObligationConfirmationResult } from "@/lib/research/reconciliationObligation/confirmation";
 
-const { confirmResearchReconciliationObligationRecoveryOnServer } = vi.hoisted(
-  () => ({
-    confirmResearchReconciliationObligationRecoveryOnServer: vi.fn(),
-  }),
-);
+const {
+  confirmResearchReconciliationObligationRecoveryOnServer,
+  authenticateRequest,
+  UnauthenticatedRequestError,
+} = vi.hoisted(() => ({
+  confirmResearchReconciliationObligationRecoveryOnServer: vi.fn(),
+  authenticateRequest: vi.fn(),
+  UnauthenticatedRequestError: class UnauthenticatedRequestError extends Error {
+    readonly status = 401;
+
+    constructor(message = "Authentication required.") {
+      super(message);
+      this.name = "UnauthenticatedRequestError";
+    }
+  },
+}));
 
 vi.mock(
   "@/lib/research/reconciliationObligation/confirmation",
@@ -14,6 +25,11 @@ vi.mock(
     confirmResearchReconciliationObligationRecoveryOnServer,
   }),
 );
+
+vi.mock("@/lib/server/auth/principal", () => ({
+  authenticateRequest,
+  UnauthenticatedRequestError,
+}));
 
 import { POST } from "./route";
 
@@ -84,6 +100,30 @@ describe(
   () => {
     beforeEach(() => {
       vi.clearAllMocks();
+
+      authenticateRequest.mockResolvedValue({
+        provider: "cognito",
+        subject: "test-subject",
+      });
+    });
+
+    it("rejects an unauthenticated request before reaching the server boundary", async () => {
+      authenticateRequest.mockRejectedValue(
+        new UnauthenticatedRequestError(),
+      );
+
+      const response = await POST(createRequest(), {
+        params: createParams("research-reconciliation-001"),
+      });
+
+      expect(response.status).toBe(401);
+      expect(
+        confirmResearchReconciliationObligationRecoveryOnServer,
+      ).not.toHaveBeenCalled();
+
+      await expect(response.json()).resolves.toEqual({
+        error: "Authentication required.",
+      });
     });
 
     it("confirms recovery through the server boundary", async () => {

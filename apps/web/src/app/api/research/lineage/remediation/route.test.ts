@@ -7,9 +7,20 @@ import type {
 
 const {
   executeResearchLineageIntegrityRemediationOnServer,
+  authenticateRequest,
+  UnauthenticatedRequestError,
   ResearchRemediationStalePlanError,
 } = vi.hoisted(() => ({
   executeResearchLineageIntegrityRemediationOnServer: vi.fn(),
+  authenticateRequest: vi.fn(),
+  UnauthenticatedRequestError: class UnauthenticatedRequestError extends Error {
+    readonly status = 401;
+
+    constructor(message = "Authentication required.") {
+      super(message);
+      this.name = "UnauthenticatedRequestError";
+    }
+  },
   ResearchRemediationStalePlanError: class ResearchRemediationStalePlanError extends Error {
     readonly code = "RESEARCH_REMEDIATION_STALE_PLAN";
 
@@ -24,6 +35,11 @@ const {
 
 vi.mock("@/lib/research/lineage/remediation/serverExecutor", () => ({
   executeResearchLineageIntegrityRemediationOnServer,
+}));
+
+vi.mock("@/lib/server/auth/principal", () => ({
+  authenticateRequest,
+  UnauthenticatedRequestError,
 }));
 
 vi.mock("@titan/database", () => ({
@@ -58,6 +74,41 @@ const executionResult: ResearchLineageIntegrityRemediationRepairExecutionResult 
 describe("POST /api/research/lineage/remediation", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+
+    authenticateRequest.mockResolvedValue({
+      provider: "cognito",
+      subject: "test-subject",
+    });
+  });
+
+  it("rejects an unauthenticated request before reaching the server executor", async () => {
+    authenticateRequest.mockRejectedValue(
+      new UnauthenticatedRequestError(),
+    );
+
+    const request = new Request(
+      "http://localhost/api/research/lineage/remediation",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          plan,
+        }),
+      },
+    );
+
+    const response = await POST(request);
+
+    expect(response.status).toBe(401);
+    expect(
+      executeResearchLineageIntegrityRemediationOnServer,
+    ).not.toHaveBeenCalled();
+
+    await expect(response.json()).resolves.toEqual({
+      error: "Authentication required.",
+    });
   });
 
   it("executes a valid remediation plan through the server boundary", async () => {

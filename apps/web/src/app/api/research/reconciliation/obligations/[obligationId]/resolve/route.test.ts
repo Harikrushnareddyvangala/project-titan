@@ -1,10 +1,28 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+const authMocks = vi.hoisted(() => ({
+  authenticateRequest: vi.fn(),
+  UnauthenticatedRequestError: class extends Error {
+    readonly status = 401;
+
+    constructor(message = "Authentication required.") {
+      super(message);
+      this.name = "UnauthenticatedRequestError";
+    }
+  },
+}));
+
 vi.mock("@/lib/research/reconciliationObligation/resolution", () => ({
   resolveResearchReconciliationObligationOnServer: vi.fn(),
 }));
 
+vi.mock("@/lib/server/auth/principal", () => authMocks);
+
 import { resolveResearchReconciliationObligationOnServer } from "@/lib/research/reconciliationObligation/resolution";
+import {
+  authenticateRequest,
+  UnauthenticatedRequestError,
+} from "@/lib/server/auth/principal";
 
 import { POST } from "./route";
 
@@ -13,6 +31,11 @@ const mockedResolve =
 
 beforeEach(() => {
   vi.clearAllMocks();
+
+  authenticateRequest.mockResolvedValue({
+    provider: "cognito",
+    subject: "test-subject",
+  });
 });
 
 function createRequest(): Request {
@@ -31,6 +54,23 @@ function createParams(obligationId: string) {
 }
 
 describe("POST /api/research/reconciliation/obligations/[obligationId]/resolve", () => {
+  it("rejects an unauthenticated request before reaching the server boundary", async () => {
+    authenticateRequest.mockRejectedValue(
+      new UnauthenticatedRequestError(),
+    );
+
+    const response = await POST(
+      createRequest(),
+      createParams("reconciliation-1"),
+    );
+
+    expect(response.status).toBe(401);
+    expect(await response.json()).toEqual({
+      error: "Authentication required.",
+    });
+    expect(mockedResolve).not.toHaveBeenCalled();
+  });
+
   it("returns the server resolution result", async () => {
     const result = {
       obligation: {
