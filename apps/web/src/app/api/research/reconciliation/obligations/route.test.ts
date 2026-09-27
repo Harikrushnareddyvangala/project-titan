@@ -1,5 +1,17 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+const authMocks = vi.hoisted(() => ({
+  authenticateRequest: vi.fn(),
+  UnauthenticatedRequestError: class UnauthenticatedRequestError extends Error {
+    readonly status = 401;
+
+    constructor(message = "Authentication required.") {
+      super(message);
+      this.name = "UnauthenticatedRequestError";
+    }
+  },
+}));
+
 const {
   getResearchReconciliationObligationsByInvestigation,
 } = vi.hoisted(() => ({
@@ -13,11 +25,46 @@ vi.mock(
   }),
 );
 
+vi.mock("@/lib/server/auth/principal", () => authMocks);
+
+import {
+  authenticateRequest,
+  UnauthenticatedRequestError,
+} from "@/lib/server/auth/principal";
 import { GET } from "./route";
+
+const mockedAuthenticateRequest = vi.mocked(authenticateRequest);
 
 describe("GET /api/research/reconciliation/obligations", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+
+    mockedAuthenticateRequest.mockResolvedValue({
+      provider: "cognito",
+      subject: "test-subject",
+    });
+  });
+
+  it("rejects an unauthenticated request before reaching the repository", async () => {
+    mockedAuthenticateRequest.mockRejectedValue(
+      new UnauthenticatedRequestError(),
+    );
+
+    const response = await GET(
+      new Request(
+        "http://localhost/api/research/reconciliation/obligations?investigationId=investigation-1",
+      ),
+    );
+
+    expect(response.status).toBe(401);
+
+    await expect(response.json()).resolves.toEqual({
+      error: "Authentication required.",
+    });
+
+    expect(
+      getResearchReconciliationObligationsByInvestigation,
+    ).not.toHaveBeenCalled();
   });
 
   it("rejects a missing investigationId", async () => {

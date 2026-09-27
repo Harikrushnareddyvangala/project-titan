@@ -4,6 +4,8 @@ import { useCallback, useEffect, useState } from "react";
 
 import type { ResearchReconciliationObligation } from "@/types/research";
 
+import { useAuthenticatedFetch } from "@/hooks/useAuthenticatedFetch";
+
 interface ResearchReconciliationObligationsResult {
   obligations: ResearchReconciliationObligation[];
   loading: boolean;
@@ -20,18 +22,15 @@ export function useResearchReconciliationObligations(
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
+  const authenticatedFetch = useAuthenticatedFetch();
+  const cleanInvestigationId = investigationId.trim();
 
   const refresh = useCallback(() => {
     setRefreshKey((current) => current + 1);
   }, []);
 
   useEffect(() => {
-    const cleanInvestigationId = investigationId.trim();
-
     if (!cleanInvestigationId) {
-      setObligations([]);
-      setLoading(false);
-      setError(null);
       return;
     }
 
@@ -42,7 +41,7 @@ export function useResearchReconciliationObligations(
         setLoading(true);
         setError(null);
 
-        const response = await fetch(
+        const response = await authenticatedFetch(
           `/api/research/reconciliation/obligations?investigationId=${encodeURIComponent(
             cleanInvestigationId,
           )}`,
@@ -101,12 +100,12 @@ export function useResearchReconciliationObligations(
     return () => {
       cancelled = true;
     };
-  }, [investigationId, refreshKey]);
+  }, [authenticatedFetch, cleanInvestigationId, refreshKey]);
 
   return {
-    obligations,
-    loading,
-    error,
+    obligations: cleanInvestigationId ? obligations : [],
+    loading: cleanInvestigationId ? loading : false,
+    error: cleanInvestigationId ? error : null,
     refresh,
   };
 }

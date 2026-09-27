@@ -4,6 +4,7 @@ import { ClipboardList, Plus, Search } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
 import { useResearchInvestigations } from "@/hooks/useResearchInvestigations";
+import { useAuthenticatedFetch } from "@/hooks/useAuthenticatedFetch";
 
 import type {
   ResearchInvestigation,
@@ -218,6 +219,8 @@ function InvestigationCard({
   onStatusChange,
   onInvestigationUpdated,
 }: InvestigationCardProps) {
+  const authenticatedFetch = useAuthenticatedFetch();
+
   const [selectedLineageNodeId, setSelectedLineageNodeId] = useState<string | null>(null);
 
   const [provenanceInspectionEventId, setProvenanceInspectionEventId] = useState<string | null>(
@@ -613,7 +616,7 @@ function InvestigationCard({
                 type="button"
                 onClick={async () => {
                   try {
-                    const response = await fetch("/api/research/lineage/remediation", {
+                    const response = await authenticatedFetch("/api/research/lineage/remediation", {
                       method: "POST",
                       headers: {
                         "Content-Type": "application/json",

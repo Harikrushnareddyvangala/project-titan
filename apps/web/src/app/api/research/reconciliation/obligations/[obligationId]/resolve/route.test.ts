@@ -1,7 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import type { AuthenticatedPrincipal } from "@titan/auth";
 
 const authMocks = vi.hoisted(() => ({
-  authenticateRequest: vi.fn(),
+  authenticateRequest: vi.fn<
+    (request: Request) => Promise<AuthenticatedPrincipal>
+  >(),
   UnauthenticatedRequestError: class extends Error {
     readonly status = 401;
 
@@ -29,10 +32,12 @@ import { POST } from "./route";
 const mockedResolve =
   vi.mocked(resolveResearchReconciliationObligationOnServer);
 
+const mockedAuthenticateRequest = vi.mocked(authenticateRequest);
+
 beforeEach(() => {
   vi.clearAllMocks();
 
-  authenticateRequest.mockResolvedValue({
+  mockedAuthenticateRequest.mockResolvedValue({
     provider: "cognito",
     subject: "test-subject",
   });
@@ -55,7 +60,7 @@ function createParams(obligationId: string) {
 
 describe("POST /api/research/reconciliation/obligations/[obligationId]/resolve", () => {
   it("rejects an unauthenticated request before reaching the server boundary", async () => {
-    authenticateRequest.mockRejectedValue(
+    mockedAuthenticateRequest.mockRejectedValue(
       new UnauthenticatedRequestError(),
     );
 

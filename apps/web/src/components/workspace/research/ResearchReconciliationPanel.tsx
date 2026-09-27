@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 
+import { useAuthenticatedFetch } from "@/hooks/useAuthenticatedFetch";
 import { useResearchReconciliationObligations } from "@/hooks/useResearchReconciliationObligations";
 import type { ResearchReconciliationObligationRecoveryPlanningResult } from "@/lib/research/reconciliationObligation/recoveryPlanning";
 import type { ResearchReconciliationObligationConfirmationResult } from "@/lib/research/reconciliationObligation/confirmation";
@@ -481,6 +482,7 @@ export function ResearchReconciliationPanel({
 }: ResearchReconciliationPanelProps) {
   const { obligations, loading, error, refresh } =
     useResearchReconciliationObligations(investigationId);
+  const authenticatedFetch = useAuthenticatedFetch();
 
   useEffect(() => {
     if (refreshGeneration === 0) {
@@ -536,7 +538,7 @@ export function ResearchReconciliationPanel({
     });
 
     try {
-      const response = await fetch(
+      const response = await authenticatedFetch(
         `/api/research/reconciliation/obligations/${encodeURIComponent(
           obligationId,
         )}/recovery`,
@@ -586,7 +588,7 @@ export function ResearchReconciliationPanel({
     });
 
     try {
-      const response = await fetch(
+      const response = await authenticatedFetch(
         `/api/research/reconciliation/obligations/${encodeURIComponent(
           obligationId,
         )}/confirm`,
@@ -642,7 +644,7 @@ export function ResearchReconciliationPanel({
     });
 
     try {
-      const response = await fetch(
+      const response = await authenticatedFetch(
         `/api/research/reconciliation/obligations/${encodeURIComponent(
           obligationId,
         )}/resolve`,
@@ -694,7 +696,7 @@ export function ResearchReconciliationPanel({
     });
 
     try {
-      const response = await fetch(
+      const response = await authenticatedFetch(
         `/api/research/reconciliation/obligations/${encodeURIComponent(
           obligationId,
         )}/activate`,
