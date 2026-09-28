@@ -5,6 +5,7 @@ import type {
   ResearchFinding,
   ResearchInvestigation,
   ResearchInvestigationConclusion,
+  ResearchFindingValidation,
 } from "@/types/research";
 
 export type ResearchResourceType =
@@ -12,6 +13,7 @@ export type ResearchResourceType =
   | "experiment"
   | "evidence"
   | "finding"
+  | "validation"
   | "conclusion";
 
 function createResearchResourceIdentity(
@@ -47,6 +49,12 @@ export function toResearchFindingResourceIdentity(
   finding: ResearchFinding,
 ): ResourceIdentity {
   return createResearchResourceIdentity(finding.id, "finding");
+}
+
+export function toResearchFindingValidationResourceIdentity(
+  validation: ResearchFindingValidation,
+): ResourceIdentity {
+  return createResearchResourceIdentity(validation.id, "validation");
 }
 
 export function toResearchConclusionResourceIdentity(

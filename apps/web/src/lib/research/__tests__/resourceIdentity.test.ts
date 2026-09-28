@@ -6,6 +6,7 @@ import type {
   ResearchFinding,
   ResearchInvestigation,
   ResearchInvestigationConclusion,
+  ResearchFindingValidation,
 } from "@/types/research";
 
 import {
@@ -13,6 +14,7 @@ import {
   toResearchEvidenceResourceIdentity,
   toResearchExperimentResourceIdentity,
   toResearchFindingResourceIdentity,
+  toResearchFindingValidationResourceIdentity,
   toResearchInvestigationResourceIdentity,
 } from "@/lib/research/resourceIdentity";
 
@@ -61,6 +63,18 @@ describe("research resource identity mapping contracts", () => {
     expect(toResearchFindingResourceIdentity(finding)).toEqual({
       id: "finding-resource-001",
       type: "finding",
+      namespace: "research",
+    });
+  });
+
+  it("maps a finding validation without changing its identity", () => {
+    const validation = {
+      id: "finding-validation-resource-001",
+    } as ResearchFindingValidation;
+
+    expect(toResearchFindingValidationResourceIdentity(validation)).toEqual({
+      id: "finding-validation-resource-001",
+      type: "validation",
       namespace: "research",
     });
   });
