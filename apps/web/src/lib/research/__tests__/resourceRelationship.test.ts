@@ -2,13 +2,16 @@ import { describe, expect, it } from "vitest";
 
 import type {
   ResearchEvidenceAssessment,
+  ResearchExperiment,
   ResearchFinding,
   ResearchFindingValidation,
+  ResearchInvestigation,
 } from "@/types/research";
 
 import {
   toResearchEvidenceAssessmentResourceRelationship,
   toResearchFindingValidationResourceRelationship,
+  toResearchInvestigationExperimentResourceRelationship,
 } from "@/lib/research/resourceRelationship";
 
 function createAssessment(
@@ -43,6 +46,44 @@ function createFinding(
   };
 }
 
+function createInvestigation(
+  overrides: Partial<ResearchInvestigation> = {},
+): ResearchInvestigation {
+  return {
+    id: "investigation-001",
+    title: "Research investigation",
+    objective: "Evaluate the research question.",
+    question: "Does the evidence support the hypothesis?",
+    status: "Investigating",
+    experimentIds: ["experiment-001"],
+    evidenceIds: [],
+    findingIds: [],
+    artifactIds: [],
+    conclusionIds: [],
+    createdAt: "2026-09-28T07:00:00.000Z",
+    updatedAt: "2026-09-28T08:00:00.000Z",
+    ...overrides,
+  };
+}
+
+function createExperiment(
+  overrides: Partial<ResearchExperiment> = {},
+): ResearchExperiment {
+  return {
+    id: "experiment-001",
+    investigationId: "investigation-001",
+    title: "Research experiment",
+    objective: "Evaluate the hypothesis.",
+    status: "Draft",
+    evidenceIds: [],
+    findingIds: [],
+    lifecycle: [],
+    createdAt: "2026-09-28T08:10:00.000Z",
+    updatedAt: "2026-09-28T08:15:00.000Z",
+    ...overrides,
+  };
+}
+
 function createValidation(
   overrides: Partial<ResearchFindingValidation> = {},
 ): ResearchFindingValidation {
@@ -63,6 +104,101 @@ function createValidation(
     ...overrides,
   };
 }
+
+describe("research investigation experiment resource relationship mapping contracts", () => {
+  it("maps an investigation to its experiment as a directed Contains relationship", () => {
+    expect(
+      toResearchInvestigationExperimentResourceRelationship(
+        createInvestigation(),
+        createExperiment(),
+      ),
+    ).toEqual({
+      id: "relationship-experiment-001-Contains",
+      source: {
+        id: "investigation-001",
+        type: "investigation",
+        namespace: "research",
+      },
+      target: {
+        id: "experiment-001",
+        type: "experiment",
+        namespace: "research",
+      },
+      namespace: "research",
+      type: "Contains",
+      createdAt: "2026-09-28T08:10:00.000Z",
+    });
+  });
+
+  it("uses the experiment createdAt rather than updatedAt", () => {
+    const experiment = createExperiment({
+      createdAt: "2026-09-01T10:00:00.000Z",
+      updatedAt: "2026-09-28T10:00:00.000Z",
+    });
+
+    expect(
+      toResearchInvestigationExperimentResourceRelationship(
+        createInvestigation(),
+        experiment,
+      ),
+    ).toMatchObject({
+      createdAt: "2026-09-01T10:00:00.000Z",
+    });
+  });
+
+  it("preserves the investigation-to-experiment direction", () => {
+    const relationship =
+      toResearchInvestigationExperimentResourceRelationship(
+        createInvestigation({
+          id: "investigation-source",
+        }),
+        createExperiment({
+          investigationId: "investigation-source",
+          id: "experiment-target",
+        }),
+      );
+
+    expect(relationship?.source).toEqual({
+      id: "investigation-source",
+      type: "investigation",
+      namespace: "research",
+    });
+
+    expect(relationship?.target).toEqual({
+      id: "experiment-target",
+      type: "experiment",
+      namespace: "research",
+    });
+  });
+
+  it("keeps relationship identity deterministic for the same experiment", () => {
+    const first = toResearchInvestigationExperimentResourceRelationship(
+      createInvestigation(),
+      createExperiment(),
+    );
+
+    const second = toResearchInvestigationExperimentResourceRelationship(
+      createInvestigation(),
+      createExperiment(),
+    );
+
+    expect(first?.id).toBe(second?.id);
+  });
+
+  it("returns null when the experiment belongs to a different investigation", () => {
+    const relationship =
+      toResearchInvestigationExperimentResourceRelationship(
+        createInvestigation({
+          id: "investigation-001",
+        }),
+        createExperiment({
+          investigationId: "investigation-002",
+        }),
+      );
+
+    expect(relationship).toBeNull();
+  });
+});
 
 describe("research evidence assessment resource relationship mapping contracts", () => {
   it("maps Supporting to a directed Supports relationship", () => {

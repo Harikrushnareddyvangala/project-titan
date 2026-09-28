@@ -2,13 +2,20 @@ import type { ResourceIdentity, ResourceRelationship } from "@titan/types";
 import type {
   ResearchEvidenceAssessment,
   ResearchEvidenceAssessmentType,
+  ResearchExperiment,
   ResearchFinding,
   ResearchFindingValidation,
+  ResearchInvestigation,
 } from "@/types/research";
 
 function createResearchResourceIdentity(
   id: string,
-  type: "evidence" | "finding" | "validation",
+  type:
+    | "evidence"
+    | "finding"
+    | "validation"
+    | "investigation"
+    | "experiment",
 ): ResourceIdentity {
   return {
     id,
@@ -91,5 +98,32 @@ export function toResearchFindingValidationResourceRelationship(
     namespace: "research",
     type: "Validates",
     createdAt: validation.createdAt,
+  };
+}
+
+export function toResearchInvestigationExperimentResourceRelationship(
+  investigation: ResearchInvestigation,
+  experiment: ResearchExperiment,
+): ResourceRelationship | null {
+  if (experiment.investigationId !== investigation.id) {
+    return null;
+  }
+
+  return {
+    id: createResearchRelationshipIdentity(
+      experiment.id,
+      "Contains",
+    ),
+    source: createResearchResourceIdentity(
+      investigation.id,
+      "investigation",
+    ),
+    target: createResearchResourceIdentity(
+      experiment.id,
+      "experiment",
+    ),
+    namespace: "research",
+    type: "Contains",
+    createdAt: experiment.createdAt,
   };
 }
