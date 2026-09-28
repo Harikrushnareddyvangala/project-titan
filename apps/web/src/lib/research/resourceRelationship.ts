@@ -3,11 +3,12 @@ import type {
   ResearchEvidenceAssessment,
   ResearchEvidenceAssessmentType,
   ResearchFinding,
+  ResearchFindingValidation,
 } from "@/types/research";
 
 function createResearchResourceIdentity(
   id: string,
-  type: "evidence" | "finding",
+  type: "evidence" | "finding" | "validation",
 ): ResourceIdentity {
   return {
     id,
@@ -63,5 +64,32 @@ export function toResearchEvidenceAssessmentResourceRelationship(
     namespace: "research",
     type: relationshipType,
     createdAt: assessment.assessedAt,
+  };
+}
+
+export function toResearchFindingValidationResourceRelationship(
+  finding: ResearchFinding,
+  validation: ResearchFindingValidation,
+): ResourceRelationship | null {
+  if (validation.findingId !== finding.id) {
+    return null;
+  }
+
+  return {
+    id: createResearchRelationshipIdentity(
+      validation.id,
+      "Validates",
+    ),
+    source: createResearchResourceIdentity(
+      finding.id,
+      "finding",
+    ),
+    target: createResearchResourceIdentity(
+      validation.id,
+      "validation",
+    ),
+    namespace: "research",
+    type: "Validates",
+    createdAt: validation.createdAt,
   };
 }
