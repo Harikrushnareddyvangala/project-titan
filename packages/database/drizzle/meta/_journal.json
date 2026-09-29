@@ -29,6 +29,20 @@
       "when": 1788698251578,
       "tag": "0003_lyrical_lucky_pierre",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1790651161115,
+      "tag": "0004_reconciliation_obligations",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1790651161116,
+      "tag": "0005_reconciliation_obligation_active_identity",
+      "breakpoints": true
     }
   ]
 }
