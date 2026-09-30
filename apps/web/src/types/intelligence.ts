@@ -4,97 +4,52 @@ import type { RepositoryAnalytics } from "@/types/github";
 /*                                Trend Types                                 */
 /* -------------------------------------------------------------------------- */
 
-export type TrendDirection =
-  | "Rapid Growth"
-  | "Growing"
-  | "Stable"
-  | "Declining"
-  | "Critical";
+export type TrendDirection = "Rapid Growth" | "Growing" | "Stable" | "Declining" | "Critical";
 
 /* -------------------------------------------------------------------------- */
 /*                              Forecast Types                                */
 /* -------------------------------------------------------------------------- */
 
-export type ForecastDirection =
-  | "Strong Growth"
-  | "Growing"
-  | "Stable"
-  | "Declining"
-  | "High Risk";
+export type ForecastDirection = "Strong Growth" | "Growing" | "Stable" | "Declining" | "High Risk";
 
 /* -------------------------------------------------------------------------- */
 /*                                Risk Types                                  */
 /* -------------------------------------------------------------------------- */
 
-export type RiskLevel =
-  | "Very Low"
-  | "Low"
-  | "Moderate"
-  | "Elevated"
-  | "High"
-  | "Critical";
+export type RiskLevel = "Very Low" | "Low" | "Moderate" | "Elevated" | "High" | "Critical";
 
 /* -------------------------------------------------------------------------- */
 /*                               Grade Types                                  */
 /* -------------------------------------------------------------------------- */
 
-export type RepositoryGrade =
-  | "A+"
-  | "A"
-  | "B+"
-  | "B"
-  | "C+"
-  | "C"
-  | "D"
-  | "F";
+export type RepositoryGrade = "A+" | "A" | "B+" | "B" | "C+" | "C" | "D" | "F";
 
 /* -------------------------------------------------------------------------- */
 /*                             Portfolio Status                               */
 /* -------------------------------------------------------------------------- */
 
-export type PortfolioHealth =
-  | "Excellent"
-  | "Healthy"
-  | "Good"
-  | "Needs Improvement"
-  | "Critical";
+export type PortfolioHealth = "Excellent" | "Healthy" | "Good" | "Needs Improvement" | "Critical";
 
 /* -------------------------------------------------------------------------- */
 /*                           Engineering Maturity                             */
 /* -------------------------------------------------------------------------- */
 
-export type EngineeringLevel =
-  | "Elite"
-  | "Advanced"
-  | "Intermediate"
-  | "Basic"
-  | "Early";
+export type EngineeringLevel = "Elite" | "Advanced" | "Intermediate" | "Basic" | "Early";
 
 /* -------------------------------------------------------------------------- */
 /*                             Executive Status                               */
 /* -------------------------------------------------------------------------- */
 
-export type ExecutiveSeverity =
-  | "Info"
-  | "Success"
-  | "Warning"
-  | "Critical";
+export type ExecutiveSeverity = "Info" | "Success" | "Warning" | "Critical";
 
 /* -------------------------------------------------------------------------- */
 /*                           Evolution Types                                  */
 /* -------------------------------------------------------------------------- */
 
 export type EvolutionDirection =
-  | "Rapidly Improving"
-  | "Improving"
-  | "Stable"
-  | "Declining"
-  | "Critical";
+  "Rapidly Improving" | "Improving" | "Stable" | "Declining" | "Critical";
 
-export type RepositoryLifecycle =
-  | "Existing"
-  | "New"
-  | "Removed";
+export type RepositoryLifecycle = "Existing" | "New" | "Removed";
 
 /* -------------------------------------------------------------------------- */
 /*                         Intelligence Snapshot                              */
@@ -130,26 +85,19 @@ export type IntelligenceArtifactType =
 /*                         Intelligence Artifact Format                       */
 /* -------------------------------------------------------------------------- */
 
-export type IntelligenceArtifactFormat =
-  | "JSON"
-  | "PDF"
-  | "HTML"
-  | "Markdown";
+export type IntelligenceArtifactFormat = "JSON" | "PDF" | "HTML" | "Markdown";
 
 /* -------------------------------------------------------------------------- */
 /*                         Intelligence Artifact Source                       */
 /* -------------------------------------------------------------------------- */
 
-export type IntelligenceArtifactSource =
-  | "Repository Intelligence"
-  | "Intelligence Snapshot";
+export type IntelligenceArtifactSource = "Repository Intelligence" | "Intelligence Snapshot";
 
 /* -------------------------------------------------------------------------- */
 /*                    Intelligence Artifact Versioning                        */
 /* -------------------------------------------------------------------------- */
 
-export type IntelligenceArtifactVersion =
-  `${number}.${number}.${number}`;
+export type IntelligenceArtifactVersion = `${number}.${number}.${number}`;
 
 export interface IntelligenceArtifactVersionInfo {
   version: IntelligenceArtifactVersion;
@@ -158,13 +106,7 @@ export interface IntelligenceArtifactVersionInfo {
   patch: number;
 }
 
-export type IntelligenceArtifactVersionBump =
-  | "patch"
-  | "minor"
-  | "major";
-
-
-
+export type IntelligenceArtifactVersionBump = "patch" | "minor" | "major";
 
 /* -------------------------------------------------------------------------- */
 /*                    Intelligence Artifact Metadata                          */
@@ -183,11 +125,7 @@ export interface IntelligenceArtifactMetadata {
 /* -------------------------------------------------------------------------- */
 
 export type IntelligenceArtifactStatus =
-  | "Draft"
-  | "Registered"
-  | "Published"
-  | "Superseded"
-  | "Archived";
+  "Draft" | "Registered" | "Published" | "Superseded" | "Archived";
 
 /* -------------------------------------------------------------------------- */
 /*                         Artifact Integrity                                 */
@@ -207,13 +145,9 @@ export interface IntelligenceArtifactIntegrity {
 /*                         Intelligence Artifact Signature                    */
 /* -------------------------------------------------------------------------- */
 
-export type IntelligenceSignatureAlgorithm =
-  | "ECDSA-P256-SHA256";
+export type IntelligenceSignatureAlgorithm = "ECDSA-P256-SHA256";
 
-export type IntelligenceSignerType =
-  | "Human"
-  | "System"
-  | "Organization";
+export type IntelligenceSignerType = "Human" | "System" | "Organization";
 
 export interface IntelligenceArtifactSignature {
   algorithm: IntelligenceSignatureAlgorithm;
@@ -234,25 +168,14 @@ export interface IntelligenceArtifactSignature {
 /*                         Intelligence Trust State                           */
 /* -------------------------------------------------------------------------- */
 
-export type IntelligenceTrustStatus =
-  | "Unsigned"
-  | "Signed"
-  | "Verified"
-  | "Invalid";
+export type IntelligenceTrustStatus = "Unsigned" | "Signed" | "Verified" | "Invalid";
 /* -------------------------------------------------------------------------- */
 /*                         Artifact Trust Policy                              */
 /* -------------------------------------------------------------------------- */
 
-export type IntelligenceArtifactTrustStatus =
-  | "Verified"
-  | "Signed"
-  | "Unsigned"
-  | "Invalid";
+export type IntelligenceArtifactTrustStatus = "Verified" | "Signed" | "Unsigned" | "Invalid";
 
-export type IntelligenceArtifactTrustDecision =
-  | "Allow"
-  | "Restrict"
-  | "Block";
+export type IntelligenceArtifactTrustDecision = "Allow" | "Restrict" | "Block";
 
 export type IntelligenceArtifactTrustReason =
   | "Verified"
@@ -303,9 +226,9 @@ export interface IntelligenceArtifact {
 
   source: IntelligenceArtifactSource;
 
-   status: IntelligenceArtifactStatus;
+  status: IntelligenceArtifactStatus;
 
-   previousArtifactId?: string;
+  previousArtifactId?: string;
 
   metadata: IntelligenceArtifactMetadata;
 

@@ -1,6 +1,4 @@
-import {
-  incrementArtifactVersion,
-} from "@/lib/intelligence/artifact";
+import { incrementArtifactVersion } from "@/lib/intelligence/artifact";
 
 import type {
   IntelligenceArtifact,
@@ -8,49 +6,35 @@ import type {
   IntelligenceArtifactVersionBump,
 } from "@/types/intelligence";
 
-import {
-  createArtifactIntegrity,
-} from "./artifactIntegrity";
+import { createArtifactIntegrity } from "./artifactIntegrity";
 
-import {
-  verifyArtifactIntegrity,
-} from "./artifactIntegrity";
+import { verifyArtifactIntegrity } from "./artifactIntegrity";
 
-import {
-  createArtifactSignature,
-} from "./artifactSigning";
-import {
-  getArtifactTrustStatus,
-} from "./trustService";
+import { createArtifactSignature } from "./artifactSigning";
+import { getArtifactTrustStatus } from "./trustService";
 
 /* -------------------------------------------------------------------------- */
 /*                              Storage                                       */
 /* -------------------------------------------------------------------------- */
 
-const STORAGE_KEY =
-  "titan:intelligence-artifacts";
+const STORAGE_KEY = "titan:intelligence-artifacts";
 
 /* -------------------------------------------------------------------------- */
 /*                              Store                                         */
 /* -------------------------------------------------------------------------- */
 
-type ArtifactListener =
-  () => void;
+type ArtifactListener = () => void;
 
-const listeners =
-  new Set<ArtifactListener>();
+const listeners = new Set<ArtifactListener>();
 
-let cachedArtifacts:
-  IntelligenceArtifact[] | null =
-    null;
+let cachedArtifacts: IntelligenceArtifact[] | null = null;
 
 /* -------------------------------------------------------------------------- */
 /*                              Environment                                   */
 /* -------------------------------------------------------------------------- */
 
 function isBrowser(): boolean {
-  return typeof window !==
-    "undefined";
+  return typeof window !== "undefined";
 }
 
 /* -------------------------------------------------------------------------- */
@@ -58,84 +42,41 @@ function isBrowser(): boolean {
 /* -------------------------------------------------------------------------- */
 
 function notifyListeners(): void {
-  listeners.forEach(
-    (listener) => {
-      listener();
-    },
-  );
+  listeners.forEach((listener) => {
+    listener();
+  });
 }
 
 /* -------------------------------------------------------------------------- */
 /*                              Validation                                    */
 /* -------------------------------------------------------------------------- */
 
-function isIntelligenceArtifact(
-  value: unknown,
-): value is IntelligenceArtifact {
-  if (
-    typeof value !== "object" ||
-    value === null
-  ) {
+function isIntelligenceArtifact(value: unknown): value is IntelligenceArtifact {
+  if (typeof value !== "object" || value === null) {
     return false;
   }
 
-  const artifact =
-    value as Record<
-      string,
-      unknown
-    >;
+  const artifact = value as Record<string, unknown>;
 
-  const validStatuses = [
-    "Draft",
-    "Registered",
-    "Published",
-    "Superseded",
-    "Archived",
-  ] as const;
+  const validStatuses = ["Draft", "Registered", "Published", "Superseded", "Archived"] as const;
 
   const hasValidStatus =
     artifact.status === undefined ||
-    validStatuses.includes(
-      artifact.status as
-        (typeof validStatuses)[number],
-    );
+    validStatuses.includes(artifact.status as (typeof validStatuses)[number]);
 
   return (
-    typeof artifact.artifactId ===
-      "string" &&
-
-    typeof artifact.artifactType ===
-      "string" &&
-
-    typeof artifact.repository ===
-      "string" &&
-
-    typeof artifact.sourceSnapshotId ===
-      "string" &&
-
-    typeof artifact.author ===
-      "string" &&
-
-    typeof artifact.createdAt ===
-      "string" &&
-
-    typeof artifact.generatedAt ===
-      "string" &&
-
-    typeof artifact.version ===
-      "string" &&
-
-    typeof artifact.format ===
-      "string" &&
-
-    typeof artifact.source ===
-      "string" &&
-
+    typeof artifact.artifactId === "string" &&
+    typeof artifact.artifactType === "string" &&
+    typeof artifact.repository === "string" &&
+    typeof artifact.sourceSnapshotId === "string" &&
+    typeof artifact.author === "string" &&
+    typeof artifact.createdAt === "string" &&
+    typeof artifact.generatedAt === "string" &&
+    typeof artifact.version === "string" &&
+    typeof artifact.format === "string" &&
+    typeof artifact.source === "string" &&
     hasValidStatus &&
-
-    typeof artifact.metadata ===
-      "object" &&
-
+    typeof artifact.metadata === "object" &&
     artifact.metadata !== null
   );
 }
@@ -150,15 +91,11 @@ function isIntelligenceArtifact(
  *
  * Treat those artifacts as Registered.
  */
-function normalizeArtifact(
-  artifact: IntelligenceArtifact,
-): IntelligenceArtifact {
+function normalizeArtifact(artifact: IntelligenceArtifact): IntelligenceArtifact {
   return {
     ...artifact,
 
-    status:
-      artifact.status ??
-      "Registered",
+    status: artifact.status ?? "Registered",
   };
 }
 
@@ -166,36 +103,25 @@ function normalizeArtifact(
 /*                              Read                                          */
 /* -------------------------------------------------------------------------- */
 
-function readArtifacts():
-  IntelligenceArtifact[] {
+function readArtifacts(): IntelligenceArtifact[] {
   if (!isBrowser()) {
     return [];
   }
 
   try {
-    const raw =
-      window.localStorage.getItem(
-        STORAGE_KEY,
-      );
+    const raw = window.localStorage.getItem(STORAGE_KEY);
 
     if (!raw) {
       return [];
     }
 
-    const parsed: unknown =
-      JSON.parse(raw);
+    const parsed: unknown = JSON.parse(raw);
 
     if (!Array.isArray(parsed)) {
       return [];
     }
 
-    return parsed
-      .filter(
-        isIntelligenceArtifact,
-      )
-      .map(
-        normalizeArtifact,
-      );
+    return parsed.filter(isIntelligenceArtifact).map(normalizeArtifact);
   } catch {
     return [];
   }
@@ -205,22 +131,14 @@ function readArtifacts():
 /*                              Write                                         */
 /* -------------------------------------------------------------------------- */
 
-function writeArtifacts(
-  artifacts: IntelligenceArtifact[],
-): void {
+function writeArtifacts(artifacts: IntelligenceArtifact[]): void {
   if (!isBrowser()) {
     return;
   }
 
-  const nextArtifacts =
-    [...artifacts];
+  const nextArtifacts = [...artifacts];
 
-  window.localStorage.setItem(
-    STORAGE_KEY,
-    JSON.stringify(
-      nextArtifacts,
-    ),
-  );
+  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(nextArtifacts));
 
   /*
    * IMPORTANT:
@@ -231,8 +149,7 @@ function writeArtifacts(
    * Do not return a new array from
    * getIntelligenceArtifacts().
    */
-  cachedArtifacts =
-    nextArtifacts;
+  cachedArtifacts = nextArtifacts;
 
   notifyListeners();
 }
@@ -241,16 +158,12 @@ function writeArtifacts(
 /*                              Get All                                       */
 /* -------------------------------------------------------------------------- */
 
-export function getIntelligenceArtifacts():
-  IntelligenceArtifact[] {
-  if (
-    cachedArtifacts !== null
-  ) {
+export function getIntelligenceArtifacts(): IntelligenceArtifact[] {
+  if (cachedArtifacts !== null) {
     return cachedArtifacts;
   }
 
-  cachedArtifacts =
-    readArtifacts();
+  cachedArtifacts = readArtifacts();
 
   return cachedArtifacts;
 }
@@ -259,56 +172,30 @@ export function getIntelligenceArtifacts():
 /*                              Save                                          */
 /* -------------------------------------------------------------------------- */
 
-export function saveIntelligenceArtifact(
-  artifact: IntelligenceArtifact,
-): void {
-  const artifacts =
-    getIntelligenceArtifacts();
+export function saveIntelligenceArtifact(artifact: IntelligenceArtifact): void {
+  const artifacts = getIntelligenceArtifacts();
 
-  const nextArtifacts =
-    [...artifacts];
+  const nextArtifacts = [...artifacts];
 
-  const existingIndex =
-    nextArtifacts.findIndex(
-      (item) =>
-        item.artifactId ===
-        artifact.artifactId,
-    );
+  const existingIndex = nextArtifacts.findIndex((item) => item.artifactId === artifact.artifactId);
 
-  if (
-    existingIndex >= 0
-  ) {
-    nextArtifacts[
-      existingIndex
-    ] = artifact;
+  if (existingIndex >= 0) {
+    nextArtifacts[existingIndex] = artifact;
   } else {
-    nextArtifacts.unshift(
-      artifact,
-    );
+    nextArtifacts.unshift(artifact);
   }
 
-  writeArtifacts(
-    nextArtifacts,
-  );
+  writeArtifacts(nextArtifacts);
 }
 
 /* -------------------------------------------------------------------------- */
 /*                              Get One                                       */
 /* -------------------------------------------------------------------------- */
 
-export function getIntelligenceArtifact(
-  artifactId: string,
-): IntelligenceArtifact | null {
-  const artifacts =
-    getIntelligenceArtifacts();
+export function getIntelligenceArtifact(artifactId: string): IntelligenceArtifact | null {
+  const artifacts = getIntelligenceArtifacts();
 
-  return (
-    artifacts.find(
-      (artifact) =>
-        artifact.artifactId ===
-        artifactId,
-    ) ?? null
-  );
+  return artifacts.find((artifact) => artifact.artifactId === artifactId) ?? null;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -319,57 +206,36 @@ export function updateIntelligenceArtifactStatus(
   artifactId: string,
   status: IntelligenceArtifactStatus,
 ): IntelligenceArtifact | null {
-  const artifacts =
-    getIntelligenceArtifacts();
+  const artifacts = getIntelligenceArtifacts();
 
-  const index =
-    artifacts.findIndex(
-      (artifact) =>
-        artifact.artifactId ===
-        artifactId,
-    );
+  const index = artifacts.findIndex((artifact) => artifact.artifactId === artifactId);
 
   if (index < 0) {
     return null;
   }
 
-  const currentArtifact =
-    artifacts[index];
+  const currentArtifact = artifacts[index];
 
-  const currentStatus =
-    currentArtifact.status ??
-    "Registered";
+  const currentStatus = currentArtifact.status ?? "Registered";
 
-  if (
-    !canTransitionArtifactStatus(
-      currentStatus,
-      status,
-    )
-  ) {
+  if (!canTransitionArtifactStatus(currentStatus, status)) {
     return null;
   }
 
-  if (
-    currentStatus === status
-  ) {
+  if (currentStatus === status) {
     return currentArtifact;
   }
 
-  const nextArtifacts =
-    [...artifacts];
+  const nextArtifacts = [...artifacts];
 
-  const updatedArtifact:
-    IntelligenceArtifact = {
-      ...currentArtifact,
-      status,
-    };
+  const updatedArtifact: IntelligenceArtifact = {
+    ...currentArtifact,
+    status,
+  };
 
-  nextArtifacts[index] =
-    updatedArtifact;
+  nextArtifacts[index] = updatedArtifact;
 
-  writeArtifacts(
-    nextArtifacts,
-  );
+  writeArtifacts(nextArtifacts);
 
   return updatedArtifact;
 }
@@ -382,24 +248,13 @@ const ARTIFACT_STATUS_TRANSITIONS: Record<
   IntelligenceArtifactStatus,
   readonly IntelligenceArtifactStatus[]
 > = {
-  Draft: [
-    "Registered",
-    "Archived",
-  ],
+  Draft: ["Registered", "Archived"],
 
-  Registered: [
-    "Published",
-    "Archived",
-  ],
+  Registered: ["Published", "Archived"],
 
-  Published: [
-    "Superseded",
-    "Archived",
-  ],
+  Published: ["Superseded", "Archived"],
 
-  Superseded: [
-    "Archived",
-  ],
+  Superseded: ["Archived"],
 
   Archived: [],
 };
@@ -412,55 +267,36 @@ export function canTransitionArtifactStatus(
     return true;
   }
 
-  return ARTIFACT_STATUS_TRANSITIONS[
-    from
-  ].includes(to);
+  return ARTIFACT_STATUS_TRANSITIONS[from].includes(to);
 }
 
 export function getAllowedArtifactStatusTransitions(
   status: IntelligenceArtifactStatus,
 ): readonly IntelligenceArtifactStatus[] {
-  return ARTIFACT_STATUS_TRANSITIONS[
-    status
-  ];
+  return ARTIFACT_STATUS_TRANSITIONS[status];
 }
 /* -------------------------------------------------------------------------- */
 /*                              Publish                                       */
 /* -------------------------------------------------------------------------- */
 
-export function publishIntelligenceArtifact(
-  artifactId: string,
-): IntelligenceArtifact | null {
-  return updateIntelligenceArtifactStatus(
-    artifactId,
-    "Published",
-  );
+export function publishIntelligenceArtifact(artifactId: string): IntelligenceArtifact | null {
+  return updateIntelligenceArtifactStatus(artifactId, "Published");
 }
 
 /* -------------------------------------------------------------------------- */
 /*                              Archive                                       */
 /* -------------------------------------------------------------------------- */
 
-export function archiveIntelligenceArtifact(
-  artifactId: string,
-): IntelligenceArtifact | null {
-  return updateIntelligenceArtifactStatus(
-    artifactId,
-    "Archived",
-  );
+export function archiveIntelligenceArtifact(artifactId: string): IntelligenceArtifact | null {
+  return updateIntelligenceArtifactStatus(artifactId, "Archived");
 }
 
 /* -------------------------------------------------------------------------- */
 /*                             Supersede                                      */
 /* -------------------------------------------------------------------------- */
 
-export function supersedeIntelligenceArtifact(
-  artifactId: string,
-): IntelligenceArtifact | null {
-  return updateIntelligenceArtifactStatus(
-    artifactId,
-    "Superseded",
-  );
+export function supersedeIntelligenceArtifact(artifactId: string): IntelligenceArtifact | null {
+  return updateIntelligenceArtifactStatus(artifactId, "Superseded");
 }
 
 /* -------------------------------------------------------------------------- */
@@ -471,10 +307,7 @@ export function getNextArtifactVersion(
   artifact: IntelligenceArtifact,
   bump: IntelligenceArtifactVersionBump,
 ): IntelligenceArtifact["version"] {
-  return incrementArtifactVersion(
-    artifact.version,
-    bump,
-  );
+  return incrementArtifactVersion(artifact.version, bump);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -485,18 +318,14 @@ function findArtifactRevision(
   artifact: IntelligenceArtifact,
   version: IntelligenceArtifact["version"],
 ): IntelligenceArtifact | null {
-  const artifacts =
-    getIntelligenceArtifacts();
+  const artifacts = getIntelligenceArtifacts();
 
   return (
     artifacts.find(
       (item) =>
-        item.sourceSnapshotId ===
-          artifact.sourceSnapshotId &&
-        item.artifactType ===
-          artifact.artifactType &&
-        item.version ===
-          version,
+        item.sourceSnapshotId === artifact.sourceSnapshotId &&
+        item.artifactType === artifact.artifactType &&
+        item.version === version,
     ) ?? null
   );
 }
@@ -509,65 +338,43 @@ export function createArtifactRevision(
   artifactId: string,
   bump: IntelligenceArtifactVersionBump,
 ): IntelligenceArtifact | null {
-  const current =
-    getIntelligenceArtifact(
-      artifactId,
-    );
+  const current = getIntelligenceArtifact(artifactId);
 
   if (!current) {
     return null;
   }
 
-  const nextVersion =
-    getNextArtifactVersion(
-      current,
-      bump,
-    );
+  const nextVersion = getNextArtifactVersion(current, bump);
 
   /*
    * Prevent accidental duplicate revisions.
    */
-  const existingRevision =
-    findArtifactRevision(
-      current,
-      nextVersion,
-    );
+  const existingRevision = findArtifactRevision(current, nextVersion);
 
   if (existingRevision) {
     return existingRevision;
   }
 
-  const generatedAt =
-    new Date().toISOString();
+  const generatedAt = new Date().toISOString();
 
   /*
    * Preserve the original artifact identity
    * while making the revision uniquely addressable.
    */
-  const revisedArtifactId =
-    `${current.artifactId}-v${nextVersion}`;
+  const revisedArtifactId = `${current.artifactId}-v${nextVersion}`;
 
-  const {
-  integrity: _integrity,
-  signature: _signature,
-  ...currentArtifact
-} = current;
+  const { integrity: _integrity, signature: _signature, ...currentArtifact } = current;
 
-const revisedArtifact:
-  IntelligenceArtifact = {
+  const revisedArtifact: IntelligenceArtifact = {
     ...currentArtifact,
 
-    artifactId:
-      revisedArtifactId,
+    artifactId: revisedArtifactId,
 
-    version:
-      nextVersion,
+    version: nextVersion,
 
-    previousArtifactId:
-      current.artifactId,
+    previousArtifactId: current.artifactId,
 
-    status:
-      "Registered",
+    status: "Registered",
 
     generatedAt,
 
@@ -581,39 +388,26 @@ const revisedArtifact:
   /*
    * Supersede the current revision.
    */
-  const nextArtifacts:
-    IntelligenceArtifact[] =
-      getIntelligenceArtifacts().map(
-        (
-          artifact,
-        ): IntelligenceArtifact => {
-          if (
-            artifact.artifactId ===
-            current.artifactId
-          ) {
-            return {
-              ...artifact,
+  const nextArtifacts: IntelligenceArtifact[] = getIntelligenceArtifacts().map(
+    (artifact): IntelligenceArtifact => {
+      if (artifact.artifactId === current.artifactId) {
+        return {
+          ...artifact,
 
-              status:
-                "Superseded" satisfies
-                IntelligenceArtifactStatus,
-            };
-          }
+          status: "Superseded" satisfies IntelligenceArtifactStatus,
+        };
+      }
 
-          return artifact;
-        },
-      );
+      return artifact;
+    },
+  );
 
   /*
    * Register the new revision.
    */
-  nextArtifacts.unshift(
-    revisedArtifact,
-  );
+  nextArtifacts.unshift(revisedArtifact);
 
-  writeArtifacts(
-    nextArtifacts,
-  );
+  writeArtifacts(nextArtifacts);
 
   return revisedArtifact;
 }
@@ -631,47 +425,27 @@ const revisedArtifact:
  *
  * v1.0.0 → v1.0.1 → v1.1.0
  */
-export function getArtifactLineage(
-  artifactId: string,
-): IntelligenceArtifact[] {
-  const artifacts =
-    getIntelligenceArtifacts();
+export function getArtifactLineage(artifactId: string): IntelligenceArtifact[] {
+  const artifacts = getIntelligenceArtifacts();
 
-  const startingArtifact =
-    artifacts.find(
-      (artifact) =>
-        artifact.artifactId ===
-        artifactId,
-    );
+  const startingArtifact = artifacts.find((artifact) => artifact.artifactId === artifactId);
 
   if (!startingArtifact) {
     return [];
   }
 
-  const lineage:
-    IntelligenceArtifact[] = [
-      startingArtifact,
-    ];
+  const lineage: IntelligenceArtifact[] = [startingArtifact];
 
-  let current =
-    startingArtifact;
+  let current = startingArtifact;
 
-  const visited =
-    new Set<string>();
+  const visited = new Set<string>();
 
-  visited.add(
-    current.artifactId,
-  );
+  visited.add(current.artifactId);
 
-  while (
-    current.previousArtifactId
-  ) {
-    const previous =
-      artifacts.find(
-        (artifact) =>
-          artifact.artifactId ===
-          current.previousArtifactId,
-      );
+  while (current.previousArtifactId) {
+    const previous = artifacts.find(
+      (artifact) => artifact.artifactId === current.previousArtifactId,
+    );
 
     if (!previous) {
       break;
@@ -681,24 +455,15 @@ export function getArtifactLineage(
      * Protect against malformed/cyclic
      * localStorage data.
      */
-    if (
-      visited.has(
-        previous.artifactId,
-      )
-    ) {
+    if (visited.has(previous.artifactId)) {
       break;
     }
 
-    lineage.push(
-      previous,
-    );
+    lineage.push(previous);
 
-    visited.add(
-      previous.artifactId,
-    );
+    visited.add(previous.artifactId);
 
-    current =
-      previous;
+    current = previous;
   }
 
   return lineage.reverse();
@@ -715,64 +480,36 @@ export function getArtifactLineage(
  * Supports future branching rather than
  * assuming a strictly linear history.
  */
-export function getArtifactDescendants(
-  artifactId: string,
-): IntelligenceArtifact[] {
-  const artifacts =
-    getIntelligenceArtifacts();
+export function getArtifactDescendants(artifactId: string): IntelligenceArtifact[] {
+  const artifacts = getIntelligenceArtifacts();
 
-  const descendants:
-    IntelligenceArtifact[] = [];
+  const descendants: IntelligenceArtifact[] = [];
 
-  const queue =
-    [artifactId];
+  const queue = [artifactId];
 
-  const visited =
-    new Set<string>();
+  const visited = new Set<string>();
 
-  visited.add(
-    artifactId,
-  );
+  visited.add(artifactId);
 
-  while (
-    queue.length > 0
-  ) {
-    const currentId =
-      queue.shift();
+  while (queue.length > 0) {
+    const currentId = queue.shift();
 
     if (!currentId) {
       continue;
     }
 
-    const children =
-      artifacts.filter(
-        (artifact) =>
-          artifact.previousArtifactId ===
-          currentId,
-      );
+    const children = artifacts.filter((artifact) => artifact.previousArtifactId === currentId);
 
-    for (
-      const child of children
-    ) {
-      if (
-        visited.has(
-          child.artifactId,
-        )
-      ) {
+    for (const child of children) {
+      if (visited.has(child.artifactId)) {
         continue;
       }
 
-      visited.add(
-        child.artifactId,
-      );
+      visited.add(child.artifactId);
 
-      descendants.push(
-        child,
-      );
+      descendants.push(child);
 
-      queue.push(
-        child.artifactId,
-      );
+      queue.push(child.artifactId);
     }
   }
 
@@ -791,78 +528,38 @@ export function getArtifactDescendants(
  * The result is sorted chronologically
  * by generatedAt.
  */
-export function getArtifactFamily(
-  artifactId: string,
-): IntelligenceArtifact[] {
-  const lineage =
-    getArtifactLineage(
-      artifactId,
-    );
+export function getArtifactFamily(artifactId: string): IntelligenceArtifact[] {
+  const lineage = getArtifactLineage(artifactId);
 
-  if (
-    lineage.length === 0
-  ) {
+  if (lineage.length === 0) {
     return [];
   }
 
-  const root =
-    lineage[0];
+  const root = lineage[0];
 
-  const descendants =
-    getArtifactDescendants(
-      root.artifactId,
-    );
+  const descendants = getArtifactDescendants(root.artifactId);
 
-  const combined = [
-    ...lineage,
-    ...descendants,
-  ];
+  const combined = [...lineage, ...descendants];
 
-  const unique =
-    new Map<
-      string,
-      IntelligenceArtifact
-    >();
+  const unique = new Map<string, IntelligenceArtifact>();
 
-  for (
-    const artifact of combined
-  ) {
-    unique.set(
-      artifact.artifactId,
-      artifact,
-    );
+  for (const artifact of combined) {
+    unique.set(artifact.artifactId, artifact);
   }
 
-  return Array.from(
-    unique.values(),
-  ).sort(
-    (a, b) =>
-      a.generatedAt.localeCompare(
-        b.generatedAt,
-      ),
-  );
+  return Array.from(unique.values()).sort((a, b) => a.generatedAt.localeCompare(b.generatedAt));
 }
 
 /* -------------------------------------------------------------------------- */
 /*                              Delete                                        */
 /* -------------------------------------------------------------------------- */
 
-export function deleteIntelligenceArtifact(
-  artifactId: string,
-): void {
-  const artifacts =
-    getIntelligenceArtifacts();
+export function deleteIntelligenceArtifact(artifactId: string): void {
+  const artifacts = getIntelligenceArtifacts();
 
-  const filtered =
-    artifacts.filter(
-      (artifact) =>
-        artifact.artifactId !==
-        artifactId,
-    );
+  const filtered = artifacts.filter((artifact) => artifact.artifactId !== artifactId);
 
-  writeArtifacts(
-    filtered,
-  );
+  writeArtifacts(filtered);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -877,9 +574,7 @@ export function clearIntelligenceArtifacts(): void {
 /*                            Subscription                                    */
 /* -------------------------------------------------------------------------- */
 
-export function subscribeToIntelligenceArtifacts(
-  listener: ArtifactListener,
-): () => void {
+export function subscribeToIntelligenceArtifacts(listener: ArtifactListener): () => void {
   listeners.add(listener);
 
   return () => {
@@ -890,49 +585,33 @@ export function subscribeToIntelligenceArtifacts(
 export async function fingerprintIntelligenceArtifact(
   artifactId: string,
 ): Promise<IntelligenceArtifact | null> {
-  const artifact =
-    getIntelligenceArtifact(
-      artifactId,
-    );
+  const artifact = getIntelligenceArtifact(artifactId);
 
   if (!artifact) {
     return null;
   }
 
-  const integrity =
-    await createArtifactIntegrity(
-      artifact,
-    );
+  const integrity = await createArtifactIntegrity(artifact);
 
-  const updatedArtifact: IntelligenceArtifact =
-    {
-      ...artifact,
+  const updatedArtifact: IntelligenceArtifact = {
+    ...artifact,
 
-      integrity,
-    };
+    integrity,
+  };
 
-  saveIntelligenceArtifact(
-    updatedArtifact,
-  );
+  saveIntelligenceArtifact(updatedArtifact);
 
   return updatedArtifact;
 }
 
-export async function verifyIntelligenceArtifact(
-  artifactId: string,
-): Promise<boolean> {
-  const artifact =
-    getIntelligenceArtifact(
-      artifactId,
-    );
+export async function verifyIntelligenceArtifact(artifactId: string): Promise<boolean> {
+  const artifact = getIntelligenceArtifact(artifactId);
 
   if (!artifact) {
     return false;
   }
 
-  return verifyArtifactIntegrity(
-    artifact,
-  );
+  return verifyArtifactIntegrity(artifact);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -944,31 +623,20 @@ export async function signIntelligenceArtifact(
   privateKey: CryptoKey,
   keyId: string,
 ): Promise<IntelligenceArtifact | null> {
-  const artifact =
-    getIntelligenceArtifact(
-      artifactId,
-    );
+  const artifact = getIntelligenceArtifact(artifactId);
 
   if (!artifact) {
     return null;
   }
 
-  const signature =
-    await createArtifactSignature(
-      artifact,
-      privateKey,
-      keyId,
-    );
+  const signature = await createArtifactSignature(artifact, privateKey, keyId);
 
-  const signedArtifact:
-    IntelligenceArtifact = {
+  const signedArtifact: IntelligenceArtifact = {
     ...artifact,
     signature,
   };
 
-  saveIntelligenceArtifact(
-    signedArtifact,
-  );
+  saveIntelligenceArtifact(signedArtifact);
 
   return signedArtifact;
 }
@@ -977,36 +645,22 @@ export async function signIntelligenceArtifact(
 /*                         Signature Presence                                 */
 /* -------------------------------------------------------------------------- */
 
-export function hasArtifactSignature(
-  artifactId: string,
-): boolean {
-  const artifact =
-    getIntelligenceArtifact(
-      artifactId,
-    );
+export function hasArtifactSignature(artifactId: string): boolean {
+  const artifact = getIntelligenceArtifact(artifactId);
 
-  return Boolean(
-    artifact?.signature,
-  );
+  return Boolean(artifact?.signature);
 }
 
 /* -------------------------------------------------------------------------- */
 /*                         Artifact Trust                                     */
 /* -------------------------------------------------------------------------- */
 
-export async function getIntelligenceArtifactTrustStatus(
-  artifactId: string,
-) {
-  const artifact =
-    getIntelligenceArtifact(
-      artifactId,
-    );
+export async function getIntelligenceArtifactTrustStatus(artifactId: string) {
+  const artifact = getIntelligenceArtifact(artifactId);
 
   if (!artifact) {
     return null;
   }
 
-  return getArtifactTrustStatus(
-    artifact,
-  );
+  return getArtifactTrustStatus(artifact);
 }

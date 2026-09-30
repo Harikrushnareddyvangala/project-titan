@@ -50,6 +50,13 @@
       "when": 1790651849518,
       "tag": "0006_intelligence_snapshots",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1790747744876,
+      "tag": "0007_handy_magneto",
+      "breakpoints": true
     }
   ]
 }

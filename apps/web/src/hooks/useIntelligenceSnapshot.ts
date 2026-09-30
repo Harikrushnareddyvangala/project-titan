@@ -11,14 +11,11 @@ import type {
   IntelligenceSnapshot,
 } from "@/types/intelligence";
 
-import {
-  createIntelligenceSnapshot,
-  saveIntelligenceSnapshot,
-} from "@/lib/intelligence/snapshot";
+import { createIntelligenceSnapshot } from "@/lib/intelligence/snapshot";
 
-import {
-  createAndSaveIntelligenceArtifact,
-} from "@/lib/intelligence/artifactService";
+import { createIntelligenceArtifact } from "@/lib/intelligence/artifact";
+
+import { useAuthenticatedFetch } from "@/hooks/useAuthenticatedFetch";
 
 export function useIntelligenceSnapshot() {
   const [
@@ -26,51 +23,129 @@ export function useIntelligenceSnapshot() {
     setSnapshotCreated,
   ] = useState(false);
 
+  const [snapshotError, setSnapshotError] = useState<string | null>(null);
+
+  const authenticatedFetch = useAuthenticatedFetch();
+
   
 
   const createSnapshot = useCallback(
-    (
+    async (
       repository: string,
       analytics: RepositoryAnalytics,
-    ): IntelligenceSnapshot => {
-      const snapshot =
-        createIntelligenceSnapshot(
-          repository,
-          analytics,
-        );
+    ): Promise<IntelligenceSnapshot> => {
+      setSnapshotError(null);
 
-      saveIntelligenceSnapshot(
-        snapshot,
-      );
+      try {
+        const snapshot =
+          createIntelligenceSnapshot(
+            repository,
+            analytics,
+          );
 
-      setSnapshotCreated(true);
+        const response = await authenticatedFetch("/api/intelligence/snapshots", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ snapshot }),
+        });
 
-      
+        const data: unknown = await response.json();
 
-      window.setTimeout(() => {
-        setSnapshotCreated(false);
-      }, 2000);
+        if (!response.ok) {
+          const message =
+            typeof data === "object" &&
+            data !== null &&
+            "message" in data &&
+            typeof data.message === "string"
+              ? data.message
+              : "Failed to persist intelligence snapshot.";
 
-      return snapshot;
+          throw new Error(message);
+        }
+
+        if (
+          typeof data !== "object" ||
+          data === null ||
+          !("snapshot" in data)
+        ) {
+          throw new Error("Invalid intelligence snapshot response.");
+        }
+
+        const persistedSnapshot = data.snapshot as IntelligenceSnapshot;
+
+        setSnapshotCreated(true);
+
+        window.setTimeout(() => {
+          setSnapshotCreated(false);
+        }, 2000);
+
+        return persistedSnapshot;
+      } catch (error) {
+        const message =
+          error instanceof Error
+            ? error.message
+            : "Failed to persist intelligence snapshot.";
+
+        setSnapshotError(message);
+        throw error instanceof Error
+          ? error
+          : new Error(message);
+      }
     },
-    [],
+    [authenticatedFetch],
   );
 
   const createArtifact = useCallback(
-    (
+    async (
       snapshot: IntelligenceSnapshot,
-    ): IntelligenceArtifact => {
-      return createAndSaveIntelligenceArtifact(
-        snapshot,
+    ): Promise<IntelligenceArtifact> => {
+      const artifact = createIntelligenceArtifact(snapshot);
+
+      const response = await authenticatedFetch(
+        "/api/intelligence/artifacts",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ artifact }),
+        },
       );
+
+      const data: unknown = await response.json();
+
+      if (!response.ok) {
+        const message =
+          typeof data === "object" &&
+          data !== null &&
+          "error" in data &&
+          typeof data.error === "string"
+            ? data.error
+            : "Failed to persist intelligence artifact.";
+
+        throw new Error(message);
+      }
+
+      if (
+        typeof data !== "object" ||
+        data === null ||
+        !("artifactId" in data) ||
+        typeof data.artifactId !== "string"
+      ) {
+        throw new Error("Invalid intelligence artifact response.");
+      }
+
+      return data as IntelligenceArtifact;
     },
-    [],
+    [authenticatedFetch],
   );
 
   return {
     createSnapshot,
     createArtifact,
     snapshotCreated,
-    
+    snapshotError,
   };
 }

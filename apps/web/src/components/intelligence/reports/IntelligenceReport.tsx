@@ -2,91 +2,102 @@
 import { useState } from "react";
 
 import { FileText, Printer } from "lucide-react";
-import {
-  createAndSaveReportArtifact,
-} from "@/lib/intelligence/artifactService";
-import type {
-  IntelligenceArtifact,
-  IntelligenceSnapshot,
-} from "@/types/intelligence";
+import { useAuthenticatedFetch } from "@/hooks/useAuthenticatedFetch";
+import { createIntelligenceArtifact } from "@/lib/intelligence/artifact";
+import type { IntelligenceArtifact, IntelligenceSnapshot } from "@/types/intelligence";
 interface IntelligenceReportProps {
   snapshot: IntelligenceSnapshot;
   onClose: () => void;
 }
 
-export function IntelligenceReport({
-  snapshot,
-  onClose,
-}: IntelligenceReportProps) {
-  const [generatedAt] = useState(
-  () => new Date()
-);
-const [
-  registeredArtifact,
-  setRegisteredArtifact,
-] = useState<IntelligenceArtifact | null>(
-  null,
-);
-  const generatedAtText =
-    generatedAt.toLocaleString("en-IN", {
-      day: "2-digit",
-      month: "long",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-      hour12: true,
-      timeZone: "Asia/Kolkata",
-    });
+export function IntelligenceReport({ snapshot, onClose }: IntelligenceReportProps) {
+  const [generatedAt] = useState(() => new Date());
+  const [registeredArtifact, setRegisteredArtifact] = useState<IntelligenceArtifact | null>(null);
+  const generatedAtText = generatedAt.toLocaleString("en-IN", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: true,
+    timeZone: "Asia/Kolkata",
+  });
 
-  const [artifactCreated, setArtifactCreated] =
-    useState(false);
+  const [artifactCreated, setArtifactCreated] = useState(false);
+  const [creatingArtifact, setCreatingArtifact] = useState(false);
+  const [artifactError, setArtifactError] = useState<string | null>(null);
+  const authenticatedFetch = useAuthenticatedFetch();
 
-  const handleCreateReportArtifact = () => {
-  const artifact =
-    createAndSaveReportArtifact(snapshot,);
-    setRegisteredArtifact(
-    artifact,
-  );
+  const handleCreateReportArtifact = async () => {
+    if (creatingArtifact) {
+      return;
+    }
 
-  setArtifactCreated(true);
+    setCreatingArtifact(true);
+    setArtifactError(null);
 
-  window.setTimeout(() => {
-    setArtifactCreated(false);
-  }, 2500);
-};
+    try {
+      const artifact = createIntelligenceArtifact(snapshot, {
+        artifactType: "Report",
+        format: "PDF",
+        source: "Intelligence Snapshot",
+        author: "Harikrushnareddy Vangala",
+        version: "1.0.0",
+      });
+
+      const response = await authenticatedFetch("/api/intelligence/artifacts", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ artifact }),
+      });
+
+      if (!response.ok) {
+        const body = (await response.json().catch(() => null)) as { error?: string } | null;
+        throw new Error(body?.error ?? "Failed to register the report artifact.");
+      }
+
+      const persistedArtifact = (await response.json()) as IntelligenceArtifact;
+
+      if (!persistedArtifact?.artifactId) {
+        throw new Error("The artifact registration response was invalid.");
+      }
+
+      setRegisteredArtifact(persistedArtifact);
+      setArtifactCreated(true);
+
+      window.setTimeout(() => {
+        setArtifactCreated(false);
+      }, 2500);
+    } catch (error) {
+      setArtifactError(
+        error instanceof Error ? error.message : "Failed to register the report artifact.",
+      );
+    } finally {
+      setCreatingArtifact(false);
+    }
+  };
 
   const handlePrint = async () => {
-    const report =
-      document.getElementById(
-        "titan-intelligence-report",
-      );
+    const report = document.getElementById("titan-intelligence-report");
 
     if (!report) {
       window.print();
       return;
     }
 
-    const images =
-      Array.from(
-        report.querySelectorAll("img"),
-      );
+    const images = Array.from(report.querySelectorAll("img"));
 
     await Promise.all(
       images.map((image) => {
-        if (
-          image.complete &&
-          image.naturalWidth > 0
-        ) {
+        if (image.complete && image.naturalWidth > 0) {
           return Promise.resolve();
         }
 
         return new Promise<void>((resolve) => {
-          const timeout =
-            window.setTimeout(
-              resolve,
-              2000,
-            );
+          const timeout = window.setTimeout(resolve, 2000);
 
           image.addEventListener(
             "load",
@@ -109,12 +120,8 @@ const [
       }),
     );
 
-    window.setTimeout(
-      () => window.print(),
-      100,
-    );
+    window.setTimeout(() => window.print(), 100);
   };
-
 
   return (
     <section
@@ -136,10 +143,7 @@ const [
         </p>
 
         <p className="mt-2 text-sm text-zinc-500 print:text-zinc-600">
-          Snapshot created{" "}
-          {new Date(
-            snapshot.createdAt,
-          ).toLocaleString()}
+          Snapshot created {new Date(snapshot.createdAt).toLocaleString()}
         </p>
       </header>
 
@@ -150,11 +154,8 @@ const [
         </p>
 
         <p className="mt-3 max-w-4xl text-sm leading-7 text-zinc-400 print:text-zinc-700">
-          This report summarizes the repository
-          intelligence captured at the time this
-          snapshot was created. The report is generated
-          directly from the preserved intelligence
-          snapshot.
+          This report summarizes the repository intelligence captured at the time this snapshot was
+          created. The report is generated directly from the preserved intelligence snapshot.
         </p>
       </section>
 
@@ -163,135 +164,79 @@ const [
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4 print:grid-cols-2">
           <ReportMetric
             label="Enterprise Readiness"
-            value={
-              snapshot.analytics
-                .enterpriseReadiness
-            }
+            value={snapshot.analytics.enterpriseReadiness}
           />
 
-          <ReportMetric
-            label="Security Score"
-            value={
-              snapshot.analytics
-                .securityScore
-            }
-          />
+          <ReportMetric label="Security Score" value={snapshot.analytics.securityScore} />
 
-          <ReportMetric
-            label="Dependency Risk"
-            value={
-              snapshot.analytics
-                .dependencyRisk
-            }
-          />
+          <ReportMetric label="Dependency Risk" value={snapshot.analytics.dependencyRisk} />
 
-          <ReportMetric
-            label="Production Score"
-            value={
-              snapshot.analytics
-                .productionScore
-            }
-          />
+          <ReportMetric label="Production Score" value={snapshot.analytics.productionScore} />
         </div>
       </section>
 
       {/* Metadata */}
       <section className="mt-8 grid gap-4 md:grid-cols-2 print:grid-cols-2">
-        <ReportMetadata
-          label="Snapshot ID"
-          value={snapshot.id}
-        />
+        <ReportMetadata label="Snapshot ID" value={snapshot.id} />
 
-        <ReportMetadata
-          label="Repository"
-          value={snapshot.repository}
-        />
+        <ReportMetadata label="Repository" value={snapshot.repository} />
 
         <ReportMetadata
           label="Snapshot Created"
-          value={new Date(
-            snapshot.createdAt,
-          ).toLocaleString("en-IN", {
+          value={new Date(snapshot.createdAt).toLocaleString("en-IN", {
             dateStyle: "medium",
             timeStyle: "medium",
             timeZone: "Asia/Kolkata",
           })}
         />
 
-        <ReportMetadata
-          label="Report Generated"
-          value={`${generatedAtText} IST`}
-        />
+        <ReportMetadata label="Report Generated" value={`${generatedAtText} IST`} />
 
-        <ReportMetadata
-          label="Report Source"
-          value="Intelligence Snapshot"
-        />
+        <ReportMetadata label="Report Source" value="Intelligence Snapshot" />
       </section>
       {artifactCreated ? (
-  <p
-    role="status"
-    className="mt-4 text-sm font-medium text-cyan-300 print:hidden"
-  >
-    Report artifact registered successfully.
-  </p>
-) : null}
-<section className="mt-8 rounded-2xl border border-white/10 bg-white/[0.02] p-5 print:border-zinc-300 print:bg-white">
-  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-cyan-400 print:text-black">
-    Artifact Provenance
-  </p>
+        <p role="status" className="mt-4 text-sm font-medium text-cyan-300 print:hidden">
+          Report artifact registered successfully.
+        </p>
+      ) : null}
 
-  <div className="mt-4 grid gap-4 sm:grid-cols-2">
-    {registeredArtifact ? (
-      <ReportMetadata
-        label="Artifact ID"
-        value={registeredArtifact.artifactId}
-      />
-    ) : null}
+      {artifactError ? (
+        <p role="alert" className="mt-4 text-sm font-medium text-red-300 print:hidden">
+          {artifactError}
+        </p>
+      ) : null}
+      <section className="mt-8 rounded-2xl border border-white/10 bg-white/[0.02] p-5 print:border-zinc-300 print:bg-white">
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-cyan-400 print:text-black">
+          Artifact Provenance
+        </p>
 
-    <ReportMetadata
-      label="Source Snapshot"
-      value={snapshot.id}
-    />
+        <div className="mt-4 grid gap-4 sm:grid-cols-2">
+          {registeredArtifact ? (
+            <ReportMetadata label="Artifact ID" value={registeredArtifact.artifactId} />
+          ) : null}
 
-    <ReportMetadata
-      label="Artifact Type"
-      value={registeredArtifact?.artifactType ?? "Report" }
-    />
+          <ReportMetadata label="Source Snapshot" value={snapshot.id} />
 
-    <ReportMetadata
-      label="Artifact Version"
-      value={
-        registeredArtifact?.version ??
-        "1.0.0"
-      }
-    />
+          <ReportMetadata
+            label="Artifact Type"
+            value={registeredArtifact?.artifactType ?? "Report"}
+          />
 
-    <ReportMetadata
-      label="Artifact Format"
-      value={
-        registeredArtifact?.format ??
-        "PDF"
-      }
-    />
+          <ReportMetadata label="Artifact Version" value={registeredArtifact?.version ?? "1.0.0"} />
 
-    <ReportMetadata
-      label="Author"
-      value={
-        registeredArtifact?.author ??
-        "Harikrushnareddy Vangala"
-      }
-    />
+          <ReportMetadata label="Artifact Format" value={registeredArtifact?.format ?? "PDF"} />
 
-    <ReportMetadata
-      label="Source"
-      value={
-        registeredArtifact?.source ??
-        "Intelligence Snapshot"
-      }
-    />
-  </div>
-</section>
+          <ReportMetadata
+            label="Author"
+            value={registeredArtifact?.author ?? "Harikrushnareddy Vangala"}
+          />
+
+          <ReportMetadata
+            label="Source"
+            value={registeredArtifact?.source ?? "Intelligence Snapshot"}
+          />
+        </div>
+      </section>
 
       {/* =====================================================
     Author Signature - Print Only
@@ -307,34 +252,29 @@ const [
             className="titan-report-image h-20 w-auto max-w-[320px] object-contain object-left"
           />
 
-          <p className="mt-2 text-sm font-semibold text-black">
-            Harikrushnareddy Vangala
-          </p>
+          <p className="mt-2 text-sm font-semibold text-black">Harikrushnareddy Vangala</p>
 
           <p className="mt-1 text-xs text-zinc-600">
             Researcher · Data Scientist · AI Systems Research
           </p>
 
-          <p className="mt-1 text-xs text-zinc-500">
-            TITAN Intelligence System
-          </p>
+          <p className="mt-1 text-xs text-zinc-500">TITAN Intelligence System</p>
         </div>
       </section>
 
       {/* Actions */}
       <footer className="mt-8 flex flex-col gap-3 border-t border-white/10 pt-6 sm:flex-row sm:items-center sm:justify-between print:hidden">
-        <p className="text-xs text-zinc-600">
-          Generated by TITAN Repository Intelligence.
-        </p>
+        <p className="text-xs text-zinc-600">Generated by TITAN Repository Intelligence.</p>
 
         <div className="flex gap-2">
           <button
             type="button"
-            onClick={handleCreateReportArtifact}
-            className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-2.5 text-sm font-semibold text-zinc-300 transition hover:border-cyan-400/30 hover:bg-cyan-400/[0.06] hover:text-cyan-300"
+            onClick={() => void handleCreateReportArtifact()}
+            disabled={creatingArtifact}
+            className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-2.5 text-sm font-semibold text-zinc-300 transition hover:border-cyan-400/30 hover:bg-cyan-400/[0.06] hover:text-cyan-300 disabled:cursor-not-allowed disabled:opacity-50"
           >
             <FileText className="h-4 w-4" />
-            Register Artifact
+            {creatingArtifact ? "Registering..." : "Register Artifact"}
           </button>
           <button
             type="button"
@@ -363,10 +303,7 @@ interface ReportMetricProps {
   value: unknown;
 }
 
-function ReportMetric({
-  label,
-  value,
-}: ReportMetricProps) {
+function ReportMetric({ label, value }: ReportMetricProps) {
   return (
     <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-5 print:border-black/10 print:bg-white">
       <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500 print:text-zinc-600">
@@ -374,9 +311,7 @@ function ReportMetric({
       </p>
 
       <p className="mt-2 text-3xl font-black text-white print:text-black">
-        {value == null
-          ? "—"
-          : String(value)}
+        {value == null ? "—" : String(value)}
       </p>
     </div>
   );
@@ -387,10 +322,7 @@ interface ReportMetadataProps {
   value: string;
 }
 
-function ReportMetadata({
-  label,
-  value,
-}: ReportMetadataProps) {
+function ReportMetadata({ label, value }: ReportMetadataProps) {
   return (
     <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-4 print:border-black/10 print:bg-white">
       <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500 print:text-zinc-600">

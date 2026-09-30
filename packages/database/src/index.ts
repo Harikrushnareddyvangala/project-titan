@@ -14,6 +14,8 @@ export * from "./research/conclusions.js";
 export * from "./research/provenance.js";
 export * from "./research/reconciliationObligations.js";
 
+export * from "./intelligence/snapshots.js";
+export * from "./intelligence/artifacts.js";
 export {
   createExecutionRecord,
   getExecutionRecord,
