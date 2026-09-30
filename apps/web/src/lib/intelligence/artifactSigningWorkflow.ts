@@ -1,29 +1,19 @@
 "use client";
 
-import type {
-  IntelligenceArtifact,
-} from "@/types/intelligence";
+import type { IntelligenceArtifact } from "@/types/intelligence";
 
-import {
-  createArtifactSignature,
-} from "./artifactSigning";
+import { createArtifactSignature } from "./artifactSigning";
 
-import {
-  getIntelligencePrivateKey,
-} from "./keyManager";
+import { getIntelligencePrivateKey } from "./keyManager";
 
-import {
-  getIntelligenceArtifact,
-  saveIntelligenceArtifact,
-} from "./artifactRegistry";
+import { getIntelligenceArtifact, saveIntelligenceArtifact } from "./artifactRegistry";
 
 /* -------------------------------------------------------------------------- */
 /*                         Signing Result                                     */
 /* -------------------------------------------------------------------------- */
 
 export interface ArtifactSigningResult {
-  artifact:
-    IntelligenceArtifact;
+  artifact: IntelligenceArtifact;
 
   keyId: string;
 }
@@ -36,30 +26,20 @@ export async function signRegisteredArtifact(
   artifactId: string,
   keyId: string,
 ): Promise<ArtifactSigningResult> {
-  const artifact =
-    getIntelligenceArtifact(
-      artifactId,
-    );
+  const artifact = getIntelligenceArtifact(artifactId);
 
   if (!artifact) {
-    throw new Error(
-      "Artifact could not be found.",
-    );
+    throw new Error("Artifact could not be found.");
   }
 
   /* ------------------------------------------------------------------------ */
   /*                         Resolve Private Key                              */
   /* ------------------------------------------------------------------------ */
 
-  const privateKey =
-    getIntelligencePrivateKey(
-      keyId,
-    );
+  const privateKey = getIntelligencePrivateKey(keyId);
 
   if (!privateKey) {
-    throw new Error(
-      "The selected signing key is not available in this browser session.",
-    );
+    throw new Error("The selected signing key is not available in this browser session.");
   }
 
   /* ------------------------------------------------------------------------ */
@@ -76,19 +56,13 @@ export async function signRegisteredArtifact(
   /*                         Create Signature                                 */
   /* ------------------------------------------------------------------------ */
 
-  const signature =
-    await createArtifactSignature(
-      artifact,
-      privateKey,
-      keyId,
-    );
+  const signature = await createArtifactSignature(artifact, privateKey, keyId);
 
   /* ------------------------------------------------------------------------ */
   /*                         Create Signed Artifact                           */
   /* ------------------------------------------------------------------------ */
 
-  const signedArtifact:
-    IntelligenceArtifact = {
+  const signedArtifact: IntelligenceArtifact = {
     ...artifact,
 
     signature,
@@ -98,17 +72,14 @@ export async function signRegisteredArtifact(
   /*                         Persist                                          */
   /* ------------------------------------------------------------------------ */
 
-  saveIntelligenceArtifact(
-    signedArtifact,
-  );
+  saveIntelligenceArtifact(signedArtifact);
 
   /* ------------------------------------------------------------------------ */
   /*                         Result                                           */
   /* ------------------------------------------------------------------------ */
 
   return {
-    artifact:
-      signedArtifact,
+    artifact: signedArtifact,
 
     keyId,
   };

@@ -1,115 +1,120 @@
 "use client";
 
-import {
-  useState,
-  useSyncExternalStore,
-} from "react";
+import { useState } from "react";
 
 import type { IntelligenceSnapshot } from "@/types/intelligence";
 
-import {
-  clearIntelligenceSnapshots,
-  deleteIntelligenceSnapshot,
-  getIntelligenceSnapshots,
-  subscribeToIntelligenceSnapshots,
-} from "@/lib/intelligence/snapshot";
+import { useIntelligenceSnapshots } from "@/hooks/useIntelligenceSnapshots";
 
 import { IntelligenceSnapshotCard } from "./IntelligenceSnapshotCard";
 import { IntelligenceSnapshotViewer } from "./IntelligenceSnapshotViewer";
 
-
-
-const EMPTY_SNAPSHOTS: IntelligenceSnapshot[] = [];
-
-let snapshotsSnapshot:
-  | IntelligenceSnapshot[]
-  | null = null;
-
-function getSnapshotsSnapshot(): IntelligenceSnapshot[] {
-  if (snapshotsSnapshot === null) {
-    snapshotsSnapshot =
-      getIntelligenceSnapshots();
-  }
-
-  return snapshotsSnapshot;
-}
-
-function subscribe(
-  callback: () => void,
-): () => void {
-  return subscribeToIntelligenceSnapshots(
-    () => {
-      snapshotsSnapshot =
-        getIntelligenceSnapshots();
-
-      callback();
-    },
-  );
-}
-
 export function IntelligenceSnapshotHistory() {
-  const snapshots =
-    useSyncExternalStore(
-      subscribe,
-      getSnapshotsSnapshot,
-      () => EMPTY_SNAPSHOTS,
-    );
+  const {
+    snapshots,
+    loading,
+    error,
+    refresh,
+    deleteSnapshot,
+  } = useIntelligenceSnapshots();
 
-  const [
-    selectedSnapshot,
-    setSelectedSnapshot,
-  ] =
-    useState<IntelligenceSnapshot | null>(
-      null,
-    );
+  const [selectedSnapshot, setSelectedSnapshot] = useState<IntelligenceSnapshot | null>(null);
+  const [isClearing, setIsClearing] = useState(false);
+  const [mutationError, setMutationError] = useState<string | null>(null);
 
-  const [
-    isClearing,
-    setIsClearing,
-  ] = useState(false);
-
-  const handleDelete = (
-    snapshot: IntelligenceSnapshot,
-  ) => {
-    const confirmed =
-      window.confirm(
-        "Delete this intelligence snapshot?",
-      );
+  const handleDelete = async (snapshot: IntelligenceSnapshot) => {
+    const confirmed = window.confirm("Delete this intelligence snapshot?");
 
     if (!confirmed) {
       return;
     }
 
-    if (
-      selectedSnapshot?.id ===
-      snapshot.id
-    ) {
+    setMutationError(null);
+
+    if (selectedSnapshot?.id === snapshot.id) {
       setSelectedSnapshot(null);
     }
 
-    deleteIntelligenceSnapshot(
-      snapshot.id,
-    );
+    try {
+      await deleteSnapshot(snapshot.id);
+    } catch (err) {
+      setMutationError(
+        err instanceof Error
+          ? err.message
+          : "Intelligence snapshot deletion failed.",
+      );
+    }
   };
 
-  const handleClearAll = () => {
-    const confirmed =
-      window.confirm(
-        "Delete all intelligence snapshots? This cannot be undone.",
-      );
+  const handleClearAll = async () => {
+    const confirmed = window.confirm(
+      "Delete all intelligence snapshots? This cannot be undone.",
+    );
 
     if (!confirmed) {
       return;
     }
 
     setIsClearing(true);
-
+    setMutationError(null);
     setSelectedSnapshot(null);
 
-    clearIntelligenceSnapshots();
-
-    setIsClearing(false);
+    try {
+      for (const snapshot of snapshots) {
+        await deleteSnapshot(snapshot.id);
+      }
+    } catch (err) {
+      setMutationError(
+        err instanceof Error
+          ? err.message
+          : "Intelligence snapshot deletion failed.",
+      );
+    } finally {
+      setIsClearing(false);
+    }
   };
+
+  if (loading) {
+    return (
+      <section className="rounded-2xl border border-white/10 bg-white/[0.02] p-6">
+        <p className="text-sm font-semibold uppercase tracking-[0.2em] text-cyan-400">
+          Snapshot History
+        </p>
+
+        <h3 className="mt-2 text-xl font-black text-white">Loading snapshots</h3>
+
+        <p className="mt-2 text-sm leading-6 text-zinc-500">
+          Retrieving durable intelligence snapshots.
+        </p>
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section className="rounded-2xl border border-red-400/10 bg-red-400/[0.03] p-6">
+        <p className="text-sm font-semibold uppercase tracking-[0.2em] text-red-400">
+          Snapshot History
+        </p>
+
+        <h3 className="mt-2 text-xl font-black text-white">
+          Unable to load snapshots
+        </h3>
+
+        <p role="alert" className="mt-2 text-sm leading-6 text-red-300">
+          {error}
+        </p>
+
+        <button
+          type="button"
+          onClick={refresh}
+          className="mt-4 rounded-xl border border-white/10 bg-white/[0.04] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-white/[0.08]"
+        >
+          Retry
+        </button>
+      </section>
+    );
+  }
 
   if (snapshots.length === 0) {
     return (
@@ -118,14 +123,10 @@ export function IntelligenceSnapshotHistory() {
           Snapshot History
         </p>
 
-        <h3 className="mt-2 text-xl font-black text-white">
-          No snapshots yet
-        </h3>
+        <h3 className="mt-2 text-xl font-black text-white">No snapshots yet</h3>
 
         <p className="mt-2 max-w-2xl text-sm leading-6 text-zinc-500">
-          Create an intelligence snapshot to
-          preserve the current repository
-          intelligence state.
+          Create an intelligence snapshot to preserve the current repository intelligence state.
         </p>
       </section>
     );
@@ -144,11 +145,7 @@ export function IntelligenceSnapshotHistory() {
           </h3>
 
           <p className="mt-1 text-sm text-zinc-500">
-            {snapshots.length}{" "}
-            {snapshots.length === 1
-              ? "snapshot"
-              : "snapshots"}{" "}
-            stored locally.
+            {snapshots.length} {snapshots.length === 1 ? "snapshot" : "snapshots"} stored durably.
           </p>
         </div>
 
@@ -165,31 +162,28 @@ export function IntelligenceSnapshotHistory() {
       {selectedSnapshot ? (
         <IntelligenceSnapshotViewer
           snapshot={selectedSnapshot}
-          onClose={() =>
-            setSelectedSnapshot(null)
-          }
+          onClose={() => setSelectedSnapshot(null)}
         />
       ) : null}
 
+      {mutationError ? (
+        <p
+          role="alert"
+          className="rounded-xl border border-red-400/10 bg-red-400/[0.03] px-4 py-3 text-sm text-red-300"
+        >
+          {mutationError}
+        </p>
+      ) : null}
+
       <div className="grid gap-3">
-        {snapshots.map(
-          (snapshot) => (
-            <IntelligenceSnapshotCard
-              key={snapshot.id}
-              snapshot={snapshot}
-              onView={() =>
-                setSelectedSnapshot(
-                  snapshot,
-                )
-              }
-              onDelete={() =>
-                handleDelete(
-                  snapshot,
-                )
-              }
-            />
-          ),
-        )}
+        {snapshots.map((snapshot) => (
+          <IntelligenceSnapshotCard
+            key={snapshot.id}
+            snapshot={snapshot}
+            onView={() => setSelectedSnapshot(snapshot)}
+            onDelete={() => handleDelete(snapshot)}
+          />
+        ))}
       </div>
     </section>
   );
