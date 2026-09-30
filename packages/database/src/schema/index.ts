@@ -71,3 +71,5 @@ export {
 } from "./executionResourceInteractions.js";
 
 export { researchReconciliationObligations } from "./reconciliationObligations.js";
+
+export { intelligenceSnapshots } from "./intelligenceSnapshots.js";
