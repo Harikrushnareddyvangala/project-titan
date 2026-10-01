@@ -2,7 +2,7 @@
 
 # 🚀 Project TITAN
 
-![Vision](posters/TITAN Vision.png)
+![Alt Text](posters/TITAN Vision.png)
 
 An enterprise-grade AI & Data Science platform built with modern technologies.
 
