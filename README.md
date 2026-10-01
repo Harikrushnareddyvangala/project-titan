@@ -2,7 +2,7 @@
 
 # 🚀 Project TITAN
 
-![Alt Text](posters/TITAN_Vision.png)
+<img width="1536" height="1024" alt="TITAN Vision" src="https://github.com/user-attachments/assets/88481c97-4364-4e0c-8cff-a2f7f79705cf" />
 
 An enterprise-grade AI & Data Science platform built with modern technologies.
 
